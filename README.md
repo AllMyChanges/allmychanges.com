@@ -6,11 +6,11 @@ A project for Django Dash 2013
 How to setup
 ------------
 
-    $ sudo apt-get install mysql-server redis-server python-dev libxml2-dev libxslt1-dev logtail
+    $ sudo apt-get install mysql-server redis-server python-dev libxml2-dev libxslt1-dev logtail python-virtualenv python-pip python-mysqldb
     $ chmod +x scripts/create-env.sh
     $ scripts/create-env.sh
     $ source env/bin/activate
-    $ echo 'SECRET_KEY = "some really secret string"' > secure_settings.py
+    $ echo "SECRET_KEY = '$(python -c 'import os, sha; print sha.sha(os.urandom(100)).hexdigest()')'" > secure_settings.py
     $ chmod +x manage.py
     $ sudo mkdir -p /var/log/allmychanges
     $ sudo chmod 777 /var/log/allmychanges
