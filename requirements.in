@@ -14,9 +14,10 @@ docutils
 markdown
 lxml
 gunicorn
+django-social-auth
 
 -e git+git://github.com/svetlyak40wt/pip-tools.git@my-future
 -e git+git://github.com/svetlyak40wt/nose-notify-tmux.git
 -e git+git://github.com/svetlyak40wt/tdaemon.git@develop
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
-
+-e git+git://github.com/svetlyak40wt/pip-1.git@ask-before-hard-reset#egg=pip

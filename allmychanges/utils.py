@@ -187,3 +187,7 @@ def count_time(metric_key):
         value = time.time() - start
         logging.getLogger('stats').info('METRIC_TIME metric={metric} value={value}s'.format(
                 metric=metric_key, value=value))
+
+
+def show_debug_toolbar(request):
+    return True

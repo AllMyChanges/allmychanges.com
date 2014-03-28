@@ -1,25 +1,31 @@
 -e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster
--e git+git://github.com/svetlyak40wt/nose-notify-tmux.git@1c5fbe474a9b5b279460c5d1ee7928faca6e0160#egg=nose-notify-tmux
--e git+git://github.com/svetlyak40wt/pip-tools.git@49e94cd8531db0cfed681ce2524e6e50d07dd1d9#egg=pip-tools
--e git+git://github.com/svetlyak40wt/tdaemon.git@0c6eaaa39aec5dd8c51366476acba3d8aff0d78d#egg=tdaemon
-South==0.8.2
-django-debug-toolbar==0.9.4
-django-extensions==1.2.2
-django-rq==0.5.1
-django==1.5.4
-djangorestframework==2.3.8
+-e git+git://github.com/svetlyak40wt/nose-notify-tmux.git@e715df3ea6e1c41da8e964a04be759a7a364d284#egg=nose-notify-tmux
+-e git+git://github.com/svetlyak40wt/pip-1.git@8a329ce874cfb00f5d1dfa7f4b33d0b714546982#egg=pip
+-e git+git://github.com/svetlyak40wt/pip-tools.git@fd699dd591ee69559cbe7a333b94a7b2354759a3#egg=pip-tools
+-e git+git://github.com/svetlyak40wt/tdaemon.git@8f8b9dc603a90b9c135f94dba352dac5750a1bd5#egg=tdaemon
+South==0.8.4
+django-debug-toolbar==1.0.1
+django-extensions==1.3.3
+django-rq==0.6.1
+django-social-auth==0.7.28
+django==1.5.5
+djangorestframework==2.3.13
 docutils==0.11
-drf-extensions==0.2
+drf-extensions==0.2.2
 envoy==0.0.2
-graphitesend==0.1.1
+graphitesend==0.3.0
 gunicorn==18.0
-lxml==3.2.3
-markdown==2.3.1
+httplib2==0.8
+lxml==3.3.3
+markdown==2.4
 nose==1.2.1
-python-dateutil==2.1
-pytz==2013d
-redis==2.8.0
-requests==2.0.0
-rq==0.3.11
-six==1.4.1
+oauth2==1.5.211
+python-dateutil==2.2
+python-openid==2.2.5
+pytz==2014.2
+redis==2.9.1
+requests==2.2.1
+rq==0.3.13
+six==1.6.1
+sqlparse==0.1.11
 times==0.6.2
