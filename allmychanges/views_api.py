@@ -21,11 +21,15 @@ class HandleExceptionMixin(object):
     def handle_exception(self, exc):
         count('api.exception')
         if isinstance(exc, ParseError):
-            return Response(data={u'error_messages': exc.detail}, status=400, exception=exc)
+            return Response(data={u'error_messages': exc.detail},
+                            status=400,
+                            exception=exc)
         return super(HandleExceptionMixin, self).handle_exception(exc=exc)
 
 
-class RepoViewSet(HandleExceptionMixin, DetailSerializerMixin, viewsets.ReadOnlyModelViewSet):
+class RepoViewSet(HandleExceptionMixin,
+                  DetailSerializerMixin,
+                  viewsets.ReadOnlyModelViewSet):
     queryset = Repo.objects.all()
     serializer_class = RepoSerializer
     serializer_detail_class = RepoDetailSerializer
@@ -37,17 +41,22 @@ class RepoViewSet(HandleExceptionMixin, DetailSerializerMixin, viewsets.ReadOnly
         serializer = CreateChangelogSerializer(data=request.DATA)
         if serializer.is_valid():
             count('api.create.changelog')
-            repo = Repo.start_changelog_processing_for_url(url=serializer.data['url'])
+            repo = Repo.start_changelog_processing_for_url(
+                url=serializer.data['url'])
+
             return Response(data={'id': repo.id})
         else:
             raise ParseError(detail=serializer.errors)
 
 
-class SubscriptionViewSet(HandleExceptionMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
+class SubscriptionViewSet(HandleExceptionMixin,
+                          mixins.CreateModelMixin,
+                          viewsets.GenericViewSet):
     model = Subscription
     serializer_class = SubscriptionSerializer
 
     def create(self, request, *args, **kwargs):
         request.DATA['date_created'] = now()
         count('api.create.subscription')
-        return super(SubscriptionViewSet, self).create(request, *args, **kwargs)
+        return super(SubscriptionViewSet, self) \
+            .create(request, *args, **kwargs)

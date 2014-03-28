@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from allmychanges.models import Repo, RepoVersion, RepoVersionItem, RepoVersionItemChange, Subscription
+from allmychanges.models import (
+    Repo, RepoVersion,
+    RepoVersionItem,
+    RepoVersionItemChange,
+    Subscription)
 
 
 class RepoVersionInlines(admin.TabularInline):

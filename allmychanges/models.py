@@ -35,13 +35,20 @@ class Repo(models.Model):
 
     url = models.URLField(unique=True)
     title = models.CharField(max_length=255)
-    changelog_markup = models.CharField(max_length=20, choices=MARKUP_CHOICES, blank=True, null=True)
+    changelog_markup = models.CharField(max_length=20,
+                                        choices=MARKUP_CHOICES,
+                                        blank=True,
+                                        null=True)
     date_created = models.DateTimeField(blank=True, null=True)
     requested_count = models.PositiveIntegerField(default=0)
 
     # processing fields
-    processing_state = models.CharField(max_length=20, choices=PROCESSING_STATE_CHOICES, null=True)
-    processing_status_message = models.CharField(max_length=255, blank=True, null=True)
+    processing_state = models.CharField(max_length=20,
+                                        choices=PROCESSING_STATE_CHOICES,
+                                        null=True)
+    processing_status_message = models.CharField(max_length=255,
+                                                 blank=True,
+                                                 null=True)
     processing_progress = models.PositiveIntegerField(default=0)
     processing_date_started = models.DateTimeField(blank=True, null=True)
     processing_date_finished = models.DateTimeField(blank=True, null=True)
@@ -74,15 +81,18 @@ class Repo(models.Model):
             return True
         elif self.is_processing_started_more_than_minutes_ago(30):
             return True
-        elif self.is_processing_started_more_than_minutes_ago(5) and self.processing_state == 'finished':
+        elif (self.is_processing_started_more_than_minutes_ago(5)
+              and self.processing_state == 'finished'):
             return True
-        elif self.is_processing_started_more_than_minutes_ago(1) and self.processing_state == 'error':
+        elif (self.is_processing_started_more_than_minutes_ago(1)
+              and self.processing_state == 'error'):
             return True
         else:
             return False
 
     def is_processing_started_more_than_minutes_ago(self, minutes):
-        return now() > self.processing_date_started + datetime.timedelta(minutes=minutes)
+        return now() > (self.processing_date_started +
+                        datetime.timedelta(minutes=minutes))
 
     def start_changelog_processing(self):
         self.processing_state = 'ready_for_job'
@@ -117,7 +127,8 @@ class Repo(models.Model):
                         self._update_from_git_log(path)
             else:
                 self.processing_state = 'error'
-                self.processing_status_message = 'Could not download repository'
+                self.processing_status_message = \
+                    'Could not download repository'
                 self.processing_date_finished = now()
                 self.save()
 
@@ -132,11 +143,12 @@ class Repo(models.Model):
     def _update_from_git_log(self, path):
         progress = self.processing_progress
         progress_on_this_step = 30
-        
+
         def progress_callback(git_progress):
-            self.processing_progress = progress + progress_on_this_step * git_progress
+            self.processing_progress = progress + (
+                progress_on_this_step * git_progress)
             self.save()
-        
+
         changes = aggregate_git_log(path, progress_callback)
         if changes:
             self._update_from_changes(changes)
@@ -151,7 +163,8 @@ class Repo(models.Model):
             self._update_from_changes(changes)
 
     def _update_from_changes(self, changes):
-        """Update changelog in database, taking data from python-structured changelog."""
+        """Update changelog in database, taking data
+        from python-structured changelog."""
         self.title = get_package_metadata('.', 'Name')
         if self.title is None:
             self.title = self.url.rsplit('/', 1)[-1]
@@ -163,18 +176,23 @@ class Repo(models.Model):
             self.save()
 
             for change in changes:
-                version = self.versions.create(name=change['version'] or 'unrecognized',
-                                               date=change.get('date'),)
+                version = self.versions \
+                              .create(name=change['version'] or 'unrecognized',
+                                      date=change.get('date'))
+
                 for section in change['sections']:
 
                     item = version.items.create(
-                        text=get_clean_text_from_markup_text(section['notes'], markup_type=self.changelog_markup)
-                    )
+                        text=get_clean_text_from_markup_text(
+                            section['notes'],
+                            markup_type=self.changelog_markup))
+
                     for section_item in section['items']:
                         item.changes.create(
                             type=get_commit_type(section_item),
-                            text=get_clean_text_from_markup_text(section_item, markup_type=self.changelog_markup)
-                        )
+                            text=get_clean_text_from_markup_text(
+                                section_item,
+                                markup_type=self.changelog_markup))
 
                         self.processing_state = 'finished'
                         self.processing_status_message = 'Done'
@@ -203,11 +221,13 @@ class RepoVersionItem(models.Model):
     text = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        return u'Version item of {version_unicode}'.format(version_unicode=self.version.__unicode__())
+        return u'Version item of {version_unicode}' \
+            .format(version_unicode=self.version.__unicode__())
 
     @property
     def text_clean(self):
-        return '<p>%s</p>' % linebreaksbr(urlize(self.text)).replace('<br />', '</p><p>')
+        return '<p>%s</p>' % linebreaksbr(urlize(self.text)) \
+            .replace('<br />', '</p><p>')
 
 
 class RepoVersionItemChange(models.Model):
@@ -217,7 +237,8 @@ class RepoVersionItemChange(models.Model):
     )
 
     version_item = models.ForeignKey(RepoVersionItem, related_name='changes')
-    type = models.CharField(max_length=10, choices=REPO_VERSION_ITEM_CHANGE_TYPE_CHOICES)
+    type = models.CharField(max_length=10,
+                            choices=REPO_VERSION_ITEM_CHANGE_TYPE_CHOICES)
     text = models.TextField()
 
 

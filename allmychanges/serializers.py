@@ -2,7 +2,11 @@
 from rest_framework import serializers
 from rest_framework_extensions.fields import ResourceUriField
 
-from allmychanges.models import Repo, RepoVersion, RepoVersionItem, RepoVersionItemChange, Subscription
+from allmychanges.models import (
+    Repo, RepoVersion,
+    RepoVersionItem,
+    RepoVersionItemChange,
+    Subscription)
 
 
 class RepoVersionItemChangeSerializer(serializers.ModelSerializer):

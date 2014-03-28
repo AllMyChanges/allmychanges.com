@@ -1,4 +1,4 @@
-from .default import *
+from .default import *  # nopep8
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

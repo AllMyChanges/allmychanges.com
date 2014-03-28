@@ -1,12 +1,10 @@
 import os
 import requests
-import re
-import envoy
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from crawler import search_changelog, _parse_changelog_text
-from allmychanges.utils import cd, load_data, transform_url, download_repo
+from allmychanges.utils import cd, load_data, download_repo
 
 
 def fetch_with_crawler_this(url):
@@ -14,7 +12,8 @@ def fetch_with_crawler_this(url):
         if False:
             result = requests.get(url)
             if result.status_code != 200:
-                raise RuntimeError('Bad status code: {0}'.format(result.status_code))
+                raise RuntimeError(
+                    'Bad status code: {0}'.format(result.status_code))
 
         path = download_repo(url, pull_if_exists=False)
 
@@ -38,13 +37,13 @@ def fetch_with_crawler_this(url):
                                 was_parsed = True
                     except Exception:
                         pass
-                    return fullfilename, was_parsed, num_versions, num_items, False
+                    return (fullfilename, was_parsed,
+                            num_versions, num_items, False)
     finally:
         pass
 
     return None, False, 0, 0, path is None
 
-        
 
 class Command(BaseCommand):
     help = u"""Tests crawler on selected projects."""
@@ -61,10 +60,13 @@ class Command(BaseCommand):
 
         for name, url in reps:
             try:
-                changelog_filename, was_parsed, num_versions, num_items, not_found = fetch_with_crawler_this(url)
+                changelog_filename, was_parsed, \
+                    num_versions, num_items, \
+                    not_found = fetch_with_crawler_this(url)
+
                 if not_found:
                     reps_not_found += 1
-                    
+
                 if changelog_filename:
                     changelogs_found += 1
                     if was_parsed:

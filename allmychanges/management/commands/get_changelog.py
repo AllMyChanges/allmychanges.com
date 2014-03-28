@@ -1,13 +1,12 @@
 import os
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
 
 from crawler import search_changelog, _parse_changelog_text
 from allmychanges.models import Repo
 from allmychanges.utils import cd, get_package_metadata, download_repo
 
-        
+
 class Command(BaseCommand):
     help = u"""Updates single project."""
 
@@ -20,7 +19,7 @@ class Command(BaseCommand):
             path = download_repo(url)
         else:
             path = url
-            
+
         with cd(path):
             changelog_filename = search_changelog()
             if changelog_filename:
@@ -35,10 +34,15 @@ class Command(BaseCommand):
                             url=url,
                             title=get_package_metadata('.', 'Name'))
                         repo.versions.all().delete()
-                        
+
                         for change in changes:
-                            version = repo.versions.create(name=change['version'])
+                            version = repo.versions.create(
+                                name=change['version'])
+
                             for section in change['sections']:
-                                item = version.items.create(text=section['notes'])
+                                item = version.items.create(
+                                    text=section['notes'])
+
                                 for section_item in section['items']:
-                                    item.changes.create(type='new', text=section_item)
+                                    item.changes.create(type='new',
+                                                        text=section_item)

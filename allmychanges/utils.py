@@ -49,7 +49,8 @@ def get_package_metadata(path, field_name):
         for line in response.std_out.split('\n'):
             if 'PKG-INFO' in line:
                 with open(line.split(None, 1)[1]) as f:
-                    match = re.search(r'{0}: (.*)'.format(field_name), f.read())
+                    match = re.search(r'{0}: (.*)'.format(field_name),
+                                      f.read())
                     if match is not None:
                         return match.group(1)
 
@@ -57,11 +58,13 @@ def get_package_metadata(path, field_name):
 def transform_url(url):
     """Normalizes url to 'git@github.com:{username}/{repo}' and also
     returns username and repository's name."""
-    username, repo = re.search(r'[/:](?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)', url).groups()
+    regex = r'[/:](?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
+    username, repo = re.search(regex, url).groups()
     if url.startswith('git@'):
         return url, username, repo
-    return 'git@github.com:{username}/{repo}'.format(**locals()), username, repo
-
+    return ('git@github.com:{username}/{repo}'.format(**locals()),
+            username,
+            repo)
 
 
 def download_repo(url, pull_if_exists=True):
@@ -77,23 +80,28 @@ def download_repo(url, pull_if_exists=True):
             with cd(path):
                 response = envoy.run('git checkout master')
                 if response.status_code != 0:
-                    raise RuntimeError('Bad status_code from git checkout master: {0}. Git\'s stderr: {1}'.format(
+                    raise RuntimeError(
+                        'Bad status_code from git checkout master: '
+                        '{0}. Git\'s stderr: {1}'.format(
                             response.status_code, response.std_err))
 
                 response = envoy.run('git pull')
                 if response.status_code != 0:
-                    raise RuntimeError('Bad status_code from git pull: {0}. Git\'s stderr: {1}'.format(
-                            response.status_code, response.std_err))
+                    raise RuntimeError('Bad status_code from git pull: '
+                                       '{0}. Git\'s stderr: {1}'.format(
+                                           response.status_code,
+                                           response.std_err))
     else:
-        response = envoy.run('git clone {url} {path}'.format(url=url, path=path))
+        response = envoy.run('git clone {url} {path}'.format(url=url,
+                                                             path=path))
 
         if response.status_code != 0:
             os.makedirs(path)
             with open(os.path.join(path, '.failed'), 'w') as f:
                 f.write('')
-            raise RuntimeError('Bad status_code from git clone: {0}. Git\'s stderr: {1}'.format(
-                response.status_code, response.std_err)
-            )
+            raise RuntimeError('Bad status_code from git clone: {0}. '
+                               'Git\'s stderr: {1}'.format(
+                                   response.status_code, response.std_err))
 
     return path
 
@@ -105,9 +113,9 @@ def get_markup_type(filename):
         markdown={'md', 'markdown', 'mdown'},
         rest={'rst', 'rest'},
     )
-    for markup, possible_extensions in mapping.items():
+    for markup_type, possible_extensions in mapping.items():
         if extension in possible_extensions:
-            return markup
+            return markup_type
 
 
 def get_commit_type(commit_message):
@@ -135,7 +143,8 @@ def get_commit_type(commit_message):
 def get_clean_text_from_html(raw_html):
     if not raw_html:
         return ''
-    return html.tostring(html.fromstring(force_text(raw_html)), method='text', encoding=unicode)
+    return html.tostring(html.fromstring(force_text(raw_html)),
+                         method='text', encoding=unicode)
 
 
 def get_clean_text_from_markup_text(text, markup_type):
@@ -172,10 +181,13 @@ def graphite_send(**kwargs):
     except Exception:
         logging.getLogger('django').exception('Graphite is down')
 
+
 def count(metric_key, value=1):
     """Log some metrics to process with logster and graphite."""
-    logging.getLogger('stats').info('METRIC_COUNT metric={metric} value={value}'.format(
+    logging.getLogger('stats').info(
+        'METRIC_COUNT metric={metric} value={value}'.format(
             metric=metric_key, value=value))
+
 
 @contextmanager
 def count_time(metric_key):
@@ -185,7 +197,8 @@ def count_time(metric_key):
         yield
     finally:
         value = time.time() - start
-        logging.getLogger('stats').info('METRIC_TIME metric={metric} value={value}s'.format(
+        logging.getLogger('stats').info(
+            'METRIC_TIME metric={metric} value={value}s'.format(
                 metric=metric_key, value=value))
 
 

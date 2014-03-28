@@ -12,7 +12,8 @@ def update_repo(repo_id):
             from .models import Repo
             repo = Repo.objects.get(pk=repo_id)
             repo._update()
-        
+
     except Exception:
-        logging.getLogger('tasks').exception('Unhandler error in update_repo worker')
+        logging.getLogger('tasks') \
+               .exception('Unhandler error in update_repo worker')
         raise

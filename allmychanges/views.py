@@ -15,3 +15,21 @@ class IndexView(TemplateView):
 class HumansView(TemplateView):
     template_name = 'allmychanges/humans.txt'
     content_type = 'text/plain'
+
+
+class DigestView(TemplateView):
+    template_name = 'allmychanges/digest.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(IndexView, self).get_context_data(**kwargs)
+        result['settings'] = settings
+        return result
+
+
+class EditDigestView(TemplateView):
+    template_name = 'allmychanges/edit_digest.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(IndexView, self).get_context_data(**kwargs)
+        result['settings'] = settings
+        return result

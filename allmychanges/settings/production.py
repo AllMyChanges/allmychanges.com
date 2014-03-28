@@ -1,4 +1,4 @@
-from .default import *
+from .default import *  # nopep8
 
 REST_FRAMEWORK.update({
     'DEFAULT_RENDERER_CLASSES': (
@@ -13,7 +13,7 @@ RQ_QUEUES = {
         'PORT': 6379,
         'DB': 1,
         'PASSWORD': '',
-   },
+    }
 }
 
 DATABASES['default'].update({

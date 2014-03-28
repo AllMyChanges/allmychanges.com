@@ -17,13 +17,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'allmychanges_' + _current_user.replace('-', '_'), # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'allmychanges_' + _current_user.replace('-', '_'),
         'USER': 'allmychanges',
         'PASSWORD': 'allmychanges',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -75,15 +74,15 @@ STATIC_ROOT = root('static')
 STATIC_URL = '/static/'
 
 # Additional locations of static files
-#STATICFILES_DIRS = (
-#)
+# STATICFILES_DIRS = (
+# )
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -143,7 +142,8 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(asctime)s; %(levelname)s; %(name)s; %(module)s; %(message)s'
+            'format': ('%(asctime)s; %(levelname)s; '
+                       '%(name)s; %(module)s; %(message)s')
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -164,19 +164,22 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.handlers.WatchedFileHandler',
             'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/django-{0}.log'.format(_current_user)
+            'filename': '/var/log/allmychanges/django-{0}.log'.format(
+                _current_user)
         },
         'workers_catchall': {
             'level': 'ERROR',
             'class': 'logging.handlers.WatchedFileHandler',
             'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/workers-{0}.log'.format(_current_user)
+            'filename': '/var/log/allmychanges/workers-{0}.log'.format(
+                _current_user)
         },
         'stats': {
             'level': 'INFO',
             'class': 'logging.handlers.WatchedFileHandler',
             'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/stats-{0}.log'.format(_current_user)
+            'filename': '/var/log/allmychanges/stats-{0}.log'.format(
+                _current_user)
         },
     },
     'loggers': {
@@ -213,9 +216,9 @@ RQ_QUEUES = {
         'PORT': 6379,
         'DB': 0,
         'PASSWORD': '',
-   },
+    }
 }
 
 GRAPHITE_PREFIX = 'allmychanges.' + _current_user
 
-from secure_settings import *
+from secure_settings import *  # nopep8
