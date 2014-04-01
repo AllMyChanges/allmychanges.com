@@ -5,6 +5,7 @@ import datetime
 
 from django.db import models
 from django.utils.timezone import now
+from django.conf import settings
 
 from crawler import search_changelog, _parse_changelog_text
 from crawler.git_crawler import aggregate_git_log
@@ -17,6 +18,7 @@ from allmychanges.utils import (
     get_clean_text_from_markup_text,
 )
 from allmychanges.tasks import update_repo
+from django.contrib.auth import get_user_model
 
 
 MARKUP_CHOICES = (
@@ -221,8 +223,7 @@ class RepoVersionItem(models.Model):
     text = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
-        return u'Version item of {version_unicode}' \
-            .format(version_unicode=self.version.__unicode__())
+        return self.text
 
     @property
     def text_clean(self):
@@ -248,3 +249,41 @@ class Subscription(models.Model):
 
     def __unicode__(self):
         return self.email
+
+
+class Package(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name='packages')
+    namespace = models.CharField(max_length=80)
+    name = models.CharField(max_length=80)
+    source = models.CharField(max_length=1000)
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField(blank=True, null=True)
+    next_update_at = models.DateTimeField()
+    repo = models.OneToOneField(Repo,
+                                related_name='package',
+                                blank=True, null=True)
+
+    def update(self):
+        if self.repo is None:
+            self.repo, created = Repo.objects.get_or_create(url=self.source)
+
+        repo = self.repo
+        repo._update()
+
+        versions = list(repo.versions.all()[:5])
+
+        if versions:
+            print 'Latest versions:'
+            for version in versions:
+                print version
+                for item in version.items.all():
+                    if item.text:
+                        print '   ', item.text
+
+                    for change in item.changes.all():
+                        if change.text:
+                            print '  *', change.text
+        else:
+            print 'ChangeLog wasn\'t found.'
+

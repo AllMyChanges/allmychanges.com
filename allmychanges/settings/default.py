@@ -128,6 +128,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+
+    'social_auth',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
@@ -204,6 +206,9 @@ LOGGING = {
 # rest framework
 REST_FRAMEWORK = {
     'PAGINATE_BY': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    )
 }
 
 
@@ -221,4 +226,5 @@ RQ_QUEUES = {
 
 GRAPHITE_PREFIX = 'allmychanges.' + _current_user
 
+from .auth import *  # nopep8
 from secure_settings import *  # nopep8

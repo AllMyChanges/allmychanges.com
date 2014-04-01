@@ -1,10 +1,44 @@
 {% extends "allmychanges/base.html" %}
 
 
+{% block anjular-js %}
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+{% block extra_head %}
+  <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
+  <link href="/static/allmychanges/css/digest.css" rel="stylesheet"/>
+{% endblock extra_head %}
+
 {% block content %}
-    {% verbatim %}
-    <div ng-controller="MainCtrl">
-      <h1>The Digest</h1>
-    </div>
-    {% endverbatim %}
+    {% if request.user.is_authenticated %}
+      {{ request.user }} <a href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
+    {% else %}
+      <a href="{% url "socialauth_begin" "twitter" %}">Login with Twitter</a>
+    {% endif %}
+
+{% verbatim %}
+<body ng-controller="DigestBuilderCtrl">
+  <p>{{scope.blah}}</p>
+  <ul class="digest-source">
+    <li ng-repeat="item in items">
+      <p>
+        <input type="text" ng-model="item.namespace"/>
+        <input type="text" ng-model="item.name"/>
+        <input type="text" ng-model="item.source"/>
+        <button ng-click="remove(item.resource_uri)">x</button> 
+      </p>
+    </li>
+  </ul>
+
+  <p>
+    <input ng-model="new_item.namespace" type="text" placeholder="Namespace (python, node, etc.)"/>
+    <input ng-model="new_item.name" type="text" placeholder="Package name"/>
+    <input ng-model="new_item.source" type="text" placeholder="Source repository"/>
+    <button ng-click="add_item()" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)">Add</button>
+  </p>
+</body>
+{% endverbatim %}
+
 {% endblock content %}

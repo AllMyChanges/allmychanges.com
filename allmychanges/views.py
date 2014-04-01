@@ -21,8 +21,9 @@ class DigestView(TemplateView):
     template_name = 'allmychanges/digest.html'
 
     def get_context_data(self, **kwargs):
-        result = super(IndexView, self).get_context_data(**kwargs)
+        result = super(DigestView, self).get_context_data(**kwargs)
         result['settings'] = settings
+        result['request'] = self.request
         return result
 
 
@@ -30,6 +31,6 @@ class EditDigestView(TemplateView):
     template_name = 'allmychanges/edit_digest.html'
 
     def get_context_data(self, **kwargs):
-        result = super(IndexView, self).get_context_data(**kwargs)
+        result = super(EditDigestView, self).get_context_data(**kwargs)
         result['settings'] = settings
         return result

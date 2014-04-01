@@ -14,10 +14,12 @@ urlpatterns = patterns(
     url(r'^digest/$', DigestView.as_view(), name='digest'),
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
-    url(r'^v1/', include('allmychanges.urls_api')),
+    url(r'^v1/', include('allmychanges.api.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^favicon.ico/$', lambda x: redirect('/static/favicon.ico')),
     url(r'^django-rq/', include('django_rq.urls')),
+    url(r'logout/', 'django.contrib.auth.views.logout', name='logout'),
+    url(r'', include('social_auth.urls')),
 )
 
 urlpatterns += staticfiles_urlpatterns()
