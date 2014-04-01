@@ -1,0 +1,53 @@
+var app = angular.module('allMyChangesApp', ['ngCookies']);
+
+app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies) {
+    $http.defaults.headers.common['X-CSRFToken'] = $cookies['csrftoken'];
+
+    function init_new_item () {
+        return {
+            'namespace': '',
+            'name': '',
+            'source': ''
+        }
+    }
+    $scope.new_item = init_new_item();
+    $scope.items = [];
+
+    $http.get('/v1/packages/').success(function(data) {
+        $scope.items = data.results;
+        $scope.$watch('items', function(new_collection, old_collection) {
+            if (new_collection.length == old_collection.length) {
+                for (i=0; i<new_collection.length; i++) {
+                    var new_obj = new_collection[i];
+                    var old_obj = old_collection[i];
+                    angular.forEach(new_obj, function(value, key) {
+                        if (key != '$$hashKey' && value != old_obj[key]) {
+                            console.log(key);
+                            console.log(old_obj[key] + ' -> ' + value);
+                            $http.put(new_obj['resource_uri'], new_obj);
+                            // TODO: optimize and save with slight delay
+                        }
+                    });
+                }
+            }
+        }, true);
+    });
+
+    $scope.add_item = function () {
+        $http.post('/v1/packages/', $scope.new_item).success(function(data) {
+            $scope.items.push(data);
+            $scope.new_item = init_new_item();
+        }).error(function(data) {
+            // TODO: may be handle error someday
+        });
+    };
+
+    $scope.remove = function (url) {
+        var item_index = this.$index;
+
+        $http.delete(url).success(function(data) {
+            $scope.items.splice(item_index, 1);
+        });
+    }
+});
+
