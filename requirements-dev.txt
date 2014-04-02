@@ -1,0 +1,16 @@
+-e git+git://github.com/nosedjango/nosedjango.git@05d280a98085d05182119ce6b5eac2dcf59553b6#egg=nosedjango
+-e git+git://github.com/svetlyak40wt/nose-notify-tmux.git@e715df3ea6e1c41da8e964a04be759a7a364d284#egg=nose-notify-tmux
+-e git+git://github.com/svetlyak40wt/pip-1.git@8a329ce874cfb00f5d1dfa7f4b33d0b714546982#egg=pip
+-e git+git://github.com/svetlyak40wt/pip-tools.git@fd699dd591ee69559cbe7a333b94a7b2354759a3#egg=pip-tools
+-e git+git://github.com/svetlyak40wt/tdaemon.git@8f8b9dc603a90b9c135f94dba352dac5750a1bd5#egg=tdaemon
+PyYAML==3.11
+argcomplete==0.7.1
+fancycompleter==0.4
+kaptan==0.5.7
+nose==1.2.1
+pdbpp==0.7.2
+pyflakes==0.8.1
+pygments==1.6
+pyrepl==0.8.4
+tmuxp==0.1.9
+wmctrl==0.1

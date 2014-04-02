@@ -35,3 +35,13 @@ In production you will need additional steps like:
    $ sudo -u www-data ssh-keygen
    $ cat /var/www/.ssh/id_rsa.pub
    $ echo "Now create a new GitHub account and put this ssh key there."
+
+
+How to run tmux for development
+-------------------------------
+
+   env/bin/tmuxp load .tmuxp.yaml
+
+or
+
+   a tmux

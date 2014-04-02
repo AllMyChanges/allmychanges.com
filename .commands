@@ -1,0 +1,3 @@
+function tmux () {
+    env/bin/tmuxp load .tmuxp.yaml
+}

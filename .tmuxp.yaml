@@ -1,0 +1,20 @@
+session_name: allmychanges
+shell_command_before:
+  - '[ -f env/bin/activate ] && source env/bin/activate'
+  - reset
+windows:
+  - window_name: editor
+    panes:
+      - emacs
+  - window_name: shell
+    panes:
+      -
+  - window_name: tests
+    panes:
+      - tdaemon 'nosetests allmychanges/'
+  - window_name: backend
+    panes:
+      - ./manage.py runserver 0.0.0.0:8000
+  - window_name: worker
+    panes:
+      - ./manage.py rqworker
