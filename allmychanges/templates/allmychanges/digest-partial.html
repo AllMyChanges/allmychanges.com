@@ -1,0 +1,28 @@
+  {% if changes %}
+  <h2>{{title}}</h2>
+  <ul class="grouped-changes">
+    {% for package in changes %}
+    <li class="package-changes">
+      <h3 class="package-changes__package-title"><a href="/p/{{package.namespace}}/{{package.name}}/">{{package.namespace}}/{{package.name}}</a></h3>
+      <ul class="package-changes__version">
+        {% for version in package.versions %}
+        <li class="package-version">
+          <h4 class="package-version__number">{{version.number}}</h4>
+          <h5 class="package-version__date">{{version.date}}</h5>
+          {% for item in version.items %}
+            {% if item.text %}<p class="package-version__text">{{item.text}}</p>{% endif %}
+            {% if item.changes %}
+              <ul class="package-version__changes">
+                {% for change in item.changes %}
+                <li class="package-version__changes-item package-version__changes-item_{{change.type}}">{{change.text}}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}

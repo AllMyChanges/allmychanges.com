@@ -267,11 +267,14 @@ class Package(models.Model):
     def update(self):
         if self.repo is None:
             self.repo, created = Repo.objects.get_or_create(url=self.source)
+            self.save()
 
         repo = self.repo
         repo._update()
 
         versions = list(repo.versions.all()[:5])
+
+        print '/'.join((self.namespace, self.name))
 
         if versions:
             print 'Latest versions:'

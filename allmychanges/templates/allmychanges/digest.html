@@ -1,13 +1,7 @@
 {% extends "allmychanges/base.html" %}
 
 
-{% block anjular-js %}
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8"></script>
-{% endblock %}
-
 {% block extra_head %}
-  <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
   <link href="/static/allmychanges/css/digest.css" rel="stylesheet"/>
 {% endblock extra_head %}
 
@@ -18,27 +12,13 @@
       <a href="{% url "socialauth_begin" "twitter" %}">Login with Twitter</a>
     {% endif %}
 
-{% verbatim %}
-<body ng-controller="DigestBuilderCtrl">
-  <p>{{scope.blah}}</p>
-  <ul class="digest-source">
-    <li ng-repeat="item in items">
-      <p>
-        <input type="text" ng-model="item.namespace"/>
-        <input type="text" ng-model="item.name"/>
-        <input type="text" ng-model="item.source"/>
-        <button ng-click="remove(item.resource_uri)">x</button> 
-      </p>
-    </li>
-  </ul>
+<body>
+  <h1>All Your Changes</h1>
 
-  <p>
-    <input ng-model="new_item.namespace" type="text" placeholder="Namespace (python, node, etc.)"/>
-    <input ng-model="new_item.name" type="text" placeholder="Package name"/>
-    <input ng-model="new_item.source" type="text" placeholder="Source repository"/>
-    <button ng-click="add_item()" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)">Add</button>
-  </p>
+  {% include "allmychanges/digest-partial.html" with changes=today_changes title="Today" %}
+  {% include "allmychanges/digest-partial.html" with changes=week_changes title="This week" %}
+  {% include "allmychanges/digest-partial.html" with changes=month_changes title="This month" %}
+  {% include "allmychanges/digest-partial.html" with changes=ealier_changes title="More than month ago" %}
 </body>
-{% endverbatim %}
 
 {% endblock content %}

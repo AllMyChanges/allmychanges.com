@@ -2,19 +2,26 @@ var app = angular.module('allMyChangesApp', ['ngCookies']);
 
 app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies) {
     $http.defaults.headers.common['X-CSRFToken'] = $cookies['csrftoken'];
+    $scope.items = [];
 
     function init_new_item () {
+        var namespace = '';
+        if ($scope.items.length > 0) {
+            namespace = $scope.items[$scope.items.length - 1].namespace;
+        }
         return {
-            'namespace': '',
+            'namespace': namespace,
             'name': '',
             'source': ''
         }
     }
-    $scope.new_item = init_new_item();
-    $scope.items = [];
+    $scope.new_item = {};
+
 
     $http.get('/v1/packages/').success(function(data) {
         $scope.items = data.results;
+        $scope.new_item = init_new_item();
+
         $scope.$watch('items', function(new_collection, old_collection) {
             if (new_collection.length == old_collection.length) {
                 for (i=0; i<new_collection.length; i++) {
