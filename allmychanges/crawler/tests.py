@@ -167,11 +167,11 @@ def test_starts_with_ident():
 
 
 def test_url_normalization():
-    eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
+    eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
         normalize_url('https://github.com/svetlyak40wt/blah'))
-    eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
+    eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
         normalize_url('https://github.com/svetlyak40wt/blah/'))
-    eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
+    eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
         normalize_url('http://github.com/svetlyak40wt/blah'))
     eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
         normalize_url('git@github.com:svetlyak40wt/blah'))

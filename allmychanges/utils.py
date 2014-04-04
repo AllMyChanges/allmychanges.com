@@ -217,8 +217,6 @@ def show_debug_toolbar(request):
 
 
 def update_changelog_from_raw_data(package, raw_data):
-    from allmychanges.models import Changelog
-    
     log = package.changelog
     for raw_version in raw_data:
         version, created = log.versions.get_or_create(number=raw_version['version'])
@@ -303,10 +301,48 @@ def parse_changelog_file(filename):
         return parse_changelog(f.read())
 
 
+def choose_history_extractor(path):
+    if isinstance(path, list):
+        # this is a special case for tests
+        def test_history_extractor(path):
+            for version, date, message in path:
+                yield date, message
+        return test_history_extractor
+
+    return git_history_extractor
+
+
+def choose_version_extractor(path):
+    if isinstance(path, list):
+        # this is a special case for tests
+        index = [0]
+        def test_version_extractor(path):
+            version = path[index[0]][0]
+            index[0] += 1
+            return version
+        return test_version_extractor
+
+    return python_version_extractor
+    
+
 def extract_changelog_from_vcs(path):
-    return None
-    extract_history = choose_history_extractor(path)
+    walk_through_history = choose_history_extractor(path)
     extract_version = choose_version_extractor(path)
+    current_version = None
+    current_commits = []
+    results = []
+    
+    for date, message in walk_through_history(path):
+        version = extract_version(path)
+        current_commits.append(message)
+        if version != current_version:
+            current_version = version
+            results.append({'version': current_version,
+                            'date': date,
+                            'sections': [{'items': current_commits}]})
+            current_commits = []
+
+    return results
 
 
 class UpdateError(Exception):
@@ -314,6 +350,8 @@ class UpdateError(Exception):
 
     
 def update_changelog(package):
+    package.changelog.filename = None
+
     try:
         download = choose_downloader(package)
         path = download(package)
@@ -330,9 +368,14 @@ def update_changelog(package):
             if raw_data:
                 raw_data.sort(key=lambda item: len(item[0]),
                               reverse=True)
+
+                filename = raw_data[0][1]
                 raw_data = raw_data[0][0]
 
-            if not raw_data:
+            if raw_data:
+                package.changelog.filename = filename
+                package.changelog.save()
+            else:
                 raw_data = extract_changelog_from_vcs(path)
                 
         except Exception:

@@ -257,6 +257,10 @@ class Changelog(models.Model):
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)
+    filename = models.CharField(max_length=1000,
+                               help_text=('If changelog was discovered, then '
+                                          'field will store it\'s filename'),
+                               blank=True, null=True)
     
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)

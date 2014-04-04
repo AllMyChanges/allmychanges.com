@@ -1,0 +1,41 @@
+{% extends "allmychanges/base.html" %}
+
+
+{% block extra_head %}
+  <link href="/static/allmychanges/css/package.css" rel="stylesheet"/>
+{% endblock extra_head %}
+
+{% block content %}
+    {% if request.user.is_authenticated %}
+      {{ request.user }} <a href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
+    {% else %}
+      <a href="{% url "socialauth_begin" "twitter" %}">Login with Twitter</a>
+    {% endif %}
+
+<body>
+  <div class="package-changes">
+    <h1 class="package-changes__package-title">{{package.namespace}}/{{package.name}}</h1>
+    <h2 class="package-changes__source-link"><a href="{{package.source}}">source</a></h2>
+
+    <ul class="package-changes__version">
+        {% for version in package.changelog.versions.all %}
+        <li class="package-version">
+          <h4 class="package-version__number">{{version.number}}</h4>
+          <h5 class="package-version__date">{{version.date}}</h5>
+          {% for section in version.sections.all %}
+            {% if section.notes %}<p class="package-version__notes">{{section.notes}}</p>{% endif %}
+            {% if section.items.count %}
+              <ul class="package-version__items">
+                {% for item in section.items.all %}
+                <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text}}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+  </div>
+</body>
+
+{% endblock content %}

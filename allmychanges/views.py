@@ -4,6 +4,9 @@ import datetime
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
+
+from allmychanges.models import Package
 
 
 class IndexView(TemplateView):
@@ -30,7 +33,8 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     if after_date is not None:
         packages = packages.filter(changelog__versions__date__gte=after_date)
 
-    packages = packages.distinct()
+    packages = packages.select_related('changelog').distinct()
+
     changes = []
     for package in packages:
         versions = []
@@ -39,6 +43,9 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
             versions_queryset = versions_queryset.filter(date__lt=before_date)
         if after_date is not None:
             versions_queryset = versions_queryset.filter(date__gte=after_date)
+
+        # this allows to reduce number of queries in 5 times
+        versions_queryset = versions_queryset.prefetch_related('sections__items')
 
         for version in versions_queryset[:limit_versions]:
             sections = []
@@ -95,3 +102,22 @@ class EditDigestView(TemplateView):
         result['settings'] = settings
         result['request'] = self.request
         return result
+
+
+class PackageView(TemplateView):
+    template_name = 'allmychanges/package.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(PackageView, self).get_context_data(**kwargs)
+        result['settings'] = settings
+        result['request'] = self.request
+
+        result['package'] = get_object_or_404(
+            Package.objects.select_related('changelog') \
+                          .prefetch_related('changelog__versions__sections__items'),
+            user=self.request.user,
+            namespace=kwargs['namespace'],
+            name=kwargs['name'])
+
+        return result
+

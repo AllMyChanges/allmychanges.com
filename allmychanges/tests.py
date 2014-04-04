@@ -10,7 +10,8 @@ from allmychanges.models import Package
 from allmychanges.utils import (
     update_changelog_from_raw_data,
     update_changelog,
-    fake_downloader)
+    fake_downloader,
+    extract_changelog_from_vcs)
 
 
 def check_status_code(desired_code, response):
@@ -158,3 +159,27 @@ def test_changing_source_on_package_will_create_another_changelog():
     assert new_changelog != old_changelog
     eq_(1, new_changelog.packages.count())
     eq_(0, old_changelog.packages.count())
+
+
+def test_extract_from_vcs():
+    date = datetime.date
+    raw_data = extract_changelog_from_vcs(
+        [('0.1.0', date(2014, 1, 15), 'Initial commit'),
+         ('0.1.0', date(2014, 1, 16), 'Tests were added'),
+         ('0.2.0', date(2014, 2, 10), 'Some new functions'),
+         ('0.2.0', date(2014, 2, 11), 'Other feature'),
+         ('0.3.0', date(2014, 2, 14), 'Version bump')])
+
+    eq_([{'version': '0.1.0',
+          'date': date(2014, 1, 15),
+          'sections': [{'items': ['Initial commit']}]},
+         {'version': '0.2.0',
+          'date': date(2014, 2, 10),
+          'sections': [{'items': ['Tests were added',
+                                  'Some new functions']}]},
+         {'version': '0.3.0',
+          'date': date(2014, 2, 14),
+          'sections': [{'items': ['Other feature',
+                                  'Version bump']}]}],
+        raw_data)
+
