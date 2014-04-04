@@ -4,17 +4,18 @@
     {% for package in changes %}
     <li class="package-changes">
       <h3 class="package-changes__package-title"><a href="/p/{{package.namespace}}/{{package.name}}/">{{package.namespace}}/{{package.name}}</a></h3>
+      <h4 class="package-changes__source-link"><a href="{{package.source}}">source</a></h4>
       <ul class="package-changes__version">
         {% for version in package.versions %}
         <li class="package-version">
           <h4 class="package-version__number">{{version.number}}</h4>
           <h5 class="package-version__date">{{version.date}}</h5>
-          {% for item in version.items %}
-            {% if item.text %}<p class="package-version__text">{{item.text}}</p>{% endif %}
-            {% if item.changes %}
-              <ul class="package-version__changes">
-                {% for change in item.changes %}
-                <li class="package-version__changes-item package-version__changes-item_{{change.type}}">{{change.text}}</li>
+          {% for section in version.sections %}
+            {% if section.notes %}<p class="package-version__notes">{{section.notes}}</p>{% endif %}
+            {% if section.items %}
+              <ul class="package-version__items">
+                {% for item in section.items %}
+                <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text}}</li>
                 {% endfor %}
               </ul>
             {% endif %}

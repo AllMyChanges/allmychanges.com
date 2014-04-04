@@ -4,11 +4,11 @@ import os
 import datetime
 
 from django.db import models
-from django.utils.timezone import now
+from django.utils import timezone
 from django.conf import settings
 
-from crawler import search_changelog, _parse_changelog_text
-from crawler.git_crawler import aggregate_git_log
+from allmychanges.crawler import search_changelog, parse_changelog
+from allmychanges.crawler.git_crawler import aggregate_git_log
 from allmychanges.utils import (
     cd,
     get_package_metadata,
@@ -18,7 +18,6 @@ from allmychanges.utils import (
     get_clean_text_from_markup_text,
 )
 from allmychanges.tasks import update_repo
-from django.contrib.auth import get_user_model
 
 
 MARKUP_CHOICES = (
@@ -63,7 +62,7 @@ class Repo(models.Model):
         repo, is_created = Repo.objects.get_or_create(url=url)
         repo.requested_count += 1
         if is_created:
-            repo.date_created = now()
+            repo.date_created = timezone.now()
         repo.save()
         repo.start_processing_if_needed()
         return repo
@@ -93,7 +92,7 @@ class Repo(models.Model):
             return False
 
     def is_processing_started_more_than_minutes_ago(self, minutes):
-        return now() > (self.processing_date_started +
+        return timezone.now() > (self.processing_date_started +
                         datetime.timedelta(minutes=minutes))
 
     def start_changelog_processing(self):
@@ -108,7 +107,7 @@ class Repo(models.Model):
         self.processing_state = 'in_progress'
         self.processing_status_message = 'Downloading code'
         self.processing_progress = 50
-        self.processing_date_started = now()
+        self.processing_date_started = timezone.now()
         self.save()
 
         try:
@@ -131,14 +130,14 @@ class Repo(models.Model):
                 self.processing_state = 'error'
                 self.processing_status_message = \
                     'Could not download repository'
-                self.processing_date_finished = now()
+                self.processing_date_finished = timezone.now()
                 self.save()
 
         except Exception as e:
             self.processing_state = 'error'
             self.processing_status_message = str(e)[:255]
             self.processing_progress = 100
-            self.processing_date_finished = now()
+            self.processing_date_finished = timezone.now()
             self.save()
             raise
 
@@ -161,7 +160,7 @@ class Repo(models.Model):
             self.processing_status_message = 'Parsing changelog'
             self.processing_progress = 60
             self.save()
-            changes = _parse_changelog_text(f.read())
+            changes = parse_changelog(f.read())
             self._update_from_changes(changes)
 
     def _update_from_changes(self, changes):
@@ -199,12 +198,12 @@ class Repo(models.Model):
                         self.processing_state = 'finished'
                         self.processing_status_message = 'Done'
                         self.processing_progress = 100
-                        self.processing_date_finished = now()
+                        self.processing_date_finished = timezone.now()
         else:
             self.processing_state = 'error'
             self.processing_status_message = 'Changelog not found'
             self.processing_progress = 100
-            self.processing_date_finished = now()
+            self.processing_date_finished = timezone.now()
 
         self.save()
 
@@ -251,19 +250,75 @@ class Subscription(models.Model):
         return self.email
 
 
+class Changelog(models.Model):
+    source = models.URLField(unique=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    processing_started_at = models.DateTimeField(blank=True, null=True)
+    problem = models.CharField(max_length=1000,
+                               help_text='Latest error message',
+                               blank=True, null=True)
+    
+    def __unicode__(self):
+        return u'Changelog from {0}'.format(self.source)
+
+
+class Version(models.Model):
+    changelog = models.ForeignKey(Changelog, related_name='versions')
+    date = models.DateField(blank=True, null=True)
+    number = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.number
+
+
+class Section(models.Model):
+    version = models.ForeignKey(Version, related_name='sections')
+    notes = models.TextField(blank=True, null=True)
+
+    def __unicode__(self):
+        return self.notes
+
+
+
+class Item(models.Model):
+    CHANGE_TYPES = (
+        ('new', 'new'),
+        ('fix', 'fix'),
+    )
+
+    section = models.ForeignKey(Section, related_name='items')
+    type = models.CharField(max_length=10, choices=CHANGE_TYPES)
+    text = models.TextField()
+
+
+
 class Package(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              related_name='packages')
     namespace = models.CharField(max_length=80)
     name = models.CharField(max_length=80)
     source = models.CharField(max_length=1000)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(blank=True, null=True)
-    next_update_at = models.DateTimeField()
+    next_update_at = models.DateTimeField(default=timezone.now)
     repo = models.OneToOneField(Repo,
                                 related_name='package',
                                 blank=True, null=True)
+    changelog = models.ForeignKey(Changelog,
+                                  related_name='packages',
+                                  blank=True, null=True)
 
+    def __unicode__(self):
+        return u'/'.join((self.user.username, self.name))
+
+    def save(self, *args, **kwargs):
+        """Create corresponding changelog object"""
+        super(Package, self).save(*args, **kwargs)
+
+        if self.changelog is None or self.changelog.source != self.source:
+            self.changelog = Changelog.objects.create(source=self.source)
+            self.save()
+        
     def update(self):
         if self.repo is None:
             self.repo, created = Repo.objects.get_or_create(url=self.source)

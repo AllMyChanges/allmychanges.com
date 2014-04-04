@@ -3,7 +3,7 @@ import requests
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from crawler import search_changelog, _parse_changelog_text
+from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.utils import cd, load_data, download_repo
 
 
@@ -27,7 +27,7 @@ def fetch_with_crawler_this(url):
                     num_versions = num_items = 0
                     try:
                         with open(fullfilename) as f:
-                            changes = _parse_changelog_text(f.read())
+                            changes = parse_changelog(f.read())
                             num_versions = len(changes)
                             num_items = sum(len(section['items'])
                                             for version in changes

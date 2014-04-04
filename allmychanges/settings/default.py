@@ -226,5 +226,8 @@ RQ_QUEUES = {
 
 GRAPHITE_PREFIX = 'allmychanges.' + _current_user
 
+
+TEMP_DIR = '/tmp/allmychanges'
+
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8

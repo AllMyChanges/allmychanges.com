@@ -22,12 +22,13 @@
 <body ng-controller="DigestBuilderCtrl">
   <p>{{scope.blah}}</p>
   <ul class="digest-source">
-    <li ng-repeat="item in items">
+    <li ng-repeat="item in items" class="digest-source__item">
       <p>
         <input type="text" ng-model="item.namespace"/>
         <input type="text" ng-model="item.name"/>
         <input type="text" ng-model="item.source"/>
         <button ng-click="remove(item.resource_uri)">x</button> 
+        <span class="digest-source__problem" ng-if="item.problem">{{item.problem}}</span>
       </p>
     </li>
   </ul>

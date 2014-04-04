@@ -6,3 +6,8 @@
 body {
     padding-left: 100px;
 }
+
+.digest-source__problem {
+    color: red;
+    margin-left: 1px;
+}

@@ -19,7 +19,7 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies) {
 
 
     $http.get('/v1/packages/').success(function(data) {
-        $scope.items = data.results;
+        $scope.items = data;
         $scope.new_item = init_new_item();
 
         $scope.$watch('items', function(new_collection, old_collection) {

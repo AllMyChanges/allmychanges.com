@@ -68,6 +68,7 @@ class PackageViewSet(HandleExceptionMixin,
                      viewsets.ModelViewSet):
     serializer_class = PackageSerializer
     serializer_detail_class = PackageSerializer
+    paginate_by = None
 
 
     def get_queryset(self, *args, **kwargs):

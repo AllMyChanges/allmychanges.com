@@ -7,10 +7,11 @@ PyYAML==3.11
 argcomplete==0.7.1
 fancycompleter==0.4
 kaptan==0.5.7
+mock==1.0.1
 nose==1.2.1
 pdbpp==0.7.2
 pyflakes==0.8.1
 pygments==1.6
 pyrepl==0.8.4
-tmuxp==0.1.9
+tmuxp==0.1.10
 wmctrl==0.1

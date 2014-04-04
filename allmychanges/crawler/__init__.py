@@ -7,13 +7,22 @@ from dateutil.parser import parse as date_parser
 RE_DATE = re.compile(r'(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
 
 
-def list_files():
-    """Recursivly walks through files and returns them as iterable."""
-    for root, dirs, files in os.walk('.'):
-        if '.git' in dirs:
-            dirs.remove('.git')
+IGNORE_DIRS = ['.git', '.hg', '.svn']
+
+def list_files(path='.'):
+    """Recursivly walks through files and returns them as iterable.
+
+    All filenames are relative to given path (this is important!)
+    """
+    for root, dirs, files in os.walk(path):
+        for dir_to_ignore in IGNORE_DIRS:
+            if dir_to_ignore in dirs:
+                dirs.remove(dir_to_ignore)
+                
         for file in files:
-            yield os.path.join(root, file)
+            yield os.path.relpath(
+                os.path.join(root, file),
+                path)
 
 
 include_predicates = [
@@ -21,6 +30,7 @@ include_predicates = [
     lambda x: 'news' in x,
     lambda x: 'release' in x,
     lambda x: 'history' in x,
+    lambda x: 'readme' in x,
 ]
 
 
@@ -38,11 +48,13 @@ def _filter_changelog_files(filenames):
             yield filename
 
 
-def search_changelog():
+def search_changelog(path='.'):
     """Searches changelog-like files in the current directory."""
-    filenames = list(list_files())
-    for filename in _filter_changelog_files(filenames):
-        return filename
+    filenames = list(list_files(path=path))
+    filenames = [os.path.join(path, filename)
+                 for filename in _filter_changelog_files(filenames)]
+    return filenames
+
 
 
 def _extract_version(line):
@@ -88,7 +100,7 @@ def _starts_with_ident(line, ident):
     return match is not None
 
 
-def _parse_changelog_text(text):
+def parse_changelog(text):
     changelog = []
     current_version = None
     current_section = None

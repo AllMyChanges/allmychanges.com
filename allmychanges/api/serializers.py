@@ -87,6 +87,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 class PackageSerializer(serializers.ModelSerializer):
     resource_uri = ResourceUriField(view_name='package-detail')
+    problem = serializers.Field(source='changelog.problem')
+    
     class Meta:
         model = Package
         fields = (
@@ -97,6 +99,7 @@ class PackageSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'next_update_at',
+            'problem',
         )
         read_only_fields = (
             'created_at',

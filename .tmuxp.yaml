@@ -1,3 +1,5 @@
+# http://tmuxp.readthedocs.org/en/latest/examples.html
+
 session_name: allmychanges
 shell_command_before:
   - '[ -f env/bin/activate ] && source env/bin/activate'

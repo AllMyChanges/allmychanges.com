@@ -1,10 +1,10 @@
 from datetime import date
 from nose.tools import eq_
 
-from . import (_filter_changelog_files, _parse_changelog_text,
+from . import (_filter_changelog_files, parse_changelog,
                _extract_version, _starts_with_ident, _parse_item,
                _extract_date,)
-from allmychanges.utils import transform_url, get_markup_type, get_commit_type
+from allmychanges.utils import normalize_url, get_markup_type, get_commit_type
 
 
 def test_changelog_finder():
@@ -25,6 +25,7 @@ def test_changelog_finder():
           './release.sh',
           './.travis-release-requirements.txt',
           './mkrelease.sh',
+          './README.rst',
     ]
 
     out = [
@@ -36,6 +37,7 @@ def test_changelog_finder():
           './release-process.txt',
           './docs/release_notes/v0.9.15.rst',
           './.travis-release-requirements.txt',
+          './README.rst',
     ]
     eq_(out, list(_filter_changelog_files(in_)))
 
@@ -77,7 +79,7 @@ Bugfix release, released on June 29th 2011
 - Added missing future import that broke 2.5 compatibility.
 - Fixed an infinite redirect issue with blueprints.
 """
-    parsed = _parse_changelog_text(input)
+    parsed = parse_changelog(input)
     eq_(3, len(parsed))
     eq_('1.0', parsed[0]['version'])
     eq_(date(2013, 12, 23), parsed[0]['date'])
@@ -108,7 +110,7 @@ Each paragraph should be separated with empty line.
 
 Like that.
 """
-    parsed = _parse_changelog_text(input)
+    parsed = parse_changelog(input)
     eq_("""Some note with few paragraphs. Each paragraph should be separated with empty line. 
 Like that.""", parsed[0]['sections'][0]['notes'])
     
@@ -166,13 +168,15 @@ def test_starts_with_ident():
 
 def test_url_normalization():
     eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
-        transform_url('https://github.com/svetlyak40wt/blah'))
+        normalize_url('https://github.com/svetlyak40wt/blah'))
     eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
-        transform_url('https://github.com/svetlyak40wt/blah/'))
+        normalize_url('https://github.com/svetlyak40wt/blah/'))
     eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
-        transform_url('http://github.com/svetlyak40wt/blah'))
+        normalize_url('http://github.com/svetlyak40wt/blah'))
     eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
-        transform_url('git@github.com:svetlyak40wt/blah'))
+        normalize_url('git@github.com:svetlyak40wt/blah'))
+    eq_(('https://some-server.com/repo', None, 'repo'),
+        normalize_url('git+https://some-server.com/repo'))
 
 
 def test_get_markup_type():

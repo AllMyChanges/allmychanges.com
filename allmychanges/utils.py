@@ -5,6 +5,8 @@ import envoy
 import logging
 import graphitesend
 import time
+import tempfile
+import shutil
 
 from lxml import html
 from contextlib import contextmanager
@@ -12,6 +14,9 @@ from contextlib import contextmanager
 from django.contrib.markup.templatetags import markup
 from django.conf import settings
 from django.utils.encoding import force_text
+from django.utils import timezone
+
+from allmychanges.crawler import search_changelog, parse_changelog
 
 
 def load_data(filename):
@@ -55,20 +60,25 @@ def get_package_metadata(path, field_name):
                         return match.group(1)
 
 
-def transform_url(url):
+def normalize_url(url):
     """Normalizes url to 'git@github.com:{username}/{repo}' and also
     returns username and repository's name."""
-    regex = r'[/:](?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
-    username, repo = re.search(regex, url).groups()
-    if url.startswith('git@'):
-        return url, username, repo
-    return ('git@github.com:{username}/{repo}'.format(**locals()),
-            username,
-            repo)
+    url = url.replace('git+', '')
+    
+    if 'github' in url:
+        regex = r'[/:](?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
+        username, repo = re.search(regex, url).groups()
+        if url.startswith('git@'):
+            return url, username, repo
+        return ('git://github.com/{username}/{repo}'.format(**locals()),
+                username,
+                repo)
+    else:
+        return (url, None, url.rsplit('/')[-1])
 
 
 def download_repo(url, pull_if_exists=True):
-    url, username, repo = transform_url(url)
+    url, username, repo = normalize_url(url)
 
     path = os.path.join(settings.REPO_ROOT, username, repo)
 
@@ -204,3 +214,139 @@ def count_time(metric_key):
 
 def show_debug_toolbar(request):
     return True
+
+
+def update_changelog_from_raw_data(package, raw_data):
+    from allmychanges.models import Changelog
+    
+    log = package.changelog
+    for raw_version in raw_data:
+        version, created = log.versions.get_or_create(number=raw_version['version'])
+        raw_date = raw_version.get('date')
+        if raw_date is None:
+            if version.date is None:
+                version.date = timezone.now()
+        else:
+            version.date = raw_date
+        version.save()
+
+        version.sections.all().delete()
+        for raw_section in raw_version['sections']:
+            section = version.sections.create(notes=raw_section.get('notes'))
+            for raw_item in raw_section.get('items', []):
+                section.items.create(text=raw_item)
+
+
+def fake_downloader(package):
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    shutil.copyfile(
+        package.source.replace('test+', ''),
+        os.path.join(path, 'CHANGELOG'))
+    return path
+
+    
+def git_downloader(package):
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    url, username, repo_name = normalize_url(package.source)
+
+    with cd(path):
+        response = envoy.run('git clone {url} {path}'.format(url=url,
+                                                             path=path))
+    if response.status_code != 0:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        raise RuntimeError('Bad status_code from git clone: {0}. '
+                           'Git\'s stderr: {1}'.format(
+                               response.status_code, response.std_err))
+
+    return path
+
+
+def hg_downloader(package):
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    url = package.source.replace('hg+', '')
+
+    with cd(path):
+        response = envoy.run('hg clone {url} {path}'.format(url=url,
+                                                             path=path))
+    if response.status_code != 0:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        raise RuntimeError('Bad status_code from hg clone: {0}. '
+                           'Mercurial\'s stderr: {1}'.format(
+                               response.status_code, response.std_err))
+
+    return path
+
+    
+def choose_downloader(package):
+    source = package.source
+    
+    if source.startswith('test+'):
+        return fake_downloader
+
+    if source.startswith('git+'):
+        return git_downloader
+
+    if source.startswith('hg+'):
+        return hg_downloader
+        
+    if 'git' in source:
+        return git_downloader
+
+    if 'hg' in source or 'bitbucket' in source:
+        return hg_downloader
+        
+
+def parse_changelog_file(filename):
+    with open(filename) as f:
+        return parse_changelog(f.read())
+
+
+def extract_changelog_from_vcs(path):
+    return None
+    extract_history = choose_history_extractor(path)
+    extract_version = choose_version_extractor(path)
+
+
+class UpdateError(Exception):
+    pass
+
+    
+def update_changelog(package):
+    try:
+        download = choose_downloader(package)
+        path = download(package)
+    except Exception:
+        logging.getLogger('update-changelog').exception('unhandled')
+        raise UpdateError('Unable to download sources')
+
+    try:
+        try:
+            filenames = search_changelog(path)
+
+            raw_data = [(parse_changelog_file(filename), filename)
+                        for filename in filenames]
+            if raw_data:
+                raw_data.sort(key=lambda item: len(item[0]),
+                              reverse=True)
+                raw_data = raw_data[0][0]
+
+            if not raw_data:
+                raw_data = extract_changelog_from_vcs(path)
+                
+        except Exception:
+            logging.getLogger('update-changelog').exception('unhandled')
+            raise UpdateError('Unable to parse or extract sources')
+            
+        if not raw_data:
+            raise UpdateError('Changelog not found')
+
+        try:
+            update_changelog_from_raw_data(package, raw_data)
+        except Exception:
+            logging.getLogger('update-changelog').exception('unhandled')
+            raise UpdateError('Unable to update database')
+
+    finally:
+        shutil.rmtree(path)

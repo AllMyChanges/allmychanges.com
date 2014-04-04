@@ -2,38 +2,17 @@
 import anyjson
 
 from nose.tools import eq_
-from allmychanges.models import Package
 from django.test import Client
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 
+from allmychanges.models import Package
+from allmychanges.tests import check_status_code, create_user
 
 # схема урлов
 # / - список доступных урлов
 # /digest/
 # /packages/
 # /package/:namespace/:name/
-
-def check_status_code(desired_code, response):
-    eq_(desired_code,
-        response.status_code,
-        'Status code {0} != {1}, content: {2}'.format(
-            response.status_code,
-            desired_code,
-            response.content))
-
-
-def create_user(username):
-    """Создает пользователя с заданным username и таким же паролем."""
-    try:
-        return get_user_model().objects.get(username=username)
-
-    except get_user_model().DoesNotExist:
-        user = get_user_model().objects.create_user(
-            username, username + '@example.yandex.ru', username)
-        user.center_id = 10000 + user.id
-        user.save()
-        return user
 
 
 def setup():
@@ -61,8 +40,8 @@ def test_show_packages():
     response = cl.get('/v1/packages/')
     eq_(200, response.status_code)
     data = anyjson.deserialize(response.content)
-    eq_(1, len(data['results']))
-    eq_('pip', data['results'][0]['name'])
+    eq_(1, len(data))
+    eq_('pip', data[0]['name'])
 
 
 def test_add_package():

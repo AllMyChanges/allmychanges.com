@@ -26,33 +26,34 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     packages = user.packages
 
     if before_date is not None:
-        packages = packages.filter(repo__versions__date__lt=before_date)
+        packages = packages.filter(changelog__versions__date__lt=before_date)
     if after_date is not None:
-        packages = packages.filter(repo__versions__date__gte=after_date)
+        packages = packages.filter(changelog__versions__date__gte=after_date)
 
     packages = packages.distinct()
     changes = []
     for package in packages:
         versions = []
-        versions_queryset = package.repo.versions.all()
+        versions_queryset = package.changelog.versions.all()
         if before_date is not None:
             versions_queryset = versions_queryset.filter(date__lt=before_date)
         if after_date is not None:
             versions_queryset = versions_queryset.filter(date__gte=after_date)
 
         for version in versions_queryset[:limit_versions]:
-            items = []
-            for item in version.items.all():
-                items.append(dict(text=item.text,
-                                  changes=[
-                                      dict(text=change.text,
-                                           type=change.type)
-                                      for change in item.changes.all()]))
-            versions.append(dict(number=version.name,
+            sections = []
+            for section in version.sections.all():
+                sections.append(dict(notes=section.notes,
+                                     items=[
+                                         dict(text=item.text,
+                                              type=item.type)
+                                         for item in section.items.all()]))
+            versions.append(dict(number=version.number,
                                  date=version.date,
-                                 items=items))
+                                 sections=sections))
         changes.append(dict(namespace=package.namespace,
                             name=package.name,
+                            source=package.source,
                             versions=versions))
     return changes
 
@@ -71,6 +72,7 @@ class DigestView(TemplateView):
         day_ago = now - datetime.timedelta(1)
         week_ago = now - datetime.timedelta(7)
         month_ago = now - datetime.timedelta(31)
+
 
         result['today_changes'] = get_digest_for(self.request.user,
                                                  after_date=day_ago)
