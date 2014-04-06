@@ -7,7 +7,8 @@ import graphitesend
 import time
 import tempfile
 import shutil
-
+import times
+    
 from lxml import html
 from contextlib import contextmanager
 
@@ -54,8 +55,10 @@ def get_package_metadata(path, field_name):
         for line in response.std_out.split('\n'):
             if 'PKG-INFO' in line:
                 with open(line.split(None, 1)[1]) as f:
-                    match = re.search(r'{0}: (.*)'.format(field_name),
-                                      f.read())
+                    text = f.read()
+                    match = re.search(r'^{0}: (.*)$'.format(field_name),
+                                      text,
+                                      re.M)
                     if match is not None:
                         return match.group(1)
 
@@ -301,6 +304,21 @@ def parse_changelog_file(filename):
         return parse_changelog(f.read())
 
 
+def git_history_extractor(path):
+    splitter = '-----======!!!!!!======-----'
+    ins = '--!!==!!--'
+
+    with cd(path):
+        r = envoy.run('git log --reverse --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{splitter}"'.format(ins=ins, splitter=splitter))
+
+        for group in r.std_out.split(splitter)[:-1]:
+            _hash, date, msg = group.strip().split(ins)
+
+            r = envoy.run('git checkout {revision}'.format(revision=_hash))
+            assert r.status_code == 0
+            yield times.parse(date.strip()), msg.strip()
+
+
 def choose_history_extractor(path):
     if isinstance(path, list):
         # this is a special case for tests
@@ -311,6 +329,10 @@ def choose_history_extractor(path):
 
     return git_history_extractor
 
+
+def python_version_extractor(path):
+    return get_package_metadata(path, 'Version')
+    
 
 def choose_version_extractor(path):
     if isinstance(path, list):
@@ -331,24 +353,50 @@ def extract_changelog_from_vcs(path):
     current_version = None
     current_commits = []
     results = []
-    
+
     for date, message in walk_through_history(path):
         version = extract_version(path)
+
         current_commits.append(message)
-        if version != current_version:
+        if version != current_version and version is not None:
             current_version = version
             results.append({'version': current_version,
                             'date': date,
                             'sections': [{'items': current_commits}]})
             current_commits = []
 
+    if current_commits:
+        results.append({'version': 'x.x.x',
+                        'unreleased': True,
+                        'date': date,
+                        'sections': [{'items': current_commits}]})
     return results
 
 
 class UpdateError(Exception):
     pass
 
+
+def search_changelog2(path):
+    """Searches a file which contains large
+    amount of changelog-like records"""
     
+    filenames = search_changelog(path)
+    
+    raw_data = [(parse_changelog_file(filename), filename)
+                for filename in filenames]
+    if raw_data:
+        raw_data.sort(key=lambda item: len(item[0]),
+                      reverse=True)
+
+        filename, raw_data = raw_data[0][1], raw_data[0][0]
+        # only return data if we found some records
+        if len(raw_data) > 0:
+            return filename, raw_data
+            
+    return None, None
+    
+
 def update_changelog(package):
     package.changelog.filename = None
 
@@ -361,23 +409,16 @@ def update_changelog(package):
 
     try:
         try:
-            filenames = search_changelog(path)
-
-            raw_data = [(parse_changelog_file(filename), filename)
-                        for filename in filenames]
-            if raw_data:
-                raw_data.sort(key=lambda item: len(item[0]),
-                              reverse=True)
-
-                filename = raw_data[0][1]
-                raw_data = raw_data[0][0]
+            filename, raw_data = search_changelog2(path)
 
             if raw_data:
                 package.changelog.filename = filename
                 package.changelog.save()
             else:
                 raw_data = extract_changelog_from_vcs(path)
-                
+
+        except UpdateError:
+            raise
         except Exception:
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to parse or extract sources')

@@ -164,22 +164,35 @@ def test_changing_source_on_package_will_create_another_changelog():
 def test_extract_from_vcs():
     date = datetime.date
     raw_data = extract_changelog_from_vcs(
-        [('0.1.0', date(2014, 1, 15), 'Initial commit'),
+        [(None,    date(2014, 1, 15), 'Initial commit'),
+         (None,    date(2014, 1, 15), 'Feature was added'),
          ('0.1.0', date(2014, 1, 16), 'Tests were added'),
+         (None,    date(2014, 2, 9),  'Repackaging'), # such gaps should be considered
+                                                      # as having previous version
          ('0.2.0', date(2014, 2, 10), 'Some new functions'),
          ('0.2.0', date(2014, 2, 11), 'Other feature'),
-         ('0.3.0', date(2014, 2, 14), 'Version bump')])
+         ('0.3.0', date(2014, 2, 14), 'Version bump'),
+         ('0.3.0', date(2014, 3, 20), 'First unreleased feature'),
+         ('0.3.0', date(2014, 3, 21), 'Second unreleased feature')])
 
     eq_([{'version': '0.1.0',
-          'date': date(2014, 1, 15),
-          'sections': [{'items': ['Initial commit']}]},
+          'date': date(2014, 1, 16),
+          'sections': [{'items': ['Initial commit',
+                                  'Feature was added',
+                                  'Tests were added']}]},
          {'version': '0.2.0',
           'date': date(2014, 2, 10),
-          'sections': [{'items': ['Tests were added',
+          'sections': [{'items': ['Repackaging',
                                   'Some new functions']}]},
          {'version': '0.3.0',
           'date': date(2014, 2, 14),
           'sections': [{'items': ['Other feature',
-                                  'Version bump']}]}],
+                                  'Version bump']}]},
+         {'version': 'x.x.x',
+          'unreleased': True,
+          'date': date(2014, 3, 21),
+          'sections': [{'items': ['First unreleased feature',
+                                  'Second unreleased feature']}]}],
+        
         raw_data)
 

@@ -15,5 +15,6 @@ lxml
 gunicorn
 django-social-auth
 anyjson<0.4
+times
 
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
