@@ -8,6 +8,7 @@ import time
 import tempfile
 import shutil
 import times
+import requests
     
 from lxml import html
 from contextlib import contextmanager

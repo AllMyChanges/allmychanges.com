@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.conf import settings
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 
 from allmychanges.models import Package
@@ -112,12 +113,35 @@ class PackageView(TemplateView):
         result['settings'] = settings
         result['request'] = self.request
 
+        kwargs.setdefault('username', self.request.user.username)
+        
         result['package'] = get_object_or_404(
             Package.objects.select_related('changelog') \
                           .prefetch_related('changelog__versions__sections__items'),
-            user=self.request.user,
+            user=get_user_model().objects.get(username=kwargs['username']),
             namespace=kwargs['namespace'],
             name=kwargs['name'])
 
         return result
+
+
+class BadgeView(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        kwargs.setdefault('username', self.request.user.username)
+        
+        package = get_object_or_404(
+            Package.objects.select_related('changelog') \
+                          .prefetch_related('changelog__versions__sections__items'),
+            user=get_user_model().objects.get(username=kwargs['username']),
+            namespace=kwargs['namespace'],
+            name=kwargs['name'])
+
+        version = list(package.changelog.versions.all().order_by('-date')[:1])
+        if version:
+            version = version[0].number
+        else:
+            version = '?.?.?'
+
+        return 'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
+            version)
 

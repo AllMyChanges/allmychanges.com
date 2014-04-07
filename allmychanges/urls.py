@@ -7,6 +7,7 @@ from .views import (IndexView,
                     HumansView,
                     DigestView,
                     EditDigestView,
+                    BadgeView,
                     PackageView)
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
@@ -20,6 +21,9 @@ urlpatterns = patterns(
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
     
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
+    url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
+    url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='users-package'),
+
     
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
     url(r'^v1/', include('allmychanges.api.urls')),
