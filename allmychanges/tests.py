@@ -11,6 +11,7 @@ from allmychanges.utils import (
     update_changelog_from_raw_data,
     update_changelog,
     fake_downloader,
+    guess_source,
     extract_changelog_from_vcs)
 
 
@@ -196,3 +197,23 @@ def test_extract_from_vcs():
         
         raw_data)
 
+
+def test_source_guesser():
+    content = """Some text with package description
+    which have urls like <a href="http://github.com/alex/django-filter/tree/master">that</a>
+    and <a href="https://github.com/alex/django-filter">that</a>
+
+    But also it could include links <a href="http://bitbucket.org/antocuni/pdb">to the bitbucked</a>
+    To some <a href="https://raw.github.com/tony/tmuxp/master/doc/_static/tmuxp-dev-screenshot.png">raw materials</a>.
+    And raw <a href="http://bitbucket.org/antocuni/pdb/raw/0c86c93cee41/screenshot.png">at bitbucket</a>.
+    """
+    with mock.patch('allmychanges.utils.requests') as requests:
+        response = mock.Mock()
+        response.content = content
+        requests.get.return_value = response
+        urls = guess_source('python', 'test')
+
+        eq_(['https://github.com/alex/django-filter',
+             'https://bitbucket.org/antocuni/pdb',
+             'https://github.com/tony/tmuxp'],
+            urls)

@@ -63,21 +63,32 @@ def get_package_metadata(path, field_name):
                         return match.group(1)
 
 
-def normalize_url(url):
+def normalize_url(url,
+                  github_template='git://github.com/{username}/{repo}',
+                  bitbucket_template='https://bitbucket.org/{username}/{repo}'):
     """Normalizes url to 'git@github.com:{username}/{repo}' and also
     returns username and repository's name."""
     url = url.replace('git+', '')
     
     if 'github' in url:
         regex = r'[/:](?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
+        match = re.search(regex, url)
+        if match is not None:
+            username, repo = match.groups()
+            if url.startswith('git@'):
+                return url, username, repo
+            return (github_template.format(**locals()),
+                    username,
+                    repo)
+            
+    elif 'bitbucket' in url:
+        regex = r'bitbucket.org/(?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
         username, repo = re.search(regex, url).groups()
-        if url.startswith('git@'):
-            return url, username, repo
-        return ('git://github.com/{username}/{repo}'.format(**locals()),
+        return (bitbucket_template.format(**locals()),
                 username,
                 repo)
-    else:
-        return (url, None, url.rsplit('/')[-1])
+        
+    return (url, None, url.rsplit('/')[-1])
 
 
 def download_repo(url, pull_if_exists=True):
@@ -434,3 +445,18 @@ def update_changelog(package):
 
     finally:
         shutil.rmtree(path)
+
+
+def guess_source(namespace, name):
+    result = []
+    if namespace == 'python':
+        response = requests.get('https://pypi.python.org/pypi/' + name)
+
+        urls = re.findall(r'"(https?://.*?)"', response.content)
+        for url in urls:
+            if ('git' in url or 'bitbucket' in url) and \
+               not ('issues' in url or 'gist' in url):
+                url, _, _ = normalize_url(url, github_template='https://github.com/{username}/{repo}')
+                if url not in result:
+                    result.append(url)
+    return result
