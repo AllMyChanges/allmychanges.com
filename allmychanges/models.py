@@ -266,10 +266,18 @@ class Changelog(models.Model):
         return u'Changelog from {0}'.format(self.source)
 
 
+class VersionManager(models.Manager):
+    def get_query_set(self):
+        # TODO: rename after migration to Django 1.6
+        return super(VersionManager, self).get_query_set().order_by('-date')
+
+
 class Version(models.Model):
     changelog = models.ForeignKey(Changelog, related_name='versions')
     date = models.DateField(blank=True, null=True)
     number = models.CharField(max_length=255)
+
+    objects = VersionManager()
 
     def __unicode__(self):
         return self.number
