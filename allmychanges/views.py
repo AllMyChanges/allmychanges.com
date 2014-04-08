@@ -31,7 +31,15 @@ class LoginRequiredMixin(object):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
-        
+
+
+class CommonContextMixin(object):
+    def get_context_data(self, **kwargs):
+        result = super(CommonContextMixin, self).get_context_data(**kwargs)
+        result['settings'] = settings
+        result['request'] = self.request
+        return result
+
 
 def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     # search packages which have changes after given date
@@ -75,14 +83,11 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
 
 
 
-class DigestView(LoginRequiredMixin, TemplateView):
+class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/digest.html'
 
     def get_context_data(self, **kwargs):
         result = super(DigestView, self).get_context_data(**kwargs)
-        result['settings'] = settings
-        result['request'] = self.request
-
 
         now = timezone.now()
         day_ago = now - datetime.timedelta(1)
@@ -104,33 +109,24 @@ class DigestView(LoginRequiredMixin, TemplateView):
         return result
 
 
-class LoginView(TemplateView):
+class LoginView(TemplateView, CommonContextMixin):
     template_name = 'allmychanges/login.html'
 
     def get_context_data(self, **kwargs):
         result = super(LoginView, self).get_context_data(**kwargs)
-        result['settings'] = settings
-        result['request'] = self.request
         result['next'] = self.request.GET.get('next', reverse('digest'))
         return result
 
-class EditDigestView(LoginRequiredMixin, TemplateView):
+
+class EditDigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/edit_digest.html'
 
-    def get_context_data(self, **kwargs):
-        result = super(EditDigestView, self).get_context_data(**kwargs)
-        result['settings'] = settings
-        result['request'] = self.request
-        return result
 
-
-class PackageView(TemplateView):
+class PackageView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/package.html'
 
     def get_context_data(self, **kwargs):
         result = super(PackageView, self).get_context_data(**kwargs)
-        result['settings'] = settings
-        result['request'] = self.request
 
         # TODO: redirect to login if there is no username in kwargs
         # and request.user is anonymous
@@ -182,16 +178,10 @@ class EmailForm(forms.Form):
         email = forms.EmailField(label='Please check if this is email you wish to receive your digest and news to')
                             
 
-class CheckEmailView(LoginRequiredMixin, FormView):
+class CheckEmailView(LoginRequiredMixin, CommonContextMixin, FormView):
     template_name = 'allmychanges/check-email.html'
     form_class = EmailForm
     success_url = '/digest/edit/'
-
-    def get_context_data(self, **kwargs):
-        result = super(CheckEmailView, self).get_context_data(**kwargs)
-        result['settings'] = settings
-        result['request'] = self.request
-        return result
 
     def get_initial(self):
         return {'email': self.request.user.email}
