@@ -8,6 +8,9 @@ from .views import (IndexView,
                     DigestView,
                     EditDigestView,
                     BadgeView,
+                    AfterLoginView,
+                    CheckEmailView,
+                    LoginView,
                     PackageView)
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
@@ -31,7 +34,10 @@ urlpatterns = patterns(
     url(r'^favicon.ico/$', lambda x: redirect('/static/favicon.ico')),
     url(r'^django-rq/', include('django_rq.urls')),
     url(r'logout/', 'django.contrib.auth.views.logout', name='logout'),
-    url(r'', include('social_auth.urls')),
+    url(r'after-login/', AfterLoginView.as_view(), name='after-login'),
+    url(r'check-email/', CheckEmailView.as_view(), name='after-login'),
+    url(r'accounts/login/', LoginView.as_view(), name='login'),
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
 )
 
 urlpatterns += staticfiles_urlpatterns()

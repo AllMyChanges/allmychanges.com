@@ -1,0 +1,11 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block content %}
+  <h1>Please check email</h1>
+  <form action="." method="POST">
+    {{ form }}
+    {% csrf_token %}
+    <input type="submit" value="Yes, use this email!"/>
+  </form>
+{% endblock content %}

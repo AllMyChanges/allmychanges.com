@@ -1,24 +1,10 @@
-{% extends "allmychanges/base.html" %}
-
-
-{% block extra_head %}
-  <link href="/static/allmychanges/css/digest.css" rel="stylesheet"/>
-{% endblock extra_head %}
+{% extends "allmychanges/new-base.html" %}
 
 {% block content %}
-    {% if request.user.is_authenticated %}
-      {{ request.user }} <a href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
-    {% else %}
-      <a href="{% url "socialauth_begin" "twitter" %}">Login with Twitter</a>
-    {% endif %}
-
-<body>
   <h1>All Your Changes</h1>
 
   {% include "allmychanges/digest-partial.html" with changes=today_changes title="Today" %}
   {% include "allmychanges/digest-partial.html" with changes=week_changes title="This week" %}
   {% include "allmychanges/digest-partial.html" with changes=month_changes title="This month" %}
   {% include "allmychanges/digest-partial.html" with changes=ealier_changes title="More than month ago" %}
-</body>
-
 {% endblock content %}

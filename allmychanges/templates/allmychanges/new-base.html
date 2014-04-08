@@ -1,0 +1,84 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html ng-app="allMyChangesApp">
+<head>
+    <title>AllMyChanges.com</title>
+
+    <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
+    <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
+
+
+    {% block anjular-js %}
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript" charset="utf-8">
+      </script>
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8">
+      </script>
+    {% endblock %}
+
+    {% block extra_head %}{% endblock extra_head %}
+</head>
+
+<body>
+    <div class="page">
+      <div class="header">
+        <div class="logo">
+          <h1 class="logo__text"><a class="logo__link" href="/digest/">AllMyChanges.com</a></h1>
+        </div>
+
+        <div class="login-plate">
+          {% if request.user.is_authenticated %}
+            Hi, {{ request.user }}! <a class="login-plate__logout-link" href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
+          {% else %}
+            <span class="login-plate__buttons">Login with: <a href="{% url "social:begin" "github" %}">GitHub</a> or <a href="{% url "social:begin" "twitter" %}">Twitter</a></span>
+          {% endif %}
+        </div>
+        <div class="clear"></div>
+      </div>
+
+      <div class="content">
+        {% block content %}{% endblock content %}
+      </div>
+
+      <div class="footer">
+        <small>
+          Follow us on <a href="https://twitter.com/allmychanges">Twitter</a>.
+          Report bugs to <a href="https://github.com/AllMyChanges/allmychanges.com/issues">GitHub</a>.
+        </small>
+      </div>
+    </div>
+
+
+{% if settings.SHOW_METRIKA %}
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+(function (d, w, c) {
+    (w[c] = w[c] || []).push(function() {
+        try {
+            w.yaCounter22434466 = new Ya.Metrika({id:22434466,
+                    webvisor:true,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true});
+        } catch(e) { }
+    });
+
+    var n = d.getElementsByTagName("script")[0],
+        s = d.createElement("script"),
+        f = function () { n.parentNode.insertBefore(s, n); };
+    s.type = "text/javascript";
+    s.async = true;
+    s.src = (d.location.protocol == "https:" ? "https:" : "http:") +
+        "//mc.yandex.ru/metrika/watch.js";
+
+    if (w.opera == "[object Opera]") {
+        d.addEventListener("DOMContentLoaded", f, false);
+    } else { f(); }
+})(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="//mc.yandex.ru/watch/22434466"
+                    style="position:absolute; left:-9999px;" alt=""
+                    /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+{% endif %}
+</body>
+</html>

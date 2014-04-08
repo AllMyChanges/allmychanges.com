@@ -1,26 +1,15 @@
-{% extends "allmychanges/base.html" %}
+{% extends "allmychanges/new-base.html" %}
 
-
-{% block anjular-js %}
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript" charset="utf-8"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8"></script>
-{% endblock %}
 
 {% block extra_head %}
   <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
-  <link href="/static/allmychanges/css/digest.css" rel="stylesheet"/>
 {% endblock extra_head %}
 
+
 {% block content %}
-    {% if request.user.is_authenticated %}
-      {{ request.user }} <a href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
-    {% else %}
-      <a href="{% url "socialauth_begin" "twitter" %}">Login with Twitter</a>
-    {% endif %}
 
 {% verbatim %}
-<body ng-controller="DigestBuilderCtrl">
-  <p>{{scope.blah}}</p>
+<div ng-controller="DigestBuilderCtrl">
   <ul class="digest-source">
     <li ng-repeat="item in items" class="digest-source__item">
       <p>
@@ -39,7 +28,7 @@
     <input ng-model="new_item.source" type="text" placeholder="Source repository"/>
     <button ng-click="add_item()" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)">Add</button>
   </p>
-</body>
+</div>
 {% endverbatim %}
 
 {% endblock content %}

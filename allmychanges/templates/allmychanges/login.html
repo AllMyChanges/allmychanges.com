@@ -1,0 +1,6 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block content %}
+To use this service, please, login using <span class="login-plate__buttons"><a href="{% url "social:begin" "github" %}?next={{ next }}">GitHub</a> or <a href="{% url "social:begin" "twitter" %}?next={{ next }}">Twitter</a></span>
+{% endblock content %}

@@ -13,7 +13,7 @@ docutils
 markdown
 lxml
 gunicorn
-django-social-auth
+python-social-auth
 anyjson<0.4
 times
 

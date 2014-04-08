@@ -1,0 +1,51 @@
+        
+.header {
+    margin-bottom: 2em;
+}
+
+.logo {
+    float: left;
+    margin-left: 100px
+}
+
+.logo__text {
+    font-size: 2em
+}
+.logo__link {
+    text-decoration: none;
+    color: black;
+}
+
+.login-plate {
+    float: right;
+    margin-right: 100px;
+    line-height: 2em;
+}
+
+
+.digest-source {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+.content {
+    margin-left: 100px;
+    margin-right: 100px;
+    min-height: 400px;
+}
+
+.footer {
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+.digest-source__problem {
+    color: red;
+    margin-left: 1px;
+}
+
+
+.clear {
+    clear: both;
+}
+
