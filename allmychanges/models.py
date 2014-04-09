@@ -261,6 +261,8 @@ class Changelog(models.Model):
                                help_text=('If changelog was discovered, then '
                                           'field will store it\'s filename'),
                                blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    next_update_at = models.DateTimeField(default=timezone.now)
     
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)
@@ -311,8 +313,6 @@ class Package(models.Model):
     name = models.CharField(max_length=80)
     source = models.CharField(max_length=1000)
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    next_update_at = models.DateTimeField(default=timezone.now)
     repo = models.OneToOneField(Repo,
                                 related_name='package',
                                 blank=True, null=True)

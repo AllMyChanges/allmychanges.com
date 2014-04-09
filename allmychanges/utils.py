@@ -231,10 +231,9 @@ def show_debug_toolbar(request):
     return True
 
 
-def update_changelog_from_raw_data(package, raw_data):
-    log = package.changelog
+def update_changelog_from_raw_data(changelog, raw_data):
     for raw_version in raw_data:
-        version, created = log.versions.get_or_create(number=raw_version['version'])
+        version, created = changelog.versions.get_or_create(number=raw_version['version'])
         raw_date = raw_version.get('date')
         if raw_date is None:
             if version.date is None:
@@ -250,17 +249,17 @@ def update_changelog_from_raw_data(package, raw_data):
                 section.items.create(text=raw_item)
 
 
-def fake_downloader(package):
+def fake_downloader(changelog):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     shutil.copyfile(
-        package.source.replace('test+', ''),
+        changelog.source.replace('test+', ''),
         os.path.join(path, 'CHANGELOG'))
     return path
 
     
-def git_downloader(package):
+def git_downloader(changelog):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    url, username, repo_name = normalize_url(package.source)
+    url, username, repo_name = normalize_url(changelog.source)
 
     with cd(path):
         response = envoy.run('git clone {url} {path}'.format(url=url,
@@ -275,9 +274,9 @@ def git_downloader(package):
     return path
 
 
-def hg_downloader(package):
+def hg_downloader(changelog):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    url = package.source.replace('hg+', '')
+    url = changelog.source.replace('hg+', '')
 
     with cd(path):
         response = envoy.run('hg clone {url} {path}'.format(url=url,
@@ -292,8 +291,8 @@ def hg_downloader(package):
     return path
 
     
-def choose_downloader(package):
-    source = package.source
+def choose_downloader(changelog):
+    source = changelog.source
     
     if source.startswith('test+'):
         return fake_downloader
@@ -409,12 +408,12 @@ def search_changelog2(path):
     return None, None
     
 
-def update_changelog(package):
-    package.changelog.filename = None
+def update_changelog(changelog):
+    changelog.filename = None
 
     try:
-        download = choose_downloader(package)
-        path = download(package)
+        download = choose_downloader(changelog)
+        path = download(changelog)
     except Exception:
         logging.getLogger('update-changelog').exception('unhandled')
         raise UpdateError('Unable to download sources')
@@ -424,8 +423,8 @@ def update_changelog(package):
             filename, raw_data = search_changelog2(path)
 
             if raw_data:
-                package.changelog.filename = filename
-                package.changelog.save()
+                changelog.filename = filename
+                changelog.save()
             else:
                 raw_data = extract_changelog_from_vcs(path)
 
@@ -439,13 +438,15 @@ def update_changelog(package):
             raise UpdateError('Changelog not found')
 
         try:
-            update_changelog_from_raw_data(package, raw_data)
+            update_changelog_from_raw_data(changelog, raw_data)
         except Exception:
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to update database')
 
     finally:
         shutil.rmtree(path)
+        changelog.updated_at = timezone.now()
+        changelog.save()
 
 
 def guess_source(namespace, name):
@@ -461,3 +462,4 @@ def guess_source(namespace, name):
                 if url not in result:
                     result.append(url)
     return result
+

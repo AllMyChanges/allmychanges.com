@@ -25,15 +25,13 @@ def test_show_packages():
     user.packages.create(namespace='python',
                          name='pip',
                          source='https://github.com/pipa/pip',
-                         created_at=timezone.now(),
-                         next_update_at=timezone.now())
+                         created_at=timezone.now())
     
     user = create_user('gena')
     user.packages.create(namespace='python',
                          name='rest',
                          source='https://github.com/frame/work',
-                         created_at=timezone.now(),
-                         next_update_at=timezone.now())
+                         created_at=timezone.now())
 
     # user art should be able to see only his own packages
     cl.login(username='art', password='art')
@@ -81,3 +79,4 @@ def test_two_users_are_able_to_add_package_with_same_source():
                            source='https://github.com/pipa/pip'))
     check_status_code(201, response)
     eq_(2, Package.objects.count())
+

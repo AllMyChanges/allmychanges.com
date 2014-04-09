@@ -55,7 +55,7 @@ def test_update_package_from_basic_structure():
         namespace='python', name='pip', source='test',
         user=art)
     
-    update_changelog_from_raw_data(package, structure)
+    update_changelog_from_raw_data(package.changelog, structure)
     
     eq_(2, package.changelog.versions.count())
     v2 = package.changelog.versions.all()[1]
@@ -77,7 +77,7 @@ def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw
         namespace='python', name='pip', source='test',
         user=art)
     
-    update_changelog_from_raw_data(package, structure)
+    update_changelog_from_raw_data(package.changelog, structure)
     
     v = package.changelog.versions.all()[0]
     date = v.date
@@ -85,7 +85,7 @@ def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw
 
     with mock.patch('allmychanges.utils.timezone') as timezone:
         timezone.now.return_value = datetime.datetime.now() + datetime.timedelta(10)
-        update_changelog_from_raw_data(package, structure)
+        update_changelog_from_raw_data(package.changelog, structure)
         
     v = package.changelog.versions.all()[0]
     eq_(date, v.date)
@@ -103,7 +103,7 @@ def test_update_package_changes_date_if_it_was_changed_in_the_raw_data():
         namespace='python', name='pip', source='test',
         user=art)
     
-    update_changelog_from_raw_data(package, structure)
+    update_changelog_from_raw_data(package.changelog, structure)
     
     v = package.changelog.versions.all()[0]
     date = v.date
@@ -111,7 +111,7 @@ def test_update_package_changes_date_if_it_was_changed_in_the_raw_data():
     
     new_date = datetime.date(2013, 3, 27)
     structure[0]['date'] = new_date
-    update_changelog_from_raw_data(package, structure)
+    update_changelog_from_raw_data(package.changelog, structure)
     v = package.changelog.versions.all()[0]
     eq_(new_date, v.date)
 
@@ -139,7 +139,7 @@ def test_update_package_using_full_pipeline():
         namespace='python', name='pip', source='test+samples/very-simple.md',
         user=art)
     
-    update_changelog(package)
+    update_changelog(package.changelog)
     eq_(1, package.changelog.versions.count())
     eq_('Initial release.', package.changelog.versions.all()[0].sections.all()[0].items.all()[0].text)
 

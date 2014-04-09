@@ -26,24 +26,26 @@ def update_repo(repo_id):
 
 
 @job
-def schedule_updates(reschedule=False):
-    from .models import Package
+def schedule_updates(reschedule=False, packages=[]):
+    from .models import Changelog
 
-    packages = Package.objects.all()
+    if packages :
+        changelogs = Changelog.objects.filter(package__name__in=packages).distinct()
+    else:
+        changelogs = Changelog.objects.all()
 
     if not reschedule:
-        packages = packages.filter(next_update_at__lte=timezone.now())
+        changelogs = changelogs.filter(next_update_at__lte=timezone.now())
 
-    for package in packages:
-        update_package.delay(package.id)
+    for changelog in changelogs:
+        update_changelog_task.delay(changelog.source)
 
 
 @job
-def update_package(package_id):
-    from .models import Package
-    package = Package.objects.get(pk=package_id)
+def update_changelog_task(source):
+    from .models import Changelog
+    changelog = Changelog.objects.get(source=source)
     
-    changelog = package.changelog
     if changelog.processing_started_at is not None:
         return # because somebody already processing this changelog
     
@@ -54,8 +56,8 @@ def update_package(package_id):
         changelog.processing_started_at = timezone.now()
         changelog.save()
         
-        update_changelog(package)
-        package.next_update_at = timezone.now() + datetime.timedelta(1)
+        update_changelog(changelog)
+        changelog.next_update_at = timezone.now() + datetime.timedelta(1)
     except UpdateError, e:
         changelog.problem = ', '.join(e.args)
     except Exception, e:
@@ -64,10 +66,9 @@ def update_package(package_id):
         else:
             changelog.problem = 'Unknown error'
             
-        print 'Unable to update changelog for package {0}'.format(package)
-        package.next_update_at = next_update_if_error
+        print 'Unable to update changelog with source {0}'.format(source)
+        changelog.next_update_at = next_update_if_error
         raise
     finally:
         changelog.processing_started_at = None
-        package.save()
         changelog.save()

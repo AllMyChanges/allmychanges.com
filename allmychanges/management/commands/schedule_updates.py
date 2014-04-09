@@ -6,5 +6,7 @@ class Command(BaseCommand):
     help = u"""Updates single project."""
 
     def handle(self, *args, **options):
-        reschedule = True if args and args[0] == 'reschedule' else False
-        schedule_updates.delay(reschedule=reschedule)
+        reschedule = True if args and 'reschedule' in args else False
+        packages = [name for name in args if name != 'reschedule']
+        schedule_updates.delay(reschedule=reschedule,
+                               packages=packages)
