@@ -328,7 +328,7 @@ class Package(models.Model):
         super(Package, self).save(*args, **kwargs)
 
         if self.changelog is None or self.changelog.source != self.source:
-            self.changelog = Changelog.objects.create(source=self.source)
+            self.changelog, created = Changelog.objects.get_or_create(source=self.source)
             self.save()
         
     def update(self):

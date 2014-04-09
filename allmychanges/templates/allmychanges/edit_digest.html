@@ -8,6 +8,9 @@
 
 {% block content %}
 
+<h1 class="page-header">Watched packages</h1>
+<h2 class="page-subheader"><a href="{% url "digest" %}">Go to digest</a></h2>
+
 {% verbatim %}
 <div ng-controller="DigestBuilderCtrl">
   <ul class="digest-source">

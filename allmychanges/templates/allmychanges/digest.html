@@ -1,10 +1,17 @@
 {% extends "allmychanges/new-base.html" %}
 
 {% block content %}
-  <h1>All Your Changes</h1>
-
-  {% include "allmychanges/digest-partial.html" with changes=today_changes title="Today" %}
-  {% include "allmychanges/digest-partial.html" with changes=week_changes title="This week" %}
-  {% include "allmychanges/digest-partial.html" with changes=month_changes title="This month" %}
-  {% include "allmychanges/digest-partial.html" with changes=ealier_changes title="More than month ago" %}
+  {% if no_data %}
+    <h1 class="page-header">No data available</h1>
+    {% if no_package %}
+      <p>You have no watched packages. Please <a href="{% url "edit-digest" %}">edit the list</a>.</p>
+    {% else %}
+      <p>Data is not available yet. Please, keep calm and add <a href="{% url "edit-digest" %}">add more packages</a> while you are waiting.</p>
+    {% endif %}
+  {% else %}
+    {% include "allmychanges/digest-partial.html" with changes=today_changes title="Today" %}
+    {% include "allmychanges/digest-partial.html" with changes=week_changes title="This week" %}
+    {% include "allmychanges/digest-partial.html" with changes=month_changes title="This month" %}
+    {% include "allmychanges/digest-partial.html" with changes=ealier_changes title="More than month ago" %}
+  {% endif %}
 {% endblock content %}

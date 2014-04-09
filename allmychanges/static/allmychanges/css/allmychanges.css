@@ -1,6 +1,7 @@
         
 .header {
     margin-bottom: 2em;
+    margin-top: 1em;
 }
 
 .logo {
@@ -31,12 +32,15 @@
 .content {
     margin-left: 100px;
     margin-right: 100px;
-    min-height: 400px;
 }
 
 .footer {
     margin-left: 100px;
     margin-right: 100px;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    border-top: 1px solid #ddd;
+    padding-top: 1em;
 }
 
 .digest-source__problem {
@@ -49,3 +53,72 @@
     clear: both;
 }
 
+.page-header {
+    font-size: 1.5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.page-subheader {
+    margin-top: -1em;
+    margin-bottom: 1em;
+}
+
+.grouped-changes-title {
+    font-size: 1.5em;
+}
+
+
+.package-changes {
+    list-style: none;
+}
+
+.package-changes__package-title {
+    font-size: 1.2em;
+    display: inline;    
+}
+
+.package-changes__source-link {
+    display: inline;
+}
+
+.package-changes__version {
+    padding-left: 1em;
+}
+
+.package-version {
+    list-style: none;
+}
+
+.package-version__number {
+    display: inline-block;
+    margin-top: 1em;
+}
+
+.package-version__date {
+    display: inline;
+    color: gray;
+}
+
+.package-version__items {
+    margin-left: 1em;
+    margin-top: 0.5em;
+}
+
+.package-version__section-item {
+    list-style: disc inside;
+}
+
+.package-version__notes {
+    margin-left: 1em;
+    margin-top: 0.5em;
+}
+
+.grouped-changes-title {
+    margin-top: 1em;
+}
+
+.package-changes__package-title {
+    margin-top: 1em;
+    display: inline-block;
+}

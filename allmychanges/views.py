@@ -95,17 +95,22 @@ class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
         month_ago = now - datetime.timedelta(31)
 
 
-        if self.request.user.is_authenticated():
-            result['today_changes'] = get_digest_for(self.request.user,
-                                                     after_date=day_ago)
-            result['week_changes'] = get_digest_for(self.request.user,
-                                                    before_date=day_ago,
-                                                    after_date=week_ago)
-            result['month_changes'] = get_digest_for(self.request.user,
-                                                     before_date=week_ago,
-                                                     after_date=month_ago)
-            result['ealier_changes'] = get_digest_for(self.request.user,
-                                                      before_date=month_ago)
+        result['today_changes'] = get_digest_for(self.request.user,
+                                                 after_date=day_ago)
+        result['week_changes'] = get_digest_for(self.request.user,
+                                                before_date=day_ago,
+                                                after_date=week_ago)
+        result['month_changes'] = get_digest_for(self.request.user,
+                                                 before_date=week_ago,
+                                                 after_date=month_ago)
+        result['ealier_changes'] = get_digest_for(self.request.user,
+                                                  before_date=month_ago)
+
+        result['no_packages'] = self.request.user.packages.count() == 0
+        result['no_data'] = all(
+            len(result[key]) == 0
+            for key in result.keys()
+            if key.endswith('_changes'))
         return result
 
 

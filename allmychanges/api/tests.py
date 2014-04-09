@@ -57,3 +57,27 @@ def test_add_package():
                            source='https://github.com/pipa/pip'))
     check_status_code(201, response)
     eq_(1, Package.objects.count())
+
+
+def test_two_users_are_able_to_add_package_with_same_source():
+    cl = Client()
+
+    create_user('art')
+    cl.login(username='art', password='art')
+    eq_(0, Package.objects.count())
+
+    response = cl.post('/v1/packages/',
+                      dict(namespace='python',
+                           name='pip',
+                           source='https://github.com/pipa/pip'))
+    check_status_code(201, response)
+
+    create_user('peter')
+    cl.login(username='peter', password='peter')
+
+    response = cl.post('/v1/packages/',
+                      dict(namespace='python',
+                           name='pip',
+                           source='https://github.com/pipa/pip'))
+    check_status_code(201, response)
+    eq_(2, Package.objects.count())
