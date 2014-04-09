@@ -18,3 +18,4 @@ anyjson<0.4
 times
 
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
+-e git+https://github.com/pinax/django-mailer

@@ -4,6 +4,7 @@
 -e git+git://github.com/svetlyak40wt/pip-1.git@8a329ce874cfb00f5d1dfa7f4b33d0b714546982#egg=pip
 -e git+git://github.com/svetlyak40wt/pip-tools.git@fd699dd591ee69559cbe7a333b94a7b2354759a3#egg=pip-tools
 -e git+git://github.com/svetlyak40wt/tdaemon.git@8f8b9dc603a90b9c135f94dba352dac5750a1bd5#egg=tdaemon
+-e git+https://github.com/pinax/django-mailer@44641b814660a9deef907ad9049d571cb1709901#egg=django-mailer
 PyYAML==3.11
 South==0.8.4
 anyjson==0.3.3
@@ -41,4 +42,5 @@ six==1.6.1
 sqlparse==0.1.11
 times==0.6.2
 tmuxp==0.1.11
+werkzeug==0.9.4
 wmctrl==0.1

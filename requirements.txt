@@ -1,4 +1,5 @@
 -e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster
+-e git+https://github.com/pinax/django-mailer@44641b814660a9deef907ad9049d571cb1709901#egg=django-mailer
 South==0.8.4
 anyjson==0.3.3
 django-debug-toolbar==1.0.1
