@@ -1,0 +1,17 @@
+<body>
+    {% include "allmychanges/digest-partial.html" with changes=today_changes title="Today" %}
+
+    {% if week_changes_count %}
+      <div class="email-note">
+       <p>Also, during this week {{ week_changes_count }} packages were changes.</p>
+       <p>Read <a href="{% url "digest" %}">full digest</a> on a separate page.</p>
+      </div>
+    {% endif %}
+
+    <div class="email-unsubscribe">
+      <p>You received this letter because you (or somebody else), subscribed this email to
+        allmychanges.com service. If you would like to unsubscribe from these digests or
+        manage your subscription's settings, please <a href="/check-email/">follow this link</a>.
+      </p>
+    </div>
+</body>
