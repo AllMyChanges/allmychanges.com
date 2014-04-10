@@ -1,7 +1,8 @@
 {% extends "allmychanges/new-base.html" %}
 
 {% block content %}
-  <h1 class="page-header">Digest <a href="{% url "edit-digest" %}">edit</a></h1>
+  <h1 class="page-header">Digest</h1>
+  <h2 class="page-subheader"><a href="{% url "edit-digest" %}">Edit digest</a></h2>
   {% if no_data %}
     <h1 class="page-header">No data available</h1>
     {% if no_package %}

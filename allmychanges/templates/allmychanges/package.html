@@ -2,10 +2,26 @@
 
 
 {% block content %}
-  <div class="package-changes">
-    <h1 class="package-changes__package-title">{{package.namespace}}/{{package.name}}</h1>
-    <h2 class="package-changes__source-link"><a href="{{package.source}}">source</a></h2>
+  <h1 class="page-header">{{package.namespace}}/{{package.name}}</h1>
+  <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source}}">go to sources</a></h2>
 
+  <dl class="package-metadata">
+    <dt>Last update was:</dt>
+    <dd>{{package.changelog.updated_at|timesince}} ago</dd>
+    <dt>Time to next update:</dt>
+    <dd>{{package.changelog.next_update_at|timeuntil}}</dd>
+
+    {% if settings.DEBUG %}
+      <dt>Filename:</dt>
+      <dd>{{package.changelog.filename}}</dd>
+      {% if package.changelog.problem %}
+        <dt>Problem:</dt>
+        <dd>{{package.changelog.problem}}</dd>
+      {% endif %}
+    {% endif %}
+  </dl>
+
+  <div class="package-changes">
     <ul class="package-changes__version">
         {% for version in package.changelog.versions.all %}
         <li class="package-version">
