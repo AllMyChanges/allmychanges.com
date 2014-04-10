@@ -1,6 +1,9 @@
 {% extends "allmychanges/new-base.html" %}
 
+{% load cache %}
+
 {% block content %}
+  {% cache 500 digest-html request.user.username %}
   <h1 class="page-header">Digest</h1>
   <h2 class="page-subheader"><a href="{% url "edit-digest" %}">Edit digest</a></h2>
   {% if no_data %}
@@ -16,4 +19,5 @@
     {% include "allmychanges/digest-partial.html" with changes=month_changes title="This month" %}
     {% include "allmychanges/digest-partial.html" with changes=ealier_changes title="More than month ago" %}
   {% endif %}
+  {% endcache %}
 {% endblock content %}

@@ -41,44 +41,56 @@ class CommonContextMixin(object):
         return result
 
 
+from django.core.cache import cache
+
 def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
-    # search packages which have changes after given date
-    packages = user.packages
+    cache_key = 'digest-{username}-{before}-{after}-{limit}'.format(
+        username=user.username,
+        before=before_date.date() if before_date else 0,
+        after=after_date.date() if after_date else 0,
+        limit=limit_versions)
+    
+    changes = cache.get(cache_key)
+    if changes is None:
+        # search packages which have changes after given date
+        packages = user.packages
 
-    if before_date is not None:
-        packages = packages.filter(changelog__versions__date__lt=before_date)
-    if after_date is not None:
-        packages = packages.filter(changelog__versions__date__gte=after_date)
-
-    packages = packages.select_related('changelog').distinct()
-
-    changes = []
-    for package in packages:
-        versions = []
-        versions_queryset = package.changelog.versions.all()
         if before_date is not None:
-            versions_queryset = versions_queryset.filter(date__lt=before_date)
+            packages = packages.filter(changelog__versions__date__lt=before_date)
         if after_date is not None:
-            versions_queryset = versions_queryset.filter(date__gte=after_date)
+            packages = packages.filter(changelog__versions__date__gte=after_date)
 
-        # this allows to reduce number of queries in 5 times
-        versions_queryset = versions_queryset.prefetch_related('sections__items')
+        packages = packages.select_related('changelog').distinct()
 
-        for version in versions_queryset[:limit_versions]:
-            sections = []
-            for section in version.sections.all():
-                sections.append(dict(notes=section.notes,
-                                     items=[
-                                         dict(text=item.text,
-                                              type=item.type)
-                                         for item in section.items.all()]))
-            versions.append(dict(number=version.number,
-                                 date=version.date,
-                                 sections=sections))
-        changes.append(dict(namespace=package.namespace,
-                            name=package.name,
-                            source=package.source,
-                            versions=versions))
+        changes = []
+        for package in packages:
+            versions = []
+            versions_queryset = package.changelog.versions.all()
+            if before_date is not None:
+                versions_queryset = versions_queryset.filter(date__lt=before_date)
+            if after_date is not None:
+                versions_queryset = versions_queryset.filter(date__gte=after_date)
+
+            # this allows to reduce number of queries in 5 times
+            versions_queryset = versions_queryset.prefetch_related('sections__items')
+
+            for version in versions_queryset[:limit_versions]:
+                sections = []
+                for section in version.sections.all():
+                    sections.append(dict(notes=section.notes,
+                                         items=[
+                                             dict(text=item.text,
+                                                  type=item.type)
+                                             for item in section.items.all()]))
+                versions.append(dict(number=version.number,
+                                     date=version.date,
+                                     sections=sections))
+            changes.append(dict(namespace=package.namespace,
+                                name=package.name,
+                                source=package.source,
+                                versions=versions))
+
+        cache.set(cache_key, changes, 60 * 60)
     return changes
 
 

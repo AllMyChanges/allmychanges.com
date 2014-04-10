@@ -1,3 +1,8 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 1.3em;
+}
         
 .header {
     margin-bottom: 2em;
@@ -75,12 +80,8 @@
 
 .package-changes__package-title {
     font-size: 1.2em;
-    display: inline;    
 }
 
-.package-changes__source-link {
-    display: inline;
-}
 
 .package-changes__version {
     padding-left: 1em;
