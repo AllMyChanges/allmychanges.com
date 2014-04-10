@@ -45,9 +45,9 @@ class Command(BaseCommand):
                                       base_url='http://art.dev.allmychanges.com:8000/',
                                       external_styles=external_styles)
                 body = premailer.transform()
-                message = EmailMultiAlternatives('All you changes',
+                message = EmailMultiAlternatives('Changelogs digest on {0:%d %B %Y}'.format(now),
                           None,
-                          'noreply@allmychanges.com',
+                          'AllMyChanges.com <noreply@allmychanges.com>',
                           [user.email])
                 message.attach_alternative(body.encode('utf-8'), 'text/html')
                 message.send()

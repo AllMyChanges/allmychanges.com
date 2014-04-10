@@ -125,7 +125,12 @@
 
 .email-note {
     margin-top: 2em;
-    font-size: 1.5em;
+    font-size: 1.2em;
+}
+
+.email-signature {
+    margin-top: 2em;
+    font-size: 1.2em;
 }
 
 .email-unsubscribe {
