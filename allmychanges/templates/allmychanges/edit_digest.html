@@ -26,10 +26,12 @@
   </ul>
 
   <p>
-    <input ng-model="new_item.namespace" type="text" placeholder="Namespace (python, node, etc.)"/>
-    <input ng-model="new_item.name" type="text" placeholder="Package name"/>
-    <input ng-model="new_item.source" type="text" placeholder="Source repository"/>
-    <button ng-click="add_item()" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)">Add</button>
+    <form ng-submit="add_item()">
+      <input ng-model="new_item.namespace" type="text" placeholder="Namespace (python, node, etc.)"/>
+      <input ng-model="new_item.name" type="text" placeholder="Package name"/>
+      <input ng-model="new_item.source" type="text" placeholder="Source repository"/>
+      <input type="submit" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)" value="Add"/>
+    </form>
   </p>
 </div>
 {% endverbatim %}
