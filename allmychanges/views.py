@@ -244,3 +244,7 @@ class CheckEmailView(LoginRequiredMixin, CommonContextMixin, FormView):
         self.request.user.email = form.cleaned_data['email']
         self.request.user.save()
         return super(CheckEmailView, self).form_valid(form)
+
+
+class StyleGuideView(TemplateView):
+    template_name = 'allmychanges/style-guide.html'

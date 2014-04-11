@@ -20,3 +20,7 @@ windows:
   - window_name: worker
     panes:
       - ./manage.py rqworker
+
+  - window_name: stylus
+    panes:
+      - node_modules/.bin/stylus --watch --out allmychanges/static/allmychanges/css allmychanges/static/allmychanges/stylus
