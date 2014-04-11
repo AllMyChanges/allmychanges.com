@@ -1,0 +1,154 @@
+@require "forms"
+@require "boxes"
+@require "typography"
+@require "header"
+@require "subscription"
+@require "utils"
+
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.3em;
+    background-color: #F6F5F3;
+}
+        
+
+
+.digest-source {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+.content {
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+.footer {
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    border-top: 1px solid #ddd;
+    padding-top: 1em;
+    color: gray;
+}
+
+.digest-source__problem {
+    color: red;
+    margin-left: 1px;
+}
+
+
+.clear {
+    clear: both;
+}
+
+
+.grouped-changes-title {
+    font-size: 1.5em;
+}
+
+
+.package-changes {
+    list-style: none;
+}
+
+.package-changes__package-title {
+    font-size: 1.2em;
+}
+
+
+.package-changes__version {
+    padding-left: 1em;
+}
+
+.package-version {
+    list-style: none;
+}
+
+.package-version__number {
+    display: inline-block;
+    margin-top: 1em;
+}
+
+.package-version__date {
+    display: inline;
+    color: gray;
+}
+
+.package-version__items {
+    margin-left: 1em;
+    margin-top: 0.5em;
+}
+
+.package-version__section-item {
+    list-style: disc inside;
+}
+
+.package-version__notes {
+    margin-left: 1em;
+    margin-top: 0.5em;
+}
+
+.grouped-changes-title {
+    margin-top: 1em;
+}
+
+.package-changes__package-title {
+    margin-top: 1em;
+    display: inline-block;
+}
+
+.email-note {
+    margin-top: 2em;
+    font-size: 1.2em;
+}
+
+.email-signature {
+    margin-top: 2em;
+    font-size: 1.2em;
+}
+
+.email-unsubscribe {
+    font-size: 0.75em;
+    margin-top: 2em;
+}
+
+
+.subscription-form {
+    font-size: 2em;
+    line-height: 2em;
+    margin-top: 1em;
+    margin-left: 0.8em;
+}
+
+.subscription-form input[name="email"] {
+    font-size: 1.5em;
+    border: 1px solid gray;
+    padding-left: 0.1em;
+}
+
+.error > input[type="text"] {
+    border: 1px solid red;
+}
+
+.subscription-form input[type="submit"] {
+    font-size: 1em;
+    line-height: 1.7em;
+    border: 1px solid #dedede;
+    border-radius: 3px;
+    color: white;
+    background-color: #5cb85c;
+}
+
+.subscription-form input[type="submit"]:hover {
+    background-color: #47a447;
+}
+
+.subscribed-text {
+    font-size: 1.5em;
+    margin-left: 1em;
+}
+

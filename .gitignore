@@ -43,3 +43,4 @@ nosetests.xml
 /src/
 /.noseids
 /.tdaemon.state
+/node_modules/

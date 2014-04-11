@@ -1,0 +1,34 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block content %}
+  <h1 class="page-header">Style Guide</h1>
+
+  <div class="box box_guide">
+    <h2 class="page-subheader">A simple form with input and submit button</h2>
+    <form class="form">
+      <label for="field">Some field:</label>
+      <input name="field" class="text-input" type="text" value="Blah minor" />
+      <input class="button" type="submit" value="Submit" />
+    </form>
+  </div>
+
+  <div class="box box_guide">
+    <h2 class="page-subheader">A form with large inputs</h2>
+    <form class="form form_large">
+      <label for="field">Some field:</label>
+      <input name="field" class="text-input" type="text" value="Blah minor" />
+      <input class="button" type="submit" value="Submit" />
+    </form>
+  </div>
+
+  <div class="box box_guide">
+    <h2 class="page-subheader">Colored buttons</h2>
+    <form class="form">
+      <input class="button" type="submit" value="Generic" />
+      <input class="button button_good" type="submit" value="Good" />
+      <input class="button button_bad" type="submit" value="Bad" />
+    </form>
+  </div>
+
+{% endblock content %}

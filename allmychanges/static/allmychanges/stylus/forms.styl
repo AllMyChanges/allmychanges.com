@@ -1,0 +1,50 @@
+@require "variables"
+
+.form
+    margin-top: 1em
+    margin-bottom: 1em
+
+    &_large
+        font-size: (30em / 15)
+        line-height: (40em / 30) 
+
+.text-input
+    border: 1px solid input-border-color
+    font-size: 1em
+    padding: (1em/15)
+    margin: 0
+    
+    &__error
+        border: 1px solid (input-border-color + #f00)
+
+.button
+    color: button-text-color
+    background-color: button-color
+    border: 1px solid input-border-color
+    font-size: (12em / 15)
+    line-height: (19em / 12)
+    padding-top: (1em / 12)
+    padding-bottom: @padding-top
+    padding-left: (1em / 4)
+    padding-right: @padding-left
+    margin: 0
+
+    border-radius: (1em / 4)
+
+    &:hover
+        background-color: (button-color - 20%)
+
+    &_good
+        color: good-button-text-color
+        background-color: good-button-color
+
+        &:hover
+            background-color: (good-button-color - 20%)
+
+    &_bad
+        color: bad-button-text-color
+        background-color: bad-button-color
+
+        &:hover
+            background-color: (bad-button-color - 20%)
+        

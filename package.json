@@ -1,0 +1,23 @@
+{
+  "name": "allmychanges.com",
+  "version": "0.1.0",
+  "description": "A cool ChangeLog tracker.",
+  "main": "index.js",
+  "dependencies": {
+    "stylus": "~0.43.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/AllMyChanges/allmychanges.com.git"
+  },
+  "author": "Alexander Artemenko",
+  "license": "BSD",
+  "bugs": {
+    "url": "https://github.com/AllMyChanges/allmychanges.com/issues"
+  },
+  "homepage": "https://github.com/AllMyChanges/allmychanges.com"
+}
