@@ -183,16 +183,16 @@ body {
 }
 
 .subscription-form input[type="submit"] {
-    font-size: 1.5em;
-    line-height: 1em;
+    font-size: 1em;
+    line-height: 1.7em;
     border: 1px solid #dedede;
     border-radius: 3px;
     color: white;
-    background-color: #72FF5B;
+    background-color: #5cb85c;
 }
 
 .subscription-form input[type="submit"]:hover {
-    border: 1px solid gray;
+    background-color: #47a447;
 }
 
 .subscribed-text {
