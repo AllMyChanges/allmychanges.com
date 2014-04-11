@@ -25,6 +25,7 @@
           <h1 class="logo__text"><a class="logo__link" href="/digest/">AllMyChanges.com</a></h1>
         </div>
 
+        {% block login-plate %}
         <div class="login-plate">
           {% if request.user.is_authenticated %}
             Hi, {{ request.user }}! <a class="login-plate__logout-link" href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
@@ -32,6 +33,7 @@
             <span class="login-plate__buttons">Login with: <a href="{% url "social:begin" "github" %}">GitHub</a> or <a href="{% url "social:begin" "twitter" %}">Twitter</a></span>
           {% endif %}
         </div>
+        {% endblock %}
         <div class="clear"></div>
       </div>
 

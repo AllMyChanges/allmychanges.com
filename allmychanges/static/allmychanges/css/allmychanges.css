@@ -2,11 +2,14 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 15px;
     line-height: 1.3em;
+    background-color: #F6F5F3;
 }
         
 .header {
-    margin-bottom: 2em;
-    margin-top: 1em;
+    padding-bottom: 1.5em;
+    padding-top: 1.5em;
+    background-color: white;
+    border-bottom: 1px solid #dedede;
 }
 
 .logo {
@@ -46,6 +49,7 @@ body {
     margin-bottom: 1em;
     border-top: 1px solid #ddd;
     padding-top: 1em;
+    color: gray;
 }
 
 .digest-source__problem {
@@ -137,4 +141,61 @@ body {
 .email-unsubscribe {
     font-size: 0.75em;
     margin-top: 2em;
+}
+
+.box {
+    background-color: white;
+    padding: 0.5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: -0.5em;
+    border: 1px solid #dedede;    
+}
+
+.box_coming-soon {
+    margin-left: -2.5em;
+    margin-right: -2.5em;
+    padding-top: 1em;
+    padding-bottom: 2em;
+}
+
+.page-header_coming-soon {
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    font-size: 3em;
+}
+
+.subscription-form {
+    font-size: 2em;
+    line-height: 2em;
+    margin-top: 1em;
+    margin-left: 0.8em;
+}
+
+.subscription-form input[name="email"] {
+    font-size: 1.5em;
+    border: 1px solid gray;
+    padding-left: 0.1em;
+}
+
+.error > input[type="text"] {
+    border: 1px solid red;
+}
+
+.subscription-form input[type="submit"] {
+    font-size: 1.5em;
+    line-height: 1em;
+    border: 1px solid #dedede;
+    border-radius: 3px;
+    color: white;
+    background-color: #72FF5B;
+}
+
+.subscription-form input[type="submit"]:hover {
+    border: 1px solid gray;
+}
+
+.subscribed-text {
+    font-size: 1.5em;
+    margin-left: 1em;
 }

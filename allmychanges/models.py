@@ -244,6 +244,7 @@ class RepoVersionItemChange(models.Model):
 
 class Subscription(models.Model):
     email = models.EmailField()
+    come_from = models.CharField(max_length=100)
     date_created = models.DateTimeField()
 
     def __unicode__(self):

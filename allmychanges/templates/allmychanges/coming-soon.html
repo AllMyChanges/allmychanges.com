@@ -1,0 +1,21 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block login-plate %}{% endblock %}
+
+{% block content %}
+  <div class="box box_coming-soon">
+    <h1 class="page-header page-header_coming-soon">A new version of AllMyChanges.com is coming soon!</h1>
+    <form class="subscription-form" action="." method="POST">
+      Leave email and we drop you a line right before the launch:
+
+      {% if form.errors.email %}<span class="error">{% endif %}
+      {{ form.email }}
+      {% if form.errors.email %}</span>{% endif %}
+
+      {{ form.come_from }}
+      {% csrf_token %}
+      <input type="submit" value="Subscribe!"/>
+    </form>
+  </div>
+{% endblock content %}

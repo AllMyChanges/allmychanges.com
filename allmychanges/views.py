@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from django.views.generic import TemplateView, RedirectView, FormView, View
+from django.views.generic import TemplateView, RedirectView, FormView
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -9,17 +9,44 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
+from django import forms
 
-from allmychanges.models import Package
+from allmychanges.models import Package, Subscription
 
 
-class IndexView(TemplateView):
+class OldIndexView(TemplateView):
     template_name = 'allmychanges/index.html'
 
     def get_context_data(self, **kwargs):
-        result = super(IndexView, self).get_context_data(**kwargs)
+        result = super(OldIndexView, self).get_context_data(**kwargs)
         result['settings'] = settings
         return result
+
+
+class SubscriptionForm(forms.Form):
+    email = forms.EmailField(label='Email')
+    come_from = forms.CharField(widget=forms.HiddenInput)
+
+
+class SubscribedView(TemplateView):
+    template_name = 'allmychanges/subscribed.html'
+
+
+class ComingSoonView(FormView):
+    template_name = 'allmychanges/coming-soon.html'
+    form_class = SubscriptionForm
+    success_url = '/subscribed/'
+
+    def get_initial(self):
+        return {'come_from': 'coming-soon'}
+
+    def form_valid(self, form):
+        Subscription.objects.create(
+            email=form.cleaned_data['email'],
+            come_from=form.cleaned_data['come_from'],
+            date_created=timezone.now())            
+        return super(ComingSoonView, self).form_valid(form)
+
 
 
 class HumansView(TemplateView):
@@ -189,10 +216,8 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
         return '/digest/'
 
 
-from django import forms
-
 class EmailForm(forms.Form):
-        email = forms.EmailField(label='Please check if this is email you wish to receive your digest and news to')
+    email = forms.EmailField(label='Please check if this is email you wish to receive your digest and news to')
                             
 
 class CheckEmailView(LoginRequiredMixin, CommonContextMixin, FormView):

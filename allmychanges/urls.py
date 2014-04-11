@@ -3,7 +3,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
-from .views import (IndexView,
+from .views import (OldIndexView,
                     HumansView,
                     DigestView,
                     EditDigestView,
@@ -11,6 +11,8 @@ from .views import (IndexView,
                     AfterLoginView,
                     CheckEmailView,
                     LoginView,
+                    ComingSoonView,
+                    SubscribedView,
                     PackageView)
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
@@ -18,7 +20,10 @@ from django.shortcuts import redirect
 
 urlpatterns = patterns(
     '',
-    url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^$', ComingSoonView.as_view(), name='index'),
+    url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
+
+    url(r'^subscribed/$', SubscribedView.as_view(), name='subscribed'),
 
     url(r'^digest/$', DigestView.as_view(), name='digest'),
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
