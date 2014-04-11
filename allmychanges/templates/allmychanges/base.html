@@ -111,13 +111,13 @@
     <script src="{% static 'allmychanges/flat_ui/js/jquery.tagsinput.js' %}"></script>
     <script src="{% static 'allmychanges/flat_ui/js/jquery.placeholder.js' %}"></script>
 
-{% if settings.SHOW_METRIKA %}
+{% if settings.METRIKA_ID %}
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
 (function (d, w, c) {
     (w[c] = w[c] || []).push(function() {
         try {
-            w.yaCounter22434466 = new Ya.Metrika({id:22434466,
+            w.yaCounter = new Ya.Metrika({id:{{ settings.METRIKA_ID }},
                     webvisor:true,
                     clickmap:true,
                     trackLinks:true,
@@ -138,7 +138,7 @@
     } else { f(); }
 })(document, window, "yandex_metrika_callbacks");
 </script>
-<noscript><div><img src="//mc.yandex.ru/watch/22434466"
+<noscript><div><img src="//mc.yandex.ru/watch/{{ settings.METRIKA_ID }}"
                     style="position:absolute; left:-9999px;" alt=""
                     /></div></noscript>
 <!-- /Yandex.Metrika counter -->

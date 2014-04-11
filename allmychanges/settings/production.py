@@ -24,4 +24,5 @@ GRAPHITE_PREFIX = 'allmychanges'
 
 ALLOWED_HOSTS = ['allmychanges.com']
 
-SHOW_METRIKA = True
+METRIKA_ID = '22434466'
+ANALYTICS_ID = 'UA-49927178-1'

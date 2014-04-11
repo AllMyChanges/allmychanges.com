@@ -28,3 +28,7 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
     'SHOW_TOOLBAR_CALLBACK': 'allmychanges.utils.show_debug_toolbar'
 }
+
+
+METRIKA_ID = '24627125'
+ANALYTICS_ID = 'UA-49927178-2'

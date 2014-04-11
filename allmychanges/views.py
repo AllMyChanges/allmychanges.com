@@ -10,8 +10,17 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django import forms
+from django.http import HttpResponseRedirect
 
 from allmychanges.models import Package, Subscription
+
+
+class CommonContextMixin(object):
+    def get_context_data(self, **kwargs):
+        result = super(CommonContextMixin, self).get_context_data(**kwargs)
+        result['settings'] = settings
+        result['request'] = self.request
+        return result
 
 
 class OldIndexView(TemplateView):
@@ -28,11 +37,11 @@ class SubscriptionForm(forms.Form):
     come_from = forms.CharField(widget=forms.HiddenInput)
 
 
-class SubscribedView(TemplateView):
+class SubscribedView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/subscribed.html'
 
 
-class ComingSoonView(FormView):
+class ComingSoonView(CommonContextMixin, FormView):
     template_name = 'allmychanges/coming-soon.html'
     form_class = SubscriptionForm
     success_url = '/subscribed/'
@@ -47,6 +56,11 @@ class ComingSoonView(FormView):
             date_created=timezone.now())            
         return super(ComingSoonView, self).form_valid(form)
 
+    def get(self, request, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/digest/')
+        return super(ComingSoonView, self).get(request, **kwargs)
+
 
 
 class HumansView(TemplateView):
@@ -59,13 +73,6 @@ class LoginRequiredMixin(object):
     def dispatch(self, *args, **kwargs):
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
 
-
-class CommonContextMixin(object):
-    def get_context_data(self, **kwargs):
-        result = super(CommonContextMixin, self).get_context_data(**kwargs)
-        result['settings'] = settings
-        result['request'] = self.request
-        return result
 
 
 from django.core.cache import cache
@@ -153,7 +160,7 @@ class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
         return result
 
 
-class LoginView(TemplateView, CommonContextMixin):
+class LoginView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/login.html'
 
     def get_context_data(self, **kwargs):
@@ -161,6 +168,11 @@ class LoginView(TemplateView, CommonContextMixin):
         result['next'] = self.request.GET.get('next', reverse('digest'))
         return result
 
+    def get(self, request, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/digest/')
+        return super(LoginView, self).get(request, **kwargs)
+        
 
 class EditDigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/edit_digest.html'
