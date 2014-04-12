@@ -36,31 +36,20 @@ class SubscriptionForm(forms.Form):
     email = forms.EmailField(label='Email')
     come_from = forms.CharField(widget=forms.HiddenInput)
 
+    def __init__(self, *args, **kwargs):
+
+        # we need this woodoo magick to allow
+        # multiple email fields in the form
+        if 'data' in kwargs:
+            data = kwargs['data']
+            data._mutable = True
+            data.setlist('email', filter(None, data.getlist('email')))
+            data._mutable = False
+        super(SubscriptionForm, self).__init__(*args, **kwargs)
+
 
 class SubscribedView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/subscribed.html'
-
-
-class ComingSoonView(CommonContextMixin, FormView):
-    template_name = 'allmychanges/coming-soon.html'
-    form_class = SubscriptionForm
-    success_url = '/subscribed/'
-
-    def get_initial(self):
-        return {'come_from': 'coming-soon'}
-
-    def form_valid(self, form):
-        Subscription.objects.create(
-            email=form.cleaned_data['email'],
-            come_from=form.cleaned_data['come_from'],
-            date_created=timezone.now())            
-        return super(ComingSoonView, self).form_valid(form)
-
-    def get(self, request, **kwargs):
-        if request.user.is_authenticated():
-            return HttpResponseRedirect('/digest/')
-        return super(ComingSoonView, self).get(request, **kwargs)
-
 
 
 class HumansView(TemplateView):
@@ -248,3 +237,47 @@ class CheckEmailView(LoginRequiredMixin, CommonContextMixin, FormView):
 
 class StyleGuideView(TemplateView):
     template_name = 'allmychanges/style-guide.html'
+
+
+
+class ComingSoonView(CommonContextMixin, FormView):
+    template_name = 'allmychanges/coming-soon.html'
+    form_class = SubscriptionForm
+    success_url = '/subscribed/'
+
+    def get_initial(self):
+        return {'come_from': 'coming-soon'}
+
+    def form_valid(self, form):
+        Subscription.objects.create(
+            email=form.cleaned_data['email'],
+            come_from=form.cleaned_data['come_from'],
+            date_created=timezone.now())            
+        return super(ComingSoonView, self).form_valid(form)
+
+    def get(self, request, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/digest/')
+        return super(ComingSoonView, self).get(request, **kwargs)
+
+
+class LandingView(CommonContextMixin, FormView):
+    template_name = 'allmychanges/landings/ru.html'
+    form_class = SubscriptionForm
+    success_url = '/subscribed/'
+
+    def get_initial(self):
+        return {'come_from': 'landing-ru'}
+
+    def form_valid(self, form):
+        Subscription.objects.create(
+            email=form.cleaned_data['email'],
+            come_from=form.cleaned_data['come_from'],
+            date_created=timezone.now())            
+        return super(LandingView, self).form_valid(form)
+
+    def get(self, request, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/digest/')
+        return super(LandingView, self).get(request, **kwargs)
+

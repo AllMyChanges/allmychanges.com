@@ -14,6 +14,7 @@ from .views import (OldIndexView,
                     ComingSoonView,
                     SubscribedView,
                     StyleGuideView,
+                    LandingView,
                     PackageView)
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
@@ -43,6 +44,7 @@ urlpatterns = patterns(
     url(r'after-login/', AfterLoginView.as_view(), name='after-login'),
     url(r'check-email/', CheckEmailView.as_view(), name='after-login'),
     url(r'style-guide/', StyleGuideView.as_view(), name='style-guide'),
+    url(r'landing/', LandingView.as_view(), name='landing'),
     url(r'accounts/login/', LoginView.as_view(), name='login'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
 )

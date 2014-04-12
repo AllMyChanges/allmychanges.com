@@ -1,0 +1,45 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<form class="landing-ru" action="." method="POST">
+   <p><span class="highlight">Устали разбираться</span> в причинах поломок после обновления библиотек?</p>
+
+   <p><span class="highlight">AllMyChanges поможет</span> отслеживать изменения.</p>
+
+   <p>Подпишитесь на рассылку, чтобы стать одним из первых пользователей
+   и <span class="highlight">получите 3 месяца бесплатно</span>го использования!</p>
+
+   <p><span class="nowrap">Email: <input type="text" name="email" class="text-input"/> <input type="submit" value="подписаться" class="button button_good"/></span></p>
+
+   <p class="highlight">Как это работает?<br/>
+   -----------------</p>
+
+   <p>
+   * <span class="highlight">Вы выбираете</span>, за какими библиотеками следить.<br/>
+   * Наш <span class="highlight">робот</span> регулярно <span class="highlight">проверяет</span> обновления.<br/>
+   * И <span class="highlight">высылает</span> вам на почту <span class="highlight">дайжест</span> с новостями.<br/>
+   </p>
+
+
+   <p class="highlight">Какие плюсы?<br/>
+   ------------</p>
+
+   <p>
+   * Дайжест <span class="highlight">содержит</span> не только <span class="highlight">список новых версий</span>, но и их <span class="highlight">описание</span>.<br/>
+   * <span class="highlight">Вы всегда в курсе</span> последних фич и критических исправлений.<br/>
+   * Получаете всю информацию <span class="highlight">быстро и в едином формате</span>.<br/>
+   </p>
+
+   <p>
+   Станьте одним из первых пользователей и получите<br/>
+   <span class="highlight">3 месяца бесплатно</span>го использования!</p>
+
+   <p><span class="nowrap">Email: <input type="text" name="email" class="text-input"/> <input type="submit" value="подписаться" class="button button_good"/></span></p>
+
+   {{ form.come_from }}
+   {% csrf_token %}
+</form>
+{% endblock content %}

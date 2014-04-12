@@ -20,6 +20,7 @@
 
 <body>
     <div class="page">
+      {% block header %}
       <div class="header">
         <div class="logo">
           <h1 class="logo__text"><a class="logo__link" href="/">AllMyChanges.com</a></h1>
@@ -36,17 +37,20 @@
         {% endblock %}
         <div class="clear"></div>
       </div>
+      {% endblock header %}
 
       <div class="content">
         {% block content %}{% endblock content %}
       </div>
 
+      {% block footer %}
       <div class="footer">
         <small>
           Follow us on <a href="https://twitter.com/allmychanges">Twitter</a>.
           Report bugs to <a href="https://github.com/AllMyChanges/allmychanges.com/issues">GitHub</a>.
         </small>
       </div>
+      {% endblock footer %}
     </div>
 
 

@@ -4,6 +4,9 @@
 @require "header"
 @require "subscription"
 @require "utils"
+@require "landing-ru"
+@require "pages/*"
+
 
 
 body {
@@ -115,40 +118,3 @@ body {
     font-size: 0.75em;
     margin-top: 2em;
 }
-
-
-.subscription-form {
-    font-size: 2em;
-    line-height: 2em;
-    margin-top: 1em;
-    margin-left: 0.8em;
-}
-
-.subscription-form input[name="email"] {
-    font-size: 1.5em;
-    border: 1px solid gray;
-    padding-left: 0.1em;
-}
-
-.error > input[type="text"] {
-    border: 1px solid red;
-}
-
-.subscription-form input[type="submit"] {
-    font-size: 1em;
-    line-height: 1.7em;
-    border: 1px solid #dedede;
-    border-radius: 3px;
-    color: white;
-    background-color: #5cb85c;
-}
-
-.subscription-form input[type="submit"]:hover {
-    background-color: #47a447;
-}
-
-.subscribed-text {
-    font-size: 1.5em;
-    margin-left: 1em;
-}
-
