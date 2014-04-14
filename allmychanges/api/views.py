@@ -7,7 +7,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
-from allmychanges.models import Repo, Subscription, Package
+from allmychanges.models import Repo, Subscription
 from allmychanges.api.serializers import (
     RepoSerializer,
     RepoDetailSerializer,

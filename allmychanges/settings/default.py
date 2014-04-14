@@ -100,6 +100,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
 )
 
 ROOT_URLCONF = 'allmychanges.urls'
@@ -183,6 +184,13 @@ LOGGING = {
             'filename': '/var/log/allmychanges/stats-{0}.log'.format(
                 _current_user)
         },
+        'django_full': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'formatter': 'verbose',
+            'filename': '/var/log/allmychanges/full-{0}.log'.format(
+                _current_user)
+        }
     },
     'loggers': {
         'django.request': {
@@ -200,7 +208,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-    }
+    },
+    'root': {
+        'handlers': ['django_full'],
+        'level': 'DEBUG',
+        'propagate': True,
+    },
 }
 
 # rest framework
