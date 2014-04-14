@@ -52,6 +52,20 @@ class SubscriptionForm(forms.Form):
 class SubscribedView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/subscribed.html'
 
+    def get_context_data(self, **kwargs):
+        result = super(SubscribedView, self).get_context_data(**kwargs)
+
+        # if we know from which landing user came
+        # we'll set it into the context to throw
+        # this value into the Google Analytics and
+        # Yandex Metrika
+        landing = self.request.GET.get('from')
+        if landing:
+            result.setdefault('tracked_vars', {})
+            result['tracked_vars']['landing'] = landing
+            
+        return result
+
 
 class HumansView(TemplateView):
     template_name = 'allmychanges/humans.txt'
@@ -244,7 +258,6 @@ class StyleGuideView(TemplateView):
 class LandingView(CommonContextMixin, FormView):
     landings = []
     form_class = SubscriptionForm
-    success_url = '/subscribed/'
 
     def __init__(self, landings=[], *args, **kwargs):
         self.landings = landings
@@ -252,10 +265,19 @@ class LandingView(CommonContextMixin, FormView):
 
     def get_template_names(self):
         return self.choosen_template
+
+    def get_success_url(self):
+        return '/subscribed/?from=' + self.landing
         
     def get_initial(self):
         return {'come_from': 'landing-' + self.landing}
-
+        
+    def get_context_data(self, **kwargs):
+        result = super(LandingView, self).get_context_data(**kwargs)
+        result.setdefault('tracked_vars', {})
+        result['tracked_vars']['landing'] = self.landing
+        return result
+        
     def form_valid(self, form):
         Subscription.objects.create(
             email=form.cleaned_data['email'],

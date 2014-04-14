@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles allmychanges_tags %}
 <!DOCTYPE html>
 <html ng-app="allMyChangesApp">
 <head>
@@ -14,6 +14,9 @@
       <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8">
       </script>
     {% endblock %}
+
+      <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
+
 
     {% block extra_head %}{% endblock extra_head %}
 </head>
@@ -57,15 +60,20 @@
 {% if settings.METRIKA_ID %}
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
+var tracked_vars = {{ tracked_vars|json|safe }} || {};
+
 (function (d, w, c) {
     (w[c] = w[c] || []).push(function() {
         try {
-            w.yaCounter = new Ya.Metrika({id:{{ settings.METRIKA_ID }},
-                    webvisor:true,
-                    clickmap:true,
-                    trackLinks:true,
-                    accurateTrackBounce:true});
-        } catch(e) { }
+            w.yaCounter = new Ya.Metrika({
+                    id: {{ settings.METRIKA_ID }},
+                    webvisor: true,
+                    clickmap: true,
+                    trackLinks: true,
+                    accurateTrackBounce: true,
+                    params: tracked_vars});
+        } catch(e) {
+        }
     });
 
     var n = d.getElementsByTagName("script")[0],
@@ -96,6 +104,11 @@
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   ga('create', '{{ settings.ANALYTICS_ID }}', 'allmychanges.com');
+
+  {% for key, value in tracked_vars.items %}
+    ga('set', '{{key}}', '{{value}}');
+  {% endfor %}
+
   ga('send', 'pageview');
 
 </script>
