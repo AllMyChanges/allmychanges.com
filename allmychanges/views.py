@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import random
 
 from django.views.generic import TemplateView, RedirectView, FormView
 from django.conf import settings
@@ -240,34 +241,20 @@ class StyleGuideView(TemplateView):
 
 
 
-class ComingSoonView(CommonContextMixin, FormView):
-    template_name = 'allmychanges/coming-soon.html'
-    form_class = SubscriptionForm
-    success_url = '/subscribed/'
-
-    def get_initial(self):
-        return {'come_from': 'coming-soon'}
-
-    def form_valid(self, form):
-        Subscription.objects.create(
-            email=form.cleaned_data['email'],
-            come_from=form.cleaned_data['come_from'],
-            date_created=timezone.now())            
-        return super(ComingSoonView, self).form_valid(form)
-
-    def get(self, request, **kwargs):
-        if request.user.is_authenticated():
-            return HttpResponseRedirect('/digest/')
-        return super(ComingSoonView, self).get(request, **kwargs)
-
-
 class LandingView(CommonContextMixin, FormView):
-    template_name = 'allmychanges/landings/ru.html'
+    landings = []
     form_class = SubscriptionForm
     success_url = '/subscribed/'
 
+    def __init__(self, landings=[], *args, **kwargs):
+        self.landings = landings
+        super(LandingView, self).__init__(*args, **kwargs)
+
+    def get_template_names(self):
+        return self.choosen_template
+        
     def get_initial(self):
-        return {'come_from': 'landing-ru'}
+        return {'come_from': 'landing-' + self.landing}
 
     def form_valid(self, form):
         Subscription.objects.create(
@@ -279,5 +266,21 @@ class LandingView(CommonContextMixin, FormView):
     def get(self, request, **kwargs):
         if request.user.is_authenticated():
             return HttpResponseRedirect('/digest/')
+
+        session_key = u'landing:' + request.path
+        self.landing = request.session.get(session_key)
+
+        if self.landing not in self.landings:
+            self.landing = random.choice(self.landings)
+            request.session[session_key] = self.landing
+            
+        self.choosen_template = 'allmychanges/landings/{0}.html'.format(
+            self.landing)
+
         return super(LandingView, self).get(request, **kwargs)
 
+    def post(self, request, **kwargs):
+        come_from = request.POST.get('come_from', '')
+        self.landing = come_from.split('-', 1)[-1]
+        return super(LandingView, self).post(request, **kwargs)
+        

@@ -11,7 +11,6 @@ from .views import (OldIndexView,
                     AfterLoginView,
                     CheckEmailView,
                     LoginView,
-                    ComingSoonView,
                     SubscribedView,
                     StyleGuideView,
                     LandingView,
@@ -22,7 +21,7 @@ from django.shortcuts import redirect
 
 urlpatterns = patterns(
     '',
-    url(r'^$', ComingSoonView.as_view(), name='index'),
+    url(r'^$', LandingView.as_view(landings=['coming-soon']), name='index'),
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
 
     url(r'^subscribed/$', SubscribedView.as_view(), name='subscribed'),
@@ -44,7 +43,7 @@ urlpatterns = patterns(
     url(r'after-login/', AfterLoginView.as_view(), name='after-login'),
     url(r'check-email/', CheckEmailView.as_view(), name='after-login'),
     url(r'style-guide/', StyleGuideView.as_view(), name='style-guide'),
-    url(r'landing/', LandingView.as_view(), name='landing'),
+    url(r'landing/ru/', LandingView.as_view(landings=['ru']), name='landing-ru'),
     url(r'accounts/login/', LoginView.as_view(), name='login'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
 )
