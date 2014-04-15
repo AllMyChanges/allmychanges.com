@@ -45,7 +45,7 @@ six==1.6.1
 sqlparse==0.1.11
 times==0.6.2
 tmuxp==0.1.11
-twiggy-goodies==0.1.0
+twiggy-goodies==0.2.0
 twiggy==0.4.5
 werkzeug==0.9.4
 wmctrl==0.1

@@ -2,7 +2,10 @@
 import datetime
 import random
 
-from django.views.generic import TemplateView, RedirectView, FormView
+from django.views.generic import (TemplateView,
+                                  RedirectView,
+                                  FormView,
+                                  View)
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -306,3 +309,8 @@ class LandingView(CommonContextMixin, FormView):
         self.landing = come_from.split('-', 1)[-1]
         return super(LandingView, self).post(request, **kwargs)
         
+
+
+class RaiseExceptionView(View):
+    def get(self, request, **kwargs):
+        1/0

@@ -94,6 +94,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'twiggy_goodies.django.LogMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -136,7 +137,7 @@ INSTALLED_APPS = (
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # all logging goes through twiggy
-LOGGING = {'version': 1, 'handlers':{}}
+LOGGING_CONFIG = False
 
 # rest framework
 REST_FRAMEWORK = {
@@ -189,6 +190,18 @@ def init_logging(filename):
     import logging
     from twiggy_goodies.std_logging import RedirectLoggingHandler
 
+    handler = RedirectLoggingHandler()
     del logging.root.handlers[:]
-    logging.root.addHandler(RedirectLoggingHandler())
+    logging.root.addHandler(handler)
 
+
+    # we need this, to turn off django-rq's logging
+    # configuration
+    worker_logger = logging.getLogger('rq.worker')
+    del worker_logger.handlers[:]
+    worker_logger.addHandler(handler)
+    worker_logger.propagate = False
+
+    # and we need this to turn off python-rq's logging
+    # configuration
+    logging._handlers['fake-handler'] = handler

@@ -29,5 +29,5 @@ rq==0.3.13
 six==1.6.1
 sqlparse==0.1.11
 times==0.6.2
-twiggy-goodies==0.1.0
+twiggy-goodies==0.2.0
 twiggy==0.4.5

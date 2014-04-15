@@ -2,7 +2,6 @@
 import logging
 import datetime
 
-from django_rq import job
 from django.utils import timezone
 from django.conf import settings
 from allmychanges.utils import (
@@ -10,6 +9,7 @@ from allmychanges.utils import (
     update_changelog,
     UpdateError)
 
+from twiggy_goodies.django_rq import job
 
 @job
 def update_repo(repo_id):
@@ -72,3 +72,8 @@ def update_changelog_task(source):
     finally:
         changelog.processing_started_at = None
         changelog.save()
+
+
+@job
+def raise_exception():
+    1/0
