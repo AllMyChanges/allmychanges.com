@@ -1,8 +1,10 @@
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 
 from allmychanges.tasks import schedule_updates
 
-class Command(BaseCommand):
+
+class Command(LogMixin, BaseCommand):
     help = u"""Updates single project."""
 
     def handle(self, *args, **options):

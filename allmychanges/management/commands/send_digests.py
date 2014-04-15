@@ -3,6 +3,7 @@ import datetime
 import os
 
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
@@ -14,7 +15,7 @@ from allmychanges.views import get_digest_for
 from premailer import Premailer
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
 
     def handle(self, *args, **options):

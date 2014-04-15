@@ -1,6 +1,7 @@
 import os
 
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
 
@@ -13,7 +14,7 @@ def get_stats():
         return stats
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Send stats to graphite Graphite."""
 
     def handle(self, *args, **options):

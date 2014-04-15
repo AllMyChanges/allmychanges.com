@@ -1,9 +1,10 @@
 # coding: utf-8
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 from allmychanges.utils import choose_history_extractor
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Command to test VCS log extractors' first step — dates and messages extraction."""
 
     def handle(self, *args, **options):

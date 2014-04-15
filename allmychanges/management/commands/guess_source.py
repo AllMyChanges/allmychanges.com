@@ -1,11 +1,12 @@
 # coding: utf-8
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 
 from allmychanges.utils import guess_source
 from allmychanges.models import Package, Version
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Command to test VCS log extractors' second step — version extraction."""
 
     def handle(self, *args, **options):

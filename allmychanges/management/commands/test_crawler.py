@@ -2,6 +2,7 @@ import os
 import requests
 
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.utils import cd, load_data, download_repo
@@ -45,7 +46,7 @@ def fetch_with_crawler_this(url):
     return None, False, 0, 0, path is None
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Tests crawler on selected projects."""
 
     def handle(self, *args, **options):

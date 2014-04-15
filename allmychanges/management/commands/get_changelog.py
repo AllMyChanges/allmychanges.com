@@ -1,13 +1,14 @@
 import os
 
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 
 from allmychanges.crawler import search_changelog, _parse_changelog_text
 from allmychanges.models import Repo
 from allmychanges.utils import cd, get_package_metadata, download_repo
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Updates single project."""
 
     def handle(self, *args, **options):

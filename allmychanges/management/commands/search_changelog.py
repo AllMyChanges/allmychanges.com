@@ -1,9 +1,10 @@
 # coding: utf-8
 from django.core.management.base import BaseCommand
+from twiggy_goodies.django import LogMixin
 from allmychanges.utils import search_changelog2
 
 
-class Command(BaseCommand):
+class Command(LogMixin, BaseCommand):
     help = u"""Search file which probably contains changelog"""
 
     def handle(self, *args, **options):
