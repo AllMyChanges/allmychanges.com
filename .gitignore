@@ -44,3 +44,4 @@ nosetests.xml
 /.noseids
 /.tdaemon.state
 /node_modules/
+*.log

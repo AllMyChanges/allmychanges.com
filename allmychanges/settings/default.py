@@ -4,7 +4,7 @@ here = lambda * x: os.path.join(os.path.abspath(os.path.dirname(__file__)), *x)
 PROJECT_ROOT = here('..', '..')
 root = lambda * x: os.path.join(os.path.abspath(PROJECT_ROOT), *x)
 
-_current_user = os.environ.get('USER', os.environ.get('LOGNAME', 'root'))
+CURRENT_USER = os.environ.get('USER', os.environ.get('LOGNAME', 'root'))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -18,7 +18,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'allmychanges_' + _current_user.replace('-', '_'),
+        'NAME': 'allmychanges_' + CURRENT_USER.replace('-', '_'),
         'USER': 'allmychanges',
         'PASSWORD': 'allmychanges',
         'HOST': '',
@@ -135,86 +135,8 @@ INSTALLED_APPS = (
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': ('%(asctime)s; %(levelname)s; '
-                       '%(name)s; %(module)s; %(message)s')
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
-        'django_catchall': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.WatchedFileHandler',
-            'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/django-{0}.log'.format(
-                _current_user)
-        },
-        'workers_catchall': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.WatchedFileHandler',
-            'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/workers-{0}.log'.format(
-                _current_user)
-        },
-        'stats': {
-            'level': 'INFO',
-            'class': 'logging.handlers.WatchedFileHandler',
-            'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/stats-{0}.log'.format(
-                _current_user)
-        },
-        'django_full': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.WatchedFileHandler',
-            'formatter': 'verbose',
-            'filename': '/var/log/allmychanges/full-{0}.log'.format(
-                _current_user)
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['django_catchall', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'tasks': {
-            'handlers': ['workers_catchall', 'mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'stats': {
-            'handlers': ['stats'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-    'root': {
-        'handlers': ['django_full'],
-        'level': 'DEBUG',
-        'propagate': True,
-    },
-}
+# all logging goes through twiggy
+LOGGING = {'version': 1, 'handlers':{}}
 
 # rest framework
 REST_FRAMEWORK = {
@@ -237,7 +159,7 @@ RQ_QUEUES = {
     }
 }
 
-GRAPHITE_PREFIX = 'allmychanges.' + _current_user
+GRAPHITE_PREFIX = 'allmychanges.' + CURRENT_USER
 
 
 TEMP_DIR = '/tmp/allmychanges'
@@ -246,3 +168,27 @@ EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
+
+def init_logging(filename):
+    from twiggy import addEmitters, outputs, levels, formats
+
+    def is_stats(msg):
+        return msg.name.startswith('stats')
+
+    addEmitters(('all',
+                 levels.DEBUG,
+                 lambda msg: not is_stats(msg),
+                 outputs.FileOutput(filename.format(user=CURRENT_USER),
+                                    format=formats.line_format)))
+    addEmitters(('stats',
+                 levels.DEBUG,
+                 is_stats,
+                 outputs.FileOutput(filename.format(user=CURRENT_USER).replace('django-', 'stats-'),
+                                    format=formats.line_format)))
+
+    import logging
+    from twiggy_goodies.std_logging import RedirectLoggingHandler
+
+    del logging.root.handlers[:]
+    logging.root.addHandler(RedirectLoggingHandler())
+

@@ -11,3 +11,6 @@ DATABASE_NAME = DATABASES['default']['NAME']
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
+
+LOG_FILENAME = 'unittest-' + CURRENT_USER + '.log'
+init_logging(LOG_FILENAME)
