@@ -29,9 +29,8 @@ urlpatterns = patterns(
     url(r'^digest/$', DigestView.as_view(), name='digest'),
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
     
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='users-package'),
+    url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
     
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
