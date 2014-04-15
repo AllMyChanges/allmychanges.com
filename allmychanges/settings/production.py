@@ -26,3 +26,6 @@ ALLOWED_HOSTS = ['allmychanges.com']
 
 METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'
+
+LOG_FILENAME = '/var/log/allmychanges/django-root.log'
+init_logging(LOG_FILENAME)

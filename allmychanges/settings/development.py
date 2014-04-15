@@ -32,3 +32,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 METRIKA_ID = '24627125'
 ANALYTICS_ID = 'UA-49927178-2'
+
+
+LOG_FILENAME = '/var/log/allmychanges/django-' + CURRENT_USER + '.log'
+init_logging(LOG_FILENAME)

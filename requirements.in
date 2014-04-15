@@ -17,6 +17,7 @@ python-social-auth
 anyjson<0.4
 times
 premailer
+twiggy-goodies
 
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
 -e git+https://github.com/svetlyak40wt/django-sendmail-backend

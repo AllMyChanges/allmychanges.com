@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import random
 
 from django.views.generic import TemplateView, RedirectView, FormView
 from django.conf import settings
@@ -36,31 +37,34 @@ class SubscriptionForm(forms.Form):
     email = forms.EmailField(label='Email')
     come_from = forms.CharField(widget=forms.HiddenInput)
 
+    def __init__(self, *args, **kwargs):
+
+        # we need this woodoo magick to allow
+        # multiple email fields in the form
+        if 'data' in kwargs:
+            data = kwargs['data']
+            data._mutable = True
+            data.setlist('email', filter(None, data.getlist('email')))
+            data._mutable = False
+        super(SubscriptionForm, self).__init__(*args, **kwargs)
+
 
 class SubscribedView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/subscribed.html'
 
+    def get_context_data(self, **kwargs):
+        result = super(SubscribedView, self).get_context_data(**kwargs)
 
-class ComingSoonView(CommonContextMixin, FormView):
-    template_name = 'allmychanges/coming-soon.html'
-    form_class = SubscriptionForm
-    success_url = '/subscribed/'
-
-    def get_initial(self):
-        return {'come_from': 'coming-soon'}
-
-    def form_valid(self, form):
-        Subscription.objects.create(
-            email=form.cleaned_data['email'],
-            come_from=form.cleaned_data['come_from'],
-            date_created=timezone.now())            
-        return super(ComingSoonView, self).form_valid(form)
-
-    def get(self, request, **kwargs):
-        if request.user.is_authenticated():
-            return HttpResponseRedirect('/digest/')
-        return super(ComingSoonView, self).get(request, **kwargs)
-
+        # if we know from which landing user came
+        # we'll set it into the context to throw
+        # this value into the Google Analytics and
+        # Yandex Metrika
+        landing = self.request.GET.get('from')
+        if landing:
+            result.setdefault('tracked_vars', {})
+            result['tracked_vars']['landing'] = landing
+            
+        return result
 
 
 class HumansView(TemplateView):
@@ -248,3 +252,57 @@ class CheckEmailView(LoginRequiredMixin, CommonContextMixin, FormView):
 
 class StyleGuideView(TemplateView):
     template_name = 'allmychanges/style-guide.html'
+
+
+
+class LandingView(CommonContextMixin, FormView):
+    landings = []
+    form_class = SubscriptionForm
+
+    def __init__(self, landings=[], *args, **kwargs):
+        self.landings = landings
+        super(LandingView, self).__init__(*args, **kwargs)
+
+    def get_template_names(self):
+        return self.choosen_template
+
+    def get_success_url(self):
+        return '/subscribed/?from=' + self.landing
+        
+    def get_initial(self):
+        return {'come_from': 'landing-' + self.landing}
+        
+    def get_context_data(self, **kwargs):
+        result = super(LandingView, self).get_context_data(**kwargs)
+        result.setdefault('tracked_vars', {})
+        result['tracked_vars']['landing'] = self.landing
+        return result
+        
+    def form_valid(self, form):
+        Subscription.objects.create(
+            email=form.cleaned_data['email'],
+            come_from=form.cleaned_data['come_from'],
+            date_created=timezone.now())            
+        return super(LandingView, self).form_valid(form)
+
+    def get(self, request, **kwargs):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/digest/')
+
+        session_key = u'landing:' + request.path
+        self.landing = request.session.get(session_key)
+
+        if self.landing not in self.landings:
+            self.landing = random.choice(self.landings)
+            request.session[session_key] = self.landing
+            
+        self.choosen_template = 'allmychanges/landings/{0}.html'.format(
+            self.landing)
+
+        return super(LandingView, self).get(request, **kwargs)
+
+    def post(self, request, **kwargs):
+        come_from = request.POST.get('come_from', '')
+        self.landing = come_from.split('-', 1)[-1]
+        return super(LandingView, self).post(request, **kwargs)
+        

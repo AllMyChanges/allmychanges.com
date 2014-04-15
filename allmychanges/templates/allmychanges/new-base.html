@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load staticfiles allmychanges_tags %}
 <!DOCTYPE html>
 <html ng-app="allMyChangesApp">
 <head>
@@ -15,11 +15,15 @@
       </script>
     {% endblock %}
 
+      <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
+
+
     {% block extra_head %}{% endblock extra_head %}
 </head>
 
 <body>
     <div class="page">
+      {% block header %}
       <div class="header">
         <div class="logo">
           <h1 class="logo__text"><a class="logo__link" href="/">AllMyChanges.com</a></h1>
@@ -36,32 +40,40 @@
         {% endblock %}
         <div class="clear"></div>
       </div>
+      {% endblock header %}
 
       <div class="content">
         {% block content %}{% endblock content %}
       </div>
 
+      {% block footer %}
       <div class="footer">
         <small>
           Follow us on <a href="https://twitter.com/allmychanges">Twitter</a>.
           Report bugs to <a href="https://github.com/AllMyChanges/allmychanges.com/issues">GitHub</a>.
         </small>
       </div>
+      {% endblock footer %}
     </div>
 
 
 {% if settings.METRIKA_ID %}
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
+var tracked_vars = {{ tracked_vars|json|safe }} || {};
+
 (function (d, w, c) {
     (w[c] = w[c] || []).push(function() {
         try {
-            w.yaCounter = new Ya.Metrika({id:{{ settings.METRIKA_ID }},
-                    webvisor:true,
-                    clickmap:true,
-                    trackLinks:true,
-                    accurateTrackBounce:true});
-        } catch(e) { }
+            w.yaCounter = new Ya.Metrika({
+                    id: {{ settings.METRIKA_ID }},
+                    webvisor: true,
+                    clickmap: true,
+                    trackLinks: true,
+                    accurateTrackBounce: true,
+                    params: tracked_vars});
+        } catch(e) {
+        }
     });
 
     var n = d.getElementsByTagName("script")[0],
@@ -92,6 +104,11 @@
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   ga('create', '{{ settings.ANALYTICS_ID }}', 'allmychanges.com');
+
+  {% for key, value in tracked_vars.items %}
+    ga('set', '{{key}}', '{{value}}');
+  {% endfor %}
+
   ga('send', 'pageview');
 
 </script>
