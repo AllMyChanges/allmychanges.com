@@ -30,7 +30,7 @@ def schedule_updates(reschedule=False, packages=[]):
     from .models import Changelog
 
     if packages :
-        changelogs = Changelog.objects.filter(package__name__in=packages).distinct()
+        changelogs = Changelog.objects.filter(packages__name__in=packages).distinct()
     else:
         changelogs = Changelog.objects.all()
 
