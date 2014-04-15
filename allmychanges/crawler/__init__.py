@@ -152,7 +152,7 @@ def parse_changelog(text):
                         # section
                         current_section['notes'].append(line)
 
-            if v_date and current_version.get('date') is None:
+            if v_date and current_version and current_version.get('date') is None:
                 current_version['date'] = v_date
 
     return _finalize_changelog(changelog)
