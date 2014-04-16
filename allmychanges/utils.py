@@ -426,7 +426,7 @@ def update_changelog(changelog):
             filename, raw_data = search_changelog2(path)
 
             if raw_data:
-                changelog.filename = filename
+                changelog.filename = os.path.relpath(filename, path)
                 changelog.save()
             else:
                 raw_data = extract_changelog_from_vcs(path)
