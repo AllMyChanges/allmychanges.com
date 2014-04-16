@@ -118,7 +118,7 @@ class Repo(models.Model):
                     self.processing_status_message = 'Searching changes'
                     self.processing_progress = 50
                     self.save()
-                    changelog_filename = search_changelog()
+                    changelog_filename = search_changelog()[0]
                     if changelog_filename:
                         full_filename = os.path.normpath(
                             os.path.join(os.getcwd(), changelog_filename))
