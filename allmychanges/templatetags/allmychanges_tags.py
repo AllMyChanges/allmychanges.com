@@ -1,6 +1,7 @@
 import anyjson
 from django import template
 
+
 register = template.Library()
 
 

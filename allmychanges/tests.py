@@ -125,11 +125,15 @@ def test_fake_downloader():
     assert path
     with open(os.path.join(path, 'CHANGELOG')) as f:
         content = f.read()
-        eq_("""0.1.0
-======
+        eq_("""0.1.1
+=====
 
-  * Initial release.
-""", content)
+  * Some bugfix.
+
+0.1.0
+=====
+
+  * Initial release.""", content)
 
 
 
@@ -140,8 +144,9 @@ def test_update_package_using_full_pipeline():
         user=art)
     
     update_changelog(package.changelog)
-    eq_(1, package.changelog.versions.count())
-    eq_('Initial release.', package.changelog.versions.all()[0].sections.all()[0].items.all()[0].text)
+    eq_(2, package.changelog.versions.count())
+    eq_('Some bugfix.', package.changelog.versions.all()[0].sections.all()[0].items.all()[0].text)
+    eq_('Initial release.', package.changelog.versions.all()[1].sections.all()[0].items.all()[0].text)
 
 
 def test_changing_source_on_package_will_create_another_changelog():
@@ -217,3 +222,4 @@ def test_source_guesser():
              'https://bitbucket.org/antocuni/pdb',
              'https://github.com/tony/tmuxp'],
             urls)
+
