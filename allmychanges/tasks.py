@@ -32,6 +32,15 @@ def update_repo(repo_id):
 def schedule_updates(reschedule=False, packages=[]):
     from .models import Changelog
 
+    stale_changelogs = Changelog.objects.filter(
+        processing_started_at__lt=timezone.now() - datetime.timedelta(0, 60 * 60))
+
+    num_stale = len(stale_changelogs)
+    
+    if num_stale > 0:
+        log.info('{0} stale changelogs were found', num_stale)
+        stale_changelogs.update(processing_started_at=None)
+
     if packages:
         changelogs = Changelog.objects.filter(packages__name__in=packages).distinct()
     else:
