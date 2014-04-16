@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+"""JSON log tailer.
+
+Usage:
+  tail [--cross-finger] [--message=<text>] <filename>
+  tail (-h | --help)
+  tail --version
+
+Options:
+  -h --help       Show this screen.
+  --version       Show version.
+  --cross-finger  Output only if there was ERROR.
+  --message=<text> Show only items with this text in message.
+
+"""
+
+import tailer
+import anyjson
+import re
+
+from docopt import docopt
+from collections import defaultdict
+
+
+def print_item(item):
+    print '{ts} {msg}'.format(
+        ts = item['@timestamp'].replace('T', ' '),
+        msg = item['@message'])
+    
+    for kv in item['@fields'].iteritems():
+        print (' ' * 20 + '{0} = {1}').format(*kv)
+
+
+def process(filename, cross_finger=False, message=None):
+    buffer = defaultdict(list)
+
+    def print_if_needed(item):
+        if message:
+            if re.search(message, item['@message'], re.I) is None:
+                return
+        print_item(item)
+            
+
+    for line in tailer.follow(open(filename)):
+        item = anyjson.deserialize(line)
+        fields = item['@fields']
+        
+        if cross_finger:
+            if 'uuid' in fields:
+                uuid = fields['uuid']
+                buffer[uuid].append(item)
+                if fields['level'] == 'ERROR':
+
+                    print ''
+                    print '=' * 80
+                    for item in buffer[uuid]:
+                        print_if_needed(item)
+                    del buffer[uuid]
+            else:
+                if fields['level'] == 'ERROR':
+                    print_if_needed(item)
+        else:
+            print_if_needed(item)
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__, version='JSON log tailer (0.1)')
+
+    process(args['<filename>'],
+            cross_finger=args['--cross-finger'],
+            message=args['--message'])
