@@ -177,6 +177,12 @@ body {
 .package-version__section-item {
   list-style: disc inside;
 }
+.package-version__section-item > p:first-child {
+  margin-left: 0;
+}
+.package-version__section-item > p {
+  margin-left: 1em;
+}
 .package-version__notes {
   margin-left: 1em;
   margin-top: 0.5em;
@@ -209,4 +215,10 @@ body {
   float: left;
   margin-left: 0.6em;
   color: #808080;
+}
+.package-version__section-item p:first-child {
+  margin-left: 0;
+}
+.package-version__section-item p {
+  margin-left: 1em;
 }

@@ -65,30 +65,34 @@ body {
 
 .package-version {
     list-style: none;
-}
 
-.package-version__number {
-    display: inline-block;
-    margin-top: 1em;
-}
+    &__number {
+        display: inline-block;
+        margin-top: 1em;
+    }
+    &__date {
+        display: inline;
+        color: gray;
+    }
+    &__items {
+        margin-left: 1em;
+        margin-top: 0.5em;
+    }
+    &__section-item {
+        list-style: disc inside;
+        
+        > p:first-child {
+            margin-left: 0;
+        }
+        > p {
+            margin-left: 1em;
+        }
+    }
 
-.package-version__date {
-    display: inline;
-    color: gray;
-}
-
-.package-version__items {
-    margin-left: 1em;
-    margin-top: 0.5em;
-}
-
-.package-version__section-item {
-    list-style: disc inside;
-}
-
-.package-version__notes {
-    margin-left: 1em;
-    margin-top: 0.5em;
+    &__notes {
+        margin-left: 1em;
+        margin-top: 0.5em;
+    }
 }
 
 .grouped-changes-title {
@@ -127,4 +131,11 @@ body {
     
     color: gray;
   }
+}
+
+.package-version__section-item p:first-child {
+    margin-left: 0;
+}
+.package-version__section-item p {
+    margin-left: 1em;
 }
