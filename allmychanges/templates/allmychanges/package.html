@@ -11,13 +11,11 @@
     <dt>Time to next update:</dt>
     <dd>{{package.changelog.next_update_at|timeuntil}}</dd>
 
-    {% if settings.DEBUG %}
-      <dt>Source:</dt>
-      <dd>{% if package.changelog.filename %}{{package.changelog.filename}}{% else %}VCS{% endif %}</dd>
-      {% if package.changelog.problem %}
-        <dt>Problem:</dt>
-        <dd>{{package.changelog.problem}}</dd>
-      {% endif %}
+    <dt>Source:</dt>
+    <dd>{% if package.changelog.filename %}{{package.changelog.filename}}{% else %}VCS{% endif %}</dd>
+    {% if package.changelog.problem %}
+      <dt>Problem:</dt>
+      <dd>{{package.changelog.problem}}</dd>
     {% endif %}
   </dl>
 

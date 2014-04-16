@@ -403,7 +403,7 @@ def search_changelog2(path):
 
         filename, raw_data = raw_data[0][1], raw_data[0][0]
         # only return data if we found some records
-        if len(raw_data) > 0:
+        if len(raw_data) > 1:
             return filename, raw_data
             
     return None, None
