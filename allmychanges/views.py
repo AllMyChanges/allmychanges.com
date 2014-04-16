@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import random
+import requests
 
 from django.views.generic import (TemplateView,
                                   RedirectView,
@@ -14,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django import forms
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 from allmychanges.models import Package, Subscription
 
@@ -205,8 +206,8 @@ class PackageView(CommonContextMixin, TemplateView):
         return result
 
 
-class BadgeView(RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
+class BadgeView(View):
+    def get(self, *args, **kwargs):
         kwargs.setdefault('username', self.request.user.username)
         
         package = get_object_or_404(
@@ -222,8 +223,21 @@ class BadgeView(RedirectView):
         else:
             version = '?.?.?'
 
-        return 'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
+        url = 'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
             version)
+        
+        content = cache.get(url)
+
+        if content is None:
+            r = requests.get(url)
+            content = r.content
+            cache.set(url, content, 60 * 60)
+
+        response = HttpResponse(content, content_type='image/png')
+        response['Content-Length'] = len(content)
+        response['Cache-Control'] = 'no-cache'
+        return response
+
 
 
 class AfterLoginView(LoginRequiredMixin, RedirectView):
@@ -315,8 +329,3 @@ class RaiseExceptionView(View):
     def get(self, request, **kwargs):
         1/0
 
-
-class BadgeView2(RedirectView):
-#    permanent = False
-    def get_redirect_url(self, *args, **kwargs):
-        return 'http://b.repl.ca/v1/changelog-0.1.0-brightgreen.png'

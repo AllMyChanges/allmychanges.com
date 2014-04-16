@@ -8,7 +8,6 @@ from .views import (OldIndexView,
                     DigestView,
                     EditDigestView,
                     BadgeView,
-                    BadgeView2,
                     AfterLoginView,
                     CheckEmailView,
                     LoginView,
@@ -32,7 +31,6 @@ urlpatterns = patterns(
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
     
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^badge/$', BadgeView2.as_view(), name='badge2'),
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
     
