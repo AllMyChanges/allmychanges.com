@@ -7,7 +7,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
-from allmychanges.models import Repo, Subscription
+from allmychanges.models import Repo, Subscription, Package
 from allmychanges.api.serializers import (
     RepoSerializer,
     RepoDetailSerializer,
@@ -78,3 +78,12 @@ class PackageViewSet(HandleExceptionMixin,
         obj.user = self.request.user
         obj.next_update_at = obj.created_at = timezone.now()
         return super(PackageViewSet, self).pre_save(obj)
+
+
+class AutocompleteNamespaceView(viewsets.ViewSet):
+    def list(self, request, *args, **kwargs):
+        queryset = Package.objects.filter(namespace__startswith=request.GET.get('q'))
+        namespaces = list(queryset.values_list('namespace', flat=True).distinct())
+        namespaces.sort()
+        return Response({'results': [{'name': namespace}
+                                     for namespace in namespaces]})

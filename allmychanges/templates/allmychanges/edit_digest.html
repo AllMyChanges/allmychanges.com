@@ -8,6 +8,8 @@
 
 {% verbatim %}
 <div ng-controller="DigestBuilderCtrl">
+  <angucomplete-alt placeholder="Namespace" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" input-class="form-control form-control-small" override-suggestions="true"/></angucomplete-alt>
+
   <ul class="digest-source">
     <li ng-repeat="item in items" class="digest-source__item">
       <p>
