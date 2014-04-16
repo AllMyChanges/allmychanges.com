@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 
-from allmychanges.models import Package, Subscription
+from allmychanges.models import Package, Subscription, Changelog
 
 
 class CommonContextMixin(object):
@@ -25,6 +25,14 @@ class CommonContextMixin(object):
         result = super(CommonContextMixin, self).get_context_data(**kwargs)
         result['settings'] = settings
         result['request'] = self.request
+
+        key = 'num_tracked_changelogs'
+        num_tracked_changelogs = cache.get(key)
+        if num_tracked_changelogs is None:
+            num_tracked_changelogs = Changelog.objects.count()
+            cache.set(key, num_tracked_changelogs, 60 * 60)
+        result[key] = num_tracked_changelogs
+        
         return result
 
 

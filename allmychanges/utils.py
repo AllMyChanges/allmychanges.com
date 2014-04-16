@@ -308,7 +308,8 @@ def choose_downloader(changelog):
 
     if 'hg' in source or 'bitbucket' in source:
         return hg_downloader
-        
+
+    raise UpdateError('Unable to choose downloader')
 
 def parse_changelog_file(filename):
     with open(filename) as f:
@@ -414,6 +415,8 @@ def update_changelog(changelog):
     try:
         download = choose_downloader(changelog)
         path = download(changelog)
+    except UpdateError:
+        raise
     except Exception:
         logging.getLogger('update-changelog').exception('unhandled')
         raise UpdateError('Unable to download sources')

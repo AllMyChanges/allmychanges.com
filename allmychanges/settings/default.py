@@ -171,7 +171,11 @@ from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 
 def init_logging(filename):
+    import logging
     from twiggy import addEmitters, outputs, levels, formats
+    from twiggy_goodies.std_logging import RedirectLoggingHandler
+    from twiggy_goodies.json import JsonOutput
+
 
     def is_stats(msg):
         return msg.name.startswith('stats')
@@ -179,16 +183,12 @@ def init_logging(filename):
     addEmitters(('all',
                  levels.DEBUG,
                  lambda msg: not is_stats(msg),
-                 outputs.FileOutput(filename.format(user=CURRENT_USER),
-                                    format=formats.line_format)))
+                 JsonOutput(filename.format(user=CURRENT_USER))))
     addEmitters(('stats',
                  levels.DEBUG,
                  is_stats,
                  outputs.FileOutput(filename.format(user=CURRENT_USER).replace('django-', 'stats-'),
                                     format=formats.line_format)))
-
-    import logging
-    from twiggy_goodies.std_logging import RedirectLoggingHandler
 
     handler = RedirectLoggingHandler()
     del logging.root.handlers[:]

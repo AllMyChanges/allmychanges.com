@@ -154,12 +154,10 @@ body {
 }
 .package-changes {
   list-style: none;
+  clear: both;
 }
 .package-changes__package-title {
   font-size: 1.2em;
-}
-.package-changes__version {
-  padding-left: 1em;
 }
 .package-version {
   list-style: none;
@@ -201,4 +199,14 @@ body {
 .email-unsubscribe {
   font-size: 0.75em;
   margin-top: 2em;
+}
+.package-metadata > dt {
+  float: left;
+  clear: left;
+  color: #b3b3b3;
+}
+.package-metadata > dd {
+  float: left;
+  margin-left: 0.6em;
+  color: #808080;
 }
