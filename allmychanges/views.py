@@ -314,3 +314,9 @@ class LandingView(CommonContextMixin, FormView):
 class RaiseExceptionView(View):
     def get(self, request, **kwargs):
         1/0
+
+
+class BadgeView2(RedirectView):
+#    permanent = False
+    def get_redirect_url(self, *args, **kwargs):
+        return 'http://b.repl.ca/v1/changelog-0.1.0-brightgreen.png'
