@@ -22,11 +22,11 @@
 
   <p>
     <form ng-submit="add_item()">
-      <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (python, node, etc.)" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="initial_namespace"/></div>
-      <div angucomplete-alt class="autocomplete-input" placeholder="Package name" pause="100" selected-object="selected_name" remote-url="/v1/autocomplete-package-name/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true"/></div>
+      <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (python, node, etc.)" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="new_item.namespace"/></div>
 
+      <div angucomplete-alt class="autocomplete-input" placeholder="Package name" pause="100" selected-object="selected_name" remote-url="/v1/autocomplete-package-name/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="new_item.name"/></div>
 
-      <div angucomplete-alt class="autocomplete-input" placeholder="Source repository" pause="100" selected-object="selected_source" remote-url="/v1/autocomplete-source/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" remote-url-request-formatter="get_source_guessing_params"/></div>
+      <div angucomplete-alt class="autocomplete-input" placeholder="Source repository" pause="100" selected-object="selected_source" remote-url="/v1/autocomplete-source/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" remote-url-request-formatter="get_source_guessing_params" value="new_item.source"/></div>
 
       <input type="submit" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)" value="Add"/>
     </form>
