@@ -8,7 +8,6 @@
     padding: 6px;
     border-radius: 2px;
     margin-bottom: 5px;
-    font-size: 14px;
 }
 
 .angucomplete-holder {
@@ -21,24 +20,18 @@
     border-style: solid;
     border-radius: 2px;
     width: 250px;
-    padding: 6px;
+    padding: 2px;
     cursor: pointer;
     z-index: 9999;
     position: absolute;
-    /*top: 32px;
+    top: 2em;
     left: 0px;
-    */
     margin-top: -6px;
     background-color: #ffffff;
 }
 
 .angucomplete-searching {
     color: #acacac;
-    font-size: 14px;
-}
-
-.angucomplete-description {
-    font-size: 14px;
 }
 
 .angucomplete-row {
@@ -46,6 +39,10 @@
     color: #000000;
     margin-bottom: 4px;
 
+}
+
+.angucomplete-row:last-child {
+    margin-bottom: 0px;
 }
 
 .angucomplete-selected-row, .angucomplete-row:hover {
