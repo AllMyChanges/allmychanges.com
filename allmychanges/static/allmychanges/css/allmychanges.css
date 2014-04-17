@@ -102,17 +102,17 @@
 .nowrap {
   white-space: nowrap;
 }
-.landing-ru {
+.landing-ru1 {
   font-family: "Lucida Console", Monaco, monospace;
   font-size: 2em;
   line-height: 1.5em;
   padding-top: 1em;
 }
-.landing-ru > p {
+.landing-ru1 > p {
   margin-bottom: 1em;
   color: #666;
 }
-.landing-ru .highlight {
+.landing-ru1 .highlight {
   color: #333;
 }
 .subscribed-text {

@@ -289,7 +289,8 @@ class LandingView(CommonContextMixin, FormView):
         super(LandingView, self).__init__(*args, **kwargs)
 
     def get_template_names(self):
-        return self.choosen_template
+        return 'allmychanges/landings/{0}.html'.format(
+            self.landing)
 
     def get_success_url(self):
         return '/subscribed/?from=' + self.landing
@@ -315,15 +316,19 @@ class LandingView(CommonContextMixin, FormView):
             return HttpResponseRedirect('/digest/')
 
         session_key = u'landing:' + request.path
-        self.landing = request.session.get(session_key)
+
+        # for testing purpose, landing name could be
+        # supplied as ?landing=some-name GET parameter
+        self.landing = request.GET.get('landing')
+        if self.landing is None:
+            self.landing = request.session.get(session_key)
+        else:
+            request.session[session_key] = self.landing
 
         if self.landing not in self.landings:
             self.landing = random.choice(self.landings)
             request.session[session_key] = self.landing
             
-        self.choosen_template = 'allmychanges/landings/{0}.html'.format(
-            self.landing)
-
         return super(LandingView, self).get(request, **kwargs)
 
     def post(self, request, **kwargs):
