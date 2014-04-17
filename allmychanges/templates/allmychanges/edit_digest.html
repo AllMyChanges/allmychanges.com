@@ -8,8 +8,6 @@
 
 {% verbatim %}
 <div ng-controller="DigestBuilderCtrl">
-  <angucomplete-alt placeholder="Namespace" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" input-class="form-control form-control-small" override-suggestions="true"/></angucomplete-alt>
-
   <ul class="digest-source">
     <li ng-repeat="item in items" class="digest-source__item">
       <p>
@@ -24,7 +22,9 @@
 
   <p>
     <form ng-submit="add_item()">
-      <input ng-model="new_item.namespace" type="text" placeholder="Namespace (python, node, etc.)"/>
+      <angucomplete-alt placeholder="Namespace (python, node, etc.)" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="initial_namespace"/></angucomplete-alt>
+
+
       <input ng-model="new_item.name" type="text" placeholder="Package name"/>
       <input ng-model="new_item.source" type="text" placeholder="Source repository"/>
       <input type="submit" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)" value="Add"/>

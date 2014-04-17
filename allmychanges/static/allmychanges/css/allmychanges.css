@@ -222,3 +222,7 @@ body {
 .package-version__section-item p {
   margin-left: 1em;
 }
+/* autocomplete */
+angucomplete-alt {
+  display: inline-block;
+}

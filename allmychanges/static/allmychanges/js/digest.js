@@ -1,23 +1,28 @@
 var app = angular.module('allMyChangesApp', ['ngCookies', 'angucomplete-alt']);
 
-app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies) {
+app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
     $http.defaults.headers.common['X-CSRFToken'] = $cookies['csrftoken'];
     $scope.items = [];
+    $scope.selected_namespace = null;
+    $scope.initial_namespace = null;
 
     $scope.$watch('selected_namespace', function(new_object, old_object) {
-        if (new_object !== undefined) {
+        if (new_object) {
             if (new_object.originalObject.name != undefined) {
                 $scope.new_item.namespace = new_object.originalObject.name;
             } else {
                 $scope.new_item.namespace = new_object.originalObject;
             }
+            $log.info('new_item.namespace=' + $scope.new_item.namespace);
         }
-    })
+    });
 
     function init_new_item () {
         var namespace = '';
         if ($scope.items.length > 0) {
             namespace = $scope.items[$scope.items.length - 1].namespace;
+            $scope.initial_namespace = namespace; // works
+            $log.info('Now initial_namespace is ' + namespace);
         }
         return {
             'namespace': namespace,
