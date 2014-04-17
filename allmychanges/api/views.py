@@ -7,7 +7,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
-from allmychanges.models import Repo, Subscription, Package
+from allmychanges.models import Repo, Subscription, Package, Changelog
 from allmychanges.api.serializers import (
     RepoSerializer,
     RepoDetailSerializer,
@@ -15,7 +15,7 @@ from allmychanges.api.serializers import (
     SubscriptionSerializer,
     PackageSerializer,
 )
-from allmychanges.utils import count
+from allmychanges.utils import count, guess_source
 
 
 class HandleExceptionMixin(object):
@@ -99,3 +99,25 @@ class AutocompletePackageNameView(viewsets.ViewSet):
         names.sort()
         return Response({'results': [{'name': name}
                                      for name in names]})
+
+
+class AutocompleteSourceView(viewsets.ViewSet):
+    def list(self, request, *args, **kwargs):
+        namespace = request.GET.get('namespace')
+        name = request.GET.get('name')
+        
+        urls = list(Changelog.objects.filter(packages__namespace=namespace,
+                                             packages__name=name) \
+                    .values_list('source', flat=True) \
+                    .distinct())
+        guessed_urls = guess_source(namespace, name)
+
+        # we need this instead of sets,
+        # to ensure, that urls from database
+        # will retain their order
+        for url in guessed_urls:
+            if url not in urls:
+                urls.append(url)
+
+        return Response({'results': [{'name': url}
+                                     for url in urls]})

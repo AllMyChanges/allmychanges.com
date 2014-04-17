@@ -7,6 +7,7 @@ from allmychanges.api.views import (
     SubscriptionViewSet,
     AutocompleteNamespaceView,
     AutocompletePackageNameView,
+    AutocompleteSourceView,
     PackageViewSet)
 
 
@@ -17,6 +18,7 @@ router.register(r'subscriptions', SubscriptionViewSet, base_name='repo')
 router.register(r'packages', PackageViewSet, base_name='package')
 router.register(r'autocomplete-namespaces', AutocompleteNamespaceView, base_name='autocomplete-namespaces')
 router.register(r'autocomplete-package-name', AutocompletePackageNameView, base_name='autocomplete-package-name')
+router.register(r'autocomplete-source', AutocompleteSourceView, base_name='autocomplete-source')
 
 
 urlpatterns = router.urls

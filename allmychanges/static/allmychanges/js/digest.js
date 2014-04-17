@@ -3,19 +3,29 @@ var app = angular.module('allMyChangesApp', ['ngCookies', 'angucomplete-alt']);
 app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
     $http.defaults.headers.common['X-CSRFToken'] = $cookies['csrftoken'];
     $scope.items = [];
-    $scope.selected_namespace = null;
     $scope.initial_namespace = null;
 
-    $scope.$watch('selected_namespace', function(new_object, old_object) {
-        if (new_object) {
-            if (new_object.originalObject.name != undefined) {
-                $scope.new_item.namespace = new_object.originalObject.name;
-            } else {
-                $scope.new_item.namespace = new_object.originalObject;
+    transform_autocomplete_results = function(varname) {
+        $scope.$watch('selected_' + varname, function(new_object, old_object) {
+            if (new_object) {
+                var new_value;
+                if (new_object.originalObject.name != undefined) {
+                    new_value = new_object.originalObject.name;
+                } else {
+                    new_value = new_object.originalObject;
+                }
+                $scope['new_item'][varname] = new_value;
+                $log.info('new_item.' + varname + '=' + new_value);
             }
-            $log.info('new_item.namespace=' + $scope.new_item.namespace);
-        }
-    });
+        });
+    };
+    transform_autocomplete_results('namespace');
+    transform_autocomplete_results('name');
+    transform_autocomplete_results('source');
+
+    $scope.get_source_guessing_params = function (str) {
+        return $scope.new_item;
+    }
 
     function init_new_item () {
         var namespace = '';
