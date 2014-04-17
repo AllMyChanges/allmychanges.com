@@ -223,6 +223,6 @@ body {
   margin-left: 1em;
 }
 /* autocomplete */
-angucomplete-alt {
+.autocomplete-input {
   display: inline-block;
 }
