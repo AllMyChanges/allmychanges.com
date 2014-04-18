@@ -13,7 +13,7 @@
       <p>
         <input type="text" ng-model="item.namespace"/>
         <input type="text" ng-model="item.name"/>
-        <input type="text" ng-model="item.source"/>
+        <input type="text" ng-model="item.source" class="digest-source__source-field"/>
         <button ng-click="remove(item.resource_uri)">x</button> 
         <span class="digest-source__problem" ng-if="item.problem">{{item.problem}}</span>
       </p>
@@ -26,7 +26,7 @@
 
       <div angucomplete-alt class="autocomplete-input" placeholder="Package name" pause="100" selected-object="selected_name" remote-url="/v1/autocomplete-package-name/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="new_item.name"/></div>
 
-      <div angucomplete-alt class="autocomplete-input" placeholder="Source repository" pause="100" selected-object="selected_source" remote-url="/v1/autocomplete-source/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" remote-url-request-formatter="get_source_guessing_params" value="new_item.source"/></div>
+      <div angucomplete-alt class="autocomplete-input" placeholder="Source repository" pause="100" selected-object="selected_source" remote-url="/v1/autocomplete-source/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" remote-url-request-formatter="get_source_guessing_params" value="new_item.source" input-class="digest-source__source-field"/></div>
 
       <input type="submit" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)" value="Add"/>
     </form>
