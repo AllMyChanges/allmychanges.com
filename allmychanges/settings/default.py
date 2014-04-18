@@ -104,6 +104,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.transaction.TransactionMiddleware',
 )
 
+#X_FRAME_OPTIONS = 'ALLOW-FROM metrika.yandex.ru'
+
 ROOT_URLCONF = 'allmychanges.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.

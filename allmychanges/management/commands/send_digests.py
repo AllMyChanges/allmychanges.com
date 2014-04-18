@@ -43,7 +43,7 @@ class Command(LogMixin, BaseCommand):
                                  name)
                     for name in ('reset.css', 'allmychanges.css')]
                 premailer = Premailer(body,
-                                      base_url='http://art.dev.allmychanges.com:8000/',
+                                      base_url='http://allmychanges.com/',
                                       external_styles=external_styles)
                 body = premailer.transform()
                 message = EmailMultiAlternatives('Changelogs digest on {0:%d %B %Y}'.format(now),
