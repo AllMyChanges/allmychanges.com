@@ -225,6 +225,22 @@ body {
 .package-version__section-item p {
   margin-left: 1em;
 }
+.package-version__section-item_fix:before {
+  content: "FIX";
+  color: #f00;
+  position: absolute;
+  margin-left: -5em;
+  font-size: 8px;
+  font-weight: bold;
+}
+.package-version__section-item_new:before {
+  content: "NEW";
+  color: #008000;
+  position: absolute;
+  margin-left: -5em;
+  font-size: 8px;
+  font-weight: bold;
+}
 /* autocomplete */
 .autocomplete-input {
   display: inline-block;

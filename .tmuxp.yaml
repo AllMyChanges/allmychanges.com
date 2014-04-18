@@ -24,3 +24,11 @@ windows:
   - window_name: stylus
     panes:
       - node_modules/.bin/stylus --watch --out allmychanges/static/allmychanges/css allmychanges/static/allmychanges/stylus
+
+  - window_name: rqinfo
+    panes:
+      - rqinfo
+
+  - window_name: log
+    panes:
+      - ./tail --cross-finger /var/log/allmychanges/django-art.log

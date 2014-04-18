@@ -144,7 +144,27 @@ body {
     margin-left: 1em;
 }
 
+.package-version__section-item_fix:before {
+      content: "FIX";
+      color: red;
+      position: absolute;
+      margin-left: -5em;
+      font-size: 8px;
+      font-weight: bold;
+}
+
+.package-version__section-item_new:before {
+      content: "NEW";
+      color: green;
+      position: absolute;
+      margin-left: -5em;
+      font-size: 8px;
+      font-weight: bold;
+}
+
+
 /* autocomplete */
 .autocomplete-input {
     display: inline-block;
 }
+

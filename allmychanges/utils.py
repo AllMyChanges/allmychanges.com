@@ -246,7 +246,7 @@ def update_changelog_from_raw_data(changelog, raw_data):
         for raw_section in raw_version['sections']:
             section = version.sections.create(notes=raw_section.get('notes'))
             for raw_item in raw_section.get('items', []):
-                section.items.create(text=raw_item)
+                section.items.create(text=raw_item, type=get_commit_type(raw_item))
 
 
 def fake_downloader(changelog):
