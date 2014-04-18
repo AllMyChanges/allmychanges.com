@@ -1,0 +1,45 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<form class="landing-ru1" action="." method="POST">
+   <p><span class="highlight">Tired fixing broken project</span> after disasterous dependency update?</p>
+
+   <p><span class="highlight">AllMyChanges will help</span> to track changes.</p>
+
+   <p>Subscribe to a mailing list to become an early adopter
+   and you'll get a <span class="highlight">3 month subscription for free</span>!</p>
+
+   <p><span class="nowrap">Email: <input type="text" name="email" class="text-input"/> <input type="submit" value="subscribe" class="button {{ button_cls }}"/></span></p>
+
+   <p class="highlight">How does it work?<br/>
+   -----------------</p>
+
+   <p>
+   * <span class="highlight">You choose</span> which libraries or packages to track.<br/>
+   * Our <span class="highlight">robot checks</span> them regularly <span class="highlight">and discovers updates</span>.<br/>
+   * He <span class="highlight">send a digest</span> to your email.<br/>
+   </p>
+
+
+   <p class="highlight">Advantages.<br/>
+   ------------</p>
+
+   <p>
+   * Digest <span class="highlight">contains</span> a <span class="highlight">new versions</span> along with <span class="highlight">comprehensive description</span>.<br/>
+   * <span class="highlight">You always on track</span> and aware about newest features and critical updates.<br/>
+   * Receive information <span class="highlight">in time and in unified format</span>.<br/>
+   </p>
+
+   <p>
+   Become an early adopter and you'll get<br/>
+   <span class="highlight">3 months</span> for free!</p>
+
+   <p><span class="nowrap">Email: <input type="text" name="email" class="text-input"/> <input type="submit" value="subscribe" class="button {{ button_cls }}"/></span></p>
+
+   {{ form.come_from }}
+   {% csrf_token %}
+</form>
+{% endblock content %}

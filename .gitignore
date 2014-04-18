@@ -45,3 +45,4 @@ nosetests.xml
 /.tdaemon.state
 /node_modules/
 *.log
+.envrc
