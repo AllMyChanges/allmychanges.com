@@ -17,7 +17,10 @@ from django.core.urlresolvers import reverse
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 
-from allmychanges.models import Package, Subscription, Changelog
+from allmychanges.models import (Package,
+                                 Subscription,
+                                 Changelog,
+                                 Item)
 
 
 class CommonContextMixin(object):
@@ -95,60 +98,73 @@ from django.core.cache import cache
 
 
 def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
-    cache_key = 'digest-{username}-{before}-{after}-{limit}'.format(
-        username=user.username,
-        before=before_date.date() if before_date else 0,
-        after=after_date.date() if after_date else 0,
-        limit=limit_versions)
-    
-    changes = cache.get(cache_key)
-    if changes is None:
-        # search packages which have changes after given date
-        packages = user.packages
+    # search packages which have changes after given date
+    packages = user.packages
 
+    if before_date is not None:
+        packages = packages.filter(changelog__versions__date__lt=before_date)
+    if after_date is not None:
+        packages = packages.filter(changelog__versions__date__gte=after_date)
+
+    packages = packages.select_related('changelog').distinct()
+
+    changes = []
+    for package in packages:
+        versions = []
+        versions_queryset = package.changelog.versions.all()
         if before_date is not None:
-            packages = packages.filter(changelog__versions__date__lt=before_date)
+            versions_queryset = versions_queryset.filter(date__lt=before_date)
         if after_date is not None:
-            packages = packages.filter(changelog__versions__date__gte=after_date)
+            versions_queryset = versions_queryset.filter(date__gte=after_date)
 
-        packages = packages.select_related('changelog').distinct()
+        # this allows to reduce number of queries in 5 times
+        versions_queryset = versions_queryset.prefetch_related('sections__items')
 
-        changes = []
-        for package in packages:
-            versions = []
-            versions_queryset = package.changelog.versions.all()
-            if before_date is not None:
-                versions_queryset = versions_queryset.filter(date__lt=before_date)
-            if after_date is not None:
-                versions_queryset = versions_queryset.filter(date__gte=after_date)
+        for version in versions_queryset[:limit_versions]:
+            sections = []
+            for section in version.sections.all():
+                sections.append(dict(notes=section.notes,
+                                     items=[
+                                         dict(text=item.text,
+                                              type=item.type)
+                                         for item in section.items.all()]))
+            versions.append(dict(number=version.number,
+                                 date=version.date,
+                                 sections=sections))
+        changes.append(dict(namespace=package.namespace,
+                            name=package.name,
+                            source=package.source,
+                            versions=versions))
 
-            # this allows to reduce number of queries in 5 times
-            versions_queryset = versions_queryset.prefetch_related('sections__items')
-
-            for version in versions_queryset[:limit_versions]:
-                sections = []
-                for section in version.sections.all():
-                    sections.append(dict(notes=section.notes,
-                                         items=[
-                                             dict(text=item.text,
-                                                  type=item.type)
-                                             for item in section.items.all()]))
-                versions.append(dict(number=version.number,
-                                     date=version.date,
-                                     sections=sections))
-            changes.append(dict(namespace=package.namespace,
-                                name=package.name,
-                                source=package.source,
-                                versions=versions))
-
-        cache.set(cache_key, changes, 60 * 60)
     return changes
 
 
+class CachedMixin(object):
+    def get(self, *args, **kwargs):
+        cache_key, cache_ttl = self.get_cache_params(*args, **kwargs)
+        response = cache.get(cache_key)
+        if response is None:
+            response = super(DigestView, self).get(*args, **kwargs)
+            response.render()
+            cache.set(cache_key, response, cache_ttl)
+        return response
 
-class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
+    def get_cache_params(self, *args, **kwargs):
+        """This method should return cache key and value TTL."""
+        raise NotImplementedError('Please, implement get_cache_params method.')
+        
+        
+class DigestView(CachedMixin, LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/digest.html'
 
+    def get_cache_params(self, *args, **kwargs):
+        cache_key = 'digest-{username}-{packages}-{changes}'.format(
+            username=self.request.user.username,
+            packages=self.request.user.packages.count(),
+            changes=Item.objects.filter(
+                section__version__changelog__packages__user=self.request.user).count())
+        return cache_key, 14400
+        
     def get_context_data(self, **kwargs):
         result = super(DigestView, self).get_context_data(**kwargs)
 
@@ -159,6 +175,8 @@ class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
 
 
         result['current_user'] = self.request.user
+
+
         result['today_changes'] = get_digest_for(self.request.user,
                                                  after_date=day_ago)
         result['week_changes'] = get_digest_for(self.request.user,
@@ -175,6 +193,7 @@ class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
             len(result[key]) == 0
             for key in result.keys()
             if key.endswith('_changes'))
+
         return result
 
 
