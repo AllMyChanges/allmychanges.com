@@ -157,6 +157,7 @@ class DigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
         month_ago = now - datetime.timedelta(31)
 
 
+        result['current_user'] = self.request.user
         result['today_changes'] = get_digest_for(self.request.user,
                                                  after_date=day_ago)
         result['week_changes'] = get_digest_for(self.request.user,

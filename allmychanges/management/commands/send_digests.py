@@ -34,7 +34,8 @@ class Command(LogMixin, BaseCommand):
                                               after_date=week_ago)         
                 body = render_to_string(
                     'emails/digest.html',
-                    dict(today_changes=today_changes,
+                    dict(current_user=user,
+                         today_changes=today_changes,
                          week_changes_count=len(week_changes)))
 
                 external_styles = [

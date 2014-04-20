@@ -4,7 +4,7 @@
   <ul class="grouped-changes">
     {% for package in changes %}
     <li class="package-changes">
-      <h3 class="package-changes__package-title"><a href="{% url 'package' username=request.user.username namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a></h3>
+      <h3 class="package-changes__package-title"><a href="{% url 'package' username=current_user.username namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a></h3>
       <ul class="package-changes__version">
         {% for version in package.versions %}
         <li class="package-version">
