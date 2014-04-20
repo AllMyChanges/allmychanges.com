@@ -14,11 +14,12 @@ drf-extensions==0.2.2
 envoy==0.0.2
 graphitesend==0.3.0
 gunicorn==18.0
-lxml==3.3.4
+lxml==3.3.5
 markdown==2.4
 oauthlib==0.6.1
-premailer==2.0.2
+premailer==2.1.0
 python-dateutil==2.2
+python-memcached==1.53
 python-openid==2.2.5
 python-social-auth==0.1.23
 pytz==2014.2
@@ -29,5 +30,5 @@ rq==0.3.13
 six==1.6.1
 sqlparse==0.1.11
 times==0.6.2
-twiggy-goodies==0.2.0
+twiggy-goodies==0.2.2
 twiggy==0.4.5

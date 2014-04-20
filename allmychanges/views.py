@@ -93,6 +93,7 @@ class LoginRequiredMixin(object):
 
 from django.core.cache import cache
 
+
 def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     cache_key = 'digest-{username}-{before}-{after}-{limit}'.format(
         username=user.username,
