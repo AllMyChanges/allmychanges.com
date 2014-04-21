@@ -41,7 +41,7 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$parse', 
       clearSelected: '@',
       overrideSuggestions: '@'
     },
-    template: '<div class="angucomplete-holder"><input id="{{id}}_value" ng-model="searchStr" type="text" placeholder="{{placeholder}}" class="{{inputClass}}" ng-focus="resetHideResults()" ng-blur="onBlur()"/><div id="{{id}}_dropdown" class="angucomplete-dropdown" ng-if="showDropdown"><div class="angucomplete-searching" ng-show="searching">Searching...</div><div class="angucomplete-searching" ng-show="!searching && (!results || results.length == 0)">No results found</div><div class="angucomplete-row" ng-repeat="result in results" ng-click="selectResult(result)" ng-mouseover="hoverRow()" ng-class="{\'angucomplete-selected-row\': $index == currentIndex}"><div ng-if="imageField" class="angucomplete-image-holder"><img ng-if="result.image && result.image != \'\'" ng-src="{{result.image}}" class="angucomplete-image"/><div ng-if="!result.image && result.image != \'\'" class="angucomplete-image-default"></div></div><div class="angucomplete-title" ng-if="matchClass" ng-bind-html="result.title"></div><div class="angucomplete-title" ng-if="!matchClass">{{ result.title }}</div><div ng-if="result.description && result.description != \'\'" class="angucomplete-description">{{result.description}}</div></div></div></div>',
+    template: '<div class="angucomplete-holder"><input id="{{id}}_value" ng-model="searchStr" type="text" placeholder="{{placeholder}}" class="{{inputClass}}" ng-focus="onFocus()" ng-blur="onBlur()"/><div id="{{id}}_dropdown" class="angucomplete-dropdown" ng-if="showDropdown"><div class="angucomplete-searching" ng-show="searching">Searching...</div><div class="angucomplete-searching" ng-show="!searching && (!results || results.length == 0)">No results found</div><div class="angucomplete-row" ng-repeat="result in results" ng-click="selectResult(result)" ng-mouseover="hoverRow()" ng-class="{\'angucomplete-selected-row\': $index == currentIndex}"><div ng-if="imageField" class="angucomplete-image-holder"><img ng-if="result.image && result.image != \'\'" ng-src="{{result.image}}" class="angucomplete-image"/><div ng-if="!result.image && result.image != \'\'" class="angucomplete-image-default"></div></div><div class="angucomplete-title" ng-if="matchClass" ng-bind-html="result.title"></div><div class="angucomplete-title" ng-if="!matchClass">{{ result.title }}</div><div ng-if="result.description && result.description != \'\'" class="angucomplete-description">{{result.description}}</div></div></div></div>',
     link: function(scope, elem, attrs) {
       var inputField,
           minlength = MIN_LENGTH,
@@ -112,10 +112,31 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$parse', 
         }, scope.pause);
       };
 
-      scope.resetHideResults = function() {
-        if (hideTimer) {
-          $timeout.cancel(hideTimer);
-        }
+      var performNewSearch = function () {
+          lastSearchTerm = scope.searchStr;
+          scope.showDropdown = true;
+          scope.currentIndex = -1;
+          scope.results = [];
+
+          if (searchTimer) {
+              $timeout.cancel(searchTimer);
+          }
+
+          scope.searching = true;
+
+          searchTimer = $timeout(function() {
+              scope.searchTimerComplete(scope.searchStr);
+          }, scope.pause);
+      }
+
+      scope.onFocus = function() {
+          if (hideTimer) {
+              $timeout.cancel(hideTimer);
+          }
+
+          if (isNewSearchNeeded(scope.searchStr, lastSearchTerm)) {
+              performNewSearch();
+          }
       };
 
       scope.processResults = function(responseData, str) {
@@ -225,24 +246,11 @@ angular.module('angucomplete-alt', [] ).directive('angucompleteAlt', ['$parse', 
 
       scope.keyPressed = function(event) {
         if (!(event.which === KEY_UP || event.which === KEY_DW || event.which === KEY_EN)) {
-          if (!scope.searchStr || scope.searchStr === '') {
+          if (scope.searchStr === null || scope.searchStr.length < minlength) {
             scope.showDropdown = false;
             lastSearchTerm = null;
           } else if (isNewSearchNeeded(scope.searchStr, lastSearchTerm)) {
-            lastSearchTerm = scope.searchStr;
-            scope.showDropdown = true;
-            scope.currentIndex = -1;
-            scope.results = [];
-
-            if (searchTimer) {
-              $timeout.cancel(searchTimer);
-            }
-
-            scope.searching = true;
-
-            searchTimer = $timeout(function() {
-              scope.searchTimerComplete(scope.searchStr);
-            }, scope.pause);
+            performNewSearch();
           }
         } else {
           event.preventDefault();
