@@ -1,21 +1,21 @@
-0.2.0 (unreleased)
+0.2.1 (2014-04-21)
 ==================
 
-This app is just a prototype of the idea, simple but already useful. We
-already have ideas how to evolve this project into something even more
-useful. Here are some directions.
+* Fixed caching issue at digest's page, when you've
+  added a package, but digest seems not updated
+  because of the cache.
+* Fixed link to the package in digest email.
+* Added cool feature — now our robot could download
+  and parse any Markdown or ReST changelog.
+  To force this behaviour, just add `http+` before
+  the source URL.
 
- - We will add a service for authenticated users, to allow them to
-   collect packages they are interested in. Then we will send a
-   daily or weekly digest of all new changes in choosen packages.
- - We definitely should make a richer API, to make some useful projects
-   born. One of them could be a command line tool to gather new
-   changes in modules, pinned in requirements.txt
- - And of course, we are planning to broaden service's possibilities,
-   expanding to other platforms and languages.
+0.2.0 (2014-04-18)
+==================
 
-Stay tuned, subscribe to our news-letter or twitter (http://twitter.com/allmychanges)
-to receive news and ealier inventations to betas.
+* Now authentication via Twitter or GitHub was added.
+* Now users are able to add separate packages to the list
+  and receive email with digest of recent changes.
 
 0.1.0 (2013-09-28)
 ==================
