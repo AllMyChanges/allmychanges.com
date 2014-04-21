@@ -23,6 +23,7 @@ envoy==0.0.2
 fancycompleter==0.4
 graphitesend==0.3.0
 gunicorn==18.0
+html2text==2014.4.5
 kaptan==0.5.7
 lxml==3.3.5
 markdown==2.4

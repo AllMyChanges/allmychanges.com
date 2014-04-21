@@ -290,6 +290,24 @@ def hg_downloader(changelog):
 
     return path
 
+
+def http_downloader(changelog):
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    url = changelog.source.replace('http+', '')
+    
+    try:
+        with cd(path):
+            response = requests.get(url)
+            with open('ChangeLog', 'w') as f:
+                f.write(response.text.encode('utf-8'))
+
+    except Exception, e:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        raise RuntimeError('Unexpected exception "{0}" when fetching: {1}'.format(
+            e, url))
+    return path
+
     
 def choose_downloader(changelog):
     source = changelog.source
@@ -302,6 +320,9 @@ def choose_downloader(changelog):
 
     if source.startswith('hg+'):
         return hg_downloader
+
+    if source.startswith('http+'):
+        return http_downloader
         
     if 'git' in source:
         return git_downloader
@@ -313,7 +334,7 @@ def choose_downloader(changelog):
 
 def parse_changelog_file(filename):
     with open(filename) as f:
-        return parse_changelog(f.read())
+        return parse_changelog(f.read().decode('utf-8'))
 
 
 def git_history_extractor(path):

@@ -1,6 +1,7 @@
 import os
 import re
 from dateutil.parser import parse as date_parser
+from html2text import html2text
 
 
 #RE_DATE = re.compile(r'(.*\s|\s?|.*\()(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
@@ -106,6 +107,10 @@ def parse_changelog(text):
     current_section = None
     current_item = None
     current_ident = None
+
+    if '<html' in text and \
+       '<body' in text:
+        text = html2text(text)
 
     lines = text.split('\n')
 

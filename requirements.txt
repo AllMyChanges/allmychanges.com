@@ -14,6 +14,7 @@ drf-extensions==0.2.2
 envoy==0.0.2
 graphitesend==0.3.0
 gunicorn==18.0
+html2text==2014.4.5
 lxml==3.3.5
 markdown==2.4
 oauthlib==0.6.1

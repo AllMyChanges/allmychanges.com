@@ -2,6 +2,7 @@
 import datetime
 import random
 import requests
+import os
 
 from django.views.generic import (TemplateView,
                                   RedirectView,
@@ -144,7 +145,7 @@ class CachedMixin(object):
         cache_key, cache_ttl = self.get_cache_params(*args, **kwargs)
         response = cache.get(cache_key)
         if response is None:
-            response = super(DigestView, self).get(*args, **kwargs)
+            response = super(CachedMixin, self).get(*args, **kwargs)
             response.render()
             cache.set(cache_key, response, cache_ttl)
         return response
@@ -363,3 +364,16 @@ class RaiseExceptionView(View):
     def get(self, request, **kwargs):
         1/0
 
+
+
+class ChangeLogView(View):
+    def get(self, *args, **kwargs):
+        path = os.path.join(
+            os.path.dirname(__file__),
+            '..', 'CHANGELOG.md')
+        with open(path) as f:
+            content = f.read()
+            
+        response = HttpResponse(content, content_type='plain/text')
+        response['Content-Length'] = len(content)
+        return response
