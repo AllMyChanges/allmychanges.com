@@ -14,3 +14,8 @@ AUTHENTICATION_BACKENDS = (
 
 LOG_FILENAME = 'unittest-' + CURRENT_USER + '.log'
 init_logging(LOG_FILENAME)
+
+# making jobs run synchronously without queueing
+for queue_options in RQ_QUEUES.itervalues():
+    queue_options['ASYNC'] = False
+

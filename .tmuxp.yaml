@@ -23,7 +23,7 @@ windows:
 
   - window_name: stylus
     panes:
-      - node_modules/.bin/stylus --watch --out allmychanges/static/allmychanges/css allmychanges/static/allmychanges/stylus
+      - node_modules/.bin/stylus --watch --out allmychanges/static/allmychanges/css allmychanges/static/allmychanges/stylus/allmychanges.styl
 
   - window_name: rqinfo
     panes:

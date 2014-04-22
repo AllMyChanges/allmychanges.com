@@ -282,6 +282,9 @@ class Version(models.Model):
 
     objects = VersionManager()
 
+    class Meta:
+        get_latest_by = 'date'
+        
     def __unicode__(self):
         return self.number
 
@@ -313,16 +316,30 @@ class Package(models.Model):
     namespace = models.CharField(max_length=80)
     name = models.CharField(max_length=80)
     source = models.CharField(max_length=1000)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     repo = models.OneToOneField(Repo,
                                 related_name='package',
                                 blank=True, null=True)
     changelog = models.ForeignKey(Changelog,
                                   related_name='packages',
-                                  blank=True, null=True)
+                                  blank=True, null=True,
+                                  on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return u'/'.join((self.user.username, self.name))
+
+    def latest_version(self):
+        if self.changelog:
+            versions = list(self.changelog.versions.order_by('-date')[:1])
+            if versions:
+                return versions[0]
+
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('package', kwargs=dict(
+            username=self.user.username,
+            namespace=self.namespace,
+            name=self.name))
 
     def save(self, *args, **kwargs):
         """Create corresponding changelog object"""

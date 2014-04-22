@@ -1,5 +1,61 @@
 var app = angular.module('allMyChangesApp', ['ngCookies', 'angucomplete-alt']);
 
+app.directive('digestLine', ['$http', '$interval', '$timeout', function ($http, $interval, $timeout) {
+    return {
+        restrict: 'EA',
+        scope: {
+            package: '='
+        },
+        template: '<p> <input type="text" ng-model="package.namespace"/> <input type="text" ng-model="package.name"/> <input type="text" ng-model="package.source" class="digest-source__source-field"/> <button ng-click="remove()">x</button> <a class="digest-source__problem" ng-if="package.problem" ng-href="{{package.absolute_uri}}">{{package.problem}}</a> <a class="digest-source__version" ng-if="package.latest_version" ng-href="{{package.absolute_uri}}">{{package.latest_version}}</a> <a class="digest-source__waiting" ng-if="!package.latest_version && !package.problem" ng-href="{{package.absolute_uri}}">Waiting</a></p>',
+        link: function (scope, elem, attrs) {
+            scope.package = angular.copy(scope.package);
+            var my_compare = function(left, right, fields) {
+                var equal = true;
+                angular.forEach(fields, function(key) {
+                    if (left[key] != right[key]) {
+                        console.log('left[' + key + '] = ' + left[key] + ', but right is "' + right[key] + '"');
+                        equal = false;
+                    }});
+                return equal;
+            }
+            var update_package = function (data) {
+                angular.extend(scope.package, data);
+            }
+
+            var update_timeout = null;
+            var interval = null
+
+            scope.$watch('package', function(new_val, old_val) {
+                if (!my_compare(new_val, old_val, ['namespace', 'name', 'source'])) {
+
+                    if (update_timeout !== null) {
+                        $timeout.cancel(update_timeout);
+                    }
+
+                    update_timeout = $timeout(function() {
+                        $http.put(new_val['resource_uri'], new_val).success(update_package);
+                    }, 1000);
+                }
+            }, true);
+
+            scope.remove = function () {
+                var item_index = scope.$parent.$index;
+                
+                $http.delete(scope.package.resource_uri).success(function(data) {
+                    scope.$parent.$parent.items.splice(item_index, 1);
+                    $interval.cancel(interval);
+                });
+            }
+
+            interval = $interval(function () {
+                $http.get(scope.package.resource_uri).success(function (data) {
+                    angular.extend(scope.package, data);
+                });
+            }, 15 * 1000);
+        }
+   }
+}]);
+
 app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
     $http.defaults.headers.common['X-CSRFToken'] = $cookies['csrftoken'];
     $scope.items = [];
@@ -25,23 +81,6 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
     $http.get('/v1/packages/').success(function(data) {
         $scope.items = data;
         $scope.new_item = init_new_item();
-
-        $scope.$watch('items', function(new_collection, old_collection) {
-            if (new_collection.length == old_collection.length) {
-                for (i=0; i<new_collection.length; i++) {
-                    var new_obj = new_collection[i];
-                    var old_obj = old_collection[i];
-                    angular.forEach(new_obj, function(value, key) {
-                        if (key != '$$hashKey' && value != old_obj[key]) {
-                            console.log(key);
-                            console.log(old_obj[key] + ' -> ' + value);
-                            $http.put(new_obj['resource_uri'], new_obj);
-                            // TODO: optimize and save with slight delay
-                        }
-                    });
-                }
-            }
-        }, true);
     });
 
     $scope.add_item = function () {
@@ -53,12 +92,6 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
         });
     };
 
-    $scope.remove = function (url) {
-        var item_index = this.$index;
-
-        $http.delete(url).success(function(data) {
-            $scope.items.splice(item_index, 1);
-        });
-    }
+    
 });
 

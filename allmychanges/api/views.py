@@ -8,6 +8,7 @@ from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
 from allmychanges.models import Repo, Subscription, Package, Changelog
+from allmychanges.tasks import update_changelog_task
 from allmychanges.api.serializers import (
     RepoSerializer,
     RepoDetailSerializer,
@@ -76,9 +77,20 @@ class PackageViewSet(HandleExceptionMixin,
 
     def pre_save(self, obj):
         obj.user = self.request.user
-        obj.next_update_at = obj.created_at = timezone.now()
+        now = timezone.now()
+        
+        obj.next_update_at = now
+        if obj.created_at is None:
+            obj.created_at = now
+            
         return super(PackageViewSet, self).pre_save(obj)
 
+    def post_save(self, obj, *args, **kwargs):
+        response = super(PackageViewSet, self).post_save(obj, *args, **kwargs)
+        if self.action in ('create', 'update'):
+            update_changelog_task.delay(obj.changelog.source)
+        return response
+        
 
 class AutocompleteNamespaceView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):

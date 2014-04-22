@@ -84,17 +84,36 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         )
 
 
+class AbsoluteUriField(serializers.Field):
+    """
+    Represents a link to object's web representation.
+    """
+    read_only = True
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('source', 'get_absolute_url')
+        super(AbsoluteUriField, self).__init__(*args, **kwargs)
+        
+    def to_native(self, obj):
+        request = self.context['request']
+        return request.build_absolute_uri(obj)
+
+
+            
 
 class PackageSerializer(serializers.ModelSerializer):
     resource_uri = ResourceUriField(view_name='package-detail')
+    absolute_uri = AbsoluteUriField()
     problem = serializers.Field(source='changelog.problem')
     updated_at = serializers.Field(source='changelog.updated_at')
     next_update_at = serializers.Field(source='changelog.next_update_at')
+    latest_version = serializers.Field(source='latest_version')
     
     class Meta:
         model = Package
         fields = (
             'resource_uri',
+            'absolute_uri',
             'namespace',
             'name',
             'source',
@@ -102,9 +121,5 @@ class PackageSerializer(serializers.ModelSerializer):
             'updated_at',
             'next_update_at',
             'problem',
+            'latest_version',
         )
-        read_only_fields = (
-            'created_at',
-        )
-
-

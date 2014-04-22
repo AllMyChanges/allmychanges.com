@@ -1,6 +1,7 @@
 # coding: utf-8
 import anyjson
 import mock
+import time
 
 from nose.tools import eq_
 from django.test import Client, TestCase
@@ -56,6 +57,29 @@ def test_add_package():
                            source='https://github.com/pipa/pip'))
     check_status_code(201, response)
     eq_(1, Package.objects.count())
+
+
+def test_put_does_not_affect_created_at_field():
+    cl = Client()
+
+    user = create_user('art')
+    cl.login(username='art', password='art')
+    
+    package = user.packages.create(namespace='python',
+                                   name='pip',
+                                   source='https://github.com/some/url')
+    created_at = Package.objects.get(pk=package.pk).created_at
+
+    time.sleep(1)
+    response = cl.put('/v1/packages/{0}/'.format(package.id),
+                      anyjson.serialize(dict(namespace='python',
+                                             name='pip',
+                                             source='https://github.com/pipa/pip')),
+                      content_type='application/json')
+    
+    check_status_code(200, response)
+    
+    eq_(created_at, Package.objects.get(pk=package.pk).created_at)
 
 
 def test_two_users_are_able_to_add_package_with_same_source():

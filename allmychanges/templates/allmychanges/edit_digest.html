@@ -9,14 +9,7 @@
 {% verbatim %}
 <div ng-controller="DigestBuilderCtrl">
   <ul class="digest-source">
-    <li ng-repeat="item in items" class="digest-source__item">
-      <p>
-        <input type="text" ng-model="item.namespace"/>
-        <input type="text" ng-model="item.name"/>
-        <input type="text" ng-model="item.source" class="digest-source__source-field"/>
-        <button ng-click="remove(item.resource_uri)">x</button> 
-        <span class="digest-source__problem" ng-if="item.problem">{{item.problem}}</span>
-      </p>
+    <li ng-repeat="item in items" class="digest-source__item" digest-line package="item">
     </li>
   </ul>
 

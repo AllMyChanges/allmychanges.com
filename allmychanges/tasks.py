@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
 import datetime
+import time
 
 from django.db.models import Count
+from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 from allmychanges.utils import (
@@ -15,6 +17,7 @@ from twiggy_goodies.threading import log
 
 
 @job
+@transaction.commit_on_success
 def update_repo(repo_id):
     try:
         with count_time('task.update_repo.time'):
@@ -29,6 +32,7 @@ def update_repo(repo_id):
 
 
 @job
+@transaction.commit_on_success
 def schedule_updates(reschedule=False, packages=[]):
     from .models import Changelog
 
@@ -58,6 +62,7 @@ def schedule_updates(reschedule=False, packages=[]):
 
 
 @job
+@transaction.commit_on_success
 def delete_empty_changelogs():
     from .models import Changelog
     Changelog.objects.annotate(Count('packages'), Count('versions')) \
@@ -66,10 +71,28 @@ def delete_empty_changelogs():
 
 
 @job
+@transaction.commit_on_success
 def update_changelog_task(source):
     with log.fields(source=source):
+        log.error('Starting task')
         from .models import Changelog
-        changelog = Changelog.objects.get(source=source)
+
+        changelog = None
+        tries = 10
+        while changelog is None and tries > 0:
+            try:
+                changelog = Changelog.objects.get(source=source)
+            except Changelog.DoesNotExist:
+                log.error('Changelog with source={source} not found'.format(
+                    **locals()))
+                time.sleep(10)
+                # we make commit to refresh transaction state and to
+                # look if changelog object appeared in the database
+                transaction.commit()
+                tries -= 1
+
+        assert changelog is not None, 'Changelog with source={source} not found'.format(
+                    **locals())
 
         with log.fields(packages=u', '.join(map(unicode, changelog.packages.all()))):
             log.info('processing changelog')

@@ -132,6 +132,15 @@ body {
 .digest-source__source-field {
   width: 25em;
 }
+.digest-source__problem {
+  color: #f00;
+}
+.digest-source__waiting {
+  color: #00f;
+}
+.digest-source__version {
+  color: #008000;
+}
 .content {
   margin-left: 100px;
   margin-right: 100px;
@@ -144,10 +153,6 @@ body {
   border-top: 1px solid #ddd;
   padding-top: 1em;
   color: #808080;
-}
-.digest-source__problem {
-  color: #f00;
-  margin-left: 1px;
 }
 .clear {
   clear: both;
