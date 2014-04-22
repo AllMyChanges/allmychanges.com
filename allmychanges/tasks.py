@@ -85,7 +85,7 @@ def update_changelog_task(source):
             except Changelog.DoesNotExist:
                 log.error('Changelog with source={source} not found'.format(
                     **locals()))
-                time.sleep(10)
+                time.sleep(1)
                 # we make commit to refresh transaction state and to
                 # look if changelog object appeared in the database
                 transaction.commit()

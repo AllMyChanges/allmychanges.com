@@ -72,7 +72,7 @@ def normalize_url(url,
     url = url.replace('git+', '')
     
     if 'github' in url:
-        regex = r'[/:](?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
+        regex = r'[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]*)'
         match = re.search(regex, url)
         if match is not None:
             username, repo = match.groups()
@@ -83,7 +83,7 @@ def normalize_url(url,
                     repo)
             
     elif 'bitbucket' in url:
-        regex = r'bitbucket.org/(?P<username>[A-Za-z0-9-]+)/(?P<repo>[^/]*)'
+        regex = r'bitbucket.org/(?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]*)'
         username, repo = re.search(regex, url).groups()
         return (bitbucket_template.format(**locals()),
                 username,
