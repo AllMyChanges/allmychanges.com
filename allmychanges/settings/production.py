@@ -7,15 +7,6 @@ REST_FRAMEWORK.update({
 })
 
 
-RQ_QUEUES = {
-    'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 1,
-        'PASSWORD': '',
-    }
-}
-
 DATABASES['default'].update({
     'NAME': 'allmychanges',
 })
