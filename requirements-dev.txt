@@ -1,24 +1,23 @@
 -e git+git://github.com/nosedjango/nosedjango.git@05d280a98085d05182119ce6b5eac2dcf59553b6#egg=nosedjango
 -e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster
 -e git+git://github.com/svetlyak40wt/nose-notify-tmux.git@e715df3ea6e1c41da8e964a04be759a7a364d284#egg=nose-notify-tmux
--e git+git://github.com/svetlyak40wt/pip-1.git@8a329ce874cfb00f5d1dfa7f4b33d0b714546982#egg=pip
+-e git+git://github.com/svetlyak40wt/pip-1.git@2a44a3b0287a8ef05c216a93bb4a0a7a40d0e73f#egg=pip
 -e git+git://github.com/svetlyak40wt/pip-tools.git@fd699dd591ee69559cbe7a333b94a7b2354759a3#egg=pip-tools
 -e git+git://github.com/svetlyak40wt/tdaemon.git@8f8b9dc603a90b9c135f94dba352dac5750a1bd5#egg=tdaemon
--e git+https://github.com/svetlyak40wt/django-sendmail-backend@4ad95b0907f5e67acc841ca50f1b06fbe1b4a371#egg=django-sendmail-backend
-PyYAML==3.11
-South==0.8.4
+-e git+https://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend
 anyjson==0.3.3
 argcomplete==0.8.0
+chaussette==1.0
 cssselect==0.9.1
 cssutils==1.0
-django-debug-toolbar==1.1
+django-debug-toolbar==1.2
 django-extensions==1.3.3
 django-rq==0.6.1
-django==1.5.5
+django==1.5.7
 djangorestframework==2.3.13
 docopt==0.6.1
 docutils==0.11
-drf-extensions==0.2.2
+drf-extensions==0.2.3
 envoy==0.0.2
 fancycompleter==0.4
 graphitesend==0.3.0
@@ -40,11 +39,12 @@ python-memcached==1.53
 python-openid==2.2.5
 python-social-auth==0.1.23
 pytz==2014.2
-redis==2.9.1
+pyyaml==3.11
 requests-oauthlib==0.4.0
 requests==2.2.1
-rq==0.3.13
+rq==0.4.2
 six==1.6.1
+south==0.8.4
 sqlparse==0.1.11
 tailer==0.3
 times==0.6.2
