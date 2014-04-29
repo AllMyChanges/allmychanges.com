@@ -1,7 +1,7 @@
 0.2.1 (2014-04-21)
 ==================
 
-* Fixed caching issue at digest's page, when you've
+* Fixed caching issue at digest page, when you've
   added a package, but digest seems not updated
   because of the cache.
 * Fixed link to the package in digest email.
