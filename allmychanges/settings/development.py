@@ -1,3 +1,4 @@
+import os
 from .default import *  # nopep8
 
 DEBUG = True
@@ -36,3 +37,7 @@ ANALYTICS_ID = 'UA-49927178-2'
 
 LOG_FILENAME = '/var/log/allmychanges/django-' + CURRENT_USER + '.log'
 init_logging(LOG_FILENAME)
+
+
+if not os.path.exists(TEMP_DIR):
+    os.makedirs(TEMP_DIR)

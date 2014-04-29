@@ -1,3 +1,4 @@
+import os
 from .default import *  # nopep8
 
 REST_FRAMEWORK.update({
@@ -20,3 +21,7 @@ ANALYTICS_ID = 'UA-49927178-1'
 
 LOG_FILENAME = '/var/log/allmychanges/django-root.log'
 init_logging(LOG_FILENAME)
+
+
+if not os.path.exists(TEMP_DIR):
+    os.makedirs(TEMP_DIR)
