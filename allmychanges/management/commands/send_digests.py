@@ -22,11 +22,15 @@ class Command(LogMixin, BaseCommand):
         now = timezone.now()
         day_ago = now - datetime.timedelta(1)
         week_ago = now - datetime.timedelta(7)
+
+        users = get_user_model().objects.filter(is_active=True)
+        if args:
+            users = users.filter(username__in=args)
         
-        for user in get_user_model().objects.filter(is_active=True):
+        for user in users:
             today_changes = get_digest_for(user, after_date=day_ago)
             
-            if today_changes:
+            if today_changes or args:
                 print 'Sending digest to', user.username, user.email
             
                 week_changes = get_digest_for(user,
