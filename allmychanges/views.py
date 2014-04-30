@@ -23,7 +23,7 @@ from allmychanges.models import (Package,
                                  Changelog,
                                  Item)
 
-from almychanges.utils import HOUR
+from allmychanges.utils import HOUR
 
 
 class CommonContextMixin(object):
