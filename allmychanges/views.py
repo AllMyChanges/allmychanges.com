@@ -23,6 +23,8 @@ from allmychanges.models import (Package,
                                  Changelog,
                                  Item)
 
+from almychanges.utils import HOUR
+
 
 class CommonContextMixin(object):
     def get_context_data(self, **kwargs):
@@ -34,7 +36,7 @@ class CommonContextMixin(object):
         num_tracked_changelogs = cache.get(key)
         if num_tracked_changelogs is None:
             num_tracked_changelogs = Changelog.objects.count()
-            cache.set(key, num_tracked_changelogs, 60 * 60)
+            cache.set(key, num_tracked_changelogs, HOUR)
         result[key] = num_tracked_changelogs
         
         return result
@@ -164,7 +166,7 @@ class DigestView(CachedMixin, LoginRequiredMixin, CommonContextMixin, TemplateVi
             packages=self.request.user.packages.count(),
             changes=Item.objects.filter(
                 section__version__changelog__packages__user=self.request.user).count())
-        return cache_key, 14400
+        return cache_key, 4 * HOUR
         
     def get_context_data(self, **kwargs):
         result = super(DigestView, self).get_context_data(**kwargs)
@@ -261,7 +263,7 @@ class BadgeView(View):
         if content is None:
             r = requests.get(url)
             content = r.content
-            cache.set(url, content, 60 * 60)
+            cache.set(url, content, HOUR)
 
         response = HttpResponse(content, content_type='image/png')
         response['Content-Length'] = len(content)

@@ -21,6 +21,9 @@ from django.utils import timezone
 from allmychanges.crawler import search_changelog, parse_changelog
 
 
+MINUTE = 60
+HOUR = 60 * MINUTE
+
 def load_data(filename):
     data = []
     with open(filename) as f:
