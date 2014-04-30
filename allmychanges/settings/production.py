@@ -1,6 +1,10 @@
 import os
 from .default import *  # nopep8
 
+
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+
 REST_FRAMEWORK.update({
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
