@@ -1,3 +1,5 @@
+import datetime
+import copy
 import os
 import re
 import string
@@ -234,7 +236,44 @@ def show_debug_toolbar(request):
     return True
 
 
+def fill_missing_dates(raw_data):
+    """Algorithm.
+
+    If first item has no date, then it is today.
+    If Nth item has date, then assume it is a current_date.
+    If Nth item has no date and we have current_date, then assume item's
+    date is current_date.
+    If Nth item has no date and we have no current_date, then assume, it
+    is a now() - month and act like we have it.
+    """
+    result = []
+    today = datetime.date.today()
+    month = datetime.timedelta(30)
+    current_date = None
+    
+    for idx, item in enumerate(raw_data):
+        item = copy.deepcopy(item)
+        has_date = 'date' in item
+
+        if not has_date:
+            if idx == 0:
+                item['date'] = today
+            else:
+                if current_date is not None:
+                    item['date'] = current_date
+                else:
+                    item['date'] = today - month
+        else:
+            current_date = item['date']
+        result.append(item)
+    return result
+
+
 def update_changelog_from_raw_data(changelog, raw_data):
+    if changelog.versions.count() == 0:
+        # for initial filling, we should set all missing dates to some values
+        raw_data = fill_missing_dates(raw_data)
+        
     for raw_version in raw_data:
         version, created = changelog.versions.get_or_create(number=raw_version['version'])
         raw_date = raw_version.get('date')

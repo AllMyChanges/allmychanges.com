@@ -12,6 +12,7 @@ from allmychanges.utils import (
     update_changelog,
     fake_downloader,
     guess_source,
+    fill_missing_dates,
     extract_changelog_from_vcs)
 
 
@@ -223,3 +224,39 @@ def test_source_guesser():
              'https://github.com/tony/tmuxp'],
             urls)
 
+
+
+def test_filling_missing_dates_when_there_arent_any_dates():
+    from datetime import date
+    from datetime import timedelta
+    today = date.today()
+    month = timedelta(30)
+    
+    item = lambda dt: dict(date=dt)
+    eq_([item(today), item(today - month), item(today - month)],
+        fill_missing_dates([{}, {}, {}]))
+
+
+def test_filling_missing_dates_when_there_are_gaps_between():
+    from datetime import date
+    from datetime import timedelta
+    today = date.today()
+    month = timedelta(30)
+    
+    item = lambda dt: dict(date=dt)
+    first_date = today - timedelta(7)
+    last_date = today - 2 * month
+    
+    eq_([item(today),
+         item(first_date),
+         item(first_date),
+         item(last_date),
+         item(last_date)],
+        fill_missing_dates([
+            {},
+            item(first_date),
+            {}, # a gap
+            item(last_date),
+            {} # second gap at the tail
+        ]))
+    
