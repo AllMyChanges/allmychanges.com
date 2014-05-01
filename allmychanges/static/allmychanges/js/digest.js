@@ -6,7 +6,7 @@ app.directive('digestLine', ['$http', '$interval', '$timeout', function ($http, 
         scope: {
             package: '='
         },
-        template: '<p> <input type="text" ng-model="package.namespace"/> <input type="text" ng-model="package.name"/> <input type="text" ng-model="package.source" class="digest-source__source-field"/> <button ng-click="remove()">x</button> <a class="digest-source__problem" ng-if="package.problem" ng-href="{{package.absolute_uri}}">{{package.problem}}</a> <a class="digest-source__version" ng-if="package.latest_version" ng-href="{{package.absolute_uri}}">{{package.latest_version}}</a> <a class="digest-source__waiting" ng-if="!package.latest_version && !package.problem" ng-href="{{package.absolute_uri}}">Waiting</a></p>',
+        template: '<p> <input type="text" ng-model="package.namespace" class="digest-source__namespace-field"/> <input type="text" ng-model="package.name"/> <input type="text" ng-model="package.source" class="digest-source__source-field"/> <button ng-click="remove()">x</button> <a class="digest-source__problem" ng-if="package.problem" ng-href="{{package.absolute_uri}}">{{package.problem}}</a> <a class="digest-source__version" ng-if="package.latest_version" ng-href="{{package.absolute_uri}}">{{package.latest_version}}</a> <a class="digest-source__waiting" ng-if="!package.latest_version && !package.problem" ng-href="{{package.absolute_uri}}">Waiting</a></p>',
         link: function (scope, elem, attrs) {
             scope.package = angular.copy(scope.package);
             var my_compare = function(left, right, fields) {

@@ -129,6 +129,9 @@ body {
   list-style-type: none;
   padding-left: 0px;
 }
+.digest-source__namespace-field {
+  width: 15em;
+}
 .digest-source__source-field {
   width: 25em;
 }

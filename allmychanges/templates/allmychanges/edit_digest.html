@@ -15,7 +15,7 @@
 
   <p>
     <form ng-submit="add_item()">
-      <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (python, node, etc.)" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="new_item.namespace"/></div>
+      <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (e.g. python, node)" pause="100" selected-object="selected_namespace" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="new_item.namespace" input-class="digest-source__namespace-field"/></div>
 
       <div angucomplete-alt class="autocomplete-input" placeholder="Package name" pause="100" selected-object="selected_name" remote-url="/v1/autocomplete-package-name/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" value="new_item.name"/></div>
 
