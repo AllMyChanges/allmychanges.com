@@ -445,6 +445,9 @@ def extract_changelog_from_vcs(path):
                         'unreleased': True,
                         'date': date,
                         'sections': [{'items': current_commits}]})
+
+    if len(results) < 2:
+        raise UpdateError('Unable to extract versions from VCS history')
     return results
 
 
