@@ -28,7 +28,7 @@ class Command(LogMixin, BaseCommand):
             users = users.filter(username__in=args)
         
         for user in users:
-            today_changes = get_digest_for(user, after_date=day_ago)
+            today_changes = get_digest_for(user, after_date=now)
             
             if today_changes or args:
                 print 'Sending digest to', user.username, user.email

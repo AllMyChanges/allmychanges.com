@@ -101,24 +101,28 @@ from django.core.cache import cache
 
 
 def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
+    """Before date and after date are inclusive."""
     # search packages which have changes after given date
     packages = user.packages
 
-    if before_date is not None:
-        packages = packages.filter(changelog__versions__date__lt=before_date)
-    if after_date is not None:
-        packages = packages.filter(changelog__versions__date__gte=after_date)
+    filter_args = {}
 
+    if before_date and after_date:
+        filter_args['date__range'] = (after_date, before_date)
+    else:
+        if before_date:
+            filter_args['date__lt'] = before_date
+        if after_date:
+            filter_args['date__gte'] = after_date
+        
+    packages = packages.filter(**{'changelog__versions__' + key: value
+                                  for key, value in filter_args.items()})
     packages = packages.select_related('changelog').distinct()
-
+    
     changes = []
     for package in packages:
         versions = []
-        versions_queryset = package.changelog.versions.all()
-        if before_date is not None:
-            versions_queryset = versions_queryset.filter(date__lt=before_date)
-        if after_date is not None:
-            versions_queryset = versions_queryset.filter(date__gte=after_date)
+        versions_queryset = package.changelog.versions.filter(**filter_args)
 
         # this allows to reduce number of queries in 5 times
         versions_queryset = versions_queryset.prefetch_related('sections__items')
@@ -172,7 +176,8 @@ class DigestView(CachedMixin, LoginRequiredMixin, CommonContextMixin, TemplateVi
         result = super(DigestView, self).get_context_data(**kwargs)
 
         now = timezone.now()
-        day_ago = now - datetime.timedelta(1)
+        one_day = datetime.timedelta(1)
+        day_ago = now - one_day
         week_ago = now - datetime.timedelta(7)
         month_ago = now - datetime.timedelta(31)
 
@@ -181,15 +186,15 @@ class DigestView(CachedMixin, LoginRequiredMixin, CommonContextMixin, TemplateVi
 
 
         result['today_changes'] = get_digest_for(self.request.user,
-                                                 after_date=day_ago)
+                                                 after_date=now)
         result['week_changes'] = get_digest_for(self.request.user,
                                                 before_date=day_ago,
                                                 after_date=week_ago)
         result['month_changes'] = get_digest_for(self.request.user,
-                                                 before_date=week_ago,
+                                                 before_date=week_ago - one_day,
                                                  after_date=month_ago)
         result['ealier_changes'] = get_digest_for(self.request.user,
-                                                  before_date=month_ago)
+                                                  before_date=month_ago - one_day)
 
         result['no_packages'] = self.request.user.packages.count() == 0
         result['no_data'] = all(
