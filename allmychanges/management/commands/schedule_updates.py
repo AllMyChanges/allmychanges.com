@@ -15,7 +15,10 @@ class Command(LogMixin, BaseCommand):
         packages = [name for name in args if name not in special_keywords]
         
         if full:
-            Version.objects.filter(changelog__packages__name__in=packages).delete()
+            if packages:
+                Version.objects.filter(changelog__packages__name__in=packages).delete()
+            else:
+                Version.objects.all().delete()
                 
         schedule_updates.delay(reschedule=reschedule,
                                packages=packages)
