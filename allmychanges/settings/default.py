@@ -127,6 +127,7 @@ INSTALLED_APPS = (
     'south',
     'rest_framework',
     'django_rq',
+    'django_extensions',
 
     'allmychanges',
     # Uncomment the next line to enable the admin:
