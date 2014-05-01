@@ -272,7 +272,7 @@ class Changelog(models.Model):
 class VersionManager(models.Manager):
     def get_query_set(self):
         # TODO: rename after migration to Django 1.6
-        return super(VersionManager, self).get_query_set().order_by('-date')
+        return super(VersionManager, self).get_query_set().order_by('-id')
 
 
 class Version(models.Model):
