@@ -160,6 +160,10 @@ def parse_changelog(text):
             if v_date and current_version and current_version.get('date') is None:
                 current_version['date'] = v_date
 
+    # usually versions go from most recent to
+    # older, but we should return them in chronological
+    # order
+    changelog.reverse()
     return _finalize_changelog(changelog)
 
 

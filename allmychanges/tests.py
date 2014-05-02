@@ -59,11 +59,11 @@ def test_update_package_from_basic_structure():
     update_changelog_from_raw_data(package.changelog, structure)
     
     eq_(2, package.changelog.versions.count())
-    v2 = package.changelog.versions.all()[1]
-    eq_('0.2.0', v2.number)
+    v = package.changelog.versions.all()[0]
+    eq_('0.2.0', v.number)
     eq_(['boo fixed', 'baz fixed too'],
         [item.text
-         for item in v2.sections.all()[0].items.all()])
+         for item in v.sections.all()[0].items.all()])
 
 
 def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw_data():
@@ -182,24 +182,24 @@ def test_extract_from_vcs():
          ('0.3.0', date(2014, 3, 20), 'First unreleased feature'),
          ('0.3.0', date(2014, 3, 21), 'Second unreleased feature')])
 
-    eq_([{'version': 'x.x.x',
-          'unreleased': True,
-          'date': date(2014, 3, 21),
-          'sections': [{'items': ['First unreleased feature',
-                                  'Second unreleased feature']}]},
-         {'version': '0.3.0',
-          'date': date(2014, 2, 14),
-          'sections': [{'items': ['Other feature',
-                                  'Version bump']}]},
-         {'version': '0.2.0',
-          'date': date(2014, 2, 10),
-          'sections': [{'items': ['Repackaging',
-                                  'Some new functions']}]},
-         {'version': '0.1.0',
+    eq_([{'version': '0.1.0',
           'date': date(2014, 1, 16),
           'sections': [{'items': ['Initial commit',
                                   'Feature was added',
                                   'Tests were added']}]},
+         {'version': '0.2.0',
+          'date': date(2014, 2, 10),
+          'sections': [{'items': ['Repackaging',
+                                  'Some new functions']}]},
+         {'version': '0.3.0',
+          'date': date(2014, 2, 14),
+          'sections': [{'items': ['Other feature',
+                                  'Version bump']}]},
+         {'version': 'x.x.x',
+          'unreleased': True,
+          'date': date(2014, 3, 21),
+          'sections': [{'items': ['First unreleased feature',
+                                  'Second unreleased feature']}]},
      ],
         
         raw_data)
@@ -234,7 +234,7 @@ def test_filling_missing_dates_when_there_arent_any_dates():
     month = timedelta(30)
     
     item = lambda dt: dict(date=dt)
-    eq_([item(today), item(today - month), item(today - month)],
+    eq_([item(today - month), item(today - month), item(today)],
         fill_missing_dates([{}, {}, {}]))
 
 
@@ -248,16 +248,17 @@ def test_filling_missing_dates_when_there_are_gaps_between():
     first_date = today - timedelta(7)
     last_date = today - 2 * month
     
-    eq_([item(today),
-         item(first_date),
-         item(first_date),
+    eq_([item(last_date),
          item(last_date),
-         item(last_date)],
-        fill_missing_dates([
-            {},
-            item(first_date),
-            {}, # a gap
-            item(last_date),
-            {} # second gap at the tail
+         item(first_date),
+         item(first_date),
+         item(today)],
+        
+        fill_missing_dates([ 
+            {}, # 0.1.0
+            item(last_date), # 0.2.0
+            {}, # 0.2.1
+            item(first_date), # 0.3.0
+            {}, # 0.4.0
         ]))
     

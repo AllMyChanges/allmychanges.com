@@ -81,23 +81,23 @@ Bugfix release, released on June 29th 2011
 """
     parsed = parse_changelog(input)
     eq_(3, len(parsed))
-    eq_('1.0', parsed[0]['version'])
-    eq_(date(2013, 12, 23), parsed[0]['date'])
+    eq_('1.0', parsed[2]['version'])
+    eq_(date(2013, 12, 23), parsed[2]['date'])
     eq_('0.10.2', parsed[1]['version'])
-    eq_('0.7.1', parsed[2]['version'])
+    eq_('0.7.1', parsed[0]['version'])
 
-    eq_(1, len(parsed[0]['sections']))
+    eq_(1, len(parsed[2]['sections']))
     eq_('(release date to be announced, codename to be selected)',
-        parsed[0]['sections'][0]['notes'])
+        parsed[2]['sections'][0]['notes'])
 
-    eq_(1, len(parsed[0]['sections'][0]['items']))
+    eq_(1, len(parsed[2]['sections'][0]['items']))
     eq_(('Added ``SESSION_REFRESH_EACH_REQUEST`` config key that controls the '
          'set-cookie behavior.  If set to `True` a permanent session will be '
          'refreshed each request and get their lifetime extended, if set to '
          '`False` it will only be modified if the session actually modifies. '
          'Non permanent sessions are not affected by this and will always '
          'expire if the browser window closes.'),
-        parsed[0]['sections'][0]['items'][0])
+        parsed[2]['sections'][0]['items'][0])
 
 
 def test_preserve_newlines_in_long_notes():

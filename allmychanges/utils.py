@@ -250,8 +250,8 @@ def fill_missing_dates(raw_data):
     today = datetime.date.today()
     month = datetime.timedelta(30)
     current_date = None
-    
-    for idx, item in enumerate(raw_data):
+
+    for idx, item in enumerate(reversed(raw_data)):
         item = copy.deepcopy(item)
         has_date = 'date' in item
 
@@ -266,6 +266,8 @@ def fill_missing_dates(raw_data):
         else:
             current_date = item['date']
         result.append(item)
+        
+    result.reverse()
     return result
 
 
@@ -277,10 +279,6 @@ def update_changelog_from_raw_data(changelog, raw_data):
         # for initial filling, we should set all missing dates to some values
         raw_data = fill_missing_dates(raw_data)
 
-    # we do reverse to insert older records first
-    # that way, we could be sure that order by id is always
-    raw_data.reverse()
-    
     for raw_version in raw_data:
         version, created = changelog.versions.get_or_create(number=raw_version['version'])
         raw_date = raw_version.get('date')
@@ -456,7 +454,6 @@ def extract_changelog_from_vcs(path):
     if len(results) < 2:
         raise UpdateError('Unable to extract versions from VCS history')
 
-    results.reverse()
     return results
 
 
