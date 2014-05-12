@@ -8,6 +8,7 @@ mock
 werkzeug
 tailer
 docopt
+fabric
 
 -e git+git://github.com/svetlyak40wt/pip-1.git@ask-before-hard-reset#egg=pip
 -e git+git://github.com/svetlyak40wt/pip-tools.git@my-future
