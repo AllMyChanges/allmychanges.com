@@ -140,11 +140,6 @@ INSTALLED_APPS = (
 
 AUTH_USER_MODEL = 'allmychanges.User'
 
-SOUTH_MIGRATION_MODULES = {
-    'auth': 'allmychanges.authmigrations',
-    'default': 'allmychanges.socialmigrations',
-}
-
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 CACHES = {
