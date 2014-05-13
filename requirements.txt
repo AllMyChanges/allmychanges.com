@@ -1,8 +1,7 @@
 -e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster
--e git+https://github.com/svetlyak40wt/django-markdown2@a89eb08fc38c5e96664df1c217b5d64e4198d916#egg=django-markdown2
+-e git+https://github.com/svetlyak40wt/django-markdown2@4b791ab9e08e35ee0e611d6b94ade4f29c59e00a#egg=django-markdown2
 -e git+https://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend
 -e git+https://github.com/trentm/python-markdown2@26daeae75bc06cade2d9455881287e74d0b397a7#egg=python-markdown2
-South==0.8.4
 anyjson==0.3.3
 chaussette==1.1
 cssselect==0.9.1
@@ -31,6 +30,7 @@ requests-oauthlib==0.4.0
 requests==2.2.1
 rq==0.4.5
 six==1.6.1
+south==0.8.4
 sqlparse==0.1.11
 times==0.6.2
 twiggy-goodies==0.2.2
