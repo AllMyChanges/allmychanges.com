@@ -6,6 +6,8 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.contrib.auth.models import AbstractBaseUser, UserManager
+
 
 from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.crawler.git_crawler import aggregate_git_log
@@ -24,6 +26,35 @@ MARKUP_CHOICES = (
     ('markdown', 'markdown'),
     ('rest', 'rest'),
 )
+
+
+# based on http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
+
+from pytz import common_timezones
+TIMEZONE_CHOICES = [(tz, tz) for tz in common_timezones]
+
+class User(AbstractBaseUser):
+    """
+    A fully featured User model with admin-compliant permissions that uses
+    a full-length email field as the username.
+
+    Email and password are required. Other fields are optional.
+    """
+    username = models.CharField('user name', max_length=254, unique=True)
+    email = models.EmailField('email address', max_length=254, unique=True)
+    date_joined = models.DateTimeField('date joined', default=timezone.now)
+    timezone = models.CharField(max_length=100,
+                                choices=TIMEZONE_CHOICES,
+                                null=True, blank=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    class Meta:
+        verbose_name = 'user'
+        verbose_name_plural = 'users'
 
 
 class Repo(models.Model):

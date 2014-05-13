@@ -122,7 +122,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.markup',
 
     'south',
     'rest_framework',
@@ -136,7 +135,10 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 
     'social.apps.django_app.default',
+    'django_markdown2',
 )
+
+AUTH_USER_MODEL = 'auth.User'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
@@ -216,3 +218,6 @@ def init_logging(filename):
     # and we need this to turn off python-rq's logging
     # configuration
     logging._handlers['fake-handler'] = handler
+
+
+    

@@ -4,7 +4,11 @@
 -e git+git://github.com/svetlyak40wt/pip-1.git@2a44a3b0287a8ef05c216a93bb4a0a7a40d0e73f#egg=pip
 -e git+git://github.com/svetlyak40wt/pip-tools.git@fd699dd591ee69559cbe7a333b94a7b2354759a3#egg=pip-tools
 -e git+git://github.com/svetlyak40wt/tdaemon.git@8f8b9dc603a90b9c135f94dba352dac5750a1bd5#egg=tdaemon
+-e git+https://github.com/svetlyak40wt/django-markdown2@a89eb08fc38c5e96664df1c217b5d64e4198d916#egg=django-markdown2
 -e git+https://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend
+-e git+https://github.com/trentm/python-markdown2@26daeae75bc06cade2d9455881287e74d0b397a7#egg=python-markdown2
+PyYAML==3.11
+South==0.8.4
 anyjson==0.3.3
 argcomplete==0.8.0
 chaussette==1.1
@@ -43,12 +47,10 @@ python-memcached==1.53
 python-openid==2.2.5
 python-social-auth==0.1.23
 pytz==2014.2
-pyyaml==3.11
 requests-oauthlib==0.4.0
 requests==2.2.1
 rq==0.4.5
 six==1.6.1
-south==0.8.4
 sqlparse==0.1.11
 tailer==0.3
 times==0.6.2

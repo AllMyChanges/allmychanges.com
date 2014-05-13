@@ -24,3 +24,5 @@ chaussette
 
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
 -e git+https://github.com/svetlyak40wt/django-sendmail-backend
+-e git+https://github.com/svetlyak40wt/django-markdown2
+-e git+https://github.com/trentm/python-markdown2

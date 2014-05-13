@@ -15,7 +15,6 @@ import requests
 from lxml import html
 from contextlib import contextmanager
 
-from django.contrib.markup.templatetags import markup
 from django.conf import settings
 from django.utils.encoding import force_text
 from django.utils import timezone
@@ -178,26 +177,26 @@ def get_clean_text_from_html(raw_html):
 
 
 def get_clean_text_from_markup_text(text, markup_type):
-    raw_html = render_text_for_markup_type(text, markup_type=markup_type)
+    raw_html = _render_text_for_markup_type(text, markup_type=markup_type)
     return get_clean_text_from_html(raw_html)
 
 
-def render_text_for_markup_type(text, markup_type):
+def _render_text_for_markup_type(text, markup_type):
     if markup_type == 'markdown':
-        return render_markdown(text)
+        return _render_markdown(text)
     elif markup_type == 'rest':
-        return render_rest(text)
+        return _render_rest(text)
     else:
         return text
 
 
-def render_markdown(text):
+def _render_markdown(text):
     if text is None:
         text = ''
     return markup.markdown(force_text(text))
 
 
-def render_rest(text):
+def _render_rest(text):
     if text is None:
         text = ''
     return markup.restructuredtext(force_text(text))
