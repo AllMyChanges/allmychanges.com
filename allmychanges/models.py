@@ -324,6 +324,10 @@ class Changelog(models.Model):
                                blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
     next_update_at = models.DateTimeField(default=timezone.now)
+    last_update_took = models.IntegerField(
+        help_text=('Number of seconds required to '
+                   'update this changelog last time'),
+        default=0)
     
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)

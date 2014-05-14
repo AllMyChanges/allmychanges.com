@@ -111,6 +111,7 @@ def update_changelog_task(source):
             update_changelog(changelog)
             # TODO: create more complext algorithm to calculate this time
             changelog.next_update_at = timezone.now() + datetime.timedelta(0, 60 * 60)
+            changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
         except UpdateError, e:
             changelog.problem = ', '.join(e.args)
         except Exception, e:
