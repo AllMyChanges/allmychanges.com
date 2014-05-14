@@ -204,6 +204,11 @@ class DigestView(CachedMixin, LoginRequiredMixin, CommonContextMixin, TemplateVi
 
         return result
 
+    def get(self, *args, **kwargs):
+        if self.request.user.packages.count() == 0:
+            return HttpResponseRedirect(reverse('edit-digest'))
+        return super(DigestView, self).get(*args, **kwargs)
+
 
 class LoginView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/login.html'
@@ -215,7 +220,7 @@ class LoginView(CommonContextMixin, TemplateView):
 
     def get(self, request, **kwargs):
         if request.user.is_authenticated():
-            return HttpResponseRedirect('/digest/')
+            return HttpResponseRedirect(reverse('digest'))
         return super(LoginView, self).get(request, **kwargs)
         
 
