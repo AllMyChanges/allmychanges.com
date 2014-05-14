@@ -11,11 +11,11 @@
           <h4 class="package-version__number">{{version.number}}</h4>
           <h5 class="package-version__date">{{version.date}}</h5>
           {% for section in version.sections %}
-            {% if section.notes %}<p class="package-version__notes">{{section.notes|markdown}}</p>{% endif %}
+            {% if section.notes %}<p class="package-version__notes">{{section.notes|capfirst|markdown}}</p>{% endif %}
             {% if section.items %}
               <ul class="package-version__items">
                 {% for item in section.items %}
-                <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|markdown}}</li>
+                <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|capfirst|markdown}}</li>
                 {% endfor %}
               </ul>
             {% endif %}
