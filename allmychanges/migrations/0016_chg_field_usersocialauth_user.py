@@ -11,9 +11,9 @@ class Migration(SchemaMigration):
         db.alter_column('social_auth_usersocialauth', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['allmychanges.User']))
 
     def backwards(self, orm):
-
+        pass
         # Changing field 'UserSocialAuth.user'
-        db.alter_column('social_auth_usersocialauth', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
+        #db.alter_column('social_auth_usersocialauth', 'user_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User']))
 
     models = {
         u'allmychanges.user': {

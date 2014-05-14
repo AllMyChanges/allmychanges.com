@@ -6,7 +6,8 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, UserManager
+from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
+
 
 
 from allmychanges.crawler import search_changelog, parse_changelog
@@ -33,6 +34,27 @@ MARKUP_CHOICES = (
 from pytz import common_timezones
 TIMEZONE_CHOICES = [(tz, tz) for tz in common_timezones]
 
+
+class UserManager(BaseUserManager):
+    def _create_user(self, username, email=None, password=None,
+                     **extra_fields):
+        import pdb; pdb.set_trace()  # DEBUG
+        now = timezone.now()
+        email = self.normalize_email(email)
+        user = self.model(username=username,
+                          email=email,
+                          last_login=now,
+                          date_joined=now,
+                          **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        return self._create_user(username, email, password,
+                                 **extra_fields)
+
+ 
 class User(AbstractBaseUser):
     """
     A fully featured User model with admin-compliant permissions that uses
