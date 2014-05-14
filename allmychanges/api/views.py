@@ -88,9 +88,10 @@ class PackageViewSet(HandleExceptionMixin,
         obj.user = self.request.user
         now = timezone.now()
 
-        if self.request.user.packages.filter(
-                namespace=obj.namespace,
-                name=obj.name).count() > 0:
+        if self.request.method == 'POST' and \
+           self.request.user.packages.filter(
+               namespace=obj.namespace,
+               name=obj.name).count() > 0:
             raise AlreadyExists('Package {0}/{1} already exists'.format(
                 obj.namespace, obj.name))
         
