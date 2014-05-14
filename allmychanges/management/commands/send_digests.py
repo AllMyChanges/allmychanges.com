@@ -23,7 +23,7 @@ class Command(LogMixin, BaseCommand):
         day_ago = now - datetime.timedelta(1)
         week_ago = now - datetime.timedelta(7)
 
-        users = get_user_model().objects.filter(is_active=True)
+        users = get_user_model().objects.exclude(email='')
         if args:
             users = users.filter(username__in=args)
         
