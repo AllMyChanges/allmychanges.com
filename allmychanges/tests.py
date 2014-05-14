@@ -5,8 +5,10 @@ import os.path
 
 from nose.tools import eq_
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
-from allmychanges.models import Package
+
+from allmychanges.models import Package, User
 from allmychanges.utils import (
     update_changelog_from_raw_data,
     update_changelog,
@@ -261,4 +263,18 @@ def test_filling_missing_dates_when_there_are_gaps_between():
             item(first_date), # 0.3.0
             {}, # 0.4.0
         ]))
-    
+
+
+class UserTests(TestCase):
+    def test_two_users_can_have_blank_emails(self):
+        User.objects.create(username='bob', email='')
+        User.objects.create(username='karl', email='')
+        eq_(2, User.objects.count())
+
+    def test_but_two_users_should_have_different_emails(self):
+        User.objects.create(username='bob', email='mail@me.com')
+        self.assertRaises(ValueError,
+                          User.objects.create,
+                          username='karl', email='mail@me.com')
+
+

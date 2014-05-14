@@ -38,7 +38,6 @@ TIMEZONE_CHOICES = [(tz, tz) for tz in common_timezones]
 class UserManager(BaseUserManager):
     def _create_user(self, username, email=None, password=None,
                      **extra_fields):
-        import pdb; pdb.set_trace()  # DEBUG
         now = timezone.now()
         email = self.normalize_email(email)
         user = self.model(username=username,
@@ -50,7 +49,15 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def create(self, *args, **kwargs):
+        email = kwargs.get('email')
+        if email and self.filter(email=email).count() > 0:
+            raise ValueError('User with email "{0}" already exists'.format(email))
+        return super(UserManager, self).create(*args, **kwargs)
+        
     def create_user(self, username, email=None, password=None, **extra_fields):
+        if email and self.filter(email=email).count() > 0:
+            raise ValueError('User with email "{0}" already exists'.format(email))
         return self._create_user(username, email, password,
                                  **extra_fields)
 
@@ -63,7 +70,7 @@ class User(AbstractBaseUser):
     Email and password are required. Other fields are optional.
     """
     username = models.CharField('user name', max_length=254, unique=True)
-    email = models.EmailField('email address', max_length=254, unique=True)
+    email = models.EmailField('email address', max_length=254, blank=True)
     date_joined = models.DateTimeField('date joined', default=timezone.now)
     timezone = models.CharField(max_length=100,
                                 choices=TIMEZONE_CHOICES,
