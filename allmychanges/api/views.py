@@ -19,6 +19,15 @@ from allmychanges.api.serializers import (
 from allmychanges.utils import count, guess_source
 
 
+from rest_framework.exceptions import APIException
+
+
+# http://www.django-rest-framework.org/api-guide/exceptions
+class AlreadyExists(APIException):
+    status_code = 400
+    default_detail = 'Object already exists'
+    
+
 class HandleExceptionMixin(object):
     def handle_exception(self, exc):
         count('api.exception')
@@ -78,6 +87,12 @@ class PackageViewSet(HandleExceptionMixin,
     def pre_save(self, obj):
         obj.user = self.request.user
         now = timezone.now()
+
+        if self.request.user.packages.filter(
+                namespace=obj.namespace,
+                name=obj.name).count() > 0:
+            raise AlreadyExists('Package {0}/{1} already exists'.format(
+                obj.namespace, obj.name))
         
         obj.next_update_at = now
         if obj.created_at is None:

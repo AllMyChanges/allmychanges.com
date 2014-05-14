@@ -389,6 +389,9 @@ class Package(models.Model):
                                   blank=True, null=True,
                                   on_delete=models.SET_NULL)
 
+    class Meta:
+        unique_together = ('user', 'namespace', 'name')
+
     def __unicode__(self):
         return u'/'.join((self.user.username, self.name))
 

@@ -22,6 +22,8 @@
       <div angucomplete-alt class="autocomplete-input" placeholder="Source repository" pause="100" selected-object="selected_source" remote-url="/v1/autocomplete-source/?q=" remote-url-data-field="results" title-field="name" minlength="0" override-suggestions="true" remote-url-request-formatter="get_source_guessing_params" value="new_item.source" input-class="digest-source__source-field"/></div>
 
       <input type="submit" ng-disabled="!(new_item.namespace && new_item.name && new_item.source)" value="Add"/>
+
+      <p ng-if="error_message">{{ error_message }}</p>
     </form>
   </p>
 </div>

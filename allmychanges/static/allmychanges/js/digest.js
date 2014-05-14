@@ -78,6 +78,13 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
     $scope.new_item = {};
 
 
+    var hide_error_message = function() {
+        $scope.error_message = undefined;
+    }
+
+    $scope.$watch('new_item.namespace', hide_error_message);
+    $scope.$watch('new_item.name', hide_error_message);
+
     $http.get('/v1/packages/').success(function(data) {
         $scope.items = data;
         $scope.new_item = init_new_item();
@@ -88,7 +95,7 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
             $scope.items.push(data);
             $scope.new_item = init_new_item();
         }).error(function(data) {
-            // TODO: may be handle error someday
+            $scope.error_message = data.detail;
         });
     };
 
