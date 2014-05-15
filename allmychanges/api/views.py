@@ -149,3 +149,5 @@ class AutocompleteSourceView(viewsets.ViewSet):
 
         return Response({'results': [{'name': url}
                                      for url in urls]})
+
+

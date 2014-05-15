@@ -4,9 +4,7 @@ import mock
 import os.path
 
 from nose.tools import eq_
-from django.contrib.auth import get_user_model
-from django.test import TestCase
-
+from django.test import Client, TransactionTestCase, TestCase
 
 from allmychanges.models import Package, User
 from allmychanges.utils import (
@@ -17,6 +15,10 @@ from allmychanges.utils import (
     fill_missing_dates,
     extract_changelog_from_vcs)
 
+
+def refresh(obj):
+    return obj.__class__.objects.get(pk=obj.pk)
+    
 
 def check_status_code(desired_code, response):
     eq_(desired_code,
@@ -30,16 +32,14 @@ def check_status_code(desired_code, response):
 def create_user(username):
     """Создает пользователя с заданным username и таким же паролем."""
     try:
-        return get_user_model().objects.get(username=username)
+        return User.objects.get(username=username)
 
-    except get_user_model().DoesNotExist:
-        user = get_user_model().objects.create_user(
+    except User.DoesNotExist:
+        user = User.objects.create_user(
             username, username + '@example.yandex.ru', username)
-        user.center_id = 10000 + user.id
         user.save()
         return user
 
-        
 def test_update_package_from_basic_structure():
     structure = [
         {'version': '0.1.0',
@@ -277,4 +277,20 @@ class UserTests(TestCase):
                           User.objects.create,
                           username='karl', email='mail@me.com')
 
+
+class ProfileTests(TransactionTestCase):
+    def setUp(self):
+        self.user = create_user('art')
+        self.user.save()
+
+        self.cl = Client()
+        self.cl.login(username='art', password='art')
+
+    def test_timzone_update(self):
+        url = '/account/settings/'
+        response = self.cl.post(url, dict(timezone='Europe/Moscow'))
+        check_status_code(302, response)
+        assert url in response['Location']
+        user = refresh(self.user)
+        eq_('Europe/Moscow', user.timezone)
 

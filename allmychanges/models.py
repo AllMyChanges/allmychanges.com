@@ -407,7 +407,7 @@ class Package(models.Model):
             username=self.user.username,
             namespace=self.namespace,
             name=self.name))
-
+    
     def save(self, *args, **kwargs):
         """Create corresponding changelog object"""
         super(Package, self).save(*args, **kwargs)

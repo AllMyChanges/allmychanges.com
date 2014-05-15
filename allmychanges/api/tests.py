@@ -20,6 +20,7 @@ from allmychanges.tests import check_status_code, create_user
 def setup():
     Package.objects.all().delete()
 
+
 def test_show_packages():
     cl = Client()
 
@@ -132,3 +133,5 @@ class TransactionTests(TestCase):
 
         eq_(0, Package.objects.count())
         eq_(0, Changelog.objects.count())
+
+

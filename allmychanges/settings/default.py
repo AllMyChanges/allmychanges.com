@@ -136,6 +136,7 @@ INSTALLED_APPS = (
 
     'social.apps.django_app.default',
     'django_markdown2',
+    'widget_tweaks',
 )
 
 AUTH_USER_MODEL = 'allmychanges.User'

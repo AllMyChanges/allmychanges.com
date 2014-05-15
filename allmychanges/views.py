@@ -4,16 +4,16 @@ import random
 import requests
 import os
 
+from braces.views import LoginRequiredMixin
 from django.views.generic import (TemplateView,
                                   RedirectView,
                                   FormView,
+                                  UpdateView,
                                   View)
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
@@ -21,6 +21,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from allmychanges.models import (Package,
                                  Subscription,
                                  Changelog,
+                                 User,
                                  Item)
 
 from allmychanges.utils import HOUR
@@ -90,13 +91,6 @@ class HumansView(TemplateView):
     content_type = 'text/plain'
 
 
-class LoginRequiredMixin(object):
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
-
-
-
 from django.core.cache import cache
 
 
@@ -161,7 +155,7 @@ class CachedMixin(object):
         raise NotImplementedError('Please, implement get_cache_params method.')
         
         
-class DigestView(CachedMixin, LoginRequiredMixin, CommonContextMixin, TemplateView):
+class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/digest.html'
 
     def get_cache_params(self, *args, **kwargs):
@@ -389,3 +383,16 @@ class ChangeLogView(View):
         response = HttpResponse(content, content_type='plain/text')
         response['Content-Length'] = len(content)
         return response
+
+
+class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = User
+    template_name = 'allmychanges/account-settings.html'
+    success_url = '/account/settings/'
+
+    def get_form_class(self):
+        from django.forms.models import modelform_factory
+        return modelform_factory(User, fields=('email', 'timezone'))
+        
+    def get_object(self, queryset=None):
+        return self.request.user

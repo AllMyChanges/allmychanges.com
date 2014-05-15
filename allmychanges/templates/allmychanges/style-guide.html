@@ -31,4 +31,46 @@
     </form>
   </div>
 
+  <div class="box box_guide">
+    <h2 class="page-subheader">Complex form with dropdown</h2>
+
+    <form class="form">
+      <table class="form__layout">
+        <tr class="form__layout__row">
+          <td class="form__layout__left-column"><label class="label" for="field">Some field:</label></td>
+          <td class="form__layout__right-column"><input name="field" class="text-input" type="text" value="Blah minor" />
+            <p class="form__help">Digest will be sent to this email when new versions are discovered.<br/>
+              To unsubscribe, just leave it blank. But stop, don't do it, because that way we'll be unable to reach
+              you in case if some critical updates become available for libraries you use.
+            </p>
+          </td>
+        </tr>
+        <tr class="form__layout__row">
+          <td class="form__layout__left-column"><label class="label" for="timezone">Timezone:</label></td>
+          <td class="form__layout__right-column">
+            <select class="dropdown" name="timezone">
+              <option value="" selected="selected">---------</option>
+              <option value="Africa/Abidjan">Africa/Abidjan</option>
+              <option value="Africa/Accra">Africa/Accra</option>
+              <option value="Africa/Addis_Ababa">Africa/Addis_Ababa</option>
+              <option value="Africa/Algiers">Africa/Algiers</option>
+              <option value="Africa/Asmara">Africa/Asmara</option>
+              <option value="Africa/Bamako">Africa/Bamako</option>
+              <option value="Africa/Bangui">Africa/Bangui</option>
+              <option value="Africa/Banjul">Africa/Banjul</option>
+              <option value="Africa/Bissau">Africa/Bissau</option>
+              <option value="UTC">UTC</option>
+            </select>
+          </td>
+        </tr>
+        <tr class="form__layout__row">
+          <td class="form__layout__left-column"></td>
+          <td class="form__layout__right-column">
+            <input class="button button_good" type="submit" value="Submit" />
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div>
+
 {% endblock content %}

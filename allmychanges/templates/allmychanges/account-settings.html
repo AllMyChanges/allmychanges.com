@@ -1,0 +1,37 @@
+{% extends "allmychanges/new-base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <h1 class="page-header">Account settings</h1>
+  <h2 class="page-subheader">Notifications</h2>
+
+  <form action="." method="post" class="form form_profile">
+    <table class="form__layout">
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column"><label class="label">Email:</label></td>
+        <td class="form__layout__right-column">
+          {{ form.email|add_class:"text-input profile-form__email-field" }}
+          <p class="form__layout__right-column form__help">We'll mail you when new versions will be discovered.<br/>
+            To unsubscribe, just leave it blank. But stop! Don't do it, because that way we'll be unable to reach
+            you in case if some critical updates become available for libraries you use.
+          </p>
+        </td>
+      </tr>
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column"><label class="label">Timezone:</label></td>
+        <td class="form__layout__right-column">
+          {{ form.timezone|add_class:"text-input profile-form__timezone-field" }}
+          <p class="form__help">Digests will be sent at 9:00 in given timezone.</p>
+        </td>
+      </tr>
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column">
+        <td class="form__layout__right-column">
+          <input type="submit" value="Save changes" class="button button_good button_large"/>
+        </td>
+      </tr>
+    </table>
+
+     {% csrf_token %}
+  </form>
+{% endblock content %}

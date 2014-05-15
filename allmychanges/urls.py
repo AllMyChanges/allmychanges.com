@@ -16,6 +16,7 @@ from .views import (OldIndexView,
                     LandingView,
                     RaiseExceptionView,
                     ChangeLogView,
+                    ProfileView,
                     PackageView)
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
@@ -34,7 +35,8 @@ urlpatterns = patterns(
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
-    
+
+    url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
     url(r'^v1/', include('allmychanges.api.urls')),
     url(r'^admin/', include(admin.site.urls)),

@@ -4,11 +4,26 @@
     margin-top: 1em
     margin-bottom: 1em
 
+    &__help
+        color: gray
+        margin-top: (15em / 15)
+
+    &__layout
+        &__left-column
+            padding-bottom: (20em / 15)
+        &__right-column
+            padding-bottom: (20em / 15)
+
     &_large
         font-size: (30em / 15)
         line-height: (40em / 30) 
 
-.text-input
+
+.label
+    margin-right: 1em
+    white-space: nowrap
+
+.text-input, .dropdown
     border: 1px solid input-border-color
     font-size: 1em
     padding: (1em/15)
@@ -47,4 +62,8 @@
 
         &:hover
             background-color: (bad-button-color - 20%)
+
+    &_large
+        font-size: (30em / 15)
+        line-height: (40em / 30)
         
