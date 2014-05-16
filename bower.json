@@ -1,0 +1,19 @@
+{
+  "name": "allmychanges.com",
+  "version": "x.x.x",
+  "homepage": "https://github.com/svetlyak40wt/allmychanges.com",
+  "description": "A changelog tracking service.",
+  "license": "BSD",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "UserStory": "~0.0.8",
+    "Underscore": "~1.6.0"
+  }
+}

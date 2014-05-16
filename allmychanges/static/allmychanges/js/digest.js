@@ -91,6 +91,7 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
     });
 
     $scope.add_item = function () {
+        // adding [$scope.new_item] to the digest @digest.editor
         $http.post('/v1/packages/', $scope.new_item).success(function(data) {
             $scope.items.push(data);
             $scope.new_item = init_new_item();

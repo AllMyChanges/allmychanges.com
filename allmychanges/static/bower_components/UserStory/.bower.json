@@ -1,0 +1,39 @@
+{
+  "name": "UserStory",
+  "version": "0.0.8",
+  "homepage": "https://github.com/piumosso/UserStory",
+  "authors": [
+    "piumosso <golikoffartem@gmail.com>"
+  ],
+  "description": "Clientside logger",
+  "main": "lib/UserStory.js",
+  "keywords": [
+    "UserStory",
+    "logger"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "lib/UserStoryParser.js",
+    "node_modules",
+    "bower_components",
+    "specs",
+    "bin",
+    "example",
+    ".bower.json",
+    "bower.json",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "_release": "0.0.8",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.0.8",
+    "commit": "b45ecf31735db67c2e7ea64061d82be0a4a21e0c"
+  },
+  "_source": "git://github.com/piumosso/UserStory.git",
+  "_target": "~0.0.8",
+  "_originalSource": "UserStory",
+  "_direct": true
+}
