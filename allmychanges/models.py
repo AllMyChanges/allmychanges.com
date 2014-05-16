@@ -74,7 +74,7 @@ class User(AbstractBaseUser):
     date_joined = models.DateTimeField('date joined', default=timezone.now)
     timezone = models.CharField(max_length=100,
                                 choices=TIMEZONE_CHOICES,
-                                null=True, blank=True)
+                                default='UTC')
 
     objects = UserManager()
 
