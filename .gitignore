@@ -46,3 +46,4 @@ nosetests.xml
 /node_modules/
 *.log
 .envrc
+*.csv
