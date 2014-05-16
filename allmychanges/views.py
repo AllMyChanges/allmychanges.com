@@ -281,26 +281,8 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
         if timezone.now() - self.request.user.date_joined < datetime.timedelta(0, 60):
             # if account was registere no more than minute ago, then show
             # user a page where he will be able to correct email
-            return '/check-email/'
-        return '/digest/'
-
-
-class EmailForm(forms.Form):
-    email = forms.EmailField(label='Please check if this is email you wish to receive your digest and news to')
-                            
-
-class CheckEmailView(LoginRequiredMixin, CommonContextMixin, FormView):
-    template_name = 'allmychanges/check-email.html'
-    form_class = EmailForm
-    success_url = '/digest/edit/'
-
-    def get_initial(self):
-        return {'email': self.request.user.email}
-        
-    def form_valid(self, form):
-        self.request.user.email = form.cleaned_data['email']
-        self.request.user.save()
-        return super(CheckEmailView, self).form_valid(form)
+            return reverse('account-settings') + '#notifications'
+        return reverse('digest')
 
 
 class StyleGuideView(TemplateView):
