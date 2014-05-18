@@ -48,6 +48,9 @@
       {% endblock header %}
 
       <div class="content">
+        {% if not user.email %}
+          <div class="plate plate_warning">Please, <a href="{% url "account-settings" %}#notifications">setup email</a> and we will notify you when new versions will be discovered.</div>
+        {% endif %}
         {% block content %}{% endblock content %}
       </div>
 
