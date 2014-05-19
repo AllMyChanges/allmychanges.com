@@ -537,3 +537,8 @@ def guess_source(namespace, name):
                     result.append(url)
     return result
 
+
+
+def dt_in_window(tz, system_time, hour):
+    local = times.to_local(system_time, tz)
+    return local.hour == hour

@@ -13,6 +13,7 @@ from allmychanges.utils import (
     fake_downloader,
     guess_source,
     fill_missing_dates,
+    dt_in_window,
     extract_changelog_from_vcs)
 
 
@@ -286,7 +287,7 @@ class ProfileTests(TransactionTestCase):
         self.cl = Client()
         self.cl.login(username='art', password='art')
 
-    def test_timzone_update(self):
+    def test_timezone_update(self):
         url = '/account/settings/'
         response = self.cl.post(url, dict(timezone='Europe/Moscow'))
         check_status_code(302, response)
@@ -294,3 +295,16 @@ class ProfileTests(TransactionTestCase):
         user = refresh(self.user)
         eq_('Europe/Moscow', user.timezone)
 
+
+
+def test_tz_window():
+    dt = datetime.datetime
+    now = dt(2014, 05, 19, 6, 0) # system datetime (UTC)
+    
+    eq_(False,
+        dt_in_window('Europe/Moscow',        # user's timezone
+                     now,
+                     9))                     # desired hour in user's timezone
+    
+    # Kiev 1 hour ealier than Moscow
+    eq_(True, dt_in_window('Europe/Kiev', now, 9))
