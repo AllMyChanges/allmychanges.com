@@ -380,7 +380,13 @@ def choose_downloader(changelog):
 
 def parse_changelog_file(filename):
     with open(filename) as f:
-        return parse_changelog(f.read().decode('utf-8'))
+        text = f.read()
+        try:
+            decoded = text.decode('utf-8')
+        except UnicodeDecodeError:
+            return None
+        else:
+            return parse_changelog(decoded)
 
 
 def git_history_extractor(path):

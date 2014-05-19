@@ -74,7 +74,7 @@ def delete_empty_changelogs():
 @transaction.commit_on_success
 def update_changelog_task(source):
     with log.fields(source=source):
-        log.error('Starting task')
+        log.info('Starting task')
         from .models import Changelog
 
         changelog = None
