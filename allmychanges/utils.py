@@ -379,12 +379,14 @@ def choose_downloader(changelog):
     raise UpdateError('Unable to choose downloader')
 
 def parse_changelog_file(filename):
+    """This function should always return a list.
+    """
     with open(filename) as f:
         text = f.read()
         try:
             decoded = text.decode('utf-8')
         except UnicodeDecodeError:
-            return None
+            return []
         else:
             return parse_changelog(decoded)
 
