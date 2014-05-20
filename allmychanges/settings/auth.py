@@ -3,6 +3,7 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.github.GithubOAuth2',
 )
 
+SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 
 # https://apps.twitter.com/
 SOCIAL_AUTH_TWITTER_KEY        = 'zfUBhL9cF0B44r33AzszA'
