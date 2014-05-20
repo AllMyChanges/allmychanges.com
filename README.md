@@ -56,3 +56,10 @@ Installing Stylus for developement
    sudo apt-get install python-software-properties python g++ make nodejs
 
    npm install
+
+Clearing RQ queue
+-----------------
+
+1. Start `rq-dashboard`
+2. Go to http://art.dev.allmychanges.com:9181/default
+3. Press `Empty`
