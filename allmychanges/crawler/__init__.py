@@ -60,8 +60,10 @@ def search_changelog(path='.'):
 
 def _extract_version(line):
     extract_regexps = [
+        # in the beginning
         r'^(\d+\.\d+\.\d+|\d+\.\d+).*',
-        r'^[^ ].*?(\d+\.\d+\.\d+|\d+\.\d+)',
+        # in the middle of line but not far from beginning
+        r'^\w.{,10}?(\d+\.\d+\.\d+|\d+\.\d+)',
     ]
     for i in extract_regexps:
         match = re.search(i, line)
