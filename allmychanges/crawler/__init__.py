@@ -5,7 +5,7 @@ from html2text import html2text
 
 
 #RE_DATE = re.compile(r'(.*\s|\s?|.*\()(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
-RE_DATE = re.compile(r'(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
+RE_DATE = re.compile(r'(?P<date>(\d{4}[.-]\d{1,2}[.-]\d{1,2}|\d{1,2}[.-]\d{1,2}[.-]\d{4}))')
 
 
 IGNORE_DIRS = ['.git', '.hg', '.svn']
@@ -63,7 +63,7 @@ def _extract_version(line):
         # in the beginning
         r'^(\d+\.\d+\.\d+|\d+\.\d+).*',
         # in the middle of line but not far from beginning
-        r'^\w.{,10}?(\d+\.\d+\.\d+|\d+\.\d+)',
+        r'^[^ ].{,10}?(\d+\.\d+\.\d+|\d+\.\d+)',
     ]
     for i in extract_regexps:
         match = re.search(i, line)

@@ -120,6 +120,7 @@ def test_extract_version():
     eq_('1.0', _extract_version('Version 1.0'))
     eq_('0.10.2', _extract_version('Version 0.10.2'))
     eq_('2.0.0', _extract_version('2.0.0 (2013-09-24)'))
+    eq_('1.5.6', _extract_version('**1.5.6 (2014-05-16)**'))
     eq_(None, _extract_version('  some number in the item\'s text 0.1'))
     eq_(None, _extract_version('This is the first version compatible with Django 1.7.'))
 
@@ -150,6 +151,7 @@ def test_extract_date():
 
     eq_(date(2009, 5, 23), _extract_date('(2009-05-23)'))
     eq_(date(2009, 5, 23), _extract_date('v 1.0.0 (2009-05-23)'))
+    eq_(date(2014, 5, 16), _extract_date('**1.5.6 (2014-05-16)**'))
     eq_(date(2009, 5, 23), _extract_date('in a far far 2009-05-23 there were star wars'))
     eq_(date(2009, 5, 23), _extract_date('in a far far 23-05-2009 there were star wars'))
     eq_(date(2009, 5, 23), _extract_date('in a far far 23.05.2009 there were star wars'))
