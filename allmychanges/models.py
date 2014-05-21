@@ -343,6 +343,7 @@ class Version(models.Model):
     changelog = models.ForeignKey(Changelog, related_name='versions')
     date = models.DateField(blank=True, null=True)
     number = models.CharField(max_length=255)
+    unreleased = models.BooleanField(default=False)
 
     objects = VersionManager()
 
