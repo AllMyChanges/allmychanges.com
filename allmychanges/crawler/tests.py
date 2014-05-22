@@ -146,6 +146,7 @@ def test_parse_item():
     eq_((True, 3, 'Blah minor'), _parse_item(' - Blah minor'))
     eq_((True, 5, 'Blah minor'), _parse_item('  -  Blah minor'))
     eq_((True, 5, 'Blah minor'), _parse_item('  *  Blah minor'))
+    eq_((True, 5, 'Damn Nginx'), _parse_item('  *) Damn Nginx'))
 
 
 def test_extract_date():
@@ -172,6 +173,9 @@ def test_extract_date():
 
     # could confuse day and month
     eq_(date(2009, 4, 5), _extract_date('04.05.2009'))
+
+    # this variant is from Nginx's changelog
+    eq_(date(2014, 4, 24), _extract_date('   24 Apr 2014'))
 
 
 def test_starts_with_ident():
