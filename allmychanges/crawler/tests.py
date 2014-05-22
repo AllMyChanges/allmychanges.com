@@ -113,6 +113,20 @@ Like that.
     parsed = parse_changelog(input)
     eq_("""Some note with few paragraphs. Each paragraph should be separated with empty line. 
 Like that.""", parsed[0]['sections'][0]['notes'])
+
+
+def test_detect_unreleased_version():
+    input = """
+1.0 (unreleased)
+-----------
+
+Some note.
+"""
+    parsed = parse_changelog(input)
+    eq_(True, parsed[0].get('unreleased'))
+
+
+
     
 
 def test_extract_version():

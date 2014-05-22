@@ -279,7 +279,10 @@ def update_changelog_from_raw_data(changelog, raw_data):
         raw_data = fill_missing_dates(raw_data)
 
     for raw_version in raw_data:
-        version, created = changelog.versions.get_or_create(number=raw_version['version'])
+        version, created = changelog.versions.get_or_create(
+            number=raw_version['version'],
+            unreleased=raw_version.get('unreleased', False))
+        
         raw_date = raw_version.get('date')
         if raw_date is None:
             if version.date is None:

@@ -99,7 +99,10 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     # search packages which have changes after given date
     packages = user.packages
 
-    filter_args = {}
+    # we exclude unreleased changes from digest
+    # because they are not interesting
+    # probably we should make it a user preference
+    filter_args = {'unreleased': False}
 
     if before_date and after_date:
         filter_args['date__range'] = (after_date, before_date)

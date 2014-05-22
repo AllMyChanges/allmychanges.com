@@ -148,6 +148,7 @@ def parse_changelog(text):
             else:
                 # if this is not item, then this is a note
                 if current_version is not None:
+                        
                     if not current_section or current_section['items']:
                         # if there is items in the current section
                         # and we found another plaintext part,
@@ -159,8 +160,12 @@ def parse_changelog(text):
                         # section
                         current_section['notes'].append(line)
 
-            if v_date and current_version and current_version.get('date') is None:
-                current_version['date'] = v_date
+            if current_version:
+                if 'unreleased' in line.lower():
+                    current_version['unreleased'] = True
+                    
+                if v_date and current_version.get('date') is None:
+                    current_version['date'] = v_date
 
     # usually versions go from most recent to
     # older, but we should return them in chronological
