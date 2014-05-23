@@ -11,6 +11,7 @@ import tempfile
 import shutil
 import times
 import requests
+import sys
     
 from lxml import html
 from contextlib import contextmanager
@@ -421,7 +422,35 @@ def choose_history_extractor(path):
 
 
 def python_version_extractor(path):
-    return get_package_metadata(path, 'Version')
+    if os.path.exists(os.path.join(path, 'setup.py')):
+        if os.path.exists(os.path.join(path, 'setup.pyc')):
+            os.unlink(os.path.join(path, 'setup.pyc'))
+            
+        try:
+            metadata = {}
+
+            class FakeSetuptools(object):
+                @classmethod
+                def setup(*args, **kwargs):
+                    metadata.update(kwargs)
+
+            sys.modules['distutils.core'] = FakeSetuptools
+            sys.modules['setuptools'] = FakeSetuptools
+            sys.path.insert(0, path)
+            
+            try:
+                from setup import setup
+            except Exception, e:
+                pass
+
+            return metadata.get('version')
+        finally:
+            if sys.path[0] == path:
+                sys.path.pop(0)
+            del sys.modules['distutils.core']
+            del sys.modules['setuptools']
+            if 'setup' in sys.modules:
+                del sys.modules['setup']
     
 
 def choose_version_extractor(path):
