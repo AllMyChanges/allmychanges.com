@@ -1,4 +1,6 @@
-<body>
+{% extends "emails/base.html" %}
+
+{% block content %}
     {% include "allmychanges/digest-partial.html" with changes=today_changes title="Today" %}
 
     {% if week_changes_count %}
@@ -19,4 +21,4 @@
         manage your subscription's settings, please <a href="{% url "account-settings" %}">follow this link</a>.
       </p>
     </div>
-</body>
+{% endblock %}

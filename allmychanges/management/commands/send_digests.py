@@ -57,10 +57,11 @@ class Command(LogMixin, BaseCommand):
                     os.path.join(settings.STATIC_ROOT,
                                  'allmychanges/css',
                                  name)
-                    for name in ('reset.css', 'allmychanges.css')]
+                    for name in ('email.css',)]
                 premailer = Premailer(body,
                                       base_url='http://allmychanges.com/',
                                       external_styles=external_styles)
+
                 body = premailer.transform()
                 message = EmailMultiAlternatives('Changelogs digest on {0:%d %B %Y}'.format(now),
                           None,
