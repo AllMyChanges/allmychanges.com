@@ -115,6 +115,32 @@ Like that.
 Like that.""", parsed[0]['sections'][0]['notes'])
 
 
+def test_use_date_even_from_next_string():
+    input = """
+Version 1.1
+-----------
+
+(bugfix release, released on May 23rd 2014)
+
+- fixed a bug that caused text files on Python 2 to not accept
+  native strings.
+
+Version 1.0
+-----------
+
+(no codename, released on May 21st 2014)
+
+- Initial release.
+"""
+    parsed = parse_changelog(input)
+    eq_(2, len(parsed))
+    eq_('1.0', parsed[0]['version'])
+    eq_(date(2014, 5, 21), parsed[0]['date'])
+
+    eq_('1.1', parsed[1]['version'])
+    eq_(date(2014, 5, 23), parsed[1]['date'])
+
+
 def test_detect_unreleased_version():
     input = """
 1.0 (unreleased)
@@ -162,7 +188,7 @@ def test_extract_date():
     eq_(date(2009, 5, 23), _extract_date('05-23-2009'))
     eq_(date(2009, 5, 23), _extract_date('05.23.2009'))
     eq_(date(2009, 5, 23), _extract_date('23.05.2009'))
-    #eq_(date(2013, 3, 31), _extract_date('1.2.0 (2013-03-31)'))
+    eq_(date(2013, 3, 31), _extract_date('1.2.0 (2013-03-31)'))
 
     eq_(date(2009, 5, 23), _extract_date('(2009-05-23)'))
     eq_(date(2009, 5, 23), _extract_date('v 1.0.0 (2009-05-23)'))
@@ -176,6 +202,10 @@ def test_extract_date():
 
     # this variant is from Nginx's changelog
     eq_(date(2014, 4, 24), _extract_date('   24 Apr 2014'))
+
+    # these two are from python's click
+    eq_(date(2014, 5, 23), _extract_date('(bugfix release, released on May 23rd 2014)'))
+    eq_(date(2014, 5, 21), _extract_date('(no codename, released on May 21st 2014)'))
 
 
 def test_starts_with_ident():

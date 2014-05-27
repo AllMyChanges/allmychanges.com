@@ -5,7 +5,13 @@ from html2text import html2text
 
 
 #RE_DATE = re.compile(r'(.*\s|\s?|.*\()(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
-RE_DATE = re.compile(r'(?P<date>(\d{4}[.-]\d{1,2}[.-]\d{1,2}|\d{1,2}[.-]\d{1,2}[.-]\d{4}|\d{2} [A-Z][a-z]{2} \d{4}))')
+RE_DATE = re.compile(r"""(?P<date>(
+              \d{4}[.-]\d{1,2}[.-]\d{1,2} |
+              \d{1,2}[.-]\d{1,2}[.-]\d{4} |
+              \d{2}(rd|st|rd|th)?\ [A-Z][a-z]{2}\ \d{4} |
+              [A-Z][a-z]{2}\ \d{2}(rd|st|rd|th)?\ \d{4}
+              ))""",
+                     re.VERBOSE)
 
 
 IGNORE_DIRS = ['.git', '.hg', '.svn']
