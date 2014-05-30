@@ -6,10 +6,6 @@
     color: plate-text-color;
     border: 1px solid (good-plate-color - 25%);
 
-    > a {
-        color: (plate-text-color - #550);}
-    > a:visited {
-        color: (plate-text-color - #550);}
 
     &_warning {
         background-color: warning-plate-color;
@@ -17,3 +13,10 @@
     }
 }
 
+.link_plate {
+    color: (plate-text-color - #550);
+
+    &:visited {
+        color: (plate-text-color - #550);
+    }
+}

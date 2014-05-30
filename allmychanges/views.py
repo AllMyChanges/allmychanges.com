@@ -193,7 +193,10 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         result['ealier_changes'] = get_digest_for(self.request.user,
                                                   before_date=month_ago - one_day)
 
-        result['no_packages'] = self.request.user.packages.count() == 0
+        result['no_packages'] = \
+                self.request.user.packages \
+                                 .exclude(namespace='web', name='allmychanges') \
+                                 .count() == 0
         result['no_data'] = all(
             len(result[key]) == 0
             for key in result.keys()

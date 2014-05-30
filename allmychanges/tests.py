@@ -6,6 +6,7 @@ import os.path
 from nose.tools import eq_
 from django.test import Client, TransactionTestCase, TestCase
 
+from allmychanges.auth.pipeline import add_default_package
 from allmychanges.models import Package, User
 from allmychanges.utils import (
     update_changelog_from_raw_data,
@@ -308,3 +309,23 @@ def test_tz_window():
     
     # Kiev 1 hour ealier than Moscow
     eq_(True, dt_in_window('Europe/Kiev', now, 9))
+
+
+def test_new_user_have_allmychanges_in_digest():
+    user = create_user('art')
+    eq_(0, user.packages.count())
+
+    add_default_package(None, is_new=True, user=user)
+    
+    eq_(1, user.packages.count())
+    eq_('allmychanges', user.packages.all()[0].name)
+
+
+def test_old_user_can_have_zero_packages():
+    """We wont add a default package to old users."""
+    user = create_user('art')
+    eq_(0, user.packages.count())
+
+    add_default_package(None, is_new=False, user=user)
+    
+    eq_(0, user.packages.count())

@@ -32,6 +32,23 @@
   </div>
 
   <div class="box box_guide">
+    <h2 class="page-subheader">Different size of buttons</h2>
+    <form class="form">
+      <input class="button" type="submit" value="Normal" />
+      <input class="button button_medium" type="submit" value="Medium" />
+      <input class="button button_large" type="submit" value="Large" />
+    </form>
+  </div>
+
+  <div class="box box_guide">
+    <h2 class="page-subheader">Link buttons</h2>
+      <a href="" class="button">Generic</a>
+      <a href="" class="button button_good">Good</a>
+      <a href="" class="button button_bad">Bad</a>
+    </form>
+  </div>
+
+  <div class="box box_guide">
     <h2 class="page-subheader">Complex form with dropdown</h2>
 
     <form class="form">
@@ -77,8 +94,8 @@
     <h2 class="page-subheader">Different plates with warnings</h2>
     <div class="plate">By default, it is green — just a message.</div>
     <div class="plate plate_warning">But also it could be red warning.</div>
-    <div class="plate">And of cause it could contain <a href="">links to somewhere</a> else.</div>
-    <div class="plate plate_warning">And of cause it could contain <a href="">links to somewhere</a> else.</div>
+    <div class="plate">And of cause it could contain <a class="link_plate" href="">links to somewhere</a> else.</div>
+    <div class="plate plate_warning">And of cause it could contain <a class="link_plate" href="">links to somewhere</a> else.</div>
   </div>
 
 {% endblock content %}

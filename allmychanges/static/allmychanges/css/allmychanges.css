@@ -183,6 +183,7 @@ select {
 .button {
   color: #333;
   background-color: #fff;
+  text-decoration: none;
   border: 1px solid #808080;
   font-size: 0.8em;
   line-height: 1.583333333333333em;
@@ -211,6 +212,10 @@ select {
 }
 .button_bad:hover {
   background-color: #c32e2a;
+}
+.button_medium {
+  font-size: 1em;
+  line-height: 1.266666666666667em;
 }
 .button_large {
   font-size: 2em;
@@ -294,15 +299,15 @@ select {
   color: #fefefe;
   border: 1px solid #518929;
 }
-.plate > a {
-  color: #a9a9fe;
-}
-.plate > a:visited {
-  color: #a9a9fe;
-}
 .plate_warning {
   background-color: #d9534f;
   border: 1px solid #b72c27;
+}
+.link_plate {
+  color: #a9a9fe;
+}
+.link_plate:visited {
+  color: #a9a9fe;
 }
 .subscribed-text {
   font-size: 1.5em;
