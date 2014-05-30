@@ -205,7 +205,8 @@ def _render_rest(text):
 
 def graphite_send(**kwargs):
     try:
-        g = graphitesend.init(prefix=settings.GRAPHITE_PREFIX + '.',
+        g = graphitesend.init(prefix=settings.GRAPHITE_PREFIX,
+                              system_name='',
                               graphite_server=settings.GRAPHITE_HOST)
         g.send_dict(kwargs)
     except Exception:

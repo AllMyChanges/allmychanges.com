@@ -175,6 +175,7 @@ RQ_QUEUES = {
 }
 
 GRAPHITE_PREFIX = 'allmychanges.' + CURRENT_USER
+GRAPHITE_HOST = 'salmon.svetlyak.ru'
 
 
 TEMP_DIR = '/tmp/allmychanges'
