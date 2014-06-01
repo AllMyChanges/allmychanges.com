@@ -8,6 +8,8 @@
   <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source}}">go to sources</a></h2>
 
   <dl class="package-metadata">
+    <dt>Badge for README:</dt>
+    <dd><share-badge data-package="'{{package.user.username}}/{{package.namespace}}/{{package.name}}'"/></dd>
     <dt>Last update was:</dt>
     <dd>{{package.changelog.updated_at|timesince}} ago</dd>
     <dt>Time to next update:</dt>

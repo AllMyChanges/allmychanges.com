@@ -1,0 +1,41 @@
+.share-badge {
+    position: absolute;
+    
+    &__example {
+        position: absolute;
+    }
+
+    &__text {
+      position: absolute;
+      width: 400px;
+      left: 95px;
+    }
+    &__tabs {
+        font-size: 8px;
+        line-height: 1em;
+        position: absolute;
+        left: 95px;
+        top: -13px;
+        width: 400px;
+    }
+
+    .tab {
+        display: inline-block;
+        border: 1px solid gray;
+        border-bottom-width: 0;
+        padding: 2px;
+        cursor: pointer;
+
+        color: (text-color + 50%);
+        background-color: white;
+
+        &:last-child {
+            border-right: 1px solid gray;
+        }
+        &_active {
+            z-index: 100;
+            border-bottom: 1px solid white;
+            color: text-color;
+        }
+    }
+}

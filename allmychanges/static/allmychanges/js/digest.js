@@ -1,4 +1,4 @@
-var app = angular.module('allMyChangesApp', ['ngCookies', 'angucomplete-alt']);
+var app = angular.module('allMyChangesApp', ['ngCookies', 'angucomplete-alt', 'share-badge']);
 
 app.directive('digestLine', ['$http', '$interval', '$timeout', function ($http, $interval, $timeout) {
     return {
@@ -102,4 +102,3 @@ app.controller('DigestBuilderCtrl', function ($scope, $http, $cookies, $log) {
 
     
 });
-

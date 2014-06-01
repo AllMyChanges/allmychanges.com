@@ -309,6 +309,42 @@ select {
 .link_plate:visited {
   color: #a9a9fe;
 }
+.share-badge {
+  position: absolute;
+}
+.share-badge__example {
+  position: absolute;
+}
+.share-badge__text {
+  position: absolute;
+  width: 400px;
+  left: 95px;
+}
+.share-badge__tabs {
+  font-size: 8px;
+  line-height: 1em;
+  position: absolute;
+  left: 95px;
+  top: -13px;
+  width: 400px;
+}
+.share-badge .tab {
+  display: inline-block;
+  border: 1px solid #808080;
+  border-bottom-width: 0;
+  padding: 2px;
+  cursor: pointer;
+  color: #999;
+  background-color: #fff;
+}
+.share-badge .tab:last-child {
+  border-right: 1px solid #808080;
+}
+.share-badge .tab_active {
+  z-index: 100;
+  border-bottom: 1px solid #fff;
+  color: #333;
+}
 .subscribed-text {
   font-size: 1.5em;
   margin-bottom: 1em;

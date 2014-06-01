@@ -1,0 +1,14 @@
+<div class="share-badge">
+      <img class="share-badge__example" src="http://allmychanges.com/u/{{package}}/badge">
+      
+      <textarea readonly="1"  wrap="off" rows="1" ng-if="markdown" class="text-input share-badge__text">[![changelog](http://allmychanges.com/u/{{package}}/badge)](http://allmychanges.com/u/{{package}}/)</textarea>
+      <textarea readonly="1" wrap="off" rows="2" ng-if="rst" class="text-input share-badge__text">.. image:: http://allmychanges.com/u/{{package}}/badge
+   :target: http://allmychanges.com/u/{{package}}/</textarea>
+      <textarea readonly="1" wrap="off" rows="1" ng-if="html" class="text-input share-badge__text" type="text">&lt;a href=&quot;http://allmychanges.com/u/{{package}}&quot;>&lt;img title=&quot;changelog&quot; src=&quot;http://allmychanges.com/u/{{package}}/badge&quot;/>&lt;/a></textarea>
+
+      <ul class="share-badge__tabs">
+        <li ng-class="{tab_active: markdown}" class="tab" ng-click="show('markdown')">markdown</li>
+        <li ng-class="{tab_active: rst}" class="tab" ng-click="show('rst')">reST</a></li>
+        <li ng-class="{tab_active: html}" class="tab" ng-click="show('html')">html</a></li>
+      </ul>
+</div>
