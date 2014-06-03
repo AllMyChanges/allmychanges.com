@@ -141,17 +141,24 @@ Version 1.0
     eq_(date(2014, 5, 23), parsed[1]['date'])
 
 
-def test_detect_unreleased_version():
-    input = """
+def test_detect_unreleased_version_in_version_line():
+    parsed = parse_changelog("""
 1.0 (unreleased)
 -----------
 
 Some note.
-"""
-    parsed = parse_changelog(input)
+""")
     eq_(True, parsed[0].get('unreleased'))
 
 
+def test_detect_unreleased_version_but_not_in_notes():
+    parsed = parse_changelog("""
+Version 1.0
+-----------
+
+Change in a way how unreleased notes are parsed.
+""")
+    eq_(None, parsed[0].get('unreleased'))
 
     
 

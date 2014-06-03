@@ -117,6 +117,9 @@ def _starts_with_ident(line, ident):
 def parse_changelog(text):
     changelog = []
     current_version = None
+    # here we'll track each line distance from corresponding
+    # line with version number
+    line_in_current_version = None
     current_section = None
     current_item = None
     current_ident = None
@@ -133,6 +136,9 @@ def parse_changelog(text):
         if line and line == line[0] * len(line):
             continue
 
+        if line_in_current_version is not None:
+            line_in_current_version += 1
+
         is_item, ident, text = _parse_item(line)
         if is_item and current_section:
             # wow, a new changelog item was found!
@@ -146,6 +152,7 @@ def parse_changelog(text):
                 # we found a possible version number, lets
                 # start collecting the changes!
                 current_version = dict(version=version, sections=[])
+                line_in_current_version = 1
                 current_section = None
                 current_item = None
                 current_ident = None
@@ -172,7 +179,7 @@ def parse_changelog(text):
                         current_section['notes'].append(line)
 
             if current_version:
-                if 'unreleased' in line.lower():
+                if line_in_current_version < 3 and 'unreleased' in line.lower():
                     current_version['unreleased'] = True
                     
                 if v_date and current_version.get('date') is None:
