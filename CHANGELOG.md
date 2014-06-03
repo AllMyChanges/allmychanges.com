@@ -12,7 +12,7 @@ Here are most visible improvements, grouped by topics.
 ### Cool features
 
 * Nice badge generator now shown on each package's page.
-  It looks like this: ![](http://allmychanges.com/u/svetlyak40wt/web/allmychanges/badge)
+  It looks like this: ![](http://allmychanges.com/u/svetlyak40wt/web/allmychanges/badge)  
   and could be pasted into the `README.md` along with other
   badges from Travis and PyPi. This way viewers of you repository
   will be able to examine all changes in one glance without searching
