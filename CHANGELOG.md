@@ -1,3 +1,58 @@
+0.3.0 (2014-06-03)
+==================
+
+More than month passed from the previous release and we'd like
+to present a newer and better version of AllMyChanges.com.
+A number of bugs were fixed and many improvements were made.
+Actually, most of them were already tested in production because
+we are using continuous delivery.
+
+Here are most visible improvements, grouped by topics.
+
+Cool features
+-------------
+
+* Nice badge generator now shown on each package's page.
+  It looks like this: ![](http://allmychanges.com/u/svetlyak40wt/web/allmychanges/badge)
+  and could be pasted into the `README.md` along with other
+  badges from Travis and PyPi. This way viewers of you repository
+  will be able to examine all changes in one glance without searching
+  changelog in deeps of a source tree.
+
+Parsing improvements
+--------------------
+
+* Now our robot is able to parse dates like this "May 21st 2014".
+* Also, we now do our best in parsing changelogs with nonstandart formatting, like
+  [Nginx's log](http://nginx.org/en/CHANGES). It was really hard to produce
+  this [nicely formatted](http://allmychanges.com/u/svetlyak40wt/soft/nginx/) changelog from it.
+* Version extraction for python packages was significantly improved.
+  It is used when there is no human written changelog. In this case, our smart robot
+  goes through VCS history and tries to reconstruct changelog from commit messages.
+  Previously it worked only for python packages which use `setuptools` in their `setup.py`,
+  but now we are using cool hack and version extraction works even for packages
+  with `distutils`.
+* Unreleased versions could be detected if there is a word `unreleased` in it's title.
+  Here is an example: `Version 1.0.0 (unreleased)`.
+  We'll understand that this version will be released in future and won't show it in the digest.
+
+User experience
+---------------
+
+* All new users have on default package in their digest - `web/allmychanges` as an example.
+  And this package was added to the digest of all old users. If you want to receive news
+  from the AllMyChanges.com, just leave this package in your digest.
+* A [special page](http://allmychanges.com/account/settings/) was made where you is able to
+  setup email and timezone. Please enter correct email to receive digest propertly.
+* All digest email are sent around 9AM according to your timezone.
+* Two improvements were made to digest editor:
+  - Now it shows a latest discovered version near each packages and live update process
+    started after a new package was added to the list.
+  - For packages with namespace `python` we are trying to figure out it's source repository
+    and show autocomplete if something was found. We are taking this data from PyPi.
+    Probably for other landguages/ecosystems we could do this as well.
+
+
 0.2.1 (2014-04-21)
 ==================
 
