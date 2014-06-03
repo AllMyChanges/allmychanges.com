@@ -9,8 +9,7 @@ we are using continuous delivery.
 
 Here are most visible improvements, grouped by topics.
 
-Cool features
--------------
+### Cool features
 
 * Nice badge generator now shown on each package's page.
   It looks like this: ![](http://allmychanges.com/u/svetlyak40wt/web/allmychanges/badge)
@@ -19,8 +18,7 @@ Cool features
   will be able to examine all changes in one glance without searching
   changelog in deeps of a source tree.
 
-Parsing improvements
---------------------
+### Parsing improvements
 
 * Now our robot is able to parse dates like this "May 21st 2014".
 * Also, we now do our best in parsing changelogs with nonstandart formatting, like
@@ -36,8 +34,7 @@ Parsing improvements
   Here is an example: `Version 1.0.0 (unreleased)`.
   We'll understand that this version will be released in future and won't show it in the digest.
 
-User experience
----------------
+### User experience
 
 * All new users have on default package in their digest - `web/allmychanges` as an example.
   And this package was added to the digest of all old users. If you want to receive news
