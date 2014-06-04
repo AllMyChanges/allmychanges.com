@@ -5,7 +5,7 @@
 
 {% block content %}
   <h1 class="page-header">{{package.namespace}}/{{package.name}}</h1>
-  <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source}}">go to sources</a></h2>
+  <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source|remove_source_prefix}}">go to sources</a></h2>
 
   <dl class="package-metadata">
     <dt>Badge for README:</dt>
