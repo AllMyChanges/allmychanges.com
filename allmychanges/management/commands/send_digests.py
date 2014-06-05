@@ -39,7 +39,7 @@ class Command(LogMixin, BaseCommand):
             users = users.filter(timezone__in=send_for_timezones)
         
         for user in users:
-            today_changes = get_digest_for(user, after_date=now)
+            today_changes = get_digest_for(user, after_date=day_ago)
             
             if today_changes or args:
                 print 'Sending digest to', user.username, user.email

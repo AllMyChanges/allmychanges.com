@@ -15,7 +15,11 @@ from allmychanges.utils import (
     guess_source,
     fill_missing_dates,
     dt_in_window,
+    discard_seconds,
+    timezone,
     extract_changelog_from_vcs)
+
+from allmychanges.views import get_digest_for
 
 
 def refresh(obj):
@@ -85,15 +89,18 @@ def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw
     update_changelog_from_raw_data(package.changelog, structure)
     
     v = package.changelog.versions.all()[0]
-    date = v.date
-    assert date is not None
+    discovered_at = v.discovered_at
+    assert v.date is None
+    assert discovered_at is not None
 
     with mock.patch('allmychanges.utils.timezone') as timezone:
         timezone.now.return_value = datetime.datetime.now() + datetime.timedelta(10)
         update_changelog_from_raw_data(package.changelog, structure)
         
     v = package.changelog.versions.all()[0]
-    eq_(date, v.date)
+    # neither date not discovered_at were changed
+    assert v.date is None
+    eq_(discovered_at, v.discovered_at)
 
 
 def test_update_package_changes_date_if_it_was_changed_in_the_raw_data():
@@ -111,14 +118,19 @@ def test_update_package_changes_date_if_it_was_changed_in_the_raw_data():
     update_changelog_from_raw_data(package.changelog, structure)
     
     v = package.changelog.versions.all()[0]
-    date = v.date
-    assert date is not None
+    discovered_at = v.discovered_at
+    assert v.date is None
+    assert discovered_at is not None
     
     new_date = datetime.date(2013, 3, 27)
     structure[0]['date'] = new_date
     update_changelog_from_raw_data(package.changelog, structure)
     v = package.changelog.versions.all()[0]
+
+    # package's date has changed
     eq_(new_date, v.date)
+    # but discovery date didn't change
+    eq_(discovered_at, v.discovered_at)
 
 
 def test_fake_downloader():
@@ -232,31 +244,34 @@ def test_source_guesser():
 
 
 def test_filling_missing_dates_when_there_arent_any_dates():
-    from datetime import date
+    from datetime import datetime
     from datetime import timedelta
-    today = date.today()
+    today = discard_seconds(datetime.utcnow())
     month = timedelta(30)
     
-    item = lambda dt: dict(date=dt)
+    item = lambda dt: dict(discovered_at=dt)
     eq_([item(today - month), item(today - month), item(today)],
         fill_missing_dates([{}, {}, {}]))
 
 
 def test_filling_missing_dates_when_there_are_gaps_between():
-    from datetime import date
     from datetime import timedelta
-    today = date.today()
+    today = discard_seconds(timezone.now())
     month = timedelta(30)
-    
-    item = lambda dt: dict(date=dt)
+    # Тут надо подумать, чему должен быть равен discovered_at если date=today
+    def item(dt, discovered_at=None):
+        if dt is None:
+            return dict(discovered_at=discovered_at)
+        return dict(date=dt, discovered_at=discovered_at)
+
     first_date = today - timedelta(7)
     last_date = today - 2 * month
     
-    eq_([item(last_date),
-         item(last_date),
-         item(first_date),
-         item(first_date),
-         item(today)],
+    eq_([item(None,last_date),
+         item(last_date, last_date),
+         item(None, first_date),
+         item(first_date, first_date),
+         item(None, today)],
         
         fill_missing_dates([ 
             {}, # 0.1.0
@@ -329,3 +344,23 @@ def test_old_user_can_have_zero_packages():
     add_default_package(None, is_new=False, user=user)
     
     eq_(0, user.packages.count())
+
+
+def test_digest_for_today_includes_changes_from_last_9am():
+    user = create_user('art')
+    today = datetime.datetime(2014, 1, 1, 9, 0, tzinfo=timezone.UTC()) # 9am
+    one_day = datetime.timedelta(1)
+    one_minute = datetime.timedelta(0, 60)
+    
+    foo = user.packages.create(namespace='test', name='foo', source='foo')
+    foo.changelog.versions.create(number='0.1.0',
+                                  discovered_at=today - one_day - one_minute)
+
+    bar = user.packages.create(namespace='test', name='bar', source='bar')
+    bar.changelog.versions.create(number='0.3.0',
+                                  discovered_at=today - one_day)
+
+    digest = get_digest_for(user, after_date=today - one_day)
+    eq_(1, len(digest))
+    
+    

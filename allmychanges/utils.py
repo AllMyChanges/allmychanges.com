@@ -237,6 +237,10 @@ def show_debug_toolbar(request):
     return True
 
 
+def discard_seconds(dt):
+    return datetime.datetime(*dt.timetuple()[:5])
+        
+
 def fill_missing_dates(raw_data):
     """Algorithm.
 
@@ -248,7 +252,7 @@ def fill_missing_dates(raw_data):
     is a now() - month and act like we have it.
     """
     result = []
-    today = datetime.date.today()
+    today = discard_seconds(datetime.datetime.utcnow())
     month = datetime.timedelta(30)
     current_date = None
 
@@ -258,14 +262,15 @@ def fill_missing_dates(raw_data):
 
         if not has_date:
             if idx == 0:
-                item['date'] = today
+                item['discovered_at'] = today
             else:
                 if current_date is not None:
-                    item['date'] = current_date
+                    item['discovered_at'] = current_date
                 else:
-                    item['date'] = today - month
+                    item['discovered_at'] = today - month
         else:
             current_date = item['date']
+            item['discovered_at'] = current_date
         result.append(item)
         
     result.reverse()
@@ -284,13 +289,12 @@ def update_changelog_from_raw_data(changelog, raw_data):
         version, created = changelog.versions.get_or_create(
             number=raw_version['version'],
             unreleased=raw_version.get('unreleased', False))
+
+        version.date = raw_version.get('date')
         
-        raw_date = raw_version.get('date')
-        if raw_date is None:
-            if version.date is None:
-                version.date = timezone.now()
-        else:
-            version.date = raw_date
+        if version.discovered_at is None:
+            version.discovered_at = raw_version.get('discovered_at', timezone.now())
+
         version.save()
 
         version.sections.all().delete()

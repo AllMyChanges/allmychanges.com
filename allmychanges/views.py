@@ -105,12 +105,12 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     filter_args = {'unreleased': False}
 
     if before_date and after_date:
-        filter_args['date__range'] = (after_date, before_date)
+        filter_args['discovered_at__range'] = (after_date, before_date)
     else:
         if before_date:
-            filter_args['date__lt'] = before_date
+            filter_args['discovered_at__lt'] = before_date
         if after_date:
-            filter_args['date__gte'] = after_date
+            filter_args['discovered_at__gte'] = after_date
         
     packages = packages.filter(**{'changelog__versions__' + key: value
                                   for key, value in filter_args.items()})
@@ -183,15 +183,15 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
 
 
         result['today_changes'] = get_digest_for(self.request.user,
-                                                 after_date=now)
+                                                 after_date=day_ago)
         result['week_changes'] = get_digest_for(self.request.user,
                                                 before_date=day_ago,
                                                 after_date=week_ago)
         result['month_changes'] = get_digest_for(self.request.user,
-                                                 before_date=week_ago - one_day,
+                                                 before_date=week_ago,
                                                  after_date=month_ago)
         result['ealier_changes'] = get_digest_for(self.request.user,
-                                                  before_date=month_ago - one_day)
+                                                  before_date=month_ago)
 
         result['no_packages'] = \
                 self.request.user.packages \

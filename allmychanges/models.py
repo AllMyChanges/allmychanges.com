@@ -344,11 +344,12 @@ class Version(models.Model):
     date = models.DateField(blank=True, null=True)
     number = models.CharField(max_length=255)
     unreleased = models.BooleanField(default=False)
+    discovered_at = models.DateTimeField(blank=True, null=True)
 
     objects = VersionManager()
 
     class Meta:
-        get_latest_by = 'date'
+        get_latest_by = 'discovered_at'
         
     def __unicode__(self):
         return self.number
