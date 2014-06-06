@@ -61,4 +61,3 @@ twiggy-goodies==0.2.2
 twiggy==0.4.5
 werkzeug==0.9.4
 wmctrl==0.1
-
