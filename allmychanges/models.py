@@ -399,7 +399,9 @@ class Package(models.Model):
 
     def latest_version(self):
         if self.changelog:
-            versions = list(self.changelog.versions.order_by('-date')[:1])
+            versions = list(
+                self.changelog.versions.exclude(unreleased=True)
+                          .order_by('-discovered_at', '-number')[:1])
             if versions:
                 return versions[0]
 

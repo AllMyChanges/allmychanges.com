@@ -259,9 +259,9 @@ class BadgeView(View):
             namespace=kwargs['namespace'],
             name=kwargs['name'])
 
-        version = list(package.changelog.versions.all().order_by('-date')[:1])
-        if version:
-            version = version[0].number
+        version = package.latest_version()
+        if version is not None:
+            version = version.number
         else:
             version = '?.?.?'
 
