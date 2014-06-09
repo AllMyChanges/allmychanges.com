@@ -55,8 +55,9 @@ def schedule_updates(reschedule=False, packages=[]):
     if not reschedule:
         changelogs = changelogs.filter(next_update_at__lte=timezone.now())
 
-    count('task.schedule_updates.scheduling.count', num_stale)
-    log.info('Rescheduling {0} changelogs update'.format(len(changelogs)))
+    num_changelogs = len(changelogs)
+    count('task.schedule_updates.scheduling.count', num_changelogs)
+    log.info('Rescheduling {0} changelogs update'.format(num_changelogs))
 
     for changelog in changelogs:
         update_changelog_task.delay(changelog.source)
