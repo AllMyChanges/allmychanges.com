@@ -363,6 +363,9 @@ a {
 .page-subheader {
   margin-bottom: 1em;
 }
+.nowrap {
+  white-space: nowrap;
+}
 .header {
   padding-bottom: 1.5em;
   padding-top: 1.5em;
@@ -386,6 +389,13 @@ a {
   margin-right: 100px;
   line-height: 2em;
 }
+.login-plate__profile-link {
+  color: #000;
+  text-decoration: none;
+}
+.login-plate__profile-link:hover {
+  text-decoration: underline;
+}
 .form_subscription {
   font-size: 2em;
 }
@@ -398,9 +408,6 @@ a {
   padding-top: 1em;
   padding-left: 2em;
   padding-right: 2em;
-}
-.nowrap {
-  white-space: nowrap;
 }
 .landing-ru1 {
   font-family: "Lucida Console", Monaco, monospace;
@@ -441,7 +448,7 @@ a {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 15px;
   line-height: 1.3em;
-  background-color: #f6f5f3;
+  background-color: #fff;
 }
 body.email {
   background-color: #fff;
@@ -490,6 +497,13 @@ body.email {
 }
 .package-changes__package-title {
   font-size: 1.2em;
+}
+.package-changes__package-title > a {
+  color: #000;
+  text-decoration: none;
+}
+.package-changes__package-title > a:hover {
+  text-decoration: underline;
 }
 .package-version {
   list-style: none;
@@ -548,6 +562,10 @@ body.email {
   margin-left: 0.6em;
   color: #808080;
 }
+.package-version__section-item {
+  list-style: none;
+  line-height: 1.667em;
+}
 .package-version__section-item p:first-child {
   margin-left: 0;
 }
@@ -555,20 +573,34 @@ body.email {
   margin-left: 1em;
 }
 .package-version__section-item_fix:before {
-  content: "FIX";
-  color: #f00;
+  content: "fix";
+  background-color: #ee883d;
   position: absolute;
-  margin-left: -5em;
-  font-size: 8px;
-  font-weight: bold;
+  margin-left: -40px;
+  font-size: 12px;
+  font-family: Courier New;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #fff;
+  width: 24px;
+  text-align: center;
+  line-height: 1em;
+  margin-top: 5px;
 }
 .package-version__section-item_new:before {
-  content: "NEW";
-  color: #008000;
+  content: "new";
+  background-color: #5fbe40;
   position: absolute;
-  margin-left: -5em;
-  font-size: 8px;
-  font-weight: bold;
+  margin-left: -40px;
+  font-size: 12px;
+  font-family: Courier New;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #fff;
+  width: 24px;
+  text-align: center;
+  line-height: 1em;
+  margin-top: 5px;
 }
 .autocomplete-input {
   display: inline-block;

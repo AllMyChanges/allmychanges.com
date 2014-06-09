@@ -134,6 +134,7 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
                                          for item in section.items.all()]))
             versions.append(dict(number=version.number,
                                  date=version.date,
+                                 discovered_at=version.discovered_at.date(),
                                  sections=sections))
         changes.append(dict(namespace=package.namespace,
                             name=package.name,
@@ -167,6 +168,10 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
             packages=self.request.user.packages.count(),
             changes=Item.objects.filter(
                 section__version__changelog__packages__user=self.request.user).count())
+        if self.request.GET:
+            cache_key += ':'
+            cache_key += ':'.join('{0}={1}'.format(*item)
+                                  for item in self.request.GET.items())
         return cache_key, 4 * HOUR
         
     def get_context_data(self, **kwargs):

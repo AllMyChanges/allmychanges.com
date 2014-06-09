@@ -28,7 +28,7 @@
         {% for version in package.changelog.versions.all %}
         <li class="package-version">
           <h4 class="package-version__number"><a name="{{version.number}}">{{version.number}}</a></h4>
-          <h5 class="package-version__date">{% if version.unreleased %}Unreleased{% else %}{{version.date}}{% endif %}</h5>
+          <h5 class="package-version__date">{% if version.unreleased %}Unreleased{% else %}{% if version.date %}{{version.date}}{% else %}{{version.discovered_at.date }}{% endif %}{% endif %}</h5>
           {% for section in version.sections.all %}
             {% if section.notes %}<p class="package-version__notes">{{section.notes|capfirst|markdown}}</p>{% endif %}
             {% if section.items.count %}

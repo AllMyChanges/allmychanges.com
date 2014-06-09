@@ -1,9 +1,10 @@
+@require "utils"
 
 .page {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 15px;
     line-height: 1.3em;
-    background-color: #F6F5F3;
+    background-color: #FFF;
 }
 
 body.email {
@@ -62,6 +63,9 @@ body.email {
 
     &__package-title {
         font-size: 1.2em;
+        > a {
+            black-link()
+        }
     }
 }
 
@@ -135,6 +139,11 @@ body.email {
   }
 }
 
+.package-version__section-item {
+    list-style: none;
+    line-height: 1.667em;
+}
+
 .package-version__section-item p:first-child {
     margin-left: 0;
 }
@@ -142,22 +151,28 @@ body.email {
     margin-left: 1em;
 }
 
-.package-version__section-item_fix:before {
-      content: "FIX";
-      color: red;
+section-item-plate(text, color) {
+      content: text;
+      background-color: color;
       position: absolute;
-      margin-left: -5em;
-      font-size: 8px;
-      font-weight: bold;
+      margin-left: -40px;
+      font-size: 12px;
+      font-family: Courier New;
+      padding: 2px 4px;
+      border-radius: 3px;
+      color: white;
+      width: 24px;
+      text-align: center;
+      line-height: 1em;
+      margin-top: 5px;
+}
+
+.package-version__section-item_fix:before {
+    section-item-plate("fix", #ee883d)
 }
 
 .package-version__section-item_new:before {
-      content: "NEW";
-      color: green;
-      position: absolute;
-      margin-left: -5em;
-      font-size: 8px;
-      font-weight: bold;
+    section-item-plate("new", #5fbe40)
 }
 
 

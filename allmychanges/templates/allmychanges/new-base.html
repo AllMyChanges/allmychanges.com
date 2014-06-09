@@ -5,7 +5,11 @@
     <title>AllMyChanges.com</title>
 
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
+    {% if request.GET.smaker %}
+    <link href="{% static 'allmychanges/css/smaker.css' %}" rel="stylesheet">
+    {% else %}
     <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
+    {% endif %}
     <link href="{% static 'angular/angucomplete-alt.css' %}" rel="stylesheet">
 
 
@@ -37,7 +41,7 @@
         {% block login-plate %}
         <div class="login-plate">
           {% if request.user.is_authenticated %}
-            Hi, <a href="{% url "account-settings" %}">{{ request.user }}</a>! <a class="login-plate__logout-link" href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
+            Hi, <a class="login-plate__profile-link" href="{% url "account-settings" %}">{{ request.user }}</a>! <a class="login-plate__logout-link button" href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
           {% else %}
             <span class="login-plate__buttons">Login with: <a href="{% url "social:begin" "github" %}">GitHub</a> or <a href="{% url "social:begin" "twitter" %}">Twitter</a></span>
           {% endif %}
