@@ -6,7 +6,7 @@ import time
 from django.db.models import Count
 from django.db import transaction
 from django.utils import timezone
-from django.conf import settings
+
 from allmychanges.utils import (
     count,
     count_time,
@@ -105,8 +105,6 @@ def update_changelog_task(source):
             log.info('somebody already processing this changelog')
             return
 
-        next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
-
         try:
             changelog.problem = None
             changelog.processing_started_at = timezone.now()
@@ -116,19 +114,16 @@ def update_changelog_task(source):
             # TODO: create more complext algorithm to calculate this time
             changelog.next_update_at = timezone.now() + datetime.timedelta(0, 60 * 60)
             changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
-        except UpdateError, e:
+        except UpdateError as e:
             changelog.problem = ', '.join(e.args)
-            changelog.next_update_at = next_update_if_error
-        except Exception, e:
-            if settings.DEBUG:
-                changelog.problem = unicode(e)
-            else:
-                changelog.problem = 'Unknown error'
-
-            log.info('Unable to update changelog with source {0}'.format(source))
-            changelog.next_update_at = next_update_if_error
-            raise
+        except Exception as e:
+            changelog.problem = unicode(e)
         finally:
+            if changelog.problem is not None:
+                log.warning('Unable to update changelog with source {0}'.format(source))
+                next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
+                changelog.next_update_at = next_update_if_error
+
             changelog.processing_started_at = None
             changelog.save()
 
