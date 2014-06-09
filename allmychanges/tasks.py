@@ -8,6 +8,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 from allmychanges.utils import (
+    count,
     count_time,
     update_changelog,
     UpdateError)
@@ -43,6 +44,7 @@ def schedule_updates(reschedule=False, packages=[]):
     
     if num_stale > 0:
         log.info('{0} stale changelogs were found', num_stale)
+        count('task.schedule_updates.stale.count', num_stale)
         stale_changelogs.update(processing_started_at=None)
 
     if packages:
@@ -50,10 +52,11 @@ def schedule_updates(reschedule=False, packages=[]):
     else:
         changelogs = Changelog.objects.annotate(Count('packages')).filter(packages__count__gt=0)
 
-    log.info('Rescheduling {0} changelogs update'.format(len(changelogs)))
-
     if not reschedule:
         changelogs = changelogs.filter(next_update_at__lte=timezone.now())
+
+    count('task.schedule_updates.scheduling.count', num_stale)
+    log.info('Rescheduling {0} changelogs update'.format(len(changelogs)))
 
     for changelog in changelogs:
         update_changelog_task.delay(changelog.source)
@@ -114,6 +117,7 @@ def update_changelog_task(source):
             changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
         except UpdateError, e:
             changelog.problem = ', '.join(e.args)
+            changelog.next_update_at = next_update_if_error
         except Exception, e:
             if settings.DEBUG:
                 changelog.problem = unicode(e)
