@@ -8,7 +8,7 @@
       <ul class="package-changes__version">
         {% for version in package.versions %}
         <li class="package-version">
-          <h4 class="package-version__number">{{version.number}}</h4>
+          <h4 class="package-version__number"><a href="{% url 'package' username=current_user.username namespace=package.namespace name=package.name %}#{{version.number}}">{{version.number}}</a></h4>
           <h5 class="package-version__date">{% if version.date %}{{version.date}}{% else %}{{ version.discovered_at }}{% endif %}</h5>
           {% for section in version.sections %}
             {% if section.notes %}<p class="package-version__notes">{{section.notes|capfirst|markdown}}</p>{% endif %}

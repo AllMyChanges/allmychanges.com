@@ -424,6 +424,13 @@ body.email {
   display: inline-block;
   margin-top: 1em;
 }
+.package-version__number > a {
+  color: #000;
+  text-decoration: none;
+}
+.package-version__number > a:hover {
+  text-decoration: underline;
+}
 .package-version__date {
   display: inline;
   color: #808080;
