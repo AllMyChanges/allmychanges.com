@@ -23,6 +23,7 @@ html2text
 chaussette
 django-braces
 django-widget-tweaks
+django-oauth2-provider
 
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
 -e git+https://github.com/svetlyak40wt/django-sendmail-backend

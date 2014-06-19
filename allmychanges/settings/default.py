@@ -115,7 +115,7 @@ TEMPLATE_DIRS = (
     root('templates'),
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -137,7 +137,9 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     'django_markdown2',
     'widget_tweaks',
-)
+    'provider',
+    'provider.oauth2',
+]
 
 AUTH_USER_MODEL = 'allmychanges.User'
 

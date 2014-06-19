@@ -50,6 +50,7 @@ urlpatterns = patterns(
     url(r'^raise-exception/', RaiseExceptionView.as_view(), name='raise-exception'),
     url(r'^CHANGELOG.md$', ChangeLogView.as_view(), name='CHANGELOG.md'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^oauth2/', include('provider.oauth2.urls', namespace='oauth2'))
 )
 
 urlpatterns += staticfiles_urlpatterns()
