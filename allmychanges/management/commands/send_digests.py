@@ -48,6 +48,11 @@ class Command(LogMixin, BaseCommand):
             
             if today_changes or args:
                 print 'Sending digest to', user.username, user.email
+                for package in today_changes:
+                    print '\t{namespace}/{name}'.format(**package)
+                    for version in package['versions']:
+                        print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
+                            **version)
             
                 week_changes = get_digest_for(user,
                                               before_date=day_ago,
