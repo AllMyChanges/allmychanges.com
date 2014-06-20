@@ -2,6 +2,7 @@
 import datetime
 import os
 import times
+import logging
 
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
@@ -21,6 +22,10 @@ class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
 
     def handle(self, *args, **options):
+        # this will disable cssutil's logger
+        cssutils_logger = logging.getLogger('CSSUTILS')
+        cssutils_logger.level = logging.ERROR
+
         now = timezone.now()
         day_ago = now - datetime.timedelta(1)
         week_ago = now - datetime.timedelta(7)

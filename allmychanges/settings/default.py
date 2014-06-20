@@ -209,7 +209,6 @@ def init_logging(filename):
     del logging.root.handlers[:]
     logging.root.addHandler(handler)
 
-
     # we need this, to turn off django-rq's logging
     # configuration
     worker_logger = logging.getLogger('rq.worker')
