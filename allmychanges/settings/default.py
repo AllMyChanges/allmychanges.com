@@ -94,6 +94,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'twiggy_goodies.django.LogMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -137,6 +138,7 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     'django_markdown2',
     'widget_tweaks',
+    'oauth2_provider',
 )
 
 AUTH_USER_MODEL = 'allmychanges.User'

@@ -1,7 +1,11 @@
 AUTHENTICATION_BACKENDS = (
+    'oauth2_provider.backends.OAuth2Backend',
     'social.backends.twitter.TwitterOAuth',
     'social.backends.github.GithubOAuth2',
 )
+
+# OAuth2
+ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60 * 24 * 365 # 1 year
 
 SOCIAL_AUTH_PROTECTED_USER_FIELDS = ['email']
 

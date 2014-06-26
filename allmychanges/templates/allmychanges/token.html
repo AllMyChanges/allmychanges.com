@@ -1,0 +1,29 @@
+{% extends "allmychanges/new-base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <h1 class="page-header">Authentication Token</h1>
+
+  <form action="." method="post" class="form">
+    <table class="form__layout">
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column"><label class="label">Token:</label></td>
+        <td class="form__layout__right-column">
+          {{ form.token|add_class:"text-input" }}
+          <p class="form__layout__right-column form__help">This token could be used for authentication in command line client
+or other oauth clients, requiring read/write access.<br/>
+            <b>Keep it in secret if you suspect it is leaked, then regenerate it as soon as possible!</b>
+          </p>
+        </td>
+      </tr>
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column">
+        <td class="form__layout__right-column">
+          <input type="submit" value="Regenerate" class="button button_bad button_large"/>
+        </td>
+      </tr>
+    </table>
+
+     {% csrf_token %}
+  </form>
+{% endblock content %}

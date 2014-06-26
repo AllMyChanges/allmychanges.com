@@ -23,6 +23,7 @@ from allmychanges.models import (Package,
                                  Changelog,
                                  User,
                                  Item)
+from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import HOUR
 
@@ -389,3 +390,51 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         
     def get_object(self, queryset=None):
         return self.request.user
+
+
+class TokenForm(forms.Form):
+    token = forms.CharField(label='Token')
+
+
+
+def get_or_create_user_token(user):
+    from oauthlib.common import generate_token
+    try:
+        app_name = 'internal'
+        app = Application.objects.get(name=app_name)
+    except Application.DoesNotExist:
+        app = Application.objects.create(user=User.objects.get(username='svetlyak40wt'),
+                                         name=app_name,
+                                         client_type=Application.CLIENT_PUBLIC,
+                                         authorization_grant_type=Application.GRANT_IMPLICIT)
+
+    try:
+        token = AccessToken.objects.get(user=user, application=app)
+    except AccessToken.DoesNotExist:
+        token = AccessToken.objects.create(
+            user=user,
+            scope='read write',
+            expires=timezone.now() + datetime.timedelta(0, settings.ACCESS_TOKEN_EXPIRE_SECONDS),
+            token=generate_token(),
+            application=app)
+
+    return token
+
+
+def delete_user_token(user, token):
+    AccessToken.objects.filter(token=token).delete()
+
+
+class TokenView(CommonContextMixin, FormView):
+    form_class = TokenForm
+    template_name = 'allmychanges/token.html'
+    success_url = '/account/token/'
+
+    def get_initial(self):
+        token = get_or_create_user_token(self.request.user)
+        return {'token': token.token}
+        
+    def form_valid(self, form):
+        delete_user_token(self.request.user, form.cleaned_data['token'])
+        return super(TokenView, self).form_valid(form)
+

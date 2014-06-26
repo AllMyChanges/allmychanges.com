@@ -23,5 +23,14 @@ function manage () {
 }
 
 function shell () {
-    manage shell
+    manage shell_plus
+}
+
+
+function manage-dev () {
+    env/bin/python manage.py $@ --settings=allmychanges.settings.development
+}
+
+function shell-dev () {
+    manage-dev shell_plus
 }
