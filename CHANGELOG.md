@@ -1,3 +1,22 @@
+0.4.0 (2014-06-28)
+==================
+
+Few cool feature, related to usability were added recently:
+
+* Now service is able to guess source urls for packages in `perl`
+  namespace.
+* And we've implemented OAuth provider, allowing to write
+  a third party tools and integrations.
+
+Right now there is a simple interface to receive an OAuth token
+and only one tool, implemented by myself — [command-line client](https://github.com/svetlyak40wt/allmychanges),
+which have `import`, `export` and `add` commands.
+
+Also other changes were introduced:
+
+* Cleaner design (thanks to Maxim Sukharev a.k.a @smacker).
+* A number of bugs were fixed.
+	
 0.3.0 (2014-06-03)
 ==================
 
