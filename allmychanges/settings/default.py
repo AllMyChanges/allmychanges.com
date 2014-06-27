@@ -95,6 +95,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
+    'allmychanges.middleware.TurnOffCSRFProtectionIfOAuthenticated',
     'twiggy_goodies.django.LogMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
