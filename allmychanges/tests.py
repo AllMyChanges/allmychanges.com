@@ -12,12 +12,13 @@ from allmychanges.utils import (
     update_changelog_from_raw_data,
     update_changelog,
     fake_downloader,
-    guess_source,
     fill_missing_dates,
     dt_in_window,
     discard_seconds,
     timezone,
     extract_changelog_from_vcs)
+
+from allmychanges.source_guesser import guess_source
 
 from allmychanges.views import get_digest_for
 
@@ -230,7 +231,7 @@ def test_source_guesser():
     To some <a href="https://raw.github.com/tony/tmuxp/master/doc/_static/tmuxp-dev-screenshot.png">raw materials</a>.
     And raw <a href="http://bitbucket.org/antocuni/pdb/raw/0c86c93cee41/screenshot.png">at bitbucket</a>.
     """
-    with mock.patch('allmychanges.utils.requests') as requests:
+    with mock.patch('allmychanges.source_guesser.requests') as requests:
         response = mock.Mock()
         response.content = content
         requests.get.return_value = response

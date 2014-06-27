@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 
-from allmychanges.utils import guess_source
+from allmychanges.source_guesser import guess_source
 from allmychanges.models import Package, Version
 
 
@@ -11,8 +11,8 @@ class Command(LogMixin, BaseCommand):
 
     def handle(self, *args, **options):
         if args:
-            packages = [('python', name, None)
-                        for name in args]
+            packages = [arg.split('/') + [None]
+                        for arg in args]
             show_match = False
         else:
             packages = [(p.namespace, p.name, p)

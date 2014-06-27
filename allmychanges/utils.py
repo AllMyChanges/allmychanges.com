@@ -77,7 +77,7 @@ def normalize_url(url,
     url = url.replace('git+', '')
     
     if 'github' in url:
-        regex = r'[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]*)'
+        regex = r'[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>.*?)(?:\.git|/|$)'
         match = re.search(regex, url)
         if match is not None:
             username, repo = match.groups()
@@ -566,22 +566,6 @@ def update_changelog(changelog):
         shutil.rmtree(path)
         changelog.updated_at = timezone.now()
         changelog.save()
-
-
-def guess_source(namespace, name):
-    result = []
-    if namespace == 'python':
-        response = requests.get('https://pypi.python.org/pypi/' + name)
-
-        urls = re.findall(r'"(https?://.*?)"', response.content)
-        for url in urls:
-            if ('git' in url or 'bitbucket' in url) and \
-               not ('issues' in url or 'gist' in url):
-                url, _, _ = normalize_url(url, github_template='https://github.com/{username}/{repo}')
-                if url not in result:
-                    result.append(url)
-    return result
-
 
 
 def dt_in_window(tz, system_time, hour):

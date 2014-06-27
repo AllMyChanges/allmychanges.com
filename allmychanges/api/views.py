@@ -16,7 +16,8 @@ from allmychanges.api.serializers import (
     SubscriptionSerializer,
     PackageSerializer,
 )
-from allmychanges.utils import count, guess_source
+from allmychanges.utils import count
+from allmychanges.source_guesser import guess_source
 
 
 from rest_framework.exceptions import APIException
