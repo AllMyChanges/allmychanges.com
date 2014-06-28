@@ -615,3 +615,6 @@ body.email {
 .form_profile {
   width: 50%;
 }
+.text-input_with-token {
+  width: 30em;
+}

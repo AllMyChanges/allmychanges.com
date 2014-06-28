@@ -9,7 +9,7 @@
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">Token:</label></td>
         <td class="form__layout__right-column">
-          {{ form.token|add_class:"text-input" }}
+          {{ form.token|add_class:"text-input text-input_with-token" }}
           <p class="form__layout__right-column form__help">This token could be used for authentication in command line client
 or other oauth clients, requiring read/write access.<br/>
             <b>Keep it in secret if you suspect it is leaked, then regenerate it as soon as possible!</b>
