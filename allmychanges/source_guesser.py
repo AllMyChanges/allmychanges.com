@@ -40,9 +40,11 @@ def _python_guesser(name):
 
 
 def _perl_guesser(name):
+    name = name.replace('::', '-')
+    
     results = []
     hits = []
-    
+
     # first, wee look for explicit match
     response = requests.get('http://api.metacpan.org/v0/release/' + name)
     if response.status_code == 200:
