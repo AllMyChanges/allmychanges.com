@@ -12,7 +12,8 @@ import shutil
 import times
 import requests
 import sys
-    
+import setuptools as orig_setuptools
+
 from lxml import html
 from contextlib import contextmanager
 
@@ -435,14 +436,16 @@ def python_version_extractor(path):
             metadata = {}
 
             class FakeSetuptools(object):
-                @classmethod
-                def setup(*args, **kwargs):
+                def setup(self, *args, **kwargs):
                     metadata.update(kwargs)
 
-            sys.modules['distutils.core'] = FakeSetuptools
-            sys.modules['setuptools'] = FakeSetuptools
+                def __getattr__(self, name):
+                    return getattr(orig_setuptools, name)
+
+            sys.modules['distutils.core'] = FakeSetuptools()
+            sys.modules['setuptools'] = FakeSetuptools()
             sys.path.insert(0, path)
-            
+
             try:
                 from setup import setup
             except Exception, e:
@@ -452,10 +455,10 @@ def python_version_extractor(path):
         finally:
             if sys.path[0] == path:
                 sys.path.pop(0)
-            del sys.modules['distutils.core']
-            del sys.modules['setuptools']
-            if 'setup' in sys.modules:
-                del sys.modules['setup']
+
+            for name in ('distutils.core', 'setuptools', 'setup'):
+                if name in sys.modules:
+                    del sys.modules[name]
     
 
 def choose_version_extractor(path):
