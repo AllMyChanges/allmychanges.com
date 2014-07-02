@@ -5,7 +5,13 @@
 
 {% block content %}
   <h1 class="page-header">{{package.namespace}}/{{package.name}}</h1>
-  <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source|remove_source_prefix}}">go to sources</a></h2>
+  <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source|remove_source_prefix}}">go to sources</a>{% if request.user.username == 'svetlyak40wt' %}
+      {% if code_version == 'v1' %}
+        <a href="?code_version=v2">New parser</a>
+      {% else %}
+        <a href="?code_version=v1">Old parser</a>
+      {% endif %}
+    {% endif %}</h2>
 
   <dl class="package-metadata">
     <dt>Badge for README:</dt>
@@ -25,22 +31,7 @@
 
   <div class="package-changes">
     <ul class="package-changes__version">
-        {% for version in package.changelog.versions.all %}
-        <li class="package-version">
-          <h4 class="package-version__number"><a name="{{version.number}}">{{version.number}}</a></h4>
-          <h5 class="package-version__date">{% if version.unreleased %}Unreleased{% else %}{% if version.date %}{{version.date}}{% else %}{{version.discovered_at.date }}{% endif %}{% endif %}</h5>
-          {% for section in version.sections.all %}
-            {% if section.notes %}<p class="package-version__notes">{{section.notes|capfirst|markdown}}</p>{% endif %}
-            {% if section.items.count %}
-              <ul class="package-version__items">
-                {% for item in section.items.all %}
-                <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|capfirst|markdown}}</li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          {% endfor %}
-        </li>
-        {% endfor %}
-      </ul>
+      {% include "allmychanges/blocks/package-changes.html" %}
+    </ul>
   </div>
 {% endblock content %}

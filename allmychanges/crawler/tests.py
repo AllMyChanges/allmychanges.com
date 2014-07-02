@@ -209,6 +209,7 @@ def test_extract_date():
 
     # this variant is from Nginx's changelog
     eq_(date(2014, 4, 24), _extract_date('   24 Apr 2014'))
+    eq_(date(2014, 4, 28), _extract_date('April 28, 2014')) # from django
 
     # these two are from python's click
     eq_(date(2014, 5, 23), _extract_date('(bugfix release, released on May 23rd 2014)'))

@@ -328,9 +328,25 @@ class Changelog(models.Model):
         help_text=('Number of seconds required to '
                    'update this changelog last time'),
         default=0)
+    ignore_list = models.CharField(max_length=10000,
+                                   default='',
+                                   help_text=('Comma-separated list of directories'
+                                              ' and filenames to ignore searching'
+                                              ' changelog.'))
     
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)
+
+    def get_ignore_list(self):
+        """Returns a list with all filenames and directories to ignore
+        when searching a changelog."""
+        filenames = [name.strip()
+                     for name in self.ignore_list.split(',')]
+        filenames = filter(None, filenames)
+        return filenames
+
+    def set_ignore_list(self, items):
+        self.ignore_list = u','.join(items)
 
 
 class VersionManager(models.Manager):
@@ -339,13 +355,21 @@ class VersionManager(models.Manager):
         return super(VersionManager, self).get_query_set().order_by('-id')
 
 
+CODE_VERSIONS = [
+    ('v1', 'Old parser'),
+    ('v2', 'New parser')]
+
+
 class Version(models.Model):
     changelog = models.ForeignKey(Changelog, related_name='versions')
     date = models.DateField(blank=True, null=True)
     number = models.CharField(max_length=255)
     unreleased = models.BooleanField(default=False)
     discovered_at = models.DateTimeField(blank=True, null=True)
-
+    code_version = models.CharField(max_length=255, choices=CODE_VERSIONS)
+    filename = models.CharField(max_length=1000,
+                                help_text=('Source file where this version was found'),
+                                blank=True, null=True)
     objects = VersionManager()
 
     class Meta:
@@ -358,6 +382,7 @@ class Version(models.Model):
 class Section(models.Model):
     version = models.ForeignKey(Version, related_name='sections')
     notes = models.TextField(blank=True, null=True)
+    code_version = models.CharField(max_length=255, choices=CODE_VERSIONS)
 
     def __unicode__(self):
         return self.notes

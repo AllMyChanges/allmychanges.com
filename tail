@@ -18,21 +18,29 @@ Options:
 import tailer
 import anyjson
 import re
+import click
 
 from docopt import docopt
+from click import echo
 from collections import defaultdict
 
 
 def print_item(item):
-    print '{ts} {msg}'.format(
+    print u'{ts} {msg}'.format(
         ts = item['@timestamp'].replace('T', ' '),
         msg = item['@message'])
     
     for kv in item['@fields'].iteritems():
-        print (' ' * 20 + '{0} = {1}').format(*kv)
+        echo((u' ' * 20 + u'{0} = {1}').format(*kv))
 
 
-def process(filename, cross_finger=False, message=None):
+@click.command()
+@click.option('--cross-finger', is_flag=True,
+              help='Output only if there was ERROR.')
+@click.option('--message',
+              help='Show only items with this text in message.')
+@click.argument('filename')
+def process(filename, cross_finger, message):
     buffer = defaultdict(list)
 
     def print_if_needed(item):
@@ -52,8 +60,8 @@ def process(filename, cross_finger=False, message=None):
                 buffer[uuid].append(item)
                 if fields['level'] == 'ERROR':
 
-                    print ''
-                    print '=' * 80
+                    echo('')
+                    echo('=' * 80)
                     for item in buffer[uuid]:
                         print_if_needed(item)
                     del buffer[uuid]
@@ -65,8 +73,6 @@ def process(filename, cross_finger=False, message=None):
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='JSON log tailer (0.1)')
+#    args = docopt(__doc__, version='JSON log tailer (0.1)')
 
-    process(args['<filename>'],
-            cross_finger=args['--cross-finger'],
-            message=args['--message'])
+    process()

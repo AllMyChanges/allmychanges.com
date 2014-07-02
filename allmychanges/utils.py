@@ -240,8 +240,9 @@ def show_debug_toolbar(request):
 
 def discard_seconds(dt):
     return datetime.datetime(*dt.timetuple()[:5])
-        
 
+
+# TODO: remove
 def fill_missing_dates(raw_data):
     """Algorithm.
 
@@ -256,10 +257,10 @@ def fill_missing_dates(raw_data):
     today = discard_seconds(datetime.datetime.utcnow())
     month = datetime.timedelta(30)
     current_date = None
-
+        
     for idx, item in enumerate(reversed(raw_data)):
         item = copy.deepcopy(item)
-        has_date = 'date' in item
+        has_date = item.get('date')
 
         if not has_date:
             if idx == 0:
@@ -278,10 +279,47 @@ def fill_missing_dates(raw_data):
     return result
 
 
+def fill_missing_dates2(raw_data):
+    """Algorithm.
+
+    If first item has no date, then it is today.
+    If Nth item has date, then assume it is a current_date.
+    If Nth item has no date and we have current_date, then assume item's
+    date is current_date.
+    If Nth item has no date and we have no current_date, then assume, it
+    is a now() - month and act like we have it.
+    """
+    result = []
+    today = discard_seconds(datetime.datetime.utcnow())
+    month = datetime.timedelta(30)
+    current_date = None
+        
+    for idx, item in enumerate(reversed(raw_data)):
+        item = copy.deepcopy(item)
+        has_date = getattr(item, 'date', None)
+
+        if not has_date:
+            if idx == 0:
+                item.discovered_at = today
+            else:
+                if current_date is not None:
+                    item.discovered_at = current_date
+                else:
+                    item.discovered_at = today - month
+        else:
+            current_date = item.date
+            item.discovered_at = current_date
+        result.append(item)
+        
+    result.reverse()
+    return result
+
+
 def update_changelog_from_raw_data(changelog, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
-    
+    code_version = 'v1'
+
     if changelog.versions.count() == 0:
         # for initial filling, we should set all missing dates to some values
         raw_data = fill_missing_dates(raw_data)
@@ -289,7 +327,8 @@ def update_changelog_from_raw_data(changelog, raw_data):
     for raw_version in raw_data:
         version, created = changelog.versions.get_or_create(
             number=raw_version['version'],
-            unreleased=raw_version.get('unreleased', False))
+            unreleased=raw_version.get('unreleased', False),
+            code_version=code_version)
 
         version.date = raw_version.get('date')
         
@@ -300,9 +339,45 @@ def update_changelog_from_raw_data(changelog, raw_data):
 
         version.sections.all().delete()
         for raw_section in raw_version['sections']:
-            section = version.sections.create(notes=raw_section.get('notes'))
+            section = version.sections.create(notes=raw_section.get('notes'),
+                                              code_version=code_version)
             for raw_item in raw_section.get('items', []):
                 section.items.create(text=raw_item, type=get_commit_type(raw_item))
+
+
+def update_changelog_from_raw_data2(changelog, raw_data):
+    """ raw_data should be a list where versions come from
+    more recent to the oldest."""
+    code_version = 'v2'
+
+    if changelog.versions.filter(code_version=code_version).count() == 0:
+        # for initial filling, we should set all missing dates to some values
+        raw_data = fill_missing_dates2(raw_data)
+
+    for raw_version in raw_data:
+        version, created = changelog.versions.get_or_create(
+            number=raw_version.version,
+            code_version=code_version)
+
+        version.unreleased = getattr(raw_version, 'unreleased', False)
+        version.filename = getattr(raw_version, 'filename', None)
+        version.date = getattr(raw_version, 'date', None)
+        
+        if version.discovered_at is None:
+            version.discovered_at = getattr(raw_version, 'discovered_at', timezone.now())
+
+        version.save()
+
+        version.sections.all().delete()
+        for raw_section in raw_version.content:
+            if isinstance(raw_section, list):
+                section = version.sections.create(code_version=code_version)
+                for raw_item in raw_section:
+                    section.items.create(text=raw_item['text'],
+                                         type=raw_item['type'])
+            else:
+                section = version.sections.create(notes=raw_section,
+                                                  code_version=code_version)
 
 
 def fake_downloader(changelog):
@@ -448,7 +523,7 @@ def python_version_extractor(path):
 
             try:
                 from setup import setup
-            except Exception, e:
+            except Exception:
                 pass
 
             return metadata.get('version')
@@ -564,6 +639,13 @@ def update_changelog(changelog):
         except Exception:
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to update database')
+
+        try:
+            from allmychanges.parsing.pipeline import processing_pipe
+            versions = processing_pipe(path, changelog.get_ignore_list())
+            update_changelog_from_raw_data2(changelog, versions)
+        except Exception:
+            logging.getLogger('update-changelog2').exception('unhandled')
 
     finally:
         shutil.rmtree(path)

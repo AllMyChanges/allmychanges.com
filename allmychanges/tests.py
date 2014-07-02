@@ -13,10 +13,12 @@ from allmychanges.utils import (
     update_changelog,
     fake_downloader,
     fill_missing_dates,
+    fill_missing_dates2,
     dt_in_window,
     discard_seconds,
     timezone,
     extract_changelog_from_vcs)
+from allmychanges.env  import Environment
 
 from allmychanges.source_guesser import guess_source
 
@@ -162,9 +164,63 @@ def test_update_package_using_full_pipeline():
         user=art)
     
     update_changelog(package.changelog)
-    eq_(2, package.changelog.versions.count())
-    eq_('Some bugfix.', package.changelog.versions.all()[0].sections.all()[0].items.all()[0].text)
-    eq_('Initial release.', package.changelog.versions.all()[1].sections.all()[0].items.all()[0].text)
+
+    versions = list(package.changelog.versions.filter(code_version='v1'))
+    eq_(2, len(versions))
+    eq_('Some bugfix.', versions[0].sections.all()[0].items.all()[0].text)
+    eq_('Initial release.', versions[1].sections.all()[0].items.all()[0].text)
+
+
+def test_environment_cloning():
+    env = Environment()
+    env.some = 'value'
+
+    env2 = env.push()
+    eq_('value', env2.some)
+    
+    env2.some = 'another'
+    eq_('another', env2.some)
+    eq_('value', env.some)
+
+    # checking another way of creating child environment
+    # and setting the values simultaneously
+    env3 = env2.push(some='new value',
+                     other='item')
+    eq_('new value', env3.some)
+    eq_('item', env3.other)
+    eq_('another', env2.some)
+
+
+def test_environment_comparison():
+    eq_(Environment(), Environment())
+
+    env1 = Environment()
+    env1.type = 'blah'
+    env2 = Environment()
+    env2.type = 'blah'
+    eq_(env1, env2)
+
+    # first env inherits it's type
+    # second have it explicitly
+    env1 = Environment()
+    env1.type = 'blah'
+    env2 = Environment().push(type='blah')
+    eq_(env1.push(), env2)
+
+    # first env have two vars
+    # second only one
+    env1 = Environment().push(type='blah', foo='bar')
+    env2 = Environment().push(type='blah')
+    assert env1 != env2
+
+
+def test_get_env_keys():
+    eq_(['bar', 'baz', 'foo'],
+        Environment() \
+            .push(foo=1) \
+            .push(bar=2) \
+            .push(baz=3) \
+            .keys())
 
 
 def test_changing_source_on_package_will_create_another_changelog():
@@ -249,37 +305,40 @@ def test_filling_missing_dates_when_there_arent_any_dates():
     from datetime import timedelta
     today = discard_seconds(datetime.utcnow())
     month = timedelta(30)
-    
-    item = lambda dt: dict(discovered_at=dt)
+    env = Environment()
+    item = lambda dt: env.push(discovered_at=dt)
     eq_([item(today - month), item(today - month), item(today)],
-        fill_missing_dates([{}, {}, {}]))
+        fill_missing_dates2([env.push(), env.push(), env.push()]))
 
 
 def test_filling_missing_dates_when_there_are_gaps_between():
     from datetime import timedelta
     today = discard_seconds(timezone.now())
     month = timedelta(30)
+    env = Environment()
+    env.type = 'version'
+
     # Тут надо подумать, чему должен быть равен discovered_at если date=today
     def item(dt, discovered_at=None):
         if dt is None:
-            return dict(discovered_at=discovered_at)
-        return dict(date=dt, discovered_at=discovered_at)
+            return env.push(discovered_at=discovered_at)
+        return env.push(date=dt, discovered_at=discovered_at)
 
     first_date = today - timedelta(7)
     last_date = today - 2 * month
-    
+
     eq_([item(None,last_date),
          item(last_date, last_date),
          item(None, first_date),
          item(first_date, first_date),
          item(None, today)],
         
-        fill_missing_dates([ 
-            {}, # 0.1.0
+        fill_missing_dates2([ 
+            env.push(), # 0.1.0
             item(last_date), # 0.2.0
-            {}, # 0.2.1
+            env.push(), # 0.2.1
             item(first_date), # 0.3.0
-            {}, # 0.4.0
+            env.push(), # 0.4.0
         ]))
 
 
@@ -352,14 +411,17 @@ def test_digest_for_today_includes_changes_from_last_9am():
     today = datetime.datetime(2014, 1, 1, 9, 0, tzinfo=timezone.UTC()) # 9am
     one_day = datetime.timedelta(1)
     one_minute = datetime.timedelta(0, 60)
+    code_version = 'v1'
     
     foo = user.packages.create(namespace='test', name='foo', source='foo')
     foo.changelog.versions.create(number='0.1.0',
-                                  discovered_at=today - one_day - one_minute)
+                                  discovered_at=today - one_day - one_minute,
+                                  code_version=code_version)
 
     bar = user.packages.create(namespace='test', name='bar', source='bar')
     bar.changelog.versions.create(number='0.3.0',
-                                  discovered_at=today - one_day)
+                                  discovered_at=today - one_day,
+                                  code_version=code_version)
 
     digest = get_digest_for(user, after_date=today - one_day)
     eq_(1, len(digest))

@@ -37,6 +37,7 @@ class Command(LogMixin, BaseCommand):
                               if tz and dt_in_window(tz, utc_now, 9)]
         
         users = get_user_model().objects.exclude(email='')
+        code_version = 'v1'
         
         if args:
             users = users.filter(username__in=args)
@@ -44,7 +45,9 @@ class Command(LogMixin, BaseCommand):
             users = users.filter(timezone__in=send_for_timezones)
         
         for user in users:
-            today_changes = get_digest_for(user, after_date=day_ago)
+            today_changes = get_digest_for(user,
+                                           after_date=day_ago,
+                                           code_version=code_version)
             
             if today_changes or args:
                 print 'Sending digest to', user.username, user.email
@@ -56,7 +59,8 @@ class Command(LogMixin, BaseCommand):
             
                 week_changes = get_digest_for(user,
                                               before_date=day_ago,
-                                              after_date=week_ago)         
+                                              after_date=week_ago,
+                                              code_version=code_version)
                 body = render_to_string(
                     'emails/digest.html',
                     dict(current_user=user,

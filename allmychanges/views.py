@@ -95,7 +95,39 @@ class HumansView(TemplateView):
 from django.core.cache import cache
 
 
-def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
+
+def get_package_data_for_template(package, filter_args, limit_versions, code_version='v1'):
+    versions = []
+    versions_queryset = package.changelog.versions.filter(**filter_args)
+
+    # this allows to reduce number of queries in 5 times
+    versions_queryset = versions_queryset.prefetch_related('sections__items')
+
+    for version in versions_queryset[:limit_versions]:
+        sections = []
+        for section in version.sections.filter(code_version=code_version):
+            sections.append(dict(notes=section.notes,
+                                 items=[
+                                     dict(text=item.text,
+                                          type=item.type)
+                                     for item in section.items.all()]))
+        versions.append(dict(number=version.number,
+                             date=version.date,
+                             discovered_at=version.discovered_at.date(),
+                             filename=version.filename,
+                             sections=sections,
+                             unreleased=version.unreleased))
+    return dict(namespace=package.namespace,
+                name=package.name,
+                source=package.source,
+                versions=versions)
+
+
+def get_digest_for(user,
+                   before_date=None,
+                   after_date=None,
+                   limit_versions=5,
+                   code_version='v1'):
     """Before date and after date are inclusive."""
     # search packages which have changes after given date
     packages = user.packages
@@ -103,7 +135,8 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
     # we exclude unreleased changes from digest
     # because they are not interesting
     # probably we should make it a user preference
-    filter_args = {'unreleased': False}
+    filter_args = {'unreleased': False,
+                   'code_version': code_version}
 
     if before_date and after_date:
         filter_args['discovered_at__range'] = (after_date, before_date)
@@ -117,30 +150,8 @@ def get_digest_for(user, before_date=None, after_date=None, limit_versions=5):
                                   for key, value in filter_args.items()})
     packages = packages.select_related('changelog').distinct()
     
-    changes = []
-    for package in packages:
-        versions = []
-        versions_queryset = package.changelog.versions.filter(**filter_args)
-
-        # this allows to reduce number of queries in 5 times
-        versions_queryset = versions_queryset.prefetch_related('sections__items')
-
-        for version in versions_queryset[:limit_versions]:
-            sections = []
-            for section in version.sections.all():
-                sections.append(dict(notes=section.notes,
-                                     items=[
-                                         dict(text=item.text,
-                                              type=item.type)
-                                         for item in section.items.all()]))
-            versions.append(dict(number=version.number,
-                                 date=version.date,
-                                 discovered_at=version.discovered_at.date(),
-                                 sections=sections))
-        changes.append(dict(namespace=package.namespace,
-                            name=package.name,
-                            source=package.source,
-                            versions=versions))
+    changes = [get_package_data_for_template(package, filter_args, limit_versions, code_version)
+               for package in packages]
 
     return changes
 
@@ -164,11 +175,14 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
     template_name = 'allmychanges/digest.html'
 
     def get_cache_params(self, *args, **kwargs):
-        cache_key = 'digest-{username}-{packages}-{changes}'.format(
+        code_version = self.request.GET.get('code_version', 'v1')
+        cache_key = 'digest-{username}-{packages}-{changes}-{code_version}'.format(
             username=self.request.user.username,
             packages=self.request.user.packages.count(),
             changes=Item.objects.filter(
-                section__version__changelog__packages__user=self.request.user).count())
+                section__version__changelog__packages__user=self.request.user).count(),
+            code_version=code_version)
+
         if self.request.GET:
             cache_key += ':'
             cache_key += ':'.join('{0}={1}'.format(*item)
@@ -183,21 +197,26 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         day_ago = now - one_day
         week_ago = now - datetime.timedelta(7)
         month_ago = now - datetime.timedelta(31)
+        code_version = self.request.GET.get('code_version', 'v1')
 
-
+        result['code_version'] = code_version
         result['current_user'] = self.request.user
 
 
         result['today_changes'] = get_digest_for(self.request.user,
-                                                 after_date=day_ago)
+                                                 after_date=day_ago,
+                                                 code_version=code_version)
         result['week_changes'] = get_digest_for(self.request.user,
                                                 before_date=day_ago,
-                                                after_date=week_ago)
+                                                after_date=week_ago,
+                                                 code_version=code_version)
         result['month_changes'] = get_digest_for(self.request.user,
                                                  before_date=week_ago,
-                                                 after_date=month_ago)
+                                                 after_date=month_ago,
+                                                 code_version=code_version)
         result['ealier_changes'] = get_digest_for(self.request.user,
-                                                  before_date=month_ago)
+                                                  before_date=month_ago,
+                                                 code_version=code_version)
 
         result['no_packages'] = \
                 self.request.user.packages \
@@ -244,13 +263,24 @@ class PackageView(CommonContextMixin, TemplateView):
         # and request.user is anonymous
         kwargs.setdefault('username', self.request.user.username)
         
-        result['package'] = get_object_or_404(
+        code_version = self.request.GET.get('code_version', 'v1')
+        result['code_version'] = code_version
+
+        filter_args = {'code_version': code_version}
+        package = get_object_or_404(
             Package.objects.select_related('changelog') \
                           .prefetch_related('changelog__versions__sections__items'),
             user=get_user_model().objects.get(username=kwargs['username']),
             namespace=kwargs['namespace'],
             name=kwargs['name'])
+        
+        package_data = get_package_data_for_template(
+            package,
+            filter_args,
+            100,
+            code_version=code_version)
 
+        result['package'] = package_data
         return result
 
 
