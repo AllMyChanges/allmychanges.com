@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
-from allmychanges.models import Package, Changelog, Version
+from allmychanges.models import Package, Changelog, Version, User
 from django.utils import timezone
 
 
@@ -44,6 +44,7 @@ def get_stats():
 
     stats['db.packages'] = Package.objects.count()
     stats['db.changelogs'] = Changelog.objects.count()
+    stats['db.users'] = User.objects.count()
     stats['db.versions.v1'] = Version.objects.filter(code_version='v1').count()
     stats['db.versions.v2'] = Version.objects.filter(code_version='v2').count()
 
