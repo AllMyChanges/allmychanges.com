@@ -8,6 +8,7 @@ from django.conf import settings
 from allmychanges.utils import graphite_send
 from allmychanges.models import Package, Changelog, Version, User
 from django.utils import timezone
+from django.db.models import Count
 
 
 def get_stats_from_file():
@@ -42,6 +43,20 @@ def get_stats():
     for queue in Queue.all():
         stats['queue.{0}.jobs'.format(queue.name)] = queue.count
 
+
+    package_counts = list(User.objects.annotate(Count('packages')))
+
+    zero_packages = [user
+                     for user in package_counts
+                     if user.packages__count == 0]
+    others = [user.packages__count
+              for user in package_counts
+              if user.packages__count > 0]
+    stats['db.peruser-package-count.zero'] = len(zero_packages)
+    stats['db.peruser-package-count.min'] = min(others)
+    stats['db.peruser-package-count.max'] = max(others)
+    stats['db.peruser-package-count.avg'] = sum(others) / len(others)
+    
     stats['db.packages'] = Package.objects.count()
     stats['db.changelogs'] = Changelog.objects.count()
     stats['db.users'] = User.objects.count()
