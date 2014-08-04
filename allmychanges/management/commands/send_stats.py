@@ -1,9 +1,11 @@
 import os
 
+from pprint import pprint
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
+from allmychanges.models import Package, Changelog, Version
 
 
 def get_stats_from_file():
@@ -38,6 +40,11 @@ def get_stats():
     for queue in Queue.all():
         stats['queue.{0}.jobs'.format(queue.name)] = queue.count
 
+    stats['db.packages'] = Package.objects.count()
+    stats['db.changelogs'] = Changelog.objects.count()
+    stats['db.versions.v1'] = Version.objects.filter(code_version='v1').count()
+    stats['db.versions.v2'] = Version.objects.filter(code_version='v2').count()
+
     return stats
 
 
@@ -46,4 +53,7 @@ class Command(LogMixin, BaseCommand):
 
     def handle(self, *args, **options):
         stats = get_stats()
-        graphite_send(**stats)
+        if args and args[0] == 'dry':
+            pprint(stats)
+        else:
+            graphite_send(**stats)
