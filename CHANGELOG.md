@@ -1,3 +1,21 @@
+0.5.0 (2014-08-06)
+==================
+
+This release includes a new changelogs processing pipeline, which now runs
+in parallel to the old parser. We are keep eye on it's quality and performance
+and will switch to it in the near future.
+
+Also, there were some other changes:
+
+* We've fixed how source suggest works for perl packages with two colons in name.
+* OAuth token's field was made wider and now whole token is visible.
+* Now our robot is able to recognize CVE security issues and to mark changelog's
+  items as security, deprecation or backward incompatible. Look at the
+  [Nginx's](http://allmychanges.com/u/svetlyak40wt/soft/nginx/#1.7.4) and
+  [pip's](http://allmychanges.com/u/svetlyak40wt/python/pip/#1.6.0) changelogs
+  to understand how it works.
+* Also, missing values in 'Last update was' and 'Time to next update' were fixed.
+
 0.4.0 (2014-06-28)
 ==================
 
