@@ -1,3 +1,8 @@
+0.5.1 (2014-08-06)
+==================
+
+* Links to badge and package versions were fixed.
+
 0.5.0 (2014-08-06)
 ==================
 
