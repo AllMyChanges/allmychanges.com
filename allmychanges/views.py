@@ -120,6 +120,9 @@ def get_package_data_for_template(package, filter_args, limit_versions, code_ver
     return dict(namespace=package.namespace,
                 name=package.name,
                 source=package.source,
+                user=dict(
+                    username=package.user.username,
+                ),
                 changelog=dict(
                     updated_at=package.changelog.updated_at,
                     next_update_at=package.changelog.next_update_at,
