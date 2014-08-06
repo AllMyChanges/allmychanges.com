@@ -9,8 +9,11 @@ class Command(LogMixin, BaseCommand):
     def handle(self, *args, **options):
         name = args[0]
         package = Package.objects.filter(name=name)[0]
+        changelog = package.changelog
         
         if len(args) > 1 and args[1] == 'full':
-            package.changelog.versions.all().delete()
+            changelog.versions.all().delete()
 
-        update_changelog_task(package.changelog.source)
+        changelog.problem = None
+        changelog.save()
+        update_changelog_task(changelog.source)
