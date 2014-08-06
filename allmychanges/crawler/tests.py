@@ -269,3 +269,6 @@ def test_get_commit_type():
     eq_('fix', get_commit_type('some fixes'))
     eq_('fix', get_commit_type('[Fix] Resolved'))
     eq_('new', get_commit_type('change something'))
+    eq_('sec', get_commit_type('This issue solves CVE-2014-3556 report'))
+    eq_('dep', get_commit_type('pip install --build and pip install --no-clean are now deprecated'))
+    eq_('inc', get_commit_type('BACKWARD INCOMPATIBLE Removed the bundle support which was deprecated in 1.4.'))

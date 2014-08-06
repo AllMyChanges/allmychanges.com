@@ -152,7 +152,14 @@ def get_markup_type(filename):
 def get_commit_type(commit_message):
     """Return new or fix or None"""
     commit_message = commit_message.lower()
-    if commit_message.startswith('add'):
+
+    if re.search(r'cve-\d+-\d+', commit_message) is not None:
+        return 'sec'
+    elif 'backward incompatible' in commit_message:
+        return 'inc'
+    elif 'deprecated' in commit_message:
+        return 'dep'
+    elif commit_message.startswith('add'):
         return 'new'
     elif commit_message.startswith('new '):
         return 'new'

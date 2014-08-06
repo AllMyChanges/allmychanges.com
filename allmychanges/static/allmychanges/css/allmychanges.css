@@ -521,6 +521,51 @@ body.email {
   line-height: 1em;
   margin-top: 5px;
 }
+.package-version__section-item_sec:before {
+  content: "sec";
+  background-color: #ff3b16;
+  position: absolute;
+  margin-left: -40px;
+  font-size: 12px;
+  font-family: Courier New;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #fff;
+  width: 24px;
+  text-align: center;
+  line-height: 1em;
+  margin-top: 5px;
+}
+.package-version__section-item_dep:before {
+  content: "dep";
+  background-color: #ff3b16;
+  position: absolute;
+  margin-left: -40px;
+  font-size: 12px;
+  font-family: Courier New;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #fff;
+  width: 24px;
+  text-align: center;
+  line-height: 1em;
+  margin-top: 5px;
+}
+.package-version__section-item_inc:before {
+  content: "inc";
+  background-color: #ff3b16;
+  position: absolute;
+  margin-left: -40px;
+  font-size: 12px;
+  font-family: Courier New;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #fff;
+  width: 24px;
+  text-align: center;
+  line-height: 1em;
+  margin-top: 5px;
+}
 .autocomplete-input {
   display: inline-block;
 }
