@@ -1,0 +1,396 @@
+
+Changelog from https://github.com/pypa/pip
+[<Package: svetlyak40wt/pip>] have problems: 42 != 0
+
+Changelog from https://github.com/kennethreitz/requests
+[<Package: svetlyak40wt/requests>] have problems: 86 != 0
+
+Changelog from https://github.com/nvie/pip-tools
+[<Package: svetlyak40wt/pip-tools>] have problems: 9 != 8
+
+Changelog from https://github.com/ui/django-rq
+[<Package: svetlyak40wt/django-rq>] have problems: 20 != 18
+
+Changelog from https://github.com/nvie/rq
+[<Package: svetlyak40wt/rq>] have problems: 37 != 0
+
+Changelog from https://github.com/tomchristie/django-rest-framework
+[<Package: svetlyak40wt/django-rest-framework>, <Package: alexander-akhmetov/django-rest-framework>] have problems: 69 != 0
+
+Changelog from https://github.com/davidmiller/pony-mode/
+[<Package: svetlyak40wt/pony-mode>] have problems: 3 != 2
+
+Changelog from https://github.com/kennethreitz/clint
+[<Package: svetlyak40wt/clint>] have problems: 16 != 0
+
+Changelog from https://github.com/wearpants/twiggy
+[<Package: svetlyak40wt/twiggy>] have problems: 10 != 0
+
+Changelog from https://github.com/daniellawrence/graphitesend
+[<Package: svetlyak40wt/graphitesend>] have problems: 21 != 0
+
+Changelog from https://github.com/waylan/Python-Markdown
+[<Package: svetlyak40wt/markdown>] have problems: 7 != 0
+
+Changelog from https://github.com/garu/Data-Printer
+[<Package: svetlyak40wt/Data::Printer>] have problems: 36 != 0
+
+Changelog from https://github.com/surfly/gevent
+[<Package: borman/gevent>] have problems: 31 != 0
+
+Changelog from https://github.com/pydata/pandas
+[<Package: borman/pandas>] have problems: 25 != 0
+
+Changelog from https://github.com/mitsuhiko/flask
+[<Package: borman/flask>] have problems: 21 != 0
+
+Changelog from https://github.com/saltstack/salt
+[<Package: borman/salt>, <Package: svetlyak40wt/salt>] have problems: 56 != 0
+
+Changelog from https://bitbucket.org/runeh/anyjson
+[<Package: svetlyak40wt/anyjson>] have problems: 12 != 0
+
+Changelog from https://github.com/joyent/node.git
+[<Package: alexeimoisseev/node>] have problems: 774 != 0
+
+Changelog from https://github.com/numpy/numpy.git
+[<Package: romovpa/numpy>] have problems: 17 != 0
+
+Changelog from https://github.com/django/django.git
+[<Package: rndD/django>, <Package: antonyc/django>] have problems: 13 != 0
+
+Changelog from https://github.com/enb-make/enb.git
+[<Package: rndD/enb>] have problems: 47 != 0
+
+Changelog from https://github.com/bem/borschik.git
+[<Package: rndD/borschik>] have problems: 18 != 15
+
+Changelog from http://github.com/django-extensions/django-extensions
+[<Package: svetlyak40wt/django-extensions>] have problems: 10 != 9
+
+Changelog from https://github.com/django-debug-toolbar/django-debug-toolbar
+[<Package: svetlyak40wt/django-debug-toolbar>, <Package: coagulant/django-debug-toolbar>] have problems: 4 != 3
+
+Changelog from https://github.com/omab/python-social-auth
+[<Package: svetlyak40wt/python-social-auth>] have problems: 29 != 0
+
+Changelog from https://github.com/tomchristie/django-vanilla-views/
+[<Package: svetlyak40wt/django-vanilla-views>] have problems: 12 != 9
+
+Changelog from https://github.com/dotcloud/docker
+[<Package: svetlyak40wt/docker>] have problems: 59 != 0
+
+Changelog from http+https://www.virtualbox.org/wiki/Changelog
+[<Package: svetlyak40wt/virtualbox>] have problems: 22 != 0
+
+Changelog from https://github.com/mozilla-services/circus
+[<Package: svetlyak40wt/circus>] have problems: 23 != 0
+
+Changelog from https://github.com/nose-devs/nose
+[<Package: svetlyak40wt/nose>] have problems: 38 != 0
+
+Changelog from https://github.com/slambert/selfcontrol
+[<Package: svetlyak40wt/selfcontrol>] have problems: 7 != 0
+
+Changelog from https://github.com/git/git
+[<Package: svetlyak40wt/git>] have problems: 8 != 2
+
+Changelog from hg+http://selenic.com/hg/
+[<Package: svetlyak40wt/hg>] have problems: 2 != 0
+
+Changelog from http+http://mercurial.selenic.com/wiki/WhatsNew
+[] have problems: 59 != 0
+
+Changelog from http+http://nginx.org/en/CHANGES
+[<Package: svetlyak40wt/nginx>] have problems: 374 != 0
+
+Changelog from https://github.com/mitsuhiko/click
+[<Package: svetlyak40wt/click>] have problems: 10 != 0
+
+Changelog from hg+https://bitbucket.org/jurko/suds
+[<Package: svetlyak40wt/suds>] have problems: 32 != 4
+
+Changelog from https://github.com/celery/celery.git
+[<Package: antonyc/celery>, <Package: antonyc/dsdd>] have problems: 33 != 0
+
+Changelog from https://github.com/rthalley/dnspython
+[<Package: svetlyak40wt/dnspython>] have problems: 25 != 0
+
+Changelog from https://bitbucket.org/gutworth/six
+[<Package: svetlyak40wt/six>] have problems: 16 != 0
+
+Changelog from https://github.com/PerlDancer/Dancer.git
+[<Package: svetlyak40wt/Dancer>, <Package: bessarabov/Dancer>] have problems: 102 != 0
+
+Changelog from https://github.com/PerlDancer/Dancer2.git
+[<Package: bessarabov/Dancer2>] have problems: 21 != 0
+
+Changelog from https://github.com/kraih/mojo.git
+[<Package: bessarabov/Mojolicious>] have problems: 478 != 0
+
+Changelog from https://github.com/numpy/numpy
+[<Package: teegaar/numpy>] have problems: 6 != 0
+
+Changelog from https://github.com/idlesign/django-sitetree
+[<Package: idlesign/django-sitetree>] have problems: 32 != 27
+
+Changelog from https://bitbucket.org/cthedot/cssutils
+[<Package: svetlyak40wt/cssutils>] have problems: 35 != 0
+
+Changelog from https://github.com/idan/oauthlib
+[<Package: svetlyak40wt/oauthlib>] have problems: 27 != 2
+
+Changelog from https://github.com/jorgenschaefer/elpy
+[<Package: svetlyak40wt/elpy>] have problems: 14 != 11
+
+Changelog from https://github.com/evonove/django-oauth-toolkit
+[<Package: svetlyak40wt/django-oauth-toolkit>] have problems: 17 != 13
+
+Changelog from http://git.haproxy.org/git/haproxy.git/
+[<Package: svetlyak40wt/haproxy>] have problems: 74 != 0
+
+Changelog from https://github.com/bessarabov/Test-Whitespaces.git
+[<Package: bessarabov/Test::Whitespaces>] have problems: 9 != 0
+
+Changelog from https://github.com/bessarabov/App-IsGitSynced.git
+[<Package: bessarabov/App::IsGitSynced>] have problems: 6 != 0
+
+Changelog from https://github.com/bessarabov/Akado-Account.git
+[<Package: bessarabov/Akado::Account>] have problems: 6 != 0
+
+Changelog from https://github.com/miyagawa/cpanminus.git
+[<Package: bessarabov/App::cpanminus>] have problems: 161 != 0
+
+Changelog from https://github.com/rjbs/Dist-Zilla.git
+[<Package: bessarabov/Dist::Zilla>] have problems: 187 != 0
+
+Changelog from https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked.git
+[<Package: bessarabov/Dist::Zilla::Plugin::Git::ExcludeUntracked>] have problems: 3 != 0
+
+Changelog from git://github.com/tadam/Ubic-Service-Plack.git
+[<Package: bessarabov/Ubic::Service::Plack>] have problems: 9 != 0
+
+Changelog from https://github.com/Ovid/Test-Differences
+[<Package: bessarabov/Test::Differences>] have problems: 16 != 0
+
+Changelog from https://github.com/colinnewell/Jenkins-API
+[<Package: bessarabov/Jenkins::API>] have problems: 6 != 0
+
+Changelog from https://github.com/wtertius/Test-PerlTidy-Concurrent.git
+[<Package: bessarabov/Test::PerlTidy::Concurrent>] have problems: 2 != 0
+
+Changelog from http://github.com/garu/Data-Printer
+[<Package: bessarabov/Data::Printer>] have problems: 36 != 0
+
+Changelog from http://github.com/sharifulin/acme-cpanauthors-russian/tree
+[<Package: bessarabov/Acme::CPANAuthors::Russian>] have problems: 23 != 0
+
+Changelog from https://github.com/dagolden/dist-zilla-plugin-checkchangeshascontent.git
+[<Package: bessarabov/Dist::Zilla::Plugin::CheckChangesHasContent>] have problems: 6 != 0
+
+Changelog from git://github.com/xaicron/pm-uninstall.git
+[<Package: bessarabov/App::pmuninstall>] have problems: 29 != 0
+
+Changelog from https://github.com/karenetheridge/App-Nopaste.git
+[<Package: bessarabov/App::Nopaste>] have problems: 42 != 0
+
+Changelog from http://github.com/theory/semver/tree/
+[<Package: bessarabov/SemVer>] have problems: 6 != 1
+
+Changelog from https://github.com/miyagawa/Hash-MultiValue.git
+[<Package: bessarabov/Hash::MultiValue>] have problems: 15 != 0
+
+Changelog from git://github.com/sartak/pod-cpandoc.git
+[<Package: bessarabov/Pod::Cpandoc>] have problems: 14 != 0
+
+Changelog from http://github.com/pjcj/Devel--Cover
+[<Package: bessarabov/Devel::Cover>] have problems: 115 != 0
+
+Changelog from https://github.com/dagolden/Capture-Tiny.git
+[<Package: bessarabov/Capture::Tiny>] have problems: 24 != 0
+
+Changelog from https://github.com/ingydotnet/boolean-pm.git
+[<Package: bessarabov/boolean>] have problems: 23 != 1
+
+Changelog from https://github.com/szabgab/Term-ProgressBar
+[<Package: bessarabov/Term::ProgressBar>] have problems: 20 != 0
+
+Changelog from git://github.com/gugod/App-perlbrew.git
+[<Package: bessarabov/App::perlbrew>] have problems: 70 != 0
+
+Changelog from git://github.com/berekuk/Flux.git
+[<Package: bessarabov/Flux>] have problems: 4 != 0
+
+Changelog from git://github.com/tokuhirom/Sub-Retry.git
+[<Package: bessarabov/Sub::Retry>] have problems: 6 != 0
+
+Changelog from git://github.com/plack/psgi-specs.git
+[<Package: bessarabov/PSGI>] have problems: 7 != 0
+
+Changelog from https://github.com/xsawyerx/module-starter.git
+[<Package: bessarabov/Module::Starter>] have problems: 25 != 0
+
+Changelog from https://github.com/PerlDancer/Dancer
+[] have problems: 100 != 0
+
+Changelog from git://github.com/s-aska/p5-WebService-Dropbox.git
+[<Package: bessarabov/WebService::Dropbox>] have problems: 23 != 0
+
+Changelog from https://github.com/fayland/perl-net-github
+[<Package: bessarabov/Net::GitHub>] have problems: 56 != 0
+
+Changelog from git://github.com/dams/Action-Retry.git
+[<Package: bessarabov/Action::Retry>] have problems: 15 != 0
+
+Changelog from http://github.com/msgpack/msgpack-perl
+[<Package: bessarabov/Data::MessagePack>] have problems: 45 != 0
+
+Changelog from http://github.com/book/perlsecret
+[<Package: bessarabov/perlsecret>] have problems: 11 != 0
+
+Changelog from git://git.eyrie.org/perl/ansicolor.git
+[<Package: bessarabov/Term::ANSIColor>] have problems: 24 != 0
+
+Changelog from git://github.com/berekuk/Ubic.git
+[<Package: bessarabov/Ubic>] have problems: 122 != 0
+
+Changelog from git://git.shadowcat.co.uk/p5sagit/App-FatPacker.git
+[<Package: bessarabov/App::FatPacker>] have problems: 20 != 0
+
+Changelog from http://github.com/mschilli/log4perl
+[<Package: bessarabov/Log::Log4perl>] have problems: 98 != 0
+
+Changelog from https://github.com/joyent/node
+[<Package: svetlyak40wt/nodejs>] have problems: 582 != 0
+
+Changelog from git+https://github.com/yandex-sysmon/dominator
+[<Package: nikicat/dominator>] have problems: 3 != 0
+
+Changelog from https://github.com/bessarabov/Weightbot-API.git
+[<Package: bessarabov/Weightbot::API>] have problems: 6 != 0
+
+Changelog from https://github.com/bessarabov/Dist-Zilla-PluginBundle-BESSARABV.git
+[<Package: bessarabov/Dist::Zilla::PluginBundle::BESSARABV>] have problems: 6 != 0
+
+Changelog from https://github.com/bessarabov/Trac-RPC.git
+[<Package: bessarabov/Trac::RPC>] have problems: 4 != 0
+
+Changelog from https://github.com/bessarabov/App-D.git
+[<Package: bessarabov/App::D>] have problems: 6 != 0
+
+Changelog from https://github.com/bessarabov/SQL-Easy.git
+[<Package: bessarabov/SQL::Easy>] have problems: 10 != 0
+
+Changelog from https://github.com/bessarabov/Time-ETA.git
+[<Package: bessarabov/Time::ETA>] have problems: 7 != 0
+
+Changelog from https://github.com/bessarabov/Business-PFR.git
+[<Package: bessarabov/Business::PFR>] have problems: 2 != 0
+
+Changelog from https://github.com/bessarabov/StatusBoard-Graph.git
+[<Package: bessarabov/StatusBoard::Graph>] have problems: 2 != 0
+
+Changelog from https://github.com/bessarabov/YAPC-Russia.git
+[<Package: bessarabov/YAPC::Russia>] have problems: 3 != 0
+
+Changelog from https://github.com/bessarabov/App-Stopwatch.git
+[<Package: bessarabov/App::Stopwatch>] have problems: 2 != 0
+
+Changelog from https://github.com/bessarabov/Mock-Person.git
+[<Package: bessarabov/Mock::Person>] have problems: 6 != 0
+
+Changelog from git://github.com/berekuk/Ubic-Service-Memcached.git
+[<Package: bessarabov/Ubic::Service::Memcached>] have problems: 6 != 0
+
+Changelog from git://github.com/berekuk/Lock-File.git
+[<Package: bessarabov/Lock::File>] have problems: 4 != 0
+
+Changelog from git://github.com/tadam/Test-Mock-LWP-Dispatch.git
+[<Package: bessarabov/DBD::Safe>] have problems: 6 != 0
+
+Changelog from git://github.com/berekuk/Hash-Persistent.git
+[<Package: bessarabov/Hash::Persistent>] have problems: 2 != 0
+
+Changelog from git://github.com/berekuk/Ubic-Service-InitScriptWrapper.git
+[<Package: bessarabov/Ubic::Service::InitScriptWrapper>] have problems: 2 != 0
+
+Changelog from git://github.com/berekuk/Flux-Format-JSON.git
+[<Package: bessarabov/Flux::Format::JSON>] have problems: 2 != 0
+
+Changelog from git://github.com/miyagawa/Perlbal-Plugin-PSGI.git
+[<Package: bessarabov/Perlbal::Plugin::PSGI>] have problems: 3 != 0
+
+Changelog from git://github.com/miyagawa/Corona.git
+[<Package: bessarabov/Corona>] have problems: 7 != 0
+
+Changelog from git://github.com/miyagawa/cpanf.git
+[<Package: bessarabov/App::CPAN::Fresh>] have problems: 11 != 0
+
+Changelog from git://github.com/miyagawa/AnyEvent-mDNS.git
+[<Package: bessarabov/AnyEvent::mDNS>] have problems: 6 != 0
+
+Changelog from git://github.com/miyagawa/module-install-repository.git
+[<Package: bessarabov/Module::Install::Repository>] have problems: 6 != 0
+
+Changelog from https://github.com/miyagawa/HTTP-Server-Simple-PSGI.git
+[<Package: bessarabov/HTTP::Server::Simple::PSGI>] have problems: 10 != 0
+
+Changelog from https://github.com/miyagawa/Plack-Middleware-Debug.git
+[<Package: bessarabov/Plack::Middleware::Debug>] have problems: 16 != 0
+
+Changelog from https://github.com/miyagawa/Filesys-Notify-Simple.git
+[<Package: bessarabov/Filesys::Notify::Simple>] have problems: 12 != 0
+
+Changelog from https://github.com/miyagawa/LWP-Protocol-PSGI.git
+[<Package: bessarabov/LWP::Protocol::PSGI>] have problems: 7 != 0
+
+Changelog from https://github.com/miyagawa/cpanfile.git
+[<Package: bessarabov/Module::CPANfile>] have problems: 37 != 0
+
+Changelog from git://github.com/miyagawa/AnyEvent-ReverseHTTP.git
+[<Package: bessarabov/AnyEvent::ReverseHTTP>] have problems: 4 != 0
+
+Changelog from git://github.com/miyagawa/Plack-App-FCGIDispatcher.git
+[<Package: bessarabov/Plack::App::FCGIDispatcher>] have problems: 2 != 0
+
+Changelog from https://github.com/miyagawa/CPAN-Test-Dummy-Perl5-VersionQV.git
+[<Package: bessarabov/CPAN::Test::Dummy::Perl5::VersionQV>] have problems: 2 != 0
+
+Changelog from https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule.git
+[<Package: bessarabov/Dist::Zilla::Plugin::LicenseFromModule>] have problems: 4 != 0
+
+Changelog from https://github.com/miyagawa/carton.git
+[<Package: bessarabov/Carton>] have problems: 45 != 0
+
+Changelog from git://github.com/miyagawa/Plack-Middleware-Auth-Digest.git
+[<Package: bessarabov/Plack::Middleware::Auth::Digest>] have problems: 3 != 0
+
+Changelog from git://github.com/miyagawa/Plack-Middleware-File-Sass.git
+[<Package: bessarabov/Plack::Middleware::File::Sass>] have problems: 3 != 0
+
+Changelog from https://github.com/miyagawa/Twiggy.git
+[<Package: bessarabov/Twiggy>] have problems: 19 != 0
+
+Changelog from git://github.com/miyagawa/Plack-Handler-SCGI.git
+[<Package: bessarabov/Plack::Handler::SCGI>] have problems: 2 != 0
+
+Changelog from git://github.com/miyagawa/Module-Install-CPANfile.git
+[<Package: bessarabov/Module::Install::CPANfile>] have problems: 7 != 0
+
+Changelog from https://github.com/miyagawa/cpan-listchanges.git
+[<Package: bessarabov/cpan::listchanges>] have problems: 6 != 0
+
+Changelog from git://github.com/miyagawa/Twiggy.git
+[<Package: bessarabov/Plack::Server::AnyEvent>] have problems: 19 != 0
+
+Changelog from git://github.com/miyagawa/Catalyst-Engine-PSGI.git
+[<Package: bessarabov/Catalyst::Engine::PSGI>] have problems: 13 != 0
+
+Changelog from https://github.com/ingydotnet/boolean-pm
+[<Package: svetlyak40wt/boolean>] have problems: 23 != 1
+
+Changelog from https://github.com/elasticsearch/logstash
+[<Package: svetlyak40wt/logstash>] have problems: 40 != 0
+
+Changelog from https://raw.githubusercontent.com/Debian/apt/debian/experimental/debian/changelog
+[<Package: kbakba/apt>] have problems: 188 != 0
