@@ -208,7 +208,7 @@ def init_logging(filename, logstash=False):
         addEmitters(('all-to-logstash',
                      levels.DEBUG,
                      lambda msg: not is_stats(msg),
-                     JsonOutput(host='salmon.svetlyak.ru', port=6543)))
+                     LogstashOutput('salmon.svetlyak.ru', 6543)))
 
     addEmitters(('stats',
                  levels.DEBUG,
