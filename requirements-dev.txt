@@ -63,7 +63,7 @@ sqlparse==0.1.11  # requirements-dev.in:1 -> requirements.in:6 ~> django-debug-t
 tailer==0.3  # requirements-dev.in:9
 times==0.6.2  # requirements-dev.in:1 -> requirements.in:18 and requirements-dev.in:12 ~> rq-dashboard==0.3.3
 tmuxp==0.1.11  # requirements-dev.in:5
-twiggy-goodies==0.2.2  # requirements-dev.in:1 -> requirements.in:20
+twiggy-goodies==0.4.0  # requirements-dev.in:1 -> requirements.in:20
 twiggy==0.4.5  # requirements-dev.in:1 -> requirements.in:20 ~> twiggy-goodies==0.2.2
 werkzeug==0.9.6  # requirements-dev.in:12 ~> rq-dashboard==0.3.3 ~> flask==0.10.1
 wmctrl==0.1  # requirements-dev.in:3 ~> pdbpp==0.7.2

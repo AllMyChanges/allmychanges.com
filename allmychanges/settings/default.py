@@ -188,11 +188,12 @@ EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 
-def init_logging(filename):
+def init_logging(filename, logstash=False):
     import logging
     from twiggy import addEmitters, outputs, levels, formats
     from twiggy_goodies.std_logging import RedirectLoggingHandler
     from twiggy_goodies.json import JsonOutput
+    from twiggy_goodies.logstash import LogstashOutput
 
 
     def is_stats(msg):
@@ -202,6 +203,13 @@ def init_logging(filename):
                  levels.DEBUG,
                  lambda msg: not is_stats(msg),
                  JsonOutput(filename.format(user=CURRENT_USER))))
+
+    if logstash:
+        addEmitters(('all-to-logstash',
+                     levels.DEBUG,
+                     lambda msg: not is_stats(msg),
+                     JsonOutput(host='salmon.svetlyak.ru', port=6543)))
+
     addEmitters(('stats',
                  levels.DEBUG,
                  is_stats,
@@ -222,6 +230,3 @@ def init_logging(filename):
     # and we need this to turn off python-rq's logging
     # configuration
     logging._handlers['fake-handler'] = handler
-
-
-    

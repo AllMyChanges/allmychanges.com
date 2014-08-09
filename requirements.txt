@@ -36,5 +36,5 @@ six==1.7.2  # requirements.in:23 ~> chaussette==1.1
 south==0.8.4  # requirements.in:2
 sqlparse==0.1.11  # requirements.in:6 ~> django-debug-toolbar==1.2.1
 times==0.6.2  # requirements.in:18
-twiggy-goodies==0.2.2  # requirements.in:20
+twiggy-goodies==0.4.0  # requirements.in:20
 twiggy==0.4.5  # requirements.in:20 ~> twiggy-goodies==0.2.2
