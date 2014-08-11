@@ -215,6 +215,9 @@ def test_extract_date():
     eq_(date(2014, 5, 23), _extract_date('(bugfix release, released on May 23rd 2014)'))
     eq_(date(2014, 5, 21), _extract_date('(no codename, released on May 21st 2014)'))
 
+    # from perl/boolean
+    eq_(date(2014, 8, 8), _extract_date('Fri Aug  8 19:12:51 PDT 2014'))
+
 
 def test_starts_with_ident():
     eq_(False, _starts_with_ident('Blah', 0))

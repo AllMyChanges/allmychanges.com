@@ -13,7 +13,8 @@ RE_DATE_STR = r"""(?P<date>(
               \d{1,2}[.-]\d{1,2}[.-]\d{4} |
               \d{2}(rd|st|rd|th)?\ [A-Z][a-z]{2}\ \d{4} |
               [A-Z][a-z]{2}\ \d{2}(rd|st|rd|th)?\ \d{4} |
-              \month\ \d{1,2},\ \d{4}
+              \month\ \d{1,2},\ \d{4} |
+              [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \d{4} # Fri Aug  8 19:12:51 PDT 2014
               ))""".replace('\month', '({0})'.format('|'.join(_months)))
 
 RE_DATE = re.compile(RE_DATE_STR, re.VERBOSE)
