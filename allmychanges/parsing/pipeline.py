@@ -223,10 +223,14 @@ def parse_html_file(obj):
     headers.insert(0, ('h0',
                        obj.filename,
                        parsed.find('body').iterchildren()))
-    
+
+    def is_header_tag(ch):
+        if isinstance(ch.tag, basestring):
+            return not ch.tag.startswith('h') or ch.tag > tag
+        
     for tag, text, all_children in headers:
         children = itertools.takewhile(
-            lambda ch: not ch.tag.startswith('h') or ch.tag > tag,
+            is_header_tag,
             all_children)
         sections = list(create_notes(children))
         yield obj.push(type='file_section',
