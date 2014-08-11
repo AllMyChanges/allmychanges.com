@@ -9,6 +9,7 @@ from allmychanges.parsing.pipeline import (
     get_markup,
     extract_metadata,
     group_by_path,
+    strip_outer_tag,
     parse_file)
 from allmychanges.parsing.raw import RawChangelog
 from allmychanges.env import Environment
@@ -200,3 +201,23 @@ def test_grouping_by_path():
                        v('docs/notes/0.2.0.rst'),
                        v('docs/README'),
                        v('CHANGES')]))
+
+
+def test_strip_outer_tag():
+    # simple case
+    eq_('Added new feature.',
+        strip_outer_tag('<li>Added new feature.</li>'))
+
+    # a case with embedded html
+    eq_('Added <b>new</b> feature.',
+        strip_outer_tag('<li>Added <b>new</b> feature.</li>'))
+
+    # a case with newline
+    eq_('Added new\n feature.',
+        strip_outer_tag('<li>Added new\n feature.</li>'))
+
+    
+    
+    # and now multiline with embedded HTML
+    eq_('Added new output <code>twiggy_goodies.logstash.LogstashOutput</code> which\nsends json encoded data via UDP to a logstash server.',
+        strip_outer_tag('<li>Added new output <code>twiggy_goodies.logstash.LogstashOutput</code> which\nsends json encoded data via UDP to a logstash server.</li>'))

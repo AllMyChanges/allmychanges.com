@@ -36,6 +36,19 @@ def parse_changelog(raw_changelog):
 ##############################
 
 
+def strip_outer_tag(text):
+    # TODO: move to utils
+    match = re.match('^<(.*?)>', text)
+    if match is not None:
+        tag = match.group(1)
+        closing = '</{}>'.format(tag)
+        if text.endswith(closing):
+            result = text[len(tag) + 2: - len(closing)]
+            return result
+
+    return text
+
+
 def get_files(env):
     ignore_list = env.ignore_list
 
@@ -196,13 +209,18 @@ def parse_html_file(obj):
     def create_list(el):
         def inner_html(el):
             text = lxml.html.tostring(el).strip()
-            text = re.sub(ur'^<{tag}>(.*)</{tag}>$'.format(tag=el.tag),
-                          ur'\1', text)
+            text = strip_outer_tag(text)
             return text
     
         return map(inner_html, el.getchildren())
 
     def create_notes(children):
+        """ This function returns content of the current
+        version. It is a list where each item either a HTML
+        fragment or a list of html fragments.
+        If it is a list of html fragments, then each item
+        SHOULD NOT be wrapped into a node like <li> or <p>.
+        """
         current_text = ''
         for el in children:
             if el.tag == 'ul':
@@ -325,6 +343,7 @@ def extract_metadata(version):
                 
             return content_part
         else:
+            # here we process list items
             return [{'type': get_commit_type(item),
                      'text': item}
                     for item in content_part]
