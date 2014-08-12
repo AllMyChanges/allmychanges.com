@@ -192,6 +192,7 @@ def test_extract_date():
     eq_(date(2009, 5, 23), _extract_date('2009-05-23'))
     eq_(date(2009, 5, 23), _extract_date('2009-5-23'))
     eq_(date(2009, 5, 3), _extract_date('2009-05-03'))
+    eq_(date(2014, 5, 17), _extract_date('2014/05/17'))
     eq_(date(2009, 5, 23), _extract_date('05-23-2009'))
     eq_(date(2009, 5, 23), _extract_date('05.23.2009'))
     eq_(date(2009, 5, 23), _extract_date('23.05.2009'))

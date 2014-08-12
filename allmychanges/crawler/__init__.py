@@ -10,8 +10,8 @@ _months = ('January', 'February', 'March', 'April', 'May', 'June',
 _months = _months + tuple(name[:3] for name in _months)
 
 RE_DATE_STR = r"""(?P<date>(
-              # 2009-05-23
-              \d{4}[.-]\d{1,2}[.-]\d{1,2} |
+              # 2009-05-23, 2009.05.23, 2009/05/23
+              \d{4}[./-]\d{1,2}[./-]\d{1,2} |
 
               # 05-23-2009
               \d{1,2}[.-]\d{1,2}[.-]\d{4} |
