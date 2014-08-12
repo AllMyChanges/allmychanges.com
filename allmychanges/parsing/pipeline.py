@@ -317,6 +317,7 @@ def extract_metadata(version):
 
     def mention_unreleased(text):
         keywords = ('unreleased', 'under development',
+                    'not yet released',
                     'release date to be decided')
         lowered = text.lower()
         for keyword in keywords:

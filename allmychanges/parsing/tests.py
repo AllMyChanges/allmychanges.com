@@ -180,6 +180,14 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
             v(title='1.0 (unreleased)',
               content=[])))
 
+    eq_([v(type='version',
+           title='1.45 (not yet released)',
+           unreleased=True,
+           content=[])],
+        extract_metadata(
+            v(title='1.45 (not yet released)',
+              content=[])))
+
 
     
 def test_grouping_by_path():
