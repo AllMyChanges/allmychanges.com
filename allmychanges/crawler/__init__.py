@@ -7,14 +7,27 @@ from html2text import html2text
 #RE_DATE = re.compile(r'(.*\s|\s?|.*\()(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
 _months = ('January', 'February', 'March', 'April', 'May', 'June',
            'July', 'August', 'September', 'October', 'November', 'December')
+_months = _months + tuple(name[:3] for name in _months)
 
 RE_DATE_STR = r"""(?P<date>(
+              # 2009-05-23
               \d{4}[.-]\d{1,2}[.-]\d{1,2} |
+
+              # 05-23-2009
               \d{1,2}[.-]\d{1,2}[.-]\d{4} |
+
+              # 24 Apr 2014
               \d{2}(rd|st|rd|th)?\ [A-Z][a-z]{2}\ \d{4} |
+
+              # May 23rd 2014
               [A-Z][a-z]{2}\ \d{2}(rd|st|rd|th)?\ \d{4} |
+
+              # April 28, 2014
+              # Apr 01, 2013
               \month\ \d{1,2},\ \d{4} |
-              [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \d{4} # Fri Aug  8 19:12:51 PDT 2014
+
+              # Fri Aug  8 19:12:51 PDT 2014
+              [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \d{4}
               ))""".replace('\month', '({0})'.format('|'.join(_months)))
 
 RE_DATE = re.compile(RE_DATE_STR, re.VERBOSE)

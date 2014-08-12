@@ -220,6 +220,8 @@ def test_extract_date():
 
     # from https://github.com/tadam/Test-Mock-LWP-Dispatch/blob/master/Changes
     eq_(date(2013, 5, 28), _extract_date('Tue May 28, 2013'))
+    eq_(date(2013, 4, 1),  _extract_date('Mon Apr 01, 2013'))
+    eq_(date(2013, 3, 29), _extract_date('Fri Mar 29, 2013'))
 
 
 def test_starts_with_ident():
