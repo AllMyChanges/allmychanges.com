@@ -332,6 +332,13 @@ def update_changelog_from_raw_data(changelog, raw_data):
         raw_data = fill_missing_dates(raw_data)
 
     for raw_version in raw_data:
+        if not raw_version['sections']:
+            # we skipe versions without description
+            # because some maintainers use these to add
+            # unreleased versions into the changelog.
+            # Example: https://github.com/kraih/mojo/blob/master/Changes
+            continue
+            
         version, created = changelog.versions.get_or_create(
             number=raw_version['version'],
             unreleased=raw_version.get('unreleased', False),
