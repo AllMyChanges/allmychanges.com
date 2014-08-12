@@ -54,6 +54,9 @@ body.email {
 
 .grouped-changes-title {
     font-size: 1.5em;
+    font-family: header-font;
+    font-weight: 300;
+    margin-top: 1em;
 }
 
 
@@ -63,6 +66,7 @@ body.email {
 
     &__package-title {
         font-size: 1.2em;
+        font-family: header-font;
         > a {
             black-link()
         }
@@ -75,6 +79,7 @@ body.email {
     &__number {
         display: inline-block;
         margin-top: 1em;
+        font-family: header-font
         > a {
           black-link()
         }
@@ -82,10 +87,13 @@ body.email {
     &__date {
         display: inline;
         color: gray;
+        font-family: header-font
     }
     &__items {
         margin-left: 1em;
         margin-top: 0.5em;
+        font-family: generic-font;
+        font-weight: 300;
     }
     &__section-item {
         list-style: disc inside;
@@ -101,11 +109,9 @@ body.email {
     &__notes {
         margin-left: 1em;
         margin-top: 0.5em;
+        font-family: generic-font;
+        font-weight: 300;
     }
-}
-
-.grouped-changes-title {
-    margin-top: 1em;
 }
 
 .package-changes__package-title {

@@ -235,9 +235,11 @@ select {
   font-size: 1.666666666666667em;
   line-height: 1.2em;
   margin-bottom: 1em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .page-subheader {
   margin-bottom: 1em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .nowrap {
   white-space: nowrap;
@@ -255,6 +257,7 @@ select {
 }
 .logo__text {
   font-size: 2em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .logo__link {
   text-decoration: none;
@@ -402,6 +405,9 @@ body.email {
 }
 .grouped-changes-title {
   font-size: 1.5em;
+  font-family: pragmatica-web-condensed, sans-serif;
+  font-weight: 300;
+  margin-top: 1em;
 }
 .package-changes {
   list-style: none;
@@ -409,6 +415,7 @@ body.email {
 }
 .package-changes__package-title {
   font-size: 1.2em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .package-changes__package-title > a {
   color: #000;
@@ -423,6 +430,7 @@ body.email {
 .package-version__number {
   display: inline-block;
   margin-top: 1em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .package-version__number > a {
   color: #000;
@@ -434,10 +442,13 @@ body.email {
 .package-version__date {
   display: inline;
   color: #808080;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .package-version__items {
   margin-left: 1em;
   margin-top: 0.5em;
+  font-family: proxima-nova, sans-serif;
+  font-weight: 300;
 }
 .package-version__section-item {
   list-style: disc inside;
@@ -451,9 +462,8 @@ body.email {
 .package-version__notes {
   margin-left: 1em;
   margin-top: 0.5em;
-}
-.grouped-changes-title {
-  margin-top: 1em;
+  font-family: proxima-nova, sans-serif;
+  font-weight: 300;
 }
 .package-changes__package-title {
   margin-top: 1em;
