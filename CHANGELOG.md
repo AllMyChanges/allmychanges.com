@@ -1,3 +1,25 @@
+0.6.0 (2014-08-12)
+==================
+
+## Interface
+
+* "Today" section of the digest was renamed to "Last 24 hours" because it is better describes an inner changelog discovery mechanics.
+* Now service uses new fonts from TypeKit. More thin and clear. Please test it and [send us your suggestions](https://github.com/AllMyChanges/allmychanges.com/issues).
+
+## Parser
+
+* Fixed issue with perl/Mojolicious package where maintainer adds an empty unreleased versions into the changelog.
+* Fixed error when parsing multiline changelog items. There was an issue with embedded newline characters and the way how these items were renderer. This is related to the new parser only.
+* Fixed error during nodejs's changelog parsing, however it is still 
+* Now parser is able to process dates like 2014/05/17.
+* Also it've got an extended support for month abbreviations in parsed dates.
+* Fixed way how dates parsed for perl's [boolean](https://github.com/ingydotnet/boolean-pm/blob/master/Changes) package.
+
+## Other
+
+* Now we think version is not release if there is 'not yet released' keyword in it'. I think we should put online documentation with description of all keywords and logic behind this mechanism.
+* Now all code snippets for badges have a utm_source argument. Please, update you badges.
+
 0.5.1 (2014-08-06)
 ==================
 
