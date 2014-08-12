@@ -215,8 +215,11 @@ def test_extract_date():
     eq_(date(2014, 5, 23), _extract_date('(bugfix release, released on May 23rd 2014)'))
     eq_(date(2014, 5, 21), _extract_date('(no codename, released on May 21st 2014)'))
 
-    # from perl/boolean
+    # from https://github.com/ingydotnet/boolean-pm/blob/master/Changes
     eq_(date(2014, 8, 8), _extract_date('Fri Aug  8 19:12:51 PDT 2014'))
+
+    # from https://github.com/tadam/Test-Mock-LWP-Dispatch/blob/master/Changes
+    eq_(date(2013, 5, 28), _extract_date('Tue May 28, 2013'))
 
 
 def test_starts_with_ident():
