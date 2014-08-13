@@ -125,6 +125,78 @@ def parse_markdown_file(obj):
     return parse_html_file(obj.push(content=html))
 
 
+def parse_plain_file(obj):
+    from allmychanges.crawler import _parse_item, _starts_with_ident
+    current_title = None
+    # here we'll track each line distance from corresponding
+    # line with version number
+    current_sections = []
+    current_section = None
+    current_ident = None
+
+    for line in obj.content.split('\n'):
+        # skip lines like
+        # ===================
+        if line and line == line[0] * len(line):
+            continue
+
+        is_item, ident, text = _parse_item(line)
+        if is_item:
+            if not isinstance(current_section, list):
+                # wow, a new changelog item list was found
+                if current_section is not None:
+                    current_sections.append(current_section)
+                current_section = []
+
+            current_ident = ident
+            current_section.append(text)
+        else:
+            version = _extract_version(line)
+            if version is not None:
+                # we found a possible version number, lets
+                # start collecting the changes!
+                if current_title and current_sections:
+                    yield obj.push(type='file_section',
+                                   title=current_title,
+                                   content=current_sections)
+                    
+                current_title = line
+                current_section = None
+                current_sections = []
+                current_ident = None
+
+            elif _starts_with_ident(line, current_ident) and isinstance(current_section, list):
+                # previous changelog item has continuation on the
+                # next line
+                current_section[-1] += '\n' + line[current_ident:]
+            else:
+                # if this is not item, then this is a note
+                if current_title:
+                    if isinstance(current_section, list):
+                        # if there is items in the current section
+                        # and we found another plaintext part,
+                        # then start another section
+                        current_sections.append(current_section)
+                        current_section = None
+
+                    if current_section is None:
+                        if line:
+                            current_section = line
+                    else:
+                        current_section += u'\n' + line
+
+    if current_section:
+        current_sections.append(current_section)
+
+    if current_title and current_sections:
+        # if current_section:
+        #     current_sections.append(current_section)
+        yield obj.push(type='file_section',
+                       title=current_title,
+                       content=current_sections)
+
+
+
 def search_conf_py(root_dir, doc_filename):
     parts = doc_filename.split('/')
     while parts:
@@ -266,14 +338,18 @@ get_file_content = itemgetter('content')
 def get_markup(filename, content):
     filename = filename.lower()
 
-    if ':func:`' in content:
+    if filename.endswith('.rst') \
+       or':func:`' in content:
         return 'rst'
 
-    if 'change' in filename \
-       or filename.endswith('.md') \
-       or filename.endswith('.rst'):
-        # for now only markdown is supported
+    if filename.endswith('.md') \
+       or re.search('^[=-]{3,}', content, re.MULTILINE) is not None \
+       or re.search('^#{2,}', content, re.MULTILINE) is not None \
+       or re.search('\[.*?\]\(.*\)', content, re.MULTILINE) is not None \
+       or re.search('\[.*?\]\[.*\]', content, re.MULTILINE) is not None:
         return 'markdown'
+
+    return 'plain'
 
 
 def filter_versions(sections):

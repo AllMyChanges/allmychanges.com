@@ -133,12 +133,48 @@ Final word.
 def test_markup_guesser_from_extension():
     eq_('markdown', get_markup('release-notes/0.1.1.md',
                                "Minor changes"))
+    eq_('rst', get_markup('release-notes/0.1.1.rst',
+                          "Minor changes"))
+    eq_('plain', get_markup('release-notes/Changes',
+                          "Minor changes"))
 
 
 def test_markup_guesser_from_content():
     eq_('rst', get_markup('CHANGES',
                            "Some text with :func:`foo` mentioned."))
-#    :class:`
+
+    eq_('markdown', get_markup('CHANGES',
+                               """Some header
+=========="""))
+
+    eq_('markdown', get_markup('CHANGES',
+                               """Some header
+--------"""))
+
+    eq_('markdown', get_markup('CHANGES',
+                               "## Some 2 level header"))
+
+    eq_('markdown', get_markup('CHANGES',
+                               "Some [link](blah)"))
+    
+    eq_('markdown', get_markup('CHANGES',
+                               "Some [link][blah]"))
+
+    # but
+    eq_('plain', get_markup('CHANGES',
+                            "Some [thing] in brackets"))
+
+
+    eq_('plain', get_markup('CHANGES',
+"""
+0.1:
+
+ * Initial release
+
+0.1.1
+
+ * Added benchmarking script
+ * Added support for more serializer modules"""))
 
 
 def test_filter_versions():
@@ -229,3 +265,36 @@ def test_strip_outer_tag():
     # and now multiline with embedded HTML
     eq_('Added new output <code>twiggy_goodies.logstash.LogstashOutput</code> which\nsends json encoded data via UDP to a logstash server.',
         strip_outer_tag('<li>Added new output <code>twiggy_goodies.logstash.LogstashOutput</code> which\nsends json encoded data via UDP to a logstash server.</li>'))
+
+
+def test_parse_plain_text():
+    env = Environment()
+    create_file = lambda filename, content: env.push(type='file_content',
+                                                     filename=filename,
+                                                     content=content)
+    file = create_file('Changes',
+"""
+0.1:
+
+ * Initial release
+
+0.1.1
+
+ * Added benchmarking script
+ * Added support for more
+   serializer modules""")
+    
+    versions = list(parse_file(file))
+    eq_(2, len(versions))
+    v1, v2 = versions
+
+    eq_('0.1:', v1.title)
+    eq_('0.1.1', v2.title)
+
+    eq_([["Initial release"]],
+        v1.content)
+
+    eq_([["Added benchmarking script",
+          "Added support for more\nserializer modules"]],
+        v2.content)
+
