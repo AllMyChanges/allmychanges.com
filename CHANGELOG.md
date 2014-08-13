@@ -1,3 +1,12 @@
+0.7.0 (2014-08-14)
+==================
+
+Both these changes are related to the new parser which is not available for wide audience. If you wish, [create an issue](https://github.com/AllMyChanges/allmychanges.com/issues) and we'll add you to the experiment.
+
+* Added parser for plaintext files which are not looks like Markdown or Rst. This significantly improved perl packages' changelogs parsing.
+* Fixed way how bullet changelogs are parsed (previously parser just ignored them). Now [python-redis's CHANGELOG](https://github.com/andymccurdy/redis-py/blob/master/CHANGES) is parsed correctly.
+
+
 0.6.0 (2014-08-12)
 ==================
 
