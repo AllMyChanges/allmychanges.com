@@ -298,3 +298,35 @@ def test_parse_plain_text():
           "Added support for more\nserializer modules"]],
         v2.content)
 
+
+def test_parse_redispy_style_plain_text():
+    env = Environment()
+    create_file = lambda filename, content: env.push(type='file_content',
+                                                     filename=filename,
+                                                     content=content)
+    file = create_file('Changes',
+"""* 2.10.2
+    * Added support for Hiredis's new bytearray support. Thanks
+      https://github.com/tzickel
+    * Fixed a bug when attempting to send large values to Redis in a Pipeline.
+* 2.10.1
+    * Fixed a bug where Sentinel connections to a server that's no longer a
+      master and receives a READONLY error will disconnect and reconnect to
+      the master.""")
+    
+    versions = list(parse_file(file))
+
+    eq_(2, len(versions))
+    v1, v2 = versions
+
+    eq_('* 2.10.2', v1.title)
+    eq_('* 2.10.1', v2.title)
+
+    eq_([['Added support for Hiredis\'s new bytearray support. Thanks\nhttps://github.com/tzickel',
+          'Fixed a bug when attempting to send large values to Redis in a Pipeline.']],
+        v1.content)
+
+    eq_([['Fixed a bug where Sentinel connections to a server that\'s no longer a\nmaster and receives a READONLY error will disconnect and reconnect to\nthe master.']],
+        v2.content)
+
+

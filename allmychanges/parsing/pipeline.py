@@ -141,7 +141,12 @@ def parse_plain_file(obj):
             continue
 
         is_item, ident, text = _parse_item(line)
-        if is_item:
+        version = _extract_version(line)
+
+        # we have to check if item is not version
+        # because of python-redis changelog format
+        # where versions is unordered list with sublists
+        if is_item and not version:
             if not isinstance(current_section, list):
                 # wow, a new changelog item list was found
                 if current_section is not None:
@@ -151,10 +156,12 @@ def parse_plain_file(obj):
             current_ident = ident
             current_section.append(text)
         else:
-            version = _extract_version(line)
             if version is not None:
                 # we found a possible version number, lets
                 # start collecting the changes!
+                if current_section:
+                    current_sections.append(current_section)
+
                 if current_title and current_sections:
                     yield obj.push(type='file_section',
                                    title=current_title,
@@ -476,11 +483,23 @@ def processing_pipe(root, ignore_list=[]):
     if not versions:
         return []
 
+    def compare_version_numbers(left, right):
+        try:
+            # it is fair to compare version numbers
+            # as tuples of integers
+            left = tuple(map(int, left.split('.')))
+            right = tuple(map(int, right.split('.')))
+        except Exception:
+            # but some versions can't be represented with integers only
+            # in this case we'll fall back to lexicographical comparison
+            pass
+
+        return cmp(left, right)
+
     def compare_versions(left, right):
-        if left.version < right.version:
-            return -1
-        if left.version > right.version:
-            return 1
+        result = compare_version_numbers(left.version, right.version)
+        if result != 0:
+            return result
 
         left_keys_count = len(left.keys())
         right_keys_count = len(right.keys())
@@ -509,7 +528,8 @@ def processing_pipe(root, ignore_list=[]):
 
     # and finally we'll prepare a list, sorted by version number
     versions = versions.values()
-    versions.sort(key=lambda item: item.version)
+    versions.sort(cmp=lambda left, right: \
+                  compare_version_numbers(left.version, right.version))
 
     for key, value in root_env.cache.items():
         if key.endswith('_temp_path'):
