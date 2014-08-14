@@ -215,6 +215,8 @@ def test_extract_date():
     # these two are from python's click
     eq_(date(2014, 5, 23), _extract_date('(bugfix release, released on May 23rd 2014)'))
     eq_(date(2014, 5, 21), _extract_date('(no codename, released on May 21st 2014)'))
+    eq_(date(2014, 8, 13), _extract_date('August 13th 2014'))
+    
 
     # from https://github.com/ingydotnet/boolean-pm/blob/master/Changes
     # https://github.com/miyagawa/Perlbal-Plugin-PSGI/blob/master/Changes

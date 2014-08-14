@@ -20,7 +20,7 @@ RE_DATE_STR = r"""(?P<date>(
               \d{2}(rd|st|rd|th)?\ [A-Z][a-z]{2}\ \d{4} |
 
               # May 23rd 2014
-              [A-Z][a-z]{2}\ \d{2}(rd|st|rd|th)?\ \d{4} |
+              \month\ \d{2}(rd|st|rd|th)?\ \d{4} |
 
               # April 28, 2014
               # Apr 01, 2013
