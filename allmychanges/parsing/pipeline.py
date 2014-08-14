@@ -399,6 +399,13 @@ def extract_metadata(version):
                 yield content_part
 
     def mention_unreleased(text):
+        # here we limit our scoupe of searching
+        # unreleased keywords
+        # because if keyword is somewhere far from
+        # the beginning, than probably it is unrelated
+        # to the version itself
+        text = text[:300]
+
         keywords = ('unreleased', 'under development',
                     'not yet released',
                     'release date to be decided')
@@ -420,9 +427,14 @@ def extract_metadata(version):
     if mention_unreleased(version.title):
         new_version.unreleased = True
 
-    def process_content(content_part):
+    def process_content(idx, content_part):
         if isinstance(content_part, basestring):
-            if mention_unreleased(content_part):
+            # here we limit our scoupe of searching
+            # unreleased keywords
+            # because if keyword is somewhere far from
+            # the beginning, than probably it is unrelated
+            # to the version itself
+            if idx < 3 and mention_unreleased(content_part):
                 new_version.unreleased = True
                 
             return content_part
@@ -431,7 +443,9 @@ def extract_metadata(version):
             return [{'type': get_commit_type(item),
                      'text': item}
                     for item in content_part]
-    new_version.content = map(process_content, version.content)
+    new_version.content = [process_content(idx, content)
+                           for idx, content
+                           in enumerate(version.content)]
     yield new_version
 
 
