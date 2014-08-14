@@ -17,6 +17,50 @@ from twiggy_goodies.django_rq import job
 from twiggy_goodies.threading import log
 
 
+from functools import wraps
+from django_rq.queues import get_queue
+import inspect
+
+
+def get_func_name(func):
+    """Helper to get same name for the job function as rq does.
+    """
+    if inspect.ismethod(func):
+        return func.__name__
+    elif inspect.isfunction(func) or inspect.isbuiltin(func):
+        return '%s.%s' % (func.__module__, func.__name__)
+
+    raise RuntimeError('unable to get func name')
+
+
+def singletone(func):
+    """A decorator for rq's `delay` method which
+    ensures there is no a job with same name
+    and arguments already in the queue.
+    """
+    orig_delay = func.delay
+    func_name = get_func_name(func)
+
+    @wraps(func.delay)
+    def wrapper(*args, **kwargs):
+        queue = get_queue('default')
+        jobs = queue.get_jobs()
+
+        already_in_the_queue = False
+        for j in jobs:
+            if j.func_name == func_name \
+               and j.args == args \
+               and j.kwargs == kwargs:
+                already_in_the_queue = True
+                break
+        if not already_in_the_queue:
+            return orig_delay(*args, **kwargs)
+
+    func.delay = wrapper
+    return func
+
+
+@singletone
 @job
 @transaction.commit_on_success
 def update_repo(repo_id):
@@ -32,6 +76,7 @@ def update_repo(repo_id):
         raise
 
 
+@singletone
 @job
 @transaction.commit_on_success
 def schedule_updates(reschedule=False, packages=[]):
@@ -65,6 +110,7 @@ def schedule_updates(reschedule=False, packages=[]):
     delete_empty_changelogs.delay()
 
 
+@singletone
 @job
 @transaction.commit_on_success
 def delete_empty_changelogs():
@@ -74,6 +120,7 @@ def delete_empty_changelogs():
                      .delete()
 
 
+@singletone
 @job
 @transaction.commit_on_success
 def update_changelog_task(source):
@@ -131,3 +178,4 @@ def update_changelog_task(source):
 @job
 def raise_exception():
     1/0
+
