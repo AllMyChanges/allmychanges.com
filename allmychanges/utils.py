@@ -1,3 +1,4 @@
+import anyjson
 import datetime
 import copy
 import os
@@ -548,7 +549,19 @@ def python_version_extractor(path):
             for name in ('distutils.core', 'setuptools', 'setup'):
                 if name in sys.modules:
                     del sys.modules[name]
-    
+
+
+def npm_version_extractor(path):
+    filename = os.path.join(path, 'package.json')
+
+    if os.path.exists(filename):
+        with open(filename) as f:
+            try:
+                data = anyjson.deserialize(f.read())
+                return data.get('version')
+            except Exception:
+                pass
+
 
 def choose_version_extractor(path):
     if isinstance(path, list):
@@ -560,7 +573,14 @@ def choose_version_extractor(path):
             return version
         return test_version_extractor
 
-    return python_version_extractor
+    if os.path.exists(os.path.join(path, 'setup.py')):
+        return python_version_extractor
+
+    if os.path.exists(os.path.join(path, 'package.json')):
+        return npm_version_extractor
+
+    null_extractor = lambda path: None
+    return null_extractor
     
 
 def extract_changelog_from_vcs(path):
