@@ -502,7 +502,7 @@ def git_history_extractor(path):
 
             r = envoy.run('git checkout {revision}'.format(revision=_hash))
             assert r.status_code == 0
-            yield times.parse(date.strip()), msg.strip()
+            yield times.parse(date.strip()), msg.strip('\n -')
 
 
 def choose_history_extractor(path):
@@ -573,7 +573,9 @@ def extract_changelog_from_vcs(path):
     for date, message in walk_through_history(path):
         version = extract_version(path)
 
-        current_commits.append(message)
+        if message:
+            current_commits.append(message)
+
         if version != current_version and version is not None:
             current_version = version
             results.append({'version': current_version,
