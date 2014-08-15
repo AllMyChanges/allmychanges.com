@@ -10,7 +10,11 @@
   {% if section.items %}
   <ul class="package-version__items">
     {% for item in section.items %}
-    <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|process_cve|capfirst|markdown}}</li>
+    {% if version.code_version == 'v1' %}
+      <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|process_cve|capfirst|markdown}}</li>
+    {% else %}
+      <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|process_cve|capfirst|safe}}</li>
+    {% endif %}
     {% endfor %}
   </ul>
   {% endif %}
