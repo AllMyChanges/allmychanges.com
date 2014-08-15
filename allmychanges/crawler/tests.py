@@ -168,8 +168,10 @@ def test_extract_version():
     eq_('0.10.2', _extract_version('Version 0.10.2'))
     eq_('2.0.0', _extract_version('2.0.0 (2013-09-24)'))
     eq_('1.5.6', _extract_version('**1.5.6 (2014-05-16)**'))
+    eq_('0.1.1', _extract_version('release-notes/0.1.1.md'))
     eq_(None, _extract_version('  some number in the item\'s text 0.1'))
     eq_(None, _extract_version('This is the first version compatible with Django 1.7.'))
+    eq_(None, _extract_version('HTTP/1.1 302 Found'))
 
 
 def test_parse_item():

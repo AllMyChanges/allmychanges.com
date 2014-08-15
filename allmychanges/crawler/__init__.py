@@ -90,7 +90,14 @@ def _extract_version(line):
             # in the beginning
             r'^(\d+\.\d+\.\d+|\d+\.\d+).*',
             # in the middle of line but not far from beginning
-            r'^[^ ].{,20}?(\d+\.\d+\.\d+|\d+\.\d+)',
+            # version number should be preceeded by a star or whitespace
+            # i belive, star is used to make version number bold
+            # or emphasized in markdown
+            r'^[^ ].{,20}?[* ](\d+\.\d+\.\d+|\d+\.\d+)',
+            # or this could be a similar case, when version number
+            # is a part of a filename like this
+            # release-notes/0.1.1.md
+            r'/(\d+\.\d+\.\d+|\d+\.\d+)\.',
         ]
         for i in extract_regexps:
             match = re.search(i, line)
