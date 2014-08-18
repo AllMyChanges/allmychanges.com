@@ -24,6 +24,7 @@ chaussette
 django-braces
 django-widget-tweaks
 Sphinx
+bleach
 
 -e git+https://github.com/svetlyak40wt/django-oauth-toolkit
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges

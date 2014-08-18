@@ -1,10 +1,11 @@
--e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster  # requirements.in:29
--e git+https://github.com/svetlyak40wt/django-markdown2@4b791ab9e08e35ee0e611d6b94ade4f29c59e00a#egg=django-markdown2  # requirements.in:31
--e git+https://github.com/svetlyak40wt/django-oauth-toolkit@c590afc1350d43b1cf4e8da37bb0b9402ea82543#egg=django-oauth-toolkit  # requirements.in:28
--e git+https://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend  # requirements.in:30
--e git+https://github.com/trentm/python-markdown2@26daeae75bc06cade2d9455881287e74d0b397a7#egg=python-markdown2  # requirements.in:32
+-e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster  # requirements.in:30
+-e git+https://github.com/svetlyak40wt/django-markdown2@4b791ab9e08e35ee0e611d6b94ade4f29c59e00a#egg=django-markdown2  # requirements.in:32
+-e git+https://github.com/svetlyak40wt/django-oauth-toolkit@c590afc1350d43b1cf4e8da37bb0b9402ea82543#egg=django-oauth-toolkit  # requirements.in:29
+-e git+https://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend  # requirements.in:31
+-e git+https://github.com/trentm/python-markdown2@26daeae75bc06cade2d9455881287e74d0b397a7#egg=python-markdown2  # requirements.in:33
 anyjson==0.3.3  # requirements.in:17
-chaussette==1.1  # requirements.in:23
+bleach==1.4  # requirements.in:27
+chaussette==1.2  # requirements.in:23
 cssselect==0.9.1  # requirements.in:19 ~> premailer==2.5.0
 cssutils==1.0  # requirements.in:19 ~> premailer==2.5.0
 django-braces==1.4.0  # requirements.in:24
@@ -16,10 +17,11 @@ django==1.6.5  # requirements.in:1
 djangorestframework==2.3.14  # requirements.in:4 ~> drf-extensions==0.2.5
 docutils==0.12  # requirements.in:26 ~> sphinx==1.2.2
 drf-extensions==0.2.5  # requirements.in:4
-envoy==0.0.2  # requirements.in:8
+envoy==0.0.3  # requirements.in:8
 graphitesend==0.3.4  # requirements.in:9
-gunicorn==19.1.0  # requirements.in:15
+gunicorn==19.1.1  # requirements.in:15
 html2text==2014.7.3  # requirements.in:22
+html5lib==0.999  # requirements.in:27 ~> bleach==1.4
 jinja2==2.7.3  # requirements.in:26 ~> sphinx==1.2.2
 lxml==3.3.5  # requirements.in:14 and requirements.in:19 ~> premailer==2.5.0
 markdown==2.4.1  # requirements.in:13
@@ -35,7 +37,7 @@ pytz==2014.4  # requirements.in:18 ~> times==0.6.2
 requests-oauthlib==0.4.1  # requirements.in:16 ~> python-social-auth==0.1.26
 requests==2.3.0  # requirements.in:16 ~> python-social-auth==0.1.26
 rq==0.4.6  # requirements.in:11 ~> django-rq==0.7.0
-six==1.7.3  # requirements.in:23 ~> chaussette==1.1
+six==1.7.3  # requirements.in:23 ~> chaussette==1.2
 south==1.0  # requirements.in:2
 sphinx==1.2.2  # requirements.in:26
 sqlparse==0.1.11  # requirements.in:6 ~> django-debug-toolbar==1.2.1
