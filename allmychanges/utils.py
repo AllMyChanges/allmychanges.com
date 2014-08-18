@@ -678,7 +678,9 @@ def update_changelog(changelog):
 
         try:
             from allmychanges.parsing.pipeline import processing_pipe
-            versions = processing_pipe(path, changelog.get_ignore_list())
+            versions = processing_pipe(path,
+                                       changelog.get_ignore_list(),
+                                       changelog.get_check_list())
             update_changelog_from_raw_data2(changelog, versions)
         except Exception:
             logging.getLogger('update-changelog2').exception('unhandled')

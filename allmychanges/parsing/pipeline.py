@@ -51,6 +51,7 @@ def strip_outer_tag(text):
 
 def get_files(env):
     ignore_list = env.ignore_list
+    check_list = env.check_list
 
     def in_ignore_list(filename):
         for ignore_prefix in ignore_list:
@@ -58,14 +59,28 @@ def get_files(env):
                 return True
         return False
 
+    def search_in_check_list(filename):
+        for prefix, markup in check_list:
+            if filename.startswith(prefix):
+                return True, markup
+        return False, None
+
     for root, dirs, files in os.walk(env.dirname):
         for filename in files:
             full_filename = os.path.join(root, filename)
             rel_filename = os.path.relpath(full_filename, env.dirname)
             if not in_ignore_list(rel_filename):
-                yield env.push(
-                    type='filename',
-                    filename=full_filename)
+                attrs = dict(type='filename',
+                             filename=full_filename)
+                
+                if check_list:
+                    found, markup = search_in_check_list(rel_filename)
+                    if found:
+                        if markup:
+                            attrs['markup'] = markup
+                        yield env.push(**attrs)
+                else:
+                    yield env.push(**attrs)
 
 
 # TODO: remove
@@ -111,7 +126,10 @@ def parse_file(env):
     """Outputs separate sections (header + notes/items)
     from every file.
     """
-    markup = get_markup(env.filename, env.content)
+    markup = getattr(env, 'markup', None)
+    if not markup:
+        markup = get_markup(env.filename, env.content)
+
     if markup is not None:
         versions = globals().get('parse_{0}_file'.format(markup))(env)
         for version in versions:
@@ -466,11 +484,12 @@ def group_by_path(versions):
     return result
 
 
-def processing_pipe(root, ignore_list=[]):
+def processing_pipe(root, ignore_list=[], check_list=[]):
     root_env = Environment()
     root_env.type = 'directory'
     root_env.dirname = root
     root_env.ignore_list = ignore_list
+    root_env.check_list = check_list
     # a dictionary to keep data between different processor's invocations
     root_env.cache = {}
 

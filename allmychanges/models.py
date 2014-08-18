@@ -328,10 +328,15 @@ class Changelog(models.Model):
         help_text=('Number of seconds required to '
                    'update this changelog last time'),
         default=0)
-    ignore_list = models.CharField(max_length=10000,
+    ignore_list = models.CharField(max_length=1000,
                                    default='',
                                    help_text=('Comma-separated list of directories'
                                               ' and filenames to ignore searching'
+                                              ' changelog.'))
+    check_list = models.CharField(max_length=1000,
+                                  default='',
+                                  help_text=('Comma-separated list of directories'
+                                              ' and filenames to search'
                                               ' changelog.'))
     
     def __unicode__(self):
@@ -347,6 +352,30 @@ class Changelog(models.Model):
 
     def set_ignore_list(self, items):
         self.ignore_list = u','.join(items)
+
+    def get_check_list(self):
+        """Returns a list with all filenames and directories to check
+        when searching a changelog."""
+        def process(name):
+            name = name.strip()
+            if not name:
+                return None
+            elif ':' in name:
+                return name.split(':', 1)
+            else:
+                return (name, None)
+
+        filenames = map(process, self.check_list.split(','))
+        filenames = filter(None, filenames)
+        return filenames
+
+    def set_check_list(self, items):
+        def process(item):
+            if item[1]:
+                return u':'.join(item)
+            else:
+                return item
+        self.check_list = u','.join(map(process, items))
 
 
 class VersionManager(models.Manager):
