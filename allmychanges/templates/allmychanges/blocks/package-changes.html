@@ -13,7 +13,7 @@
     {% if version.code_version == 'v1' %}
       <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|process_cve|capfirst|markdown}}</li>
     {% else %}
-      <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|process_cve|capfirst|safe}}</li>
+      <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|safe}}</li>
     {% endif %}
     {% endfor %}
   </ul>

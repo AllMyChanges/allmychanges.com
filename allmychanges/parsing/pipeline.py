@@ -436,7 +436,7 @@ def extract_metadata(version):
     all_dates = _all_dates(itertools.chain([version.title],
                                            _all_list_items()))
 
-    new_version = version.push(type='version')
+    new_version = version.push(type='prerender_items')
     try:
         new_version.date = all_dates.next()
     except StopIteration:
@@ -466,6 +466,48 @@ def extract_metadata(version):
                            in enumerate(version.content)]
     yield new_version
 
+
+def prerender_items(version):
+    new_version = version.push(type='version')
+    from ..templatetags.allmychanges_tags import process_cve
+    from django.template.defaultfilters import capfirst
+    from bleach import clean
+
+    def remove_html_markup(text):
+        # import pdb; pdb.set_trace()  # DEBUG
+        # bleach.ALLOWED_TAGS
+        # [u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul']
+        # bleach.ALLOWED_ATTRIBUTES
+        # {u'a': [u'href', u'title'], u'acronym': [u'title'], u'abbr': [u'title']}
+        # bleach.ALLOWED_STYLES
+        # []
+        # 
+        return clean(text,
+                     tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote',
+                           u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
+                           u'p' # we allow paragraphs cause they are fine
+                       ],
+                     attributes={u'a': [u'href', u'title'],
+                                 u'acronym': [u'title'],
+                                 u'abbr': [u'title']},
+                     styles=[])
+
+    def apply_filters(text):
+        
+        for flt in [remove_html_markup, process_cve, capfirst]:
+            text = flt(text)
+        return text
+
+    def process_content(content):
+        if isinstance(content, basestring):
+            return apply_filters(content)
+        else:
+            return [dict(item,
+                         text=apply_filters(item['text']))
+                    for item in content]
+
+    new_version.content = map(process_content, version.content)
+    yield new_version
 
 def group_by_path(versions):
     """ Returns a dictionary, where keys are a strings
@@ -497,7 +539,8 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
                       filename=read_file,
                       file_content=parse_file,
                       file_section=filter_version,
-                      almost_version=extract_metadata)
+                      almost_version=extract_metadata,
+                      prerender_items=prerender_items)
 
     def run_pipeline(obj, get_processor=lambda obj: None):
         processor = get_processor(obj)
