@@ -1,3 +1,37 @@
+0.8.0 (2014-08-20)
+==================
+
+Now parser is able to group changelog items, extracted from
+VCS history of Node.js packages. Horay! This means that we
+could build a changelog for nodejs packages even if there
+is no handwritten changelog!
+
+There are some other changes too.
+
+## Old (current) parser
+
+* Fixed  parsing of dates like 'August 13th 2014'.
+* Now VCS history parser ignores empty commit messages.
+
+## New parser
+
+* Scope where parser searches unreleased keywords was limited
+  to first 300 symbols of version's description.
+* Don't consider version number in case if it is preceeded by
+  some symbols like backslash and other punctuation.
+  Fixes cases with HTTP/1.1 parsed as a version number.
+* Added ability to specify files and directories where to look
+  for changelog data. These hints could help parser to recognize
+  data in a vague situations.
+* Now parser sanitizes HTML in his input files and escapes dangerous tags.
+
+## Other changes
+
+* Fixed issue when job queue was filled with numerous identical
+  task which led to long intervals between package updates.
+* Job's timeout was increased from 3 minutes to 10. This should
+  help to process big repositories or extract logs from long VCS histories.
+
 0.7.0 (2014-08-14)
 ==================
 
