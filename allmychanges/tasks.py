@@ -121,7 +121,7 @@ def delete_empty_changelogs():
 
 
 @singletone
-@job
+@job('default', timeout=600)
 @transaction.commit_on_success
 def update_changelog_task(source):
     with log.fields(source=source):
