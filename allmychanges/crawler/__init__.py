@@ -97,7 +97,9 @@ def _extract_version(line):
             # or this could be a similar case, when version number
             # is a part of a filename like this
             # release-notes/0.1.1.md
-            r'/(\d+\.\d+\.\d+|\d+\.\d+)\.',
+            # but not in this case
+            # <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+            r'/(\d+\.\d+\.\d+|\d+\.\d+)\.[^\d]',
         ]
         for i in extract_regexps:
             match = re.search(i, line)

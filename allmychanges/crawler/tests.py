@@ -172,6 +172,7 @@ def test_extract_version():
     eq_(None, _extract_version('  some number in the item\'s text 0.1'))
     eq_(None, _extract_version('This is the first version compatible with Django 1.7.'))
     eq_(None, _extract_version('HTTP/1.1 302 Found'))
+    eq_(None, _extract_version('<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>'))
 
 
 def test_parse_item():
