@@ -195,7 +195,7 @@ def test_extract_metadata():
     input_data = v(title='1.0 (2014-06-24)',
                    content=[['Fixed issue']])
 
-    eq_([v(type='version',
+    eq_([v(type='prerender_items',
            title='1.0 (2014-06-24)',
            content=[[{'type': 'fix',
                       'text': 'Fixed issue'}]],
@@ -208,7 +208,7 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
     env.type = 'almost_version'
     v = lambda **kwargs: env.push(**kwargs)
 
-    eq_([v(type='version',
+    eq_([v(type='prerender_items',
            title='1.0 (unreleased)',
            unreleased=True,
            content=[])],
@@ -216,7 +216,7 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
             v(title='1.0 (unreleased)',
               content=[])))
 
-    eq_([v(type='version',
+    eq_([v(type='prerender_items',
            title='1.45 (not yet released)',
            unreleased=True,
            content=[])],
