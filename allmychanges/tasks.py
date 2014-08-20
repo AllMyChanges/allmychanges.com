@@ -167,7 +167,7 @@ def update_changelog_task(source):
             changelog.problem = unicode(e)
         finally:
             if changelog.problem is not None:
-                log.warning('Unable to update changelog with source {0}'.format(source))
+                log.warning(changelog.problem)
                 next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
                 changelog.next_update_at = next_update_if_error
 
