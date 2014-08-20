@@ -65,10 +65,25 @@ def get_files(env):
                 return True, markup
         return False, None
 
+    CHANGELOG_LIKE_FILENAMES = ('change', 'release')
+    EXTENSIONS_TO_CHECK = {'.rst', '.md', '.markdown' '.txt', '.htm', '.html'}
+    
     for root, dirs, files in os.walk(env.dirname):
         for filename in files:
             full_filename = os.path.join(root, filename)
             rel_filename = os.path.relpath(full_filename, env.dirname)
+
+            low_filename = rel_filename.lower()
+            _, ext = os.path.splitext(low_filename)
+
+            filename_looks_like_a_changelog = any(
+                (name in low_filename)
+                for name in CHANGELOG_LIKE_FILENAMES)
+            
+            if ext not in EXTENSIONS_TO_CHECK \
+               and not filename_looks_like_a_changelog:
+                continue
+
             if not in_ignore_list(rel_filename):
                 attrs = dict(type='filename',
                              filename=full_filename)
