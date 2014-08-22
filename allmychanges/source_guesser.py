@@ -22,7 +22,7 @@ def _get_data(data, path):
 
 def _append_url(results, url):
     if url:
-        url, _, _ = normalize_url(url, github_template='https://github.com/{username}/{repo}')
+        url, _, _ = normalize_url(url, for_checkout=False)
         if url not in results:
             results.append(url)
 

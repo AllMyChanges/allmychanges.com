@@ -16,7 +16,7 @@ from allmychanges.api.serializers import (
     SubscriptionSerializer,
     PackageSerializer,
 )
-from allmychanges.utils import count
+from allmychanges.utils import count, normalize_url
 from allmychanges.source_guesser import guess_source
 
 
@@ -99,7 +99,8 @@ class PackageViewSet(HandleExceptionMixin,
         obj.next_update_at = now
         if obj.created_at is None:
             obj.created_at = now
-            
+
+        obj.source, _, _ = normalize_url(obj.source, for_checkout=False)
         return super(PackageViewSet, self).pre_save(obj)
 
     def post_save(self, obj, *args, **kwargs):

@@ -71,11 +71,19 @@ def get_package_metadata(path, field_name):
                         return match.group(1)
 
 
-def normalize_url(url,
-                  github_template='git://github.com/{username}/{repo}',
-                  bitbucket_template='https://bitbucket.org/{username}/{repo}'):
-    """Normalizes url to 'git@github.com:{username}/{repo}' and also
-    returns username and repository's name."""
+def normalize_url(url, for_checkout=True):
+    """Normalize url either for browser or for checkout.
+    Usually, difference is in the schema.
+    It normalizes url to 'git@github.com:{username}/{repo}' and also
+    returns username and repository's name.
+    """
+    for_browser = not for_checkout
+    github_template = 'git://github.com/{username}/{repo}'
+    bitbucket_template = 'https://bitbucket.org/{username}/{repo}'
+
+    if for_browser:
+        github_template = 'https://github.com/{username}/{repo}'
+
     url = url.replace('git+', '')
     
     if 'github' in url:
