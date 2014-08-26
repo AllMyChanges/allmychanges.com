@@ -53,6 +53,14 @@ class OldIndexView(TemplateView):
         return result
 
 
+class IndexView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/new-index.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(IndexView, self).get_context_data(**kwargs)
+        return result
+
+
 class SubscriptionForm(forms.Form):
     email = forms.EmailField(label='Email')
     come_from = forms.CharField(widget=forms.HiddenInput)

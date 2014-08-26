@@ -4,6 +4,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from .views import (OldIndexView,
+                    IndexView,
                     HumansView,
                     DigestView,
                     EditDigestView,
@@ -25,6 +26,7 @@ from django.shortcuts import redirect
 urlpatterns = patterns(
     '',
     url(r'^$', LandingView.as_view(landings=['coming-soon']), name='index'),
+    url(r'^index/$', IndexView.as_view(), name='new-index'),
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
 
     url(r'^subscribed/$', SubscribedView.as_view(), name='subscribed'),
