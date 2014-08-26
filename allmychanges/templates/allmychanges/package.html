@@ -15,7 +15,9 @@
 
   <dl class="package-metadata">
     <dt>Badge for README:</dt>
-    <dd><share-badge data-package="'{{package.user.username}}/{{package.namespace}}/{{package.name}}'"/></dd>
+    <dd><share-badge data-username="'{{package.user.username}}'"
+                     data-namespace="'{{package.namespace}}'"
+                     data-name="'{{package.name}}'"/></dd>
     <dt>Last update was:</dt>
     <dd>{{package.changelog.updated_at|timesince}} ago</dd>
     <dt>Time to next update:</dt>

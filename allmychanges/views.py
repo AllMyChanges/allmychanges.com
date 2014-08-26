@@ -96,9 +96,19 @@ from django.core.cache import cache
 
 
 
-def get_package_data_for_template(package, filter_args, limit_versions, code_version='v1'):
+def get_package_data_for_template(package_or_changelog, filter_args, limit_versions, code_version='v1'):
+    name = package_or_changelog.name
+    namespace = package_or_changelog.namespace
+
+    if isinstance(package_or_changelog, Package):
+        changelog = package_or_changelog.changelog
+        user = package_or_changelog.user
+    else:
+        changelog = package_or_changelog
+        user = None
+
     versions = []
-    versions_queryset = package.changelog.versions.filter(**filter_args)
+    versions_queryset = changelog.versions.filter(**filter_args)
 
     # this allows to reduce number of queries in 5 times
     versions_queryset = versions_queryset.prefetch_related('sections__items')
@@ -117,17 +127,18 @@ def get_package_data_for_template(package, filter_args, limit_versions, code_ver
                              filename=version.filename,
                              sections=sections,
                              unreleased=version.unreleased))
-    return dict(namespace=package.namespace,
-                name=package.name,
-                source=package.source,
+
+    return dict(namespace=namespace,
+                name=name,
+                source=changelog.source,
                 user=dict(
-                    username=package.user.username,
+                    username=user.username if user else None,
                 ),
                 changelog=dict(
-                    updated_at=package.changelog.updated_at,
-                    next_update_at=package.changelog.next_update_at,
-                    filename=package.changelog.filename,
-                    problem=package.changelog.problem,
+                    updated_at=changelog.updated_at,
+                    next_update_at=changelog.next_update_at,
+                    filename=changelog.filename,
+                    problem=changelog.problem,
                 ),
                 versions=versions)
 
@@ -268,23 +279,26 @@ class PackageView(CommonContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         result = super(PackageView, self).get_context_data(**kwargs)
 
-        # TODO: redirect to login if there is no username in kwargs
-        # and request.user is anonymous
-        kwargs.setdefault('username', self.request.user.username)
-        
         code_version = self.request.GET.get('code_version', 'v1')
         result['code_version'] = code_version
 
         filter_args = {'code_version': code_version}
-        package = get_object_or_404(
-            Package.objects.select_related('changelog') \
-                          .prefetch_related('changelog__versions__sections__items'),
-            user=get_user_model().objects.get(username=kwargs['username']),
-            namespace=kwargs['namespace'],
-            name=kwargs['name'])
+
+        if 'username' in kwargs:
+            package_or_changelog = get_object_or_404(
+                Package.objects.select_related('changelog') \
+                              .prefetch_related('changelog__versions__sections__items'),
+                user=get_user_model().objects.get(username=kwargs['username']),
+                namespace=kwargs['namespace'],
+                name=kwargs['name'])
+        else:
+            package_or_changelog = get_object_or_404(
+                Changelog.objects.prefetch_related('versions__sections__items'),
+                namespace=kwargs['namespace'],
+                name=kwargs['name'])
         
         package_data = get_package_data_for_template(
-            package,
+            package_or_changelog,
             filter_args,
             100,
             code_version=code_version)
@@ -295,16 +309,21 @@ class PackageView(CommonContextMixin, TemplateView):
 
 class BadgeView(View):
     def get(self, *args, **kwargs):
-        kwargs.setdefault('username', self.request.user.username)
-        
-        package = get_object_or_404(
-            Package.objects.select_related('changelog') \
-                          .prefetch_related('changelog__versions__sections__items'),
-            user=get_user_model().objects.get(username=kwargs['username']),
-            namespace=kwargs['namespace'],
-            name=kwargs['name'])
 
-        version = package.latest_version()
+        if 'username' in kwargs:
+            package_or_changelog = get_object_or_404(
+                Package.objects.select_related('changelog') \
+                              .prefetch_related('changelog__versions__sections__items'),
+                user=get_user_model().objects.get(username=kwargs['username']),
+                namespace=kwargs['namespace'],
+                name=kwargs['name'])
+        else:
+            package_or_changelog = get_object_or_404(
+                Changelog.objects.prefetch_related('versions__sections__items'),
+                namespace=kwargs['namespace'],
+                name=kwargs['name'])
+
+        version = package_or_changelog.latest_version()
         if version is not None:
             version = version.number
         else:

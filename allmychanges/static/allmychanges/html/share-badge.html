@@ -1,10 +1,10 @@
 <div class="share-badge">
-      <img class="share-badge__example" src="http://allmychanges.com/u/{{package}}/badge">
+      <img class="share-badge__example" src="{{origin}}{{package_url}}/badge/">
       
-      <textarea readonly="1"  wrap="off" rows="1" ng-if="markdown" class="text-input share-badge__text">[![changelog](http://allmychanges.com/u/{{package}}/badge)](http://allmychanges.com/u/{{package}}/?utm_source=badge)</textarea>
-      <textarea readonly="1" wrap="off" rows="2" ng-if="rst" class="text-input share-badge__text">.. image:: http://allmychanges.com/u/{{package}}/badge
-   :target: http://allmychanges.com/u/{{package}}/?utm_source=badge</textarea>
-      <textarea readonly="1" wrap="off" rows="1" ng-if="html" class="text-input share-badge__text" type="text">&lt;a href=&quot;http://allmychanges.com/u/{{package}}/?utm_source=badge&quot;>&lt;img title=&quot;changelog&quot; src=&quot;http://allmychanges.com/u/{{package}}/badge&quot;/>&lt;/a></textarea>
+      <textarea readonly="1"  wrap="off" rows="1" ng-if="markdown" class="text-input share-badge__text">[![changelog]({{origin}}{{package_url}}/badge/)]({{origin}}{{package_url}}/?utm_source=badge)</textarea>
+      <textarea readonly="1" wrap="off" rows="2" ng-if="rst" class="text-input share-badge__text">.. image:: {{origin}}{{package_url}}/badge/
+   :target: {{origin}}{{package_url}}/?utm_source=badge</textarea>
+      <textarea readonly="1" wrap="off" rows="1" ng-if="html" class="text-input share-badge__text" type="text">&lt;a href=&quot;{{origin}}{{package_url}}/?utm_source=badge&quot;>&lt;img title=&quot;changelog&quot; src=&quot;{{origin}}{{package_url}}/badge/&quot;/>&lt;/a></textarea>
 
       <ul class="share-badge__tabs">
         <li ng-class="{tab_active: markdown}" class="tab" ng-click="show('markdown')">markdown</li>

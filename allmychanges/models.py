@@ -27,6 +27,8 @@ MARKUP_CHOICES = (
     ('markdown', 'markdown'),
     ('rest', 'rest'),
 )
+NAME_LENGTH = 80
+NAMESPACE_LENGTH = 80
 
 
 # based on http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
@@ -338,6 +340,10 @@ class Changelog(models.Model):
                                   help_text=('Comma-separated list of directories'
                                               ' and filenames to search'
                                               ' changelog.'))
+    namespace = models.CharField(max_length=NAMESPACE_LENGTH,
+                                 null=True)
+    name = models.CharField(max_length=NAME_LENGTH,
+                            null=True)
     
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)
@@ -376,6 +382,13 @@ class Changelog(models.Model):
             else:
                 return item
         self.check_list = u','.join(map(process, items))
+
+    def latest_version(self):
+        versions = list(
+            self.versions.exclude(unreleased=True) \
+                         .order_by('-discovered_at', '-number')[:1])
+        if versions:
+            return versions[0]
 
 
 class VersionManager(models.Manager):
@@ -429,12 +442,11 @@ class Item(models.Model):
     text = models.TextField()
 
 
-
 class Package(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              related_name='packages')
-    namespace = models.CharField(max_length=80)
-    name = models.CharField(max_length=80)
+    namespace = models.CharField(max_length=NAMESPACE_LENGTH)
+    name = models.CharField(max_length=NAME_LENGTH)
     source = models.CharField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
     repo = models.OneToOneField(Repo,
@@ -452,12 +464,7 @@ class Package(models.Model):
         return u'/'.join((self.user.username, self.name))
 
     def latest_version(self):
-        if self.changelog:
-            versions = list(
-                self.changelog.versions.exclude(unreleased=True)
-                          .order_by('-discovered_at', '-number')[:1])
-            if versions:
-                return versions[0]
+        return self.changelog.latest_version()
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
@@ -471,7 +478,15 @@ class Package(models.Model):
         super(Package, self).save(*args, **kwargs)
 
         if self.changelog is None or self.changelog.source != self.source:
-            self.changelog, created = Changelog.objects.get_or_create(source=self.source)
+            changelog, created = Changelog.objects.get_or_create(source=self.source)
+
+            # TODO: add here a check of user is moderator
+            if created and self.user.username in ('svetlyak40wt', 'bessarabov'):
+                changelog.namespace = self.namespace
+                changelog.name = self.name
+                changelog.save()
+
+            self.changelog = changelog
             self.save()
         
     def update(self):
