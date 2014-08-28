@@ -585,13 +585,12 @@ body.email {
 .text-input_with-token {
   width: 30em;
 }
-p.front-message {
+.front-message {
   font-size: 1.5em;
   line-height: 1.5em;
   margin-bottom: 2em;
   margin-right: 2em;
-  width: 45%;
-  display: inline-block;
+  width: 75%;
 }
 .front-header {
   font-size: 2em;
