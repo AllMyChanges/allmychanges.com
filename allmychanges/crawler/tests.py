@@ -249,10 +249,13 @@ def test_url_normalization():
         normalize_url('https://github.com/svetlyak40wt/blah.git'))
     eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
         normalize_url('http://github.com/svetlyak40wt/blah'))
-    eq_(('git@github.com:svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
-        normalize_url('git@github.com:svetlyak40wt/blah'))
+    eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
+        normalize_url('git@github.com:svetlyak40wt/blah.git'))
     eq_(('https://some-server.com/repo', None, 'repo'),
         normalize_url('git+https://some-server.com/repo'))
+    eq_(('https://github.com/sass/sass', 'sass', 'sass'),
+        normalize_url('git@github.com:sass/sass.git', for_checkout=False))
+
 
 
 def test_get_markup_type():

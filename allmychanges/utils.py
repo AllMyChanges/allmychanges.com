@@ -91,8 +91,6 @@ def normalize_url(url, for_checkout=True):
         match = re.search(regex, url)
         if match is not None:
             username, repo = match.groups()
-            if url.startswith('git@'):
-                return url, username, repo
             return (github_template.format(**locals()),
                     username,
                     repo)
