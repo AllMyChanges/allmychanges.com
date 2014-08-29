@@ -359,9 +359,11 @@ a {
   font-size: 1.666666666666667em;
   line-height: 1.2em;
   margin-bottom: 1em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .page-subheader {
   margin-bottom: 1em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .nowrap {
   white-space: nowrap;
@@ -379,6 +381,7 @@ a {
 }
 .logo__text {
   font-size: 2em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .logo__link {
   text-decoration: none;
@@ -490,6 +493,9 @@ body.email {
 }
 .grouped-changes-title {
   font-size: 1.5em;
+  font-family: pragmatica-web-condensed, sans-serif;
+  font-weight: 300;
+  margin-top: 1em;
 }
 .package-changes {
   list-style: none;
@@ -497,6 +503,7 @@ body.email {
 }
 .package-changes__package-title {
   font-size: 1.2em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .package-changes__package-title > a {
   color: #000;
@@ -511,6 +518,7 @@ body.email {
 .package-version__number {
   display: inline-block;
   margin-top: 1em;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .package-version__number > a {
   color: #000;
@@ -522,10 +530,13 @@ body.email {
 .package-version__date {
   display: inline;
   color: #808080;
+  font-family: pragmatica-web-condensed, sans-serif;
 }
 .package-version__items {
   margin-left: 1em;
   margin-top: 0.5em;
+  font-family: proxima-nova, sans-serif;
+  font-weight: 300;
 }
 .package-version__section-item {
   list-style: disc inside;
@@ -539,9 +550,8 @@ body.email {
 .package-version__notes {
   margin-left: 1em;
   margin-top: 0.5em;
-}
-.grouped-changes-title {
-  margin-top: 1em;
+  font-family: proxima-nova, sans-serif;
+  font-weight: 300;
 }
 .package-changes__package-title {
   margin-top: 1em;
@@ -579,9 +589,9 @@ body.email {
 .package-version__section-item p {
   margin-left: 1em;
 }
-.package-version__section-item_fix:before {
-  content: "fix";
-  background-color: #ee883d;
+.changelog-item-type {
+  background-color: #800080;
+  content: text;
   position: absolute;
   margin-left: -40px;
   font-size: 12px;
@@ -594,20 +604,20 @@ body.email {
   line-height: 1em;
   margin-top: 5px;
 }
-.package-version__section-item_new:before {
-  content: "new";
+.changelog-item-type_fix {
+  background-color: #ee883d;
+}
+.changelog-item-type_new {
   background-color: #5fbe40;
-  position: absolute;
-  margin-left: -40px;
-  font-size: 12px;
-  font-family: Courier New;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
+}
+.changelog-item-type_security {
+  background-color: #ff3b16;
+}
+.changelog-item-type_dep {
+  background-color: #ff3b16;
+}
+.changelog-item-type_inc {
+  background-color: #ff3b16;
 }
 .autocomplete-input {
   display: inline-block;
@@ -617,4 +627,28 @@ body.email {
 }
 .text-input_with-token {
   width: 30em;
+}
+.front-message {
+  font-size: 1.5em;
+  line-height: 1.5em;
+  margin-bottom: 2em;
+  margin-right: 2em;
+  width: 75%;
+}
+.front-header {
+  font-size: 2em;
+  line-height: 1.5em;
+}
+.front-descriptions {
+  margin-bottom: 3em;
+}
+.front-descriptions__item {
+  list-style: none;
+  width: 30%;
+  display: inline-block;
+  font-size: 2em;
+  line-height: 1.4em;
+}
+.front-steps__step {
+  list-style: none;
 }

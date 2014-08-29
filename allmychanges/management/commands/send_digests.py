@@ -78,6 +78,7 @@ class Command(LogMixin, BaseCommand):
                                       disable_validation=True)
 
                 body = premailer.transform()
+                
                 message = EmailMultiAlternatives('Changelogs digest on {0:%d %B %Y}'.format(now),
                           None,
                           'AllMyChanges.com <noreply@allmychanges.com>',

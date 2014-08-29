@@ -11,9 +11,9 @@
   <ul class="package-version__items">
     {% for item in section.items %}
     {% if version.code_version == 'v1' %}
-      <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|process_cve|capfirst|markdown}}</li>
+      <li class="package-version__section-item"><span class="changelog-item-type changelog-item-type_{{item.type}}">{{item.type|slice:":3"}}</span> {{item.text|process_cve|capfirst|markdown}}</li>
     {% else %}
-      <li class="package-version__section-item package-version__section-item_{{item.type}}">{{item.text|safe}}</li>
+      <li class="package-version__section-item"><span class="changelog-item-type changelog-item-type_{{item.type}}">{{item.type|slice:":3"}}</span> {{item.text|safe}}</li>
     {% endif %}
     {% endfor %}
   </ul>

@@ -501,80 +501,35 @@ body.email {
 .package-version__section-item p {
   margin-left: 1em;
 }
-.package-version__section-item_fix:before {
-  content: "fix";
+.changelog-item-type {
+  background-color: #800080;
+  content: text;
+  position: absolute;
+  margin-left: -40px;
+  font-size: 12px;
+  font-family: Courier New;
+  padding: 2px 4px;
+  border-radius: 3px;
+  color: #fff;
+  width: 24px;
+  text-align: center;
+  line-height: 1em;
+  margin-top: 5px;
+}
+.changelog-item-type_fix {
   background-color: #ee883d;
-  position: absolute;
-  margin-left: -40px;
-  font-size: 12px;
-  font-family: Courier New;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
 }
-.package-version__section-item_new:before {
-  content: "new";
+.changelog-item-type_new {
   background-color: #5fbe40;
-  position: absolute;
-  margin-left: -40px;
-  font-size: 12px;
-  font-family: Courier New;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
 }
-.package-version__section-item_sec:before {
-  content: "sec";
+.changelog-item-type_security {
   background-color: #ff3b16;
-  position: absolute;
-  margin-left: -40px;
-  font-size: 12px;
-  font-family: Courier New;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
 }
-.package-version__section-item_dep:before {
-  content: "dep";
+.changelog-item-type_dep {
   background-color: #ff3b16;
-  position: absolute;
-  margin-left: -40px;
-  font-size: 12px;
-  font-family: Courier New;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
 }
-.package-version__section-item_inc:before {
-  content: "inc";
+.changelog-item-type_inc {
   background-color: #ff3b16;
-  position: absolute;
-  margin-left: -40px;
-  font-size: 12px;
-  font-family: Courier New;
-  padding: 2px 4px;
-  border-radius: 3px;
-  color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
 }
 .autocomplete-input {
   display: inline-block;
