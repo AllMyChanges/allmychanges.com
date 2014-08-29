@@ -1,3 +1,17 @@
+0.8.1 (2014-08-29)
+==================
+
+* Colored changelog item's labels in emails were fixed. Now emails should
+  be much more readable. Thanks to [@bessarabov](https://twitter.com/bessarabov)
+  for a report.
+* Now all package urls are normalized upon save. This is most visible
+  for GitHub hosted projects. For example, if you are submitting
+  a url like `git@github.com:sass/sass.git`, it will be
+  transformed to `https://github.com/sass/sass`.
+* Now new parser only checks files if they have proper extension or
+  it's filename looks like changelog.
+* Fixed issue when new parser extracted version number from script html tags.
+
 0.8.0 (2014-08-20)
 ==================
 
