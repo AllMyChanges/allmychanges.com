@@ -1,0 +1,5 @@
+{% if today_changes %}
+  {% include "allmychanges/digest-partial.html" with changes=today_changes title="Last 24 hours" %}
+{% else %}
+  {% include "allmychanges/digest-partial.html" with changes=week_changes title="This week" %}
+{% endif %}

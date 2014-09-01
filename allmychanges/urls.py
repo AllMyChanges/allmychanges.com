@@ -8,6 +8,7 @@ from .views import (OldIndexView,
                     HumansView,
                     DigestView,
                     EditDigestView,
+                    LandingDigestView,
                     BadgeView,
                     AfterLoginView,
                     LoginView,
@@ -32,6 +33,7 @@ urlpatterns = patterns(
     url(r'^subscribed/$', SubscribedView.as_view(), name='subscribed'),
 
     url(r'^digest/$', DigestView.as_view(), name='digest'),
+    url(r'^landing-digest/$', LandingDigestView.as_view(), name='landing-digest'),
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
     
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),

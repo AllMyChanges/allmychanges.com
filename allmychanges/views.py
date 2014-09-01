@@ -17,6 +17,7 @@ from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
+from twiggy_goodies.threading import log
 
 from allmychanges.models import (Package,
                                  Subscription,
@@ -104,7 +105,7 @@ from django.core.cache import cache
 
 
 
-def get_package_data_for_template(package_or_changelog, filter_args, limit_versions, code_version='v1'):
+def get_package_data_for_template(package_or_changelog, filter_args, limit_versions, after_date, code_version='v1'):
     name = package_or_changelog.name
     namespace = package_or_changelog.namespace
 
@@ -129,9 +130,16 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
                                      dict(text=item.text,
                                           type=item.type)
                                      for item in section.items.all()]))
+        if after_date is not None and version.date is not None \
+           and version.date < after_date.date():
+            show_discovered_as_well = True
+        else:
+            show_discovered_as_well = False
+
         versions.append(dict(number=version.number,
                              date=version.date,
                              discovered_at=version.discovered_at.date(),
+                             show_discovered_as_well=show_discovered_as_well,
                              filename=version.filename,
                              sections=sections,
                              unreleased=version.unreleased))
@@ -151,14 +159,13 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
                 versions=versions)
 
 
-def get_digest_for(user,
+def get_digest_for(packages,
                    before_date=None,
                    after_date=None,
                    limit_versions=5,
                    code_version='v1'):
     """Before date and after date are inclusive."""
     # search packages which have changes after given date
-    packages = user.packages
 
     # we exclude unreleased changes from digest
     # because they are not interesting
@@ -173,12 +180,17 @@ def get_digest_for(user,
             filter_args['discovered_at__lt'] = before_date
         if after_date:
             filter_args['discovered_at__gte'] = after_date
-        
-    packages = packages.filter(**{'changelog__versions__' + key: value
-                                  for key, value in filter_args.items()})
-    packages = packages.select_related('changelog').distinct()
-    
-    changes = [get_package_data_for_template(package, filter_args, limit_versions, code_version)
+
+    if issubclass(packages.model, Package):
+        packages = packages.filter(**{'changelog__versions__' + key: value
+                                      for key, value in filter_args.items()})
+        packages = packages.select_related('changelog').distinct()
+    else:
+        packages = packages.filter(**{'versions__' + key: value
+                                      for key, value in filter_args.items()})
+        packages = packages.distinct()
+
+    changes = [get_package_data_for_template(package, filter_args, limit_versions, after_date, code_version)
                for package in packages]
 
     return changes
@@ -231,20 +243,21 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         result['current_user'] = self.request.user
 
 
-        result['today_changes'] = get_digest_for(self.request.user,
+        packages = self.request.user.packages
+        result['today_changes'] = get_digest_for(packages,
                                                  after_date=day_ago,
                                                  code_version=code_version)
-        result['week_changes'] = get_digest_for(self.request.user,
+        result['week_changes'] = get_digest_for(packages,
                                                 before_date=day_ago,
                                                 after_date=week_ago,
-                                                 code_version=code_version)
-        result['month_changes'] = get_digest_for(self.request.user,
+                                                code_version=code_version)
+        result['month_changes'] = get_digest_for(packages,
                                                  before_date=week_ago,
                                                  after_date=month_ago,
                                                  code_version=code_version)
-        result['ealier_changes'] = get_digest_for(self.request.user,
+        result['ealier_changes'] = get_digest_for(packages,
                                                   before_date=month_ago,
-                                                 code_version=code_version)
+                                                  code_version=code_version)
 
         result['no_packages'] = \
                 self.request.user.packages \
@@ -261,6 +274,49 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         if self.request.user.packages.count() == 0:
             return HttpResponseRedirect(reverse('edit-digest'))
         return super(DigestView, self).get(*args, **kwargs)
+
+
+class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/landing-digest.html'
+
+    def get_cache_params(self, *args, **kwargs):
+        packages = self.request.GET.get('packages', '')
+        self.packages = map(int, filter(None, packages.split(',')))
+
+        cache_key = 'digest-{packages}'.format(packages=','.join(map(str, sorted(packages))))
+        return cache_key, 4 * HOUR
+        
+    def get_context_data(self, **kwargs):
+        result = super(LandingDigestView, self).get_context_data(**kwargs)
+
+        # packages = self.request.GET.get('packages', '')
+        # packages = map(int, filter(None, packages.split(',')))
+
+        now = timezone.now()
+        one_day = datetime.timedelta(1)
+        day_ago = now - one_day
+        week_ago = now - datetime.timedelta(7)
+        code_version = self.request.GET.get('code_version', 'v1')
+
+        result['code_version'] = code_version
+        result['current_user'] = self.request.user
+
+        packages = Changelog.objects.filter(pk__in=self.packages)
+        result['today_changes'] = get_digest_for(packages,
+                                                 after_date=day_ago,
+                                                 code_version=code_version)
+        result['week_changes'] = get_digest_for(packages,
+                                                before_date=day_ago,
+                                                after_date=week_ago,
+                                                code_version=code_version)
+        return result
+
+    def get(self, *args, **kwargs):
+        # here, we remember user's choice in a cookie, to
+        # save these packages into his tracking list after login
+        response = super(LandingDigestView, self).get(*args, **kwargs)
+        response.set_cookie('landing-packages', ','.join(map(str, self.packages)))
+        return response
 
 
 class LoginView(CommonContextMixin, TemplateView):
@@ -309,6 +365,7 @@ class PackageView(CommonContextMixin, TemplateView):
             package_or_changelog,
             filter_args,
             100,
+            None,
             code_version=code_version)
 
         result['package'] = package_data
@@ -356,10 +413,30 @@ class BadgeView(View):
 
 class AfterLoginView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if timezone.now() - self.request.user.date_joined < datetime.timedelta(0, 60):
-            # if account was registere no more than minute ago, then show
-            # user a page where he will be able to correct email
-            return reverse('account-settings') + '#notifications'
+        user = self.request.user
+        
+        with log.name_and_fields('after-login', username=user.username):
+            if timezone.now() - self.request.user.date_joined < datetime.timedelta(0, 60):
+                # if account was registere no more than minute ago, then show
+                # user a page where he will be able to correct email
+                return reverse('account-settings') + '#notifications'
+
+            landing_packages = self.request.COOKIES.get('landing-packages')
+            if landing_packages is not None:
+                landing_packages = map(int, filter(None, landing_packages.split(',')))
+                user_packages = {ch.id
+                                 for ch in Changelog.objects.filter(packages__user=user)}
+                for package_id in landing_packages:
+                    if package_id not in user_packages:
+                        with log.fields(package_id=package_id):
+                            try:
+                                changelog = Changelog.objects.get(pk=package_id)
+                                user.packages.create(namespace=changelog.namespace,
+                                                     name=changelog.name,
+                                                     source=changelog.source,
+                                                     changelog=changelog)
+                            except Exception:
+                                log.trace().error('Unable to save landing package')
         return reverse('digest')
 
 

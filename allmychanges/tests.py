@@ -423,7 +423,8 @@ def test_digest_for_today_includes_changes_from_last_9am():
                                   discovered_at=today - one_day,
                                   code_version=code_version)
 
-    digest = get_digest_for(user, after_date=today - one_day)
+    digest = get_digest_for(user.packages,
+                            after_date=today - one_day)
     eq_(1, len(digest))
     
     

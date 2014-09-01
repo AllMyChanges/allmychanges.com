@@ -19,18 +19,31 @@
 <li class="front-descriptions__item">You receive a digest with version numbers and description what was changed and is it critical or not to upgrade.</li>
 </ul>
 
-<h1 class="front-header">Feel how it works by selecting few popular projects</h1>
+<h1 class="front-header">Try to track some projects now</h1>
 
-<ul class="front-steps">
-<li class="front-steps__step">
-  <h2 class="step-header">First: Track some packages.</h2>
-</li>
-<li class="front-steps__step">
-  <h2 class="step-header">Second: Examinate a result.</h2>
-</li>
-<li class="front-steps__step">
-  <h2 class="step-header">Third: To save result, just login via GitHub.</h2>
-</li>
-</ul>
+{% verbatim %}
+<div ng-controller="LandingPageCtrl">
+  <ul class="package-selector">
+    <li ng-repeat="package in packages" class="package-selector__item" package-selector-line package="package">
+    </li>
+  </ul>
+
+  <h1 class="front-header package-selector__next">To continue, track at least five projects…</h1>
+
+  <div class="package-selector__empty-digest" ng-if="tracked_len &lt; 5">
+    <p>Here you'll see a digest example when will track at least five packages.</p>
+  </div>
+
+  <div class="package-selector__login-plate" ng-if="tracked_len &gt;= 5">
+    <p>To save your results, <a href="/login/github/" class="large-login-button">login with Github</a> or <a href="/login/twitter/" class="large-login-button">Twitter</a>!</p>
+  </div>
+  <div class="package-selector__digest" ng-if="tracked_len &gt;= 5">
+    <p>Here is you digest:</p>
+  </div>
+  <div class="package-selector__login-plate" ng-if="tracked_len &gt;= 5">
+    <p>To save your results, <a href="/login/github/" class="large-login-button">login with Github</a> or <a href="/login/twitter/" class="large-login-button">Twitter</a>!</p>
+  </div>
+</div>
+{% endverbatim %}
 
 {% endblock content %}

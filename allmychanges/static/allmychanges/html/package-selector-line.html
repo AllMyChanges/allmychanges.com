@@ -1,0 +1,11 @@
+    <div class="package-selector__package">
+      <h1 class="package-selector__title">{{package.namespace}}/{{package.name}}</h1>
+      <ul class="package-selector__versions">
+         <li ng-repeat="version in package.versions" class="package-selector__version">
+           <span class="package-selector__number">{{ version.number }}</span>
+           <span class="package-selector__date">Released at {{ version.date }}</span>
+         </li>
+      </ul>
+      <button class="package-select__track-button" ng-click="$parent.track(package)">Track</button>
+      <button class="package-select__ignore-button" ng-click="$parent.ignore(package)">Ignore</button>
+    </div>

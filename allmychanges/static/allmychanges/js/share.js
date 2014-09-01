@@ -1,5 +1,4 @@
-angular.module('share-badge', [])
-.directive('shareBadge', [function(){
+app.directive('shareBadge', [function(){
     var link = function (scope, element, attrs) {
         var all_markups = ['markdown', 'rst', 'html'];
 

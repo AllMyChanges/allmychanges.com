@@ -23,7 +23,7 @@ def send_digest_to(user, code_version='v1'):
     day_ago = now - datetime.timedelta(1)
     week_ago = now - datetime.timedelta(7)
 
-    today_changes = get_digest_for(user,
+    today_changes = get_digest_for(user.packages,
                                    after_date=day_ago,
                                    code_version=code_version)
 
@@ -35,7 +35,7 @@ def send_digest_to(user, code_version='v1'):
                 print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
                     **version)
 
-        week_changes = get_digest_for(user,
+        week_changes = get_digest_for(user.packages,
                                       before_date=day_ago,
                                       after_date=week_ago,
                                       code_version=code_version)

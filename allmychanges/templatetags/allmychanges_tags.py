@@ -27,3 +27,9 @@ def process_cve(value):
     return re.sub(r'(CVE-\d+-\d+)',
                   r'<a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=\1">\1</a>',
                   value)
+
+
+@register.filter
+def debug(value):
+    import pdb; pdb.set_trace()  # DEBUG
+    return value

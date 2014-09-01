@@ -1,5 +1,3 @@
-var app = angular.module('allMyChangesApp', ['ngCookies', 'angucomplete-alt', 'share-badge']);
-
 app.directive('digestLine', ['$http', '$interval', '$timeout', function ($http, $interval, $timeout) {
     return {
         restrict: 'EA',

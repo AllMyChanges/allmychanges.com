@@ -8,6 +8,7 @@ from allmychanges.api.views import (
     AutocompleteNamespaceView,
     AutocompletePackageNameView,
     AutocompleteSourceView,
+    LandingPackageSuggestView,
     PackageViewSet)
 
 
@@ -19,6 +20,7 @@ router.register(r'packages', PackageViewSet, base_name='package')
 router.register(r'autocomplete-namespaces', AutocompleteNamespaceView, base_name='autocomplete-namespaces')
 router.register(r'autocomplete-package-name', AutocompletePackageNameView, base_name='autocomplete-package-name')
 router.register(r'autocomplete-source', AutocompleteSourceView, base_name='autocomplete-source')
+router.register(r'landing-package-suggest', LandingPackageSuggestView, base_name='landing-package-suggest')
 
 
 urlpatterns = router.urls

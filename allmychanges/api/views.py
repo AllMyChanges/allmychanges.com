@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils import timezone
+from django.db.models import Max
 
 from rest_framework import viewsets, mixins
 from rest_framework.exceptions import ParseError
@@ -151,3 +152,24 @@ class AutocompleteSourceView(viewsets.ViewSet):
 
         return Response({'results': [{'name': url}
                                      for url in urls]})
+
+
+class LandingPackageSuggestView(viewsets.ViewSet):
+    def list(self, request, *args, **kwargs):
+        def process_versions(versions):
+            return [{'number': v.number,
+                     'date': v.date or v.discovered_at.date()}
+                    for v in versions]
+
+        tracked = map(int, filter(None, request.GET.get('tracked', '').split(',')))
+        ignored = map(int, filter(None, request.GET.get('ignored', '').split(',')))
+        skip = map(int, filter(None, request.GET.get('skip', '').split(',')))
+        skip += tracked + ignored
+
+        changelogs = Changelog.objects.exclude(name=None).exclude(pk__in=skip).annotate(latest_date=Max('versions__discovered_at')).order_by('-latest_date')
+
+        return Response({'results': [{'id': ch.id,
+                                      'name': ch.name,
+                                      'namespace': ch.namespace,
+                                      'versions': process_versions(ch.versions.all()[:3])}
+                                     for ch in changelogs[:3]]})
