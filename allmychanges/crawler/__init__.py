@@ -111,7 +111,7 @@ def _extract_date(line):
     """Return date that is in line"""
     for date_str in RE_DATE.finditer(line):
         try:
-            return date_parser(date_str.group('date')).date()
+            return date_parser(date_str.group('date'), dayfirst=True).date()
         except:
             continue
 

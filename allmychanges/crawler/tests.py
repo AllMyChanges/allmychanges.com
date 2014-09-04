@@ -208,9 +208,6 @@ def test_extract_date():
     eq_(date(2009, 5, 23), _extract_date('in a far far 23-05-2009 there were star wars'))
     eq_(date(2009, 5, 23), _extract_date('in a far far 23.05.2009 there were star wars'))
 
-    # could confuse day and month
-    eq_(date(2009, 4, 5), _extract_date('04.05.2009'))
-
     # this variant is from Nginx's changelog
     eq_(date(2014, 4, 24), _extract_date('   24 Apr 2014'))
     eq_(date(2014, 4, 28), _extract_date('April 28, 2014')) # from django
@@ -229,6 +226,9 @@ def test_extract_date():
     eq_(date(2013, 5, 28), _extract_date('Tue May 28, 2013'))
     eq_(date(2013, 4, 1),  _extract_date('Mon Apr 01, 2013'))
     eq_(date(2013, 3, 29), _extract_date('Fri Mar 29, 2013'))
+
+    # from https://github.com/alex/django-taggit/blob/develop/CHANGELOG.txt
+    eq_(date(2014, 8, 10), _extract_date('10.08.2014'))
 
 
 def test_starts_with_ident():
