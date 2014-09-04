@@ -18,6 +18,56 @@ from allmychanges.utils import dt_in_window
 from premailer import Premailer
 
 
+def send_digest_to(user, code_version='v1'):
+    now = timezone.now()
+    day_ago = now - datetime.timedelta(1)
+    week_ago = now - datetime.timedelta(7)
+
+    today_changes = get_digest_for(user,
+                                   after_date=day_ago,
+                                   code_version=code_version)
+
+    if today_changes:
+        print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
+        for package in today_changes:
+            print '\t{namespace}/{name}'.format(**package)
+            for version in package['versions']:
+                print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
+                    **version)
+
+        week_changes = get_digest_for(user,
+                                      before_date=day_ago,
+                                      after_date=week_ago,
+                                      code_version=code_version)
+        body = render_to_string(
+            'emails/digest.html',
+            dict(current_user=user,
+                 today_changes=today_changes,
+                 week_changes_count=len(week_changes)))
+
+        external_styles = [
+            os.path.join(settings.STATIC_ROOT,
+                         'allmychanges/css',
+                         name)
+            for name in ('email.css',)]
+        premailer = Premailer(body,
+                              base_url='http://allmychanges.com/',
+                              external_styles=external_styles,
+                              disable_validation=True)
+
+        body = premailer.transform()
+        subject = 'Changelogs digest on {0:%d %B %Y}'.format(now)
+        if code_version == 'v2':
+            subject += ' (v2)'
+
+        message = EmailMultiAlternatives(subject,
+                  None,
+                  'AllMyChanges.com <noreply@allmychanges.com>',
+                  [user.email])
+        message.attach_alternative(body.encode('utf-8'), 'text/html')
+        message.send()
+
+
 class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
 
@@ -27,9 +77,6 @@ class Command(LogMixin, BaseCommand):
         cssutils_logger.level = logging.ERROR
 
         now = timezone.now()
-        day_ago = now - datetime.timedelta(1)
-        week_ago = now - datetime.timedelta(7)
-
         utc_now = times.to_universal(now)
         all_timezones = get_user_model().objects.all().values_list(
             'timezone', flat=True).distinct()
@@ -37,7 +84,6 @@ class Command(LogMixin, BaseCommand):
                               if tz and dt_in_window(tz, utc_now, 9)]
         
         users = get_user_model().objects.exclude(email='')
-        code_version = 'v1'
         
         if args:
             users = users.filter(username__in=args)
@@ -45,43 +91,7 @@ class Command(LogMixin, BaseCommand):
             users = users.filter(timezone__in=send_for_timezones)
         
         for user in users:
-            today_changes = get_digest_for(user,
-                                           after_date=day_ago,
-                                           code_version=code_version)
-            
-            if today_changes or args:
-                print 'Sending digest to', user.username, user.email
-                for package in today_changes:
-                    print '\t{namespace}/{name}'.format(**package)
-                    for version in package['versions']:
-                        print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
-                            **version)
-            
-                week_changes = get_digest_for(user,
-                                              before_date=day_ago,
-                                              after_date=week_ago,
-                                              code_version=code_version)
-                body = render_to_string(
-                    'emails/digest.html',
-                    dict(current_user=user,
-                         today_changes=today_changes,
-                         week_changes_count=len(week_changes)))
+            send_digest_to(user, code_version='v1')
 
-                external_styles = [
-                    os.path.join(settings.STATIC_ROOT,
-                                 'allmychanges/css',
-                                 name)
-                    for name in ('email.css',)]
-                premailer = Premailer(body,
-                                      base_url='http://allmychanges.com/',
-                                      external_styles=external_styles,
-                                      disable_validation=True)
-
-                body = premailer.transform()
-                
-                message = EmailMultiAlternatives('Changelogs digest on {0:%d %B %Y}'.format(now),
-                          None,
-                          'AllMyChanges.com <noreply@allmychanges.com>',
-                          [user.email])
-                message.attach_alternative(body.encode('utf-8'), 'text/html')
-                message.send()
+            if user.username == 'svetlyak40wt':
+                send_digest_to(user, code_version='v2')
