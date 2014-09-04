@@ -60,12 +60,19 @@ def send_digest_to(user, code_version='v1'):
         if code_version == 'v2':
             subject += ' (v2)'
 
+        if code_version == 'v2' and user.username != 'svetlyak40wt':
+            email = 'svetlyak.40wt+v2@gmail.com'
+        else:
+            email = user.email
+
         message = EmailMultiAlternatives(subject,
                   None,
                   'AllMyChanges.com <noreply@allmychanges.com>',
-                  [user.email])
+                  [email])
+
         if user.username != 'svetlyak40wt':
             message.bcc.append('svetlyak.40wt+changes@gmail.com')
+
         message.attach_alternative(body.encode('utf-8'), 'text/html')
         message.send()
 
@@ -94,6 +101,4 @@ class Command(LogMixin, BaseCommand):
         
         for user in users:
             send_digest_to(user, code_version='v1')
-
-            if user.username == 'svetlyak40wt':
-                send_digest_to(user, code_version='v2')
+            send_digest_to(user, code_version='v2')
