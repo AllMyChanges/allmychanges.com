@@ -1,3 +1,14 @@
+0.8.2 (2014-09-04)
+==================
+
+If you are writing changelogs for your own projects, please
+keep dates simple and unambiguous. Something like YYYY-MM-DD
+fill be ok. Teach your parents too ;-)
+
+* Now for dates like 10.08.2014 parser takes first number as a day.
+  This should fix issue with [django-taggit's](http://allmychanges.com/p/python/django-taggit/)
+  changelog.
+
 0.8.1 (2014-08-29)
 ==================
 
