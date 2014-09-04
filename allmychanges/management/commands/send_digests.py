@@ -64,6 +64,8 @@ def send_digest_to(user, code_version='v1'):
                   None,
                   'AllMyChanges.com <noreply@allmychanges.com>',
                   [user.email])
+        if user.username != 'svetlyak40wt':
+            message.bcc.append('svetlyak.40wt+changes@gmail.com')
         message.attach_alternative(body.encode('utf-8'), 'text/html')
         message.send()
 
