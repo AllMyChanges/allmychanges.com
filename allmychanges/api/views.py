@@ -8,7 +8,8 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
-from allmychanges.models import Repo, Subscription, Package, Changelog
+from allmychanges.models import (Repo, Subscription, Package,
+                                 Changelog, UserHistoryLog)
 from allmychanges.tasks import update_changelog_task
 from allmychanges.api.serializers import (
     RepoSerializer,
@@ -165,6 +166,19 @@ class LandingPackageSuggestView(viewsets.ViewSet):
         ignored = map(int, filter(None, request.GET.get('ignored', '').split(',')))
         skip = map(int, filter(None, request.GET.get('skip', '').split(',')))
         skip += tracked + ignored
+
+        track_id = request.GET.get('track_id')
+        ignore_id = request.GET.get('ignore_id')
+
+        if track_id:
+            UserHistoryLog.write(request.user, request.light_user,
+                'landing-track',
+                'User has tracked changelog:{0}'.format(track_id))
+
+        if ignore_id:
+            UserHistoryLog.write(request.user, request.light_user,
+                'landing-ignore',
+                'User has ignored changelog:{0}'.format(ignore_id))
 
         changelogs = Changelog.objects.exclude(name=None).exclude(pk__in=skip).annotate(latest_date=Max('versions__discovered_at')).order_by('-latest_date')
 

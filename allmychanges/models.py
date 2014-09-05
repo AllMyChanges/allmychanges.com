@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
 
-
+from twiggy_goodies.threading import log
 
 from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.crawler.git_crawler import aggregate_git_log
@@ -515,3 +515,31 @@ class Package(models.Model):
         else:
             print 'ChangeLog wasn\'t found.'
 
+
+
+class UserHistoryLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name='history_log',
+                             blank=True,
+                             null=True)
+    light_user = models.CharField(max_length=40)
+    action = models.CharField(max_length=40)
+    description = models.CharField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+    @staticmethod
+    def merge(user, light_user):
+        with log.fields(username=user.username,
+                        light_user=light_user):
+            log.info('Merging user history logs')
+            UserHistoryLog.objects.filter(user=None,
+                                          light_user=light_user).update(user=user)
+
+    @staticmethod
+    def write(user, light_user, action, description):
+        user = user if user.is_authenticated() else None
+        UserHistoryLog.objects.create(user=user,
+                                      light_user=light_user,
+                                      action=action,
+                                      description=description)

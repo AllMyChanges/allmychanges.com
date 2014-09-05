@@ -10,6 +10,7 @@ from django.views.generic import (TemplateView,
                                   FormView,
                                   UpdateView,
                                   View)
+from django.db.models import Q
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -23,6 +24,7 @@ from allmychanges.models import (Package,
                                  Subscription,
                                  Changelog,
                                  User,
+                                 UserHistoryLog,
                                  Item)
 from oauth2_provider.models import Application, AccessToken
 
@@ -59,6 +61,10 @@ class IndexView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(IndexView, self).get_context_data(**kwargs)
+
+        UserHistoryLog.objects.create(light_user=self.request.light_user,
+                                      action='landing-digest-view',
+                                      description='User opened a landing page with digest.')
         return result
 
 
@@ -416,10 +422,19 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
         user = self.request.user
         
         with log.name_and_fields('after-login', username=user.username):
+            UserHistoryLog.merge(user, self.request.light_user)
+
             if timezone.now() - self.request.user.date_joined < datetime.timedelta(0, 60):
                 # if account was registere no more than minute ago, then show
                 # user a page where he will be able to correct email
+                UserHistoryLog.write(user, self.request.light_user,
+                                     action='account-created',
+                                     description='User created account')
                 return reverse('account-settings') + '#notifications'
+
+            UserHistoryLog.write(user, self.request.light_user,
+                                 action='login',
+                                 description='User logged in')
 
             landing_packages = self.request.COOKIES.get('landing-packages')
             if landing_packages is not None:
@@ -580,4 +595,17 @@ class TokenView(CommonContextMixin, FormView):
     def form_valid(self, form):
         delete_user_token(self.request.user, form.cleaned_data['token'])
         return super(TokenView, self).form_valid(form)
+
+
+class UserHistoryView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/user-history.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(UserHistoryView, self).get_context_data(**kwargs)
+        user = self.request.user
+        user = user if user.is_authenticated() else None
+
+        result['log'] = UserHistoryLog.objects.filter(
+            Q(user=user) | Q(light_user=self.request.light_user))
+        return result
 

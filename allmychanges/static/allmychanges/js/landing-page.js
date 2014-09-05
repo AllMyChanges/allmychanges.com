@@ -22,12 +22,14 @@ app.controller('LandingPageCtrl', function ($scope, $http, $cookies, $log) {
         $scope.packages = $scope.packages.filter(function (el) {return el.id != package.id})
     };
 
-    var add_more_elements = function() {
+    var add_more_elements = function(track_id, ignore_id) {
         $http.get('/v1/landing-package-suggest/?tracked=' +
                   $scope.tracked.join(',') +
                   '&ignored=' +
                   $scope.ignored.join(',') +
-                 '&skip=' + $scope.packages.map(function (el) { return el.id }))
+                  '&skip=' + $scope.packages.map(function (el) { return el.id }) +
+                  '&track_id=' + track_id +
+                  '&ignore_id=' + ignore_id)
              .success(function(data) {
 
             data.results.forEach(function(el) {
@@ -70,13 +72,13 @@ app.controller('LandingPageCtrl', function ($scope, $http, $cookies, $log) {
 
 
         remove_package_from_list(package);
-        add_more_elements();
+        add_more_elements(package.id, '');
     };
     $scope.ignore = function (package) {
         $scope.ignored.push(package.id);
         remove_package_from_list(package);
-        add_more_elements();
+        add_more_elements('', package.id);
     };
 
-    add_more_elements();
+    add_more_elements('', '');
 });

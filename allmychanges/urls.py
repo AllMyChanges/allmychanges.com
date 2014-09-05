@@ -5,6 +5,7 @@ admin.autodiscover()
 
 from .views import (OldIndexView,
                     IndexView,
+                    UserHistoryView,
                     HumansView,
                     DigestView,
                     EditDigestView,
@@ -56,6 +57,7 @@ urlpatterns = patterns(
     url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
     url(r'^account/token/', TokenView.as_view(), name='token'),
     url(r'^accounts/login/', LoginView.as_view(), name='login'),
+    url(r'^user-history/', UserHistoryView.as_view(), name='user-history'),
     url(r'^raise-exception/', RaiseExceptionView.as_view(), name='raise-exception'),
     url(r'^CHANGELOG.md$', ChangeLogView.as_view(), name='CHANGELOG.md'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
