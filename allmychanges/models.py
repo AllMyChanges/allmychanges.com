@@ -530,11 +530,14 @@ class UserHistoryLog(models.Model):
 
     @staticmethod
     def merge(user, light_user):
-        with log.fields(username=user.username,
-                        light_user=light_user):
-            log.info('Merging user history logs')
-            UserHistoryLog.objects.filter(user=None,
-                                          light_user=light_user).update(user=user)
+        entries = UserHistoryLog.objects.filter(user=None,
+                                                light_user=light_user)
+        if entries.count() > 0:
+            with log.fields(username=user.username,
+                            num_entries=entries.count(),
+                            light_user=light_user):
+                log.info('Merging user history logs')
+                entries.update(user=user)
 
     @staticmethod
     def write(user, light_user, action, description):

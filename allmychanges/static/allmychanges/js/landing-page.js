@@ -43,6 +43,15 @@ app.controller('LandingPageCtrl', function ($scope, $http, $cookies, $log) {
     $scope.track = function (package) {
         $scope.tracked.push(package.id);
         $scope.tracked_len = $scope.tracked.length;
+        if ($scope.tracked_len == 1) {
+            yaCounter.reachGoal('LAND-TRACK-1');
+        }
+        if ($scope.tracked_len == 3) {
+            yaCounter.reachGoal('LAND-TRACK-3');
+        }
+        if ($scope.tracked_len == 5) {
+            yaCounter.reachGoal('LAND-TRACK-5');
+        }
 
         var strings = ['To continue, track at least five projects…',
                        'Horay! You have tracked your first project!',

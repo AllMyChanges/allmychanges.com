@@ -430,14 +430,18 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
                 UserHistoryLog.write(user, self.request.light_user,
                                      action='account-created',
                                      description='User created account')
-                return reverse('account-settings') + '#notifications'
-
-            UserHistoryLog.write(user, self.request.light_user,
-                                 action='login',
-                                 description='User logged in')
+                response = reverse('account-settings') + '?registration=1#notifications'
+            else:
+                UserHistoryLog.write(user, self.request.light_user,
+                                     action='login',
+                                     description='User logged in')
+                response = reverse('digest')
 
             landing_packages = self.request.COOKIES.get('landing-packages')
+            log.info('Cookie landing-packages={0}'.format(landing_packages))
+    
             if landing_packages is not None:
+                log.info('Merging landing packages')
                 landing_packages = map(int, filter(None, landing_packages.split(',')))
                 user_packages = {ch.id
                                  for ch in Changelog.objects.filter(packages__user=user)}
@@ -452,7 +456,7 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
                                                      changelog=changelog)
                             except Exception:
                                 log.trace().error('Unable to save landing package')
-        return reverse('digest')
+        return response
 
 
 class StyleGuideView(TemplateView):

@@ -20,7 +20,6 @@ import anyjson
 import re
 import click
 
-from docopt import docopt
 from click import echo
 from collections import defaultdict
 
@@ -39,13 +38,18 @@ def print_item(item):
               help='Output only if there was ERROR.')
 @click.option('--message',
               help='Show only items with this text in message.')
+@click.option('--name',
+              help='Show only items with logger name which matches to this regexp.')
 @click.argument('filename')
-def process(filename, cross_finger, message):
+def process(filename, cross_finger, message, name):
     buffer = defaultdict(list)
 
     def print_if_needed(item):
         if message:
             if re.search(message, item['@message'], re.I) is None:
+                return
+        if name:
+            if re.search(name, item['@fields']['name'], re.I) is None:
                 return
         print_item(item)
             
@@ -73,6 +77,4 @@ def process(filename, cross_finger, message):
 
 
 if __name__ == '__main__':
-#    args = docopt(__doc__, version='JSON log tailer (0.1)')
-
     process()
