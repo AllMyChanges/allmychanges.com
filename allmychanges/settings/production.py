@@ -18,7 +18,7 @@ DATABASES['default'].update({
 
 GRAPHITE_PREFIX = 'allmychanges'
 
-ALLOWED_HOSTS = ['allmychanges.com']
+ALLOWED_HOSTS = ['allmychanges.com', 'localhost']
 
 METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'
