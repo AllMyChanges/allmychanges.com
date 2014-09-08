@@ -185,5 +185,5 @@ class LandingPackageSuggestView(viewsets.ViewSet):
         return Response({'results': [{'id': ch.id,
                                       'name': ch.name,
                                       'namespace': ch.namespace,
-                                      'versions': process_versions(ch.versions.all()[:3])}
+                                      'versions': process_versions(ch.versions.filter(code_version='v1')[:3])}
                                      for ch in changelogs[:3]]})
