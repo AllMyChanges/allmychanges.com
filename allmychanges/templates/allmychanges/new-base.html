@@ -24,12 +24,15 @@
     {% endblock %}
 
       <script src="//yastatic.net/jquery/2.1.1/jquery.js" type="text/javascript" charset="utf-8"></script>
+
+    {% compress js %}
       <script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/share.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/landing-page.js" type="text/javascript" charset="utf-8"></script>
+    {% endcompress %}
 
       <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
       <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
