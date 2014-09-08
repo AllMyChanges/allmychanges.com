@@ -1,16 +1,15 @@
-{% load staticfiles allmychanges_tags %}
+{% load staticfiles allmychanges_tags compress %}
 <!DOCTYPE html>
 <html ng-app="allMyChangesApp">
 <head>
     <title>AllMyChanges.com</title>
 
+
+    {% compress css %}
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
-    {% if request.GET.smaker %}
-    <link href="{% static 'allmychanges/css/smaker.css' %}" rel="stylesheet">
-    {% else %}
     <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
-    {% endif %}
     <link href="{% static 'angular/angucomplete-alt.css' %}" rel="stylesheet">
+    {% endcompress %}
 
 
     {% block anjular-js %}
