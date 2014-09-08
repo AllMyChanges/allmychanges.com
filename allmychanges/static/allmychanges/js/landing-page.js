@@ -12,6 +12,12 @@ app.directive('packageSelectorLine', ['$http', '$interval', '$timeout', function
 }]);
 
 
+var reach_goal = function(name) {
+    if (yaCounter !== undefined) {
+        yaCounter.reachGoal(name);
+    }
+};
+
 app.controller('LandingPageCtrl', function ($scope, $http, $cookies, $log) {
     $scope.tracked = [];
     $scope.tracked_len = 0;
@@ -44,13 +50,13 @@ app.controller('LandingPageCtrl', function ($scope, $http, $cookies, $log) {
         $scope.tracked.push(package.id);
         $scope.tracked_len = $scope.tracked.length;
         if ($scope.tracked_len == 1) {
-            yaCounter.reachGoal('LAND-TRACK-1');
+            reach_goal('LAND-TRACK-1');
         }
         if ($scope.tracked_len == 3) {
-            yaCounter.reachGoal('LAND-TRACK-3');
+            reach_goal('LAND-TRACK-3');
         }
         if ($scope.tracked_len == 5) {
-            yaCounter.reachGoal('LAND-TRACK-5');
+            reach_goal('LAND-TRACK-5');
         }
 
         var strings = ['To continue, track at least five projects…',

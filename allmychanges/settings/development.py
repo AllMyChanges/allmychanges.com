@@ -1,7 +1,7 @@
 import os
 from .default import *  # nopep8
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 if DEBUG:
@@ -43,4 +43,4 @@ if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR)
 
 
-ALLOWED_HOSTS = ['art.dev.allmychanges.com']
+ALLOWED_HOSTS = ['localhost', 'art.dev.allmychanges.com']
