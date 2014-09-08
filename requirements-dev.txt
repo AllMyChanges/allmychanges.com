@@ -33,7 +33,7 @@ fancycompleter==0.4  # requirements-dev.in:3 ~> pdbpp==0.7.2
 flask==0.10.1  # requirements-dev.in:12 ~> rq-dashboard==0.3.4
 graphitesend==0.3.4  # requirements-dev.in:1 -> requirements.in:9
 gunicorn==19.1.1  # requirements-dev.in:1 -> requirements.in:15
-html2text==2014.9.7  # requirements-dev.in:1 -> requirements.in:22
+html2text==2014.9.8  # requirements-dev.in:1 -> requirements.in:22
 html5lib==0.999  # requirements-dev.in:1 -> requirements.in:27 ~> bleach==1.4
 itsdangerous==0.24  # requirements-dev.in:12 ~> rq-dashboard==0.3.4 ~> flask==0.10.1
 jinja2==2.7.3  # requirements-dev.in:12 ~> rq-dashboard==0.3.4 ~> flask==0.10.1

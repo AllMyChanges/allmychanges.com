@@ -16,14 +16,14 @@ django-debug-toolbar==1.2.1  # requirements.in:6
 django-extensions==1.4.0  # requirements.in:5
 django-rq==0.7.0  # requirements.in:11
 django-widget-tweaks==1.3  # requirements.in:25
-django==1.6.7  # requirements.in:1
+django==1.6.5  # requirements.in:1
 djangorestframework==2.4.2  # requirements.in:4 ~> drf-extensions==0.2.5
 docutils==0.12  # requirements.in:12
 drf-extensions==0.2.5  # requirements.in:4
 envoy==0.0.3  # requirements.in:8
 graphitesend==0.3.4  # requirements.in:9
 gunicorn==19.1.1  # requirements.in:15
-html2text==2014.9.7  # requirements.in:22
+html2text==2014.9.8  # requirements.in:22
 html5lib==0.999  # requirements.in:27 ~> bleach==1.4
 lxml==3.3.6  # requirements.in:14 and requirements.in:19 ~> premailer==2.5.1
 markdown==2.4.1  # requirements.in:13
