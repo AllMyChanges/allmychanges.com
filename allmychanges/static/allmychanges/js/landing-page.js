@@ -13,8 +13,8 @@ app.directive('packageSelectorLine', ['$http', '$interval', '$timeout', function
 
 
 var reach_goal = function(name) {
-    if (yaCounter !== undefined) {
-        yaCounter.reachGoal(name);
+    if (window.yaCounter !== undefined) {
+        window.yaCounter.reachGoal(name);
     }
 };
 
