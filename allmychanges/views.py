@@ -67,6 +67,11 @@ class IndexView(CommonContextMixin, TemplateView):
                                       description='User opened a landing page with digest.')
         return result
 
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('digest'))
+        return super(IndexView, self).get(*args, **kwargs)
+
 
 class SubscriptionForm(forms.Form):
     email = forms.EmailField(label='Email')

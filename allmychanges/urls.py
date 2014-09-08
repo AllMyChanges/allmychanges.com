@@ -27,9 +27,11 @@ from django.shortcuts import redirect
 
 urlpatterns = patterns(
     '',
-    url(r'^$', LandingView.as_view(landings=['coming-soon']), name='index'),
-    url(r'^index/$', IndexView.as_view(), name='new-index'),
+    url(r'^$', IndexView.as_view(), name='index'),
+
+    # TODO REMOVE THESE TWO
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
+    url(r'^coming-soon/$', LandingView.as_view(landings=['coming-soon']), name='comint-soon'),
 
     url(r'^subscribed/$', SubscribedView.as_view(), name='subscribed'),
 
