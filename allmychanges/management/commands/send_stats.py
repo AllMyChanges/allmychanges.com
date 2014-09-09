@@ -67,6 +67,7 @@ def get_stats():
     
     stats['db.versions.v1-unreleased'] = Version.objects.filter(code_version='v1', unreleased=True).exclude(changelog__filename=None).count()
     stats['db.versions.v2-unreleased'] = Version.objects.filter(code_version='v2', unreleased=True).count()
+    stats['db.users-with-emails'] = User.objects.exclude(email=None).count()
 
     now = timezone.now()
     minute_ago = now - datetime.timedelta(0, 60)
