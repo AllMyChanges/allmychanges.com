@@ -57,24 +57,32 @@ def send_digest_to(user, code_version='v1'):
 
         body = premailer.transform()
         subject = 'Changelogs digest on {0:%d %B %Y}'.format(now)
-        if code_version == 'v2':
-            subject += ' (v2)'
 
-        if code_version == 'v2' and user.username != 'svetlyak40wt':
-            email = 'svetlyak.40wt+v2@gmail.com'
-        else:
-            email = user.email
+        def send_to(email):
+            if user.username != 'svetlyak40wt' and not email.startswith('svetlyak.40wt'):
+                # все чужие дайжесты дублируем ко мне на email
+                send_to('svetlyak.40wt+changes@gmail.com')
 
-        message = EmailMultiAlternatives(subject,
-                  None,
-                  'AllMyChanges.com <noreply@allmychanges.com>',
-                  [email])
+            # в копиях мне — указываем username и версию
+            if email.startswith('svetlyak.40wt'):
+                actual_subject = subject + ' ({username}, {code_version})'.format(
+                    username=user.username, code_version=code_version)
+            else:
+                actual_subject = subject
 
-        if user.username != 'svetlyak40wt':
-            message.bcc.append('svetlyak.40wt+changes@gmail.com')
+            # обычным пользователям отправляем только v1 дайжесты
+            # мне — все остальные
+            if code_version == 'v1' or email.startswith('svetlyak.40wt'):
+                message = EmailMultiAlternatives(actual_subject,
+                          None,
+                          'AllMyChanges.com <noreply@allmychanges.com>',
+                          [email])
 
-        message.attach_alternative(body.encode('utf-8'), 'text/html')
-        message.send()
+                message.attach_alternative(body.encode('utf-8'), 'text/html')
+                message.send()
+
+        send_to(user.email)
+
 
 
 class Command(LogMixin, BaseCommand):
