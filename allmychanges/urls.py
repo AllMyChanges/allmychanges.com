@@ -39,6 +39,7 @@ urlpatterns = patterns(
     url(r'^landing-digest/$', LandingDigestView.as_view(), name='landing-digest'),
     url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
     
+    url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
@@ -59,7 +60,6 @@ urlpatterns = patterns(
     url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
     url(r'^account/token/', TokenView.as_view(), name='token'),
     url(r'^accounts/login/', LoginView.as_view(), name='login'),
-    url(r'^user-history/', UserHistoryView.as_view(), name='user-history'),
     url(r'^raise-exception/', RaiseExceptionView.as_view(), name='raise-exception'),
     url(r'^CHANGELOG.md$', ChangeLogView.as_view(), name='CHANGELOG.md'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),

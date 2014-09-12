@@ -611,10 +611,15 @@ class UserHistoryView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(UserHistoryView, self).get_context_data(**kwargs)
-        user = self.request.user
-        user = user if user.is_authenticated() else None
 
-        result['log'] = UserHistoryLog.objects.filter(
-            Q(user=user) | Q(light_user=self.request.light_user))
+        if 'username' in kwargs:
+            user = User.objects.get(username=kwargs['username'])
+            result['log'] = UserHistoryLog.objects.filter(user=user)
+        else:
+            user = self.request.user
+            user = user if user.is_authenticated() else None
+
+            result['log'] = UserHistoryLog.objects.filter(
+                Q(user=user) | Q(light_user=self.request.light_user))
         return result
 
