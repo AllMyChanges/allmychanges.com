@@ -21,13 +21,23 @@ from .views import (OldIndexView,
                     ProfileView,
                     TokenView,
                     PackageView)
+from .sitemaps import PackagesSitemap
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
+from django.views.generic.base import TemplateView
 
+
+sitemaps = {'packages': PackagesSitemap}
 
 urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^sitemap\.xml$',
+         'django.contrib.sitemaps.views.sitemap',
+         {'sitemaps': sitemaps}),
+
+    url(r'^robots\.txt$',
+         TemplateView.as_view(template_name='robots.txt')),
 
     # TODO REMOVE THESE TWO
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
@@ -44,7 +54,7 @@ urlpatterns = patterns(
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package-canonical'),
 
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /p/*/*
+Allow: /
+Disallow: /*
+Sitemap: http://allmychanges.com/sitemap.xml
