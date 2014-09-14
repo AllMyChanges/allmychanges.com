@@ -1,3 +1,15 @@
+0.8.3 (2014-09-14)
+==================
+
+Only two visible changes are introduced in this version.
+
+* Digest editing page was renamed to 'Edit track list' and some links were made buttons.
+* There was made a minor improvement in the way how changelog labels are rendered.
+  This should fix they rendering in some mail clients, if don't, then contact us
+  via <mail-to:support@allmychanges.com>.
+
+Another big feature is under development now — global magic pony search. Stay tuned!
+
 0.8.2 (2014-09-04)
 ==================
 
