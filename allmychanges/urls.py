@@ -37,7 +37,8 @@ urlpatterns = patterns(
          {'sitemaps': sitemaps}),
 
     url(r'^robots\.txt$',
-         TemplateView.as_view(template_name='robots.txt')),
+         TemplateView.as_view(template_name='robots.txt',
+                              content_type='text/plain')),
 
     # TODO REMOVE THESE TWO
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
