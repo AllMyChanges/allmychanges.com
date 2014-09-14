@@ -451,7 +451,8 @@ body.email {
   font-weight: 300;
 }
 .package-version__section-item {
-  list-style: disc inside;
+  list-style: none;
+  line-height: 1.667em;
 }
 .package-version__section-item > p:first-child {
   margin-left: 0;
@@ -491,30 +492,14 @@ body.email {
   margin-left: 0.6em;
   color: #808080;
 }
-.package-version__section-item {
-  list-style: none;
-  line-height: 1.667em;
-}
-.package-version__section-item p:first-child {
-  margin-left: 0;
-}
-.package-version__section-item p {
-  margin-left: 1em;
-}
 .changelog-item-type {
   background-color: #800080;
   content: text;
-  position: absolute;
-  margin-left: -40px;
   font-size: 12px;
   font-family: Courier New;
   padding: 2px 4px;
   border-radius: 3px;
   color: #fff;
-  width: 24px;
-  text-align: center;
-  line-height: 1em;
-  margin-top: 5px;
 }
 .changelog-item-type_fix {
   background-color: #ee883d;

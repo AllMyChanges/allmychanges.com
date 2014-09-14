@@ -96,7 +96,8 @@ body.email {
         font-weight: 300;
     }
     &__section-item {
-        list-style: disc inside;
+        list-style: none;
+        line-height: 1.667em;
         
         > p:first-child {
             margin-left: 0;
@@ -148,32 +149,14 @@ body.email {
   }
 }
 
-.package-version__section-item {
-    list-style: none;
-    line-height: 1.667em;
-}
-
-.package-version__section-item p:first-child {
-    margin-left: 0;
-}
-.package-version__section-item p {
-    margin-left: 1em;
-}
-
 .changelog-item-type {
       background-color: purple;
       content: text;
-      position: absolute;
-      margin-left: -40px;
       font-size: 12px;
       font-family: Courier New;
       padding: 2px 4px;
       border-radius: 3px;
       color: white;
-      width: 24px;
-      text-align: center;
-      line-height: 1em;
-      margin-top: 5px;
 }
 
 .changelog-item-type_fix {
