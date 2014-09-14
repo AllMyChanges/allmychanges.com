@@ -1,11 +1,15 @@
 from .default import *  # nopep8
 
-DATABASES['default'].update({
-    'NAME': DATABASES['default']['NAME'] + '_unittest',
-})
 
-# this need for NoseDjango
-DATABASE_NAME = DATABASES['default']['NAME']
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
+    }
+}
+DISABLE_TRANSACTION_MANAGEMENT = True
+
+DATABASE_NAME = ''
 
 
 AUTHENTICATION_BACKENDS = (
@@ -13,9 +17,13 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOG_FILENAME = 'unittest-' + CURRENT_USER + '.log'
+
 init_logging(LOG_FILENAME)
 
 # making jobs run synchronously without queueing
 for queue_options in RQ_QUEUES.itervalues():
     queue_options['ASYNC'] = False
 
+#DEBUG = False
+#TEMPLATE_DEBUG = False
+DEBUG_JOBS = True

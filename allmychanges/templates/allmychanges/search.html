@@ -1,0 +1,15 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block content %}
+{% if user_changelogs or canonical_changelogs %}
+{% if user_changelogs %}
+  {{user_changelogs }}
+{% endif %}
+
+{% if canonical_changelogs %}
+  {{canonical_changelogs }}
+{% endif %}
+{% else %}
+Nothing found. Try another query.
+{% endif %}
+{% endblock content %}

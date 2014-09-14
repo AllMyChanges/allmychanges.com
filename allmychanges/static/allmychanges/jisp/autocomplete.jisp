@@ -1,0 +1,30 @@
+(mac div attrs children
+     `(fn (React.DOM.div ,attrs ,children)))
+(mac h1 attrs children
+     `(fn (React.DOM.div ,attrs ,children)))
+
+;; ;; (mac p attrs children
+;; ;;      `(fn (React.DOM.p ,attrs ,children)))
+
+
+;; (def mknode name
+;;      (fn attrs children
+;;           (fn ((get React.DOM name) attrs children))))
+
+;; (= div (mknode "div"))
+
+(= CommentList (React.createClass
+                (displayName: "CommentList"
+                render: (div (className: "commentList")
+                             "Hello, world! I am a CommentList."))))
+
+(= CommentBox (React.createClass
+               (displayName: "CommentBox"
+                render: (div (className: "commentBox")
+                             (h1 "Hello, world! I am a CommentBox.")
+                             (CommentList)))))
+
+(React.renderComponent
+ (CommentBox null)
+ (document.getElementById "react-content"))
+

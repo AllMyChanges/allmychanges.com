@@ -28,6 +28,7 @@
     font-size: 1em
     padding: (1em/15)
     margin: 0
+    width: 100%;
     
     &__error
         border: 1px solid (input-border-color + #f00)
@@ -35,8 +36,19 @@
 .button
     color: button-text-color
     background-color: button-color
+    border: 1px solid (button-color - 10%)
+    cursor: pointer
+    &:hover
+        background-color: (button-color - 20%)
+
+    &:disabled
+        color: (@color + 40%)
+        cursor: not-allowed
+        &:hover
+            background-color: @background-color
+
+
     text-decoration: none
-    border: 1px solid input-border-color
     font-size: (12em / 15)
     line-height: (19em / 12)
     padding-top: (1em / 12)
@@ -47,24 +59,34 @@
 
     border-radius: (1em / 6)
 
-    &:hover
-        background-color: (button-color - 20%)
-
     &_good
         color: good-button-text-color
         background-color: good-button-color
-        border-color: (good-button-color - 25%)
-
+        border-color: (@background-color - 10%)
         &:hover
-            background-color: (good-button-color - 20%)
+            background-color: (@background-color - 20%)
+
+        &:disabled
+            color: @color
+            background-color: (@background-color + 50%)
+            border-color: (@background-color + 40%)
+            &:hover
+                background-color: @background-color
+
 
     &_bad
         color: bad-button-text-color
         background-color: bad-button-color
-        border-color: (good-button-color - 25%)
-
+        border-color: (@background-color - 10%)
         &:hover
-            background-color: (bad-button-color - 20%)
+            background-color: (@background-color - 20%)
+
+        &:disabled
+            color: @color
+            background-color: (@background-color + 50%)
+            border-color: (@background-color + 40%)
+            &:hover
+                background-color: @background-color
 
     &_medium
         font-size: (15em / 15)
@@ -74,3 +96,10 @@
         font-size: (30em / 15)
         line-height: (40em / 30)
         
+
+
+.input
+    margin-top: 16px
+    &__error
+        margin-left: 10px
+        color: red

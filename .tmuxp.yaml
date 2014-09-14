@@ -19,15 +19,15 @@ windows:
       - ./manage.py runserver 0.0.0.0:8000
   - window_name: worker
     panes:
-      - ./manage.py rqworker
+      - ./manage.py rqworker default preview
 
-  - window_name: stylus
+  - window_name: gulp
     panes:
-      - node_modules/.bin/stylus --watch --out allmychanges/static/allmychanges/css allmychanges/static/allmychanges/stylus/allmychanges.styl
+      - gulp
 
   - window_name: rqinfo
     panes:
-      - rqinfo
+      - rq
 
   - window_name: log
     panes:

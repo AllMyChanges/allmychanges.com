@@ -7,8 +7,8 @@ from .views import (OldIndexView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
+                    SearchView,
                     DigestView,
-                    EditDigestView,
                     LandingDigestView,
                     BadgeView,
                     AfterLoginView,
@@ -18,9 +18,12 @@ from .views import (OldIndexView,
                     LandingView,
                     RaiseExceptionView,
                     ChangeLogView,
+                    PreviewView,
+                    AddNewView,
                     ProfileView,
                     TokenView,
-                    PackageView)
+                    PackageView,
+                    EditPackageView)
 from .sitemaps import PackagesSitemap
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
@@ -40,6 +43,8 @@ urlpatterns = patterns(
          TemplateView.as_view(template_name='robots.txt',
                               content_type='text/plain')),
 
+    url(r'^search/$', SearchView.as_view(), name='search'),
+
     # TODO REMOVE THESE TWO
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
     url(r'^coming-soon/$', LandingView.as_view(landings=['coming-soon']), name='comint-soon'),
@@ -48,14 +53,15 @@ urlpatterns = patterns(
 
     url(r'^digest/$', DigestView.as_view(), name='digest'),
     url(r'^landing-digest/$', LandingDigestView.as_view(), name='landing-digest'),
-    url(r'^digest/edit/$', EditDigestView.as_view(), name='edit-digest'),
-    
+    url(r'^preview/(?P<pk>.*?)/$', PreviewView.as_view(), name='preview'),
+
     url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),
     url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^u/(?P<username>.*?)/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
+    url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package-canonical'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView.as_view(), name='edit-package'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),

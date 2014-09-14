@@ -17,6 +17,16 @@ from allmychanges.env import Environment
 from django.conf import settings
 
 
+CHANGELOG_LIKE_FILENAMES = ('change', 'release', 'news', 'history')
+EXTENSIONS_TO_CHECK = {'.rst', '.md', '.markdown', '.txt', '.htm', '.html'}
+
+
+def filename_looks_like_a_changelog(filename):
+    filename = filename.lower()
+    return any((item in filename)
+               for item in CHANGELOG_LIKE_FILENAMES)
+
+
 def compare_versions(left, right):
     return left.date < right.date \
         and left.version < right.version
@@ -49,7 +59,11 @@ def strip_outer_tag(text):
     return text
 
 
-def get_files(env):
+def get_files(env, walk=os.walk):
+    """
+    Uses: env.ignore_list, env.check_list and env.dirname.
+    """
+
     ignore_list = env.ignore_list
     check_list = env.check_list
 
@@ -65,10 +79,7 @@ def get_files(env):
                 return True, markup
         return False, None
 
-    CHANGELOG_LIKE_FILENAMES = ('change', 'release')
-    EXTENSIONS_TO_CHECK = {'.rst', '.md', '.markdown' '.txt', '.htm', '.html'}
-    
-    for root, dirs, files in os.walk(env.dirname):
+    for root, dirs, files in walk(env.dirname):
         for filename in files:
             full_filename = os.path.join(root, filename)
             rel_filename = os.path.relpath(full_filename, env.dirname)
@@ -76,18 +87,14 @@ def get_files(env):
             low_filename = rel_filename.lower()
             _, ext = os.path.splitext(low_filename)
 
-            filename_looks_like_a_changelog = any(
-                (name in low_filename)
-                for name in CHANGELOG_LIKE_FILENAMES)
-            
             if ext not in EXTENSIONS_TO_CHECK \
-               and not filename_looks_like_a_changelog:
+               and not filename_looks_like_a_changelog(low_filename):
                 continue
 
             if not in_ignore_list(rel_filename):
                 attrs = dict(type='filename',
                              filename=full_filename)
-                
+
                 if check_list:
                     found, markup = search_in_check_list(rel_filename)
                     if found:
@@ -108,7 +115,7 @@ def read_files(root, filenames):
                     f.read())
             except Exception:
                 continue
-            
+
             yield content
 
 
@@ -199,7 +206,7 @@ def parse_plain_file(obj):
                     yield obj.push(type='file_section',
                                    title=current_title,
                                    content=current_sections)
-                    
+
                 current_title = line
                 current_section = None
                 current_sections = []
@@ -323,7 +330,7 @@ def parse_html_file(obj):
             text = lxml.html.tostring(el).strip()
             text = strip_outer_tag(text)
             return text
-    
+
         return map(inner_html, el.getchildren())
 
     def create_notes(children):
@@ -357,7 +364,7 @@ def parse_html_file(obj):
     def is_header_tag(ch):
         if isinstance(ch.tag, basestring):
             return not ch.tag.startswith('h') or ch.tag > tag
-        
+
     for tag, text, all_children in headers:
         children = itertools.takewhile(
             is_header_tag,
@@ -469,7 +476,7 @@ def extract_metadata(version):
             # to the version itself
             if idx < 3 and mention_unreleased(content_part):
                 new_version.unreleased = True
-                
+
             return content_part
         else:
             # here we process list items
@@ -496,7 +503,7 @@ def prerender_items(version):
         # {u'a': [u'href', u'title'], u'acronym': [u'title'], u'abbr': [u'title']}
         # bleach.ALLOWED_STYLES
         # []
-        # 
+        #
         return clean(text,
                      tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote',
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
@@ -513,7 +520,7 @@ def prerender_items(version):
                      styles=[])
 
     def apply_filters(text):
-        
+
         for flt in [remove_html_markup, process_cve, capfirst]:
             text = flt(text)
         return text
@@ -544,6 +551,30 @@ def group_by_path(versions):
             result[''.join(path)].append(version)
             path = path[:-1]
     return result
+
+
+def filter_trash_versions(versions):
+    grouped = group_by_path(versions)
+
+    def calc_score(source):
+        score = 10
+
+        # add points if name has explicit point that there is
+        # some version information
+        if filename_looks_like_a_changelog(source):
+            score += 1000
+
+        # and add point for each version inside this source
+        score += len(grouped[source])
+        return score
+
+    sources = [(calc_score(source), source)
+               for source in grouped]
+    sources.sort(reverse=True)
+
+    best_source = sources[0][1]
+
+    return grouped[best_source]
 
 
 def processing_pipe(root, ignore_list=[], check_list=[]):
@@ -599,7 +630,7 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
         left_keys_count = len(left.keys())
         right_keys_count = len(right.keys())
-        
+
         if left_keys_count < right_keys_count:
             return -1
         if left_keys_count > right_keys_count:
@@ -607,11 +638,17 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
         return 0
 
+    # TODO: вот это надо будет использовать для сбора статистику по исходникам
+    # from itertools import groupby
+    # grouped = groupby(versions, lambda x: x.filename)
+    # grouped1 = [(key, list(value)) for key, value in grouped]
+    # grouped2 = [(key, len(value)) for key, value in grouped1]
+
+    # print '\n'.join(map('{0[0]}: {0[1]}'.format, sorted(grouped2)))
+
     # now we'll select a source with maximum number of versions
     # but not the root directory
-    grouped = group_by_path(versions).items()
-    grouped.sort(key=lambda item: len(item[1]), reverse=True)
-    versions = grouped[0][1]
+    versions = filter_trash_versions(versions)
 
     # using customized comparison we make versions which
     # have less metadata go first
@@ -636,4 +673,3 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
 
 # file|parse -> sections|filter_versions -> create_raw_versions|sort
-

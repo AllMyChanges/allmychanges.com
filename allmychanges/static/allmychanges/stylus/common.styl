@@ -348,3 +348,123 @@ level-4-header() {
 }
 
 /* end of the index page */
+
+.magic-prompt {
+    margin-top: 24px;
+    margin-left: 100px;
+    margin-right: 200px;
+
+    &__text {
+        font-size: 24px;
+        line-height: 24px;
+        margin-top: -8px;
+        padding-bottom: 0px;
+        padding-top: 4px;
+        padding-left: 4px;
+    }
+    &__autocomplete {
+        width: 80%;
+        display: inline-block;
+    }
+    &__submit {
+        font-size: 24px;
+        line-height: 32px;
+        margin-top: -10px;
+        margin-left: 20px;
+    }
+    &__apply {
+        font-size: 24px;
+        line-height: 32px;
+        margin-top: 10px;
+    }
+}
+
+
+/* start of the new package page */
+
+.new-package {
+    &__greeting {
+        font-size: 24px;
+        line-height: 32px;
+    }
+    &__url {
+        font-weight: bold;
+    }
+
+    &__fields-table {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        width: 100%;
+        max-width: 800px
+    }
+    &__search-input,
+    &__ignore-input {
+        width: 100%;
+    }
+    &__search-label,
+    &__ignore-label{
+        padding-top: 12px;
+    }
+    &__search-label,
+    &__search-input-wrap,
+    &__namespace-name-cell {
+        padding-right: 10px;
+    }
+    &__ignore-label,
+    &__ignore-input-wrap {
+        padding-left: 10px;
+    }
+
+    &__search-input,
+    &__ignore-input {
+        height: 140px;
+    }
+    &__button-cell {
+        vertical-align: bottom;
+        text-align: right;
+    }
+
+    &__save-tooltip {
+        position: absolute;
+        width: 200px;
+        color: #FE7649;
+    }
+    &__rename-warning {
+        color: #FE7649;
+    }
+}
+
+.results-spin {
+    height: 50px;
+    &__wrapper {
+        position: absolute;
+        width: 100%;
+        max-width: 800px;
+    }
+}
+
+.namespace-name-cell {
+    &__table {
+        width: 100%;
+    }
+    &__namespace-cell,
+    &__name-cell {
+        width: 50%;
+    }
+}
+
+.preview-error {
+    color: red;
+}
+
+.namespace-name-cell__namespace-cell {
+    padding-right: 10px;
+    vertical-align: bottom;
+}
+
+/* end of new-package page */
+
+.autocomplete-input {
+    width: 100%;
+}
+

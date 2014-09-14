@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
+import anyjson
+import time
 import random
 import requests
 import os
+import urllib
+import re
 
 from braces.views import LoginRequiredMixin
 from django.views.generic import (TemplateView,
@@ -17,18 +21,25 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django import forms
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from twiggy_goodies.threading import log
 
 from allmychanges.models import (Package,
+                                 LightModerator,
+                                 Version,
                                  Subscription,
                                  Changelog,
                                  User,
                                  UserHistoryLog,
+                                 Preview,
                                  Item)
 from oauth2_provider.models import Application, AccessToken
 
-from allmychanges.utils import HOUR
+from allmychanges.utils import (HOUR,
+                                normalize_url,
+                                parse_ints,
+                                join_ints)
+from allmychanges.tasks import update_preview_task
 
 
 class CommonContextMixin(object):
@@ -43,7 +54,7 @@ class CommonContextMixin(object):
             num_tracked_changelogs = Changelog.objects.count()
             cache.set(key, num_tracked_changelogs, HOUR)
         result[key] = num_tracked_changelogs
-        
+
         return result
 
 
@@ -104,7 +115,7 @@ class SubscribedView(CommonContextMixin, TemplateView):
         if landing:
             result.setdefault('tracked_vars', {})
             result['tracked_vars']['landing'] = landing
-            
+
         return result
 
 
@@ -136,7 +147,7 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
 
     for version in versions_queryset[:limit_versions]:
         sections = []
-        for section in version.sections.filter(code_version=code_version):
+        for section in version.sections.all():
             sections.append(dict(notes=section.notes,
                                  items=[
                                      dict(text=item.text,
@@ -163,6 +174,7 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
                     username=user.username if user else None,
                 ),
                 changelog=dict(
+                    id=changelog.id,
                     updated_at=changelog.updated_at,
                     next_update_at=changelog.next_update_at,
                     filename=changelog.filename,
@@ -171,7 +183,7 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
                 versions=versions)
 
 
-def get_digest_for(packages,
+def get_digest_for(changelogs,
                    before_date=None,
                    after_date=None,
                    limit_versions=5,
@@ -193,17 +205,14 @@ def get_digest_for(packages,
         if after_date:
             filter_args['discovered_at__gte'] = after_date
 
-    if issubclass(packages.model, Package):
-        packages = packages.filter(**{'changelog__versions__' + key: value
-                                      for key, value in filter_args.items()})
-        packages = packages.select_related('changelog').distinct()
-    else:
-        packages = packages.filter(**{'versions__' + key: value
-                                      for key, value in filter_args.items()})
-        packages = packages.distinct()
+    changelogs = changelogs.filter(**{'versions__' + key: value
+                                    for key, value in filter_args.items()})
+    changelogs = changelogs.distinct()
 
-    changes = [get_package_data_for_template(package, filter_args, limit_versions, after_date, code_version)
-               for package in packages]
+    changes = [get_package_data_for_template(
+        changelog, filter_args, limit_versions,
+        after_date, code_version)
+               for changelog in changelogs]
 
     return changes
 
@@ -221,18 +230,19 @@ class CachedMixin(object):
     def get_cache_params(self, *args, **kwargs):
         """This method should return cache key and value TTL."""
         raise NotImplementedError('Please, implement get_cache_params method.')
-        
-        
+
+
 class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/digest.html'
 
     def get_cache_params(self, *args, **kwargs):
-        code_version = self.request.GET.get('code_version', 'v1')
+        user = self.request.user
+
+        code_version = self.request.GET.get('code_version', 'v2')
         cache_key = 'digest-{username}-{packages}-{changes}-{code_version}'.format(
-            username=self.request.user.username,
-            packages=self.request.user.packages.count(),
-            changes=Item.objects.filter(
-                section__version__changelog__packages__user=self.request.user).count(),
+            username=user.username,
+            packages=user.changelogs.count(),
+            changes=Item.objects.filter(section__version__changelog__trackers=user).count(),
             code_version=code_version)
 
         if self.request.GET:
@@ -240,7 +250,7 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
             cache_key += ':'.join('{0}={1}'.format(*item)
                                   for item in self.request.GET.items())
         return cache_key, 4 * HOUR
-        
+
     def get_context_data(self, **kwargs):
         result = super(DigestView, self).get_context_data(**kwargs)
 
@@ -249,30 +259,30 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         day_ago = now - one_day
         week_ago = now - datetime.timedelta(7)
         month_ago = now - datetime.timedelta(31)
-        code_version = self.request.GET.get('code_version', 'v1')
+        code_version = self.request.GET.get('code_version', 'v2')
 
         result['code_version'] = code_version
         result['current_user'] = self.request.user
 
 
-        packages = self.request.user.packages
-        result['today_changes'] = get_digest_for(packages,
+        changelogs = self.request.user.changelogs
+
+        result['today_changes'] = get_digest_for(changelogs,
                                                  after_date=day_ago,
                                                  code_version=code_version)
-        result['week_changes'] = get_digest_for(packages,
+        result['week_changes'] = get_digest_for(changelogs,
                                                 before_date=day_ago,
                                                 after_date=week_ago,
                                                 code_version=code_version)
-        result['month_changes'] = get_digest_for(packages,
+        result['month_changes'] = get_digest_for(changelogs,
                                                  before_date=week_ago,
                                                  after_date=month_ago,
                                                  code_version=code_version)
-        result['ealier_changes'] = get_digest_for(packages,
+        result['ealier_changes'] = get_digest_for(changelogs,
                                                   before_date=month_ago,
                                                   code_version=code_version)
 
-        result['no_packages'] = \
-                self.request.user.packages \
+        result['no_packages'] = changelogs \
                                  .exclude(namespace='web', name='allmychanges') \
                                  .count() == 0
         result['no_data'] = all(
@@ -283,12 +293,6 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         return result
 
     def get(self, *args, **kwargs):
-        if self.request.user.packages.count() == 0:
-            return HttpResponseRedirect(reverse('edit-digest'))
-        UserHistoryLog.write(self.request.user,
-                             self.request.light_user,
-                             'digest-view',
-                             'User viewed the digest')
         return super(DigestView, self).get(*args, **kwargs)
 
 
@@ -296,32 +300,29 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/landing-digest.html'
 
     def get_cache_params(self, *args, **kwargs):
-        packages = self.request.GET.get('packages', '')
-        self.packages = map(int, filter(None, packages.split(',')))
+        changelogs = self.request.GET.get('changelogs', '')
+        self.changelogs = parse_ints(changelogs)
 
-        cache_key = 'digest-{packages}'.format(packages=','.join(map(str, sorted(packages))))
+        cache_key = 'digest-{changelogs}'.format(changelogs=join_ints(changelogs))
         return cache_key, 4 * HOUR
-        
+
     def get_context_data(self, **kwargs):
         result = super(LandingDigestView, self).get_context_data(**kwargs)
-
-        # packages = self.request.GET.get('packages', '')
-        # packages = map(int, filter(None, packages.split(',')))
 
         now = timezone.now()
         one_day = datetime.timedelta(1)
         day_ago = now - one_day
         week_ago = now - datetime.timedelta(7)
-        code_version = self.request.GET.get('code_version', 'v1')
+        code_version = self.request.GET.get('code_version', 'v2')
 
         result['code_version'] = code_version
         result['current_user'] = self.request.user
 
-        packages = Changelog.objects.filter(pk__in=self.packages)
-        result['today_changes'] = get_digest_for(packages,
+        changelogs = Changelog.objects.filter(pk__in=self.changelogs)
+        result['today_changes'] = get_digest_for(changelogs,
                                                  after_date=day_ago,
                                                  code_version=code_version)
-        result['week_changes'] = get_digest_for(packages,
+        result['week_changes'] = get_digest_for(changelogs,
                                                 before_date=day_ago,
                                                 after_date=week_ago,
                                                 code_version=code_version)
@@ -329,9 +330,9 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
 
     def get(self, *args, **kwargs):
         # here, we remember user's choice in a cookie, to
-        # save these packages into his tracking list after login
+        # save these changelogs into his tracking list after login
         response = super(LandingDigestView, self).get(*args, **kwargs)
-        response.set_cookie('landing-packages', ','.join(map(str, self.packages)))
+        response.set_cookie('tracked-changelogs', join_ints(self.changelogs))
         return response
 
 
@@ -347,16 +348,6 @@ class LoginView(CommonContextMixin, TemplateView):
         if request.user.is_authenticated():
             return HttpResponseRedirect(reverse('digest'))
         return super(LoginView, self).get(request, **kwargs)
-        
-
-class EditDigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/edit_digest.html'
-    def get(self, *args, **kwargs):
-        UserHistoryLog.write(self.request.user,
-                             self.request.light_user,
-                             'edit-digest-view',
-                             'User opened the track list editing page')
-        return super(EditDigestView, self).get(*args, **kwargs)
 
 
 class PackageView(CommonContextMixin, TemplateView):
@@ -365,32 +356,39 @@ class PackageView(CommonContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         result = super(PackageView, self).get_context_data(**kwargs)
 
-        code_version = self.request.GET.get('code_version', 'v1')
+        code_version = self.request.GET.get('code_version', 'v2')
         result['code_version'] = code_version
+
+        if self.request.user.is_authenticated():
+            result['show_sources'] = self.request.user.username == "svetlyak40wt"
 
         filter_args = {'code_version': code_version}
 
-        if 'username' in kwargs:
-            package_or_changelog = get_object_or_404(
-                Package.objects.select_related('changelog') \
-                              .prefetch_related('changelog__versions__sections__items'),
-                user=get_user_model().objects.get(username=kwargs['username']),
-                namespace=kwargs['namespace'],
-                name=kwargs['name'])
+        changelog = None
+
+        changelog = get_object_or_404(
+            Changelog.objects.prefetch_related('versions__sections__items'),
+            namespace=kwargs['namespace'],
+            name=kwargs['name'])
+
+        already_tracked = False
+        if self.request.user.is_authenticated():
+            login_to_track = False
+            already_tracked = self.request.user.does_track(changelog)
         else:
-            package_or_changelog = get_object_or_404(
-                Changelog.objects.prefetch_related('versions__sections__items'),
-                namespace=kwargs['namespace'],
-                name=kwargs['name'])
-        
+            login_to_track = True
+            already_tracked = False
+
         package_data = get_package_data_for_template(
-            package_or_changelog,
+            changelog,
             filter_args,
             100,
             None,
             code_version=code_version)
 
         result['package'] = package_data
+        result['login_to_track'] = login_to_track
+        result['already_tracked'] = already_tracked
         return result
 
     def get(self, *args, **kwargs):
@@ -425,7 +423,7 @@ class BadgeView(View):
 
         url = 'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
             version)
-        
+
         content = cache.get(url)
 
         if content is None:
@@ -443,9 +441,10 @@ class BadgeView(View):
 class AfterLoginView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         user = self.request.user
-        
+
         with log.name_and_fields('after-login', username=user.username):
             UserHistoryLog.merge(user, self.request.light_user)
+            LightModerator.merge(user, self.request.light_user)
 
             if timezone.now() - self.request.user.date_joined < datetime.timedelta(0, 60):
                 # if account was registere no more than minute ago, then show
@@ -460,25 +459,31 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
                                      description='User logged in')
                 response = reverse('digest')
 
-            landing_packages = self.request.COOKIES.get('landing-packages')
-            log.info('Cookie landing-packages={0}'.format(landing_packages))
-    
-            if landing_packages is not None:
-                log.info('Merging landing packages')
-                landing_packages = map(int, filter(None, landing_packages.split(',')))
-                user_packages = {ch.id
-                                 for ch in Changelog.objects.filter(packages__user=user)}
-                for package_id in landing_packages:
-                    if package_id not in user_packages:
-                        with log.fields(package_id=package_id):
+            tracked_changelogs = parse_ints(self.request.COOKIES.get('tracked-changelogs', ''))
+            log.info('Cookie tracked-changelogs={0}'.format(tracked_changelogs))
+
+            if tracked_changelogs:
+                log.info('Merging tracked changelogs')
+
+                user_changelogs = {ch.id
+                                 for ch in user.changelogs.all()}
+                # TODO: this should be updated to work whith new tracking scheme
+                for changelog_id in tracked_changelogs:
+                    if changelog_id not in user_changelogs:
+                        with log.fields(changelog_id=changelog_id):
                             try:
-                                changelog = Changelog.objects.get(pk=package_id)
-                                user.packages.create(namespace=changelog.namespace,
-                                                     name=changelog.name,
-                                                     source=changelog.source,
-                                                     changelog=changelog)
+                                changelog = Changelog.objects.get(pk=changelog_id)
+                                user.track(changelog)
                             except Exception:
                                 log.trace().error('Unable to save landing package')
+
+        return response
+
+    def dispatch(self, *args, **kwargs):
+        response = super(AfterLoginView, self).dispatch(*args, **kwargs)
+        # here we nulling a cookie because already merged all data in
+        # `get_redirect_url` view
+        response.delete_cookie('tracked-changelogs')
         return response
 
 
@@ -501,21 +506,21 @@ class LandingView(CommonContextMixin, FormView):
 
     def get_success_url(self):
         return '/subscribed/?from=' + self.landing
-        
+
     def get_initial(self):
         return {'come_from': 'landing-' + self.landing}
-        
+
     def get_context_data(self, **kwargs):
         result = super(LandingView, self).get_context_data(**kwargs)
         result.setdefault('tracked_vars', {})
         result['tracked_vars']['landing'] = self.landing
         return result
-        
+
     def form_valid(self, form):
         Subscription.objects.create(
             email=form.cleaned_data['email'],
             come_from=form.cleaned_data['come_from'],
-            date_created=timezone.now())            
+            date_created=timezone.now())
         return super(LandingView, self).form_valid(form)
 
     def get(self, request, **kwargs):
@@ -535,14 +540,14 @@ class LandingView(CommonContextMixin, FormView):
         if self.landing not in self.landings:
             self.landing = random.choice(self.landings)
             request.session[session_key] = self.landing
-            
+
         return super(LandingView, self).get(request, **kwargs)
 
     def post(self, request, **kwargs):
         come_from = request.POST.get('come_from', '')
         self.landing = come_from.split('-', 1)[-1]
         return super(LandingView, self).post(request, **kwargs)
-        
+
 
 
 class RaiseExceptionView(View):
@@ -558,7 +563,7 @@ class ChangeLogView(View):
             '..', 'CHANGELOG.md')
         with open(path) as f:
             content = f.read()
-            
+
         response = HttpResponse(content, content_type='plain/text')
         response['Content-Length'] = len(content)
         return response
@@ -572,7 +577,7 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     def get_form_class(self):
         from django.forms.models import modelform_factory
         return modelform_factory(User, fields=('email', 'timezone'))
-        
+
     def get_object(self, queryset=None):
         return self.request.user
 
@@ -632,7 +637,7 @@ class TokenView(CommonContextMixin, FormView):
     def get_initial(self):
         token = get_or_create_user_token(self.request.user)
         return {'token': token.token}
-        
+
     def form_valid(self, form):
         delete_user_token(self.request.user, form.cleaned_data['token'])
         return super(TokenView, self).form_valid(form)
@@ -655,3 +660,231 @@ class UserHistoryView(CommonContextMixin, TemplateView):
                 Q(user=user) | Q(light_user=self.request.light_user))
         return result
 
+
+class ImmediateResponse(BaseException):
+    def __init__(self, response):
+        self.response = response
+
+
+class ImmediateMixin(object):
+    def get(self, *args, **kwargs):
+        try:
+            return super(ImmediateMixin, self).get(*args, **kwargs)
+        except ImmediateResponse as e:
+            return e.response
+
+
+
+class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/search.html'
+
+    def get_context_data(self, **kwargs):
+        q = self.request.GET.get('q').strip()
+        if '/' in q:
+            namespace, name = q.split('/', 1)
+        elif ' ' in q:
+            namespace, name = q.split(' ', 1)
+        else:
+            namespace = None
+            name = q
+
+        params = dict(name=name.strip())
+        if namespace:
+            params['namespace'] = namespace.strip()
+
+        user_changelogs = []
+        if self.request.user.is_authenticated():
+            user_changelogs = self.request.user.packages.filter(**params)
+            if user_changelogs.count() == 1:
+                user_changelog = user_changelogs[0]
+                raise ImmediateResponse(
+                    HttpResponseRedirect(reverse('package', kwargs=dict(
+                        username=self.request.user.username,
+                        name=user_changelog.name,
+                        namespace=user_changelog.namespace))))
+
+        canonical_changelogs = Changelog.objects.filter(**params)
+        if canonical_changelogs.count() == 1:
+            canonical_changelog = canonical_changelogs[0]
+            raise ImmediateResponse(
+                HttpResponseRedirect(reverse('package', kwargs=dict(
+                    name=canonical_changelog.name,
+                    namespace=canonical_changelog.namespace))))
+
+        if '://' in q:
+            # then might be it is a URL?
+            normalized_url, _, _ = normalize_url(q, for_checkout=False)
+            try:
+                changelog = Changelog.objects.get(source=normalized_url)
+                if changelog.name is not None:
+                    raise ImmediateResponse(
+                        HttpResponseRedirect(reverse('package', kwargs=dict(
+                            name=changelog.name,
+                            namespace=changelog.namespace))))
+
+            except Changelog.DoesNotExist:
+                pass
+
+            raise ImmediateResponse(
+                    HttpResponseRedirect(reverse('add-new') \
+                                         + '?' \
+                                         + urllib.urlencode({'url': normalized_url})))
+
+        return dict(params,
+                    user_changelogs=user_changelogs,
+                    canonical_changelogs=canonical_changelogs,
+                    q=q)
+
+
+class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/add-new.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AddNewView, self).get_context_data(**kwargs)
+        url = self.request.GET.get('url')
+        if url is None:
+            return Http404
+
+        normalized_url, _, _ = normalize_url(url, for_checkout=False)
+
+        try:
+            changelog = Changelog.objects.get(source=normalized_url)
+            if changelog.name is not None:
+                raise ImmediateResponse(
+                    HttpResponseRedirect(reverse('package', kwargs=dict(
+                        name=changelog.name,
+                        namespace=changelog.namespace))))
+        except Changelog.DoesNotExist:
+            changelog = Changelog.objects.create(source=normalized_url)
+
+        changelog.problem = None
+        changelog.save()
+
+
+        preview = changelog.previews.create(
+            source=changelog.source,
+            user=self.request.user if self.request.user.is_authenticated() else None,
+            light_user=self.request.light_user)
+
+        update_preview_task.delay(preview.id)
+
+        context['changelog'] = changelog
+        context['preview'] = preview
+        context['mode'] = 'add-new'
+        context['can_edit'] = True
+        return context
+
+
+
+class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/edit-package.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EditPackageView, self).get_context_data(**kwargs)
+        changelog = Changelog.objects.get(namespace=kwargs['namespace'],
+                                          name=kwargs['name'])
+
+        preview = changelog.previews.create(
+            source=changelog.source,
+            ignore_list=changelog.ignore_list,
+            check_list=changelog.check_list,
+            user=self.request.user if self.request.user.is_authenticated() else None,
+            light_user=self.request.light_user)
+
+        def attrs_to_copy(obj, exclude=()):
+            exclude_fields = set(exclude)
+            exclude_fields.add('id')
+            return {f.name: getattr(obj, f.name)
+                    for f in obj.__class__._meta.fields
+                    if f.name not in exclude_fields}
+
+        context['changelog'] = changelog
+        context['preview'] = preview
+        context['mode'] = 'edit'
+        context['can_edit'] = changelog.editable_by(self.request.user,
+                                                    self.request.light_user)
+        return context
+
+
+
+class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
+    """This view is used to preview how changelog will look like
+    at "Add New" page.
+    It returns an html fragment to be inserted into the "Add new" page.
+    """
+    template_name = 'allmychanges/changelog-preview.html'
+
+    def get_cache_params(self, *args, **kwargs):
+        preview_id = kwargs['pk']
+        self.preview = Preview.objects.get(pk=preview_id)
+        cache_key = 'changelog-preview-{0}:{1}'.format(
+            self.preview.id,
+            int(time.mktime(self.preview.updated_at.timetuple()))
+            if self.preview.updated_at is not None
+            else 'missing')
+        return cache_key, 4 * HOUR
+
+    def get_context_data(self, **kwargs):
+        result = super(PreviewView, self).get_context_data(**kwargs)
+
+        # initially there is no versions in the preview
+        # and we'll show versions from changelog if any exist
+        if self.preview.updated_at is None:
+            obj = self.preview.changelog
+        else:
+            obj = self.preview
+
+        code_version = 'v2'
+        filter_args = {'code_version': code_version}
+        if self.preview.updated_at is not None:
+            filter_args['preview'] = self.preview
+
+        changelog = self.preview.changelog
+        package_data = get_package_data_for_template(
+            changelog,
+            filter_args,
+            10,
+            None,
+            code_version=code_version)
+
+        has_results = obj.versions.filter(code_version=code_version).count() > 0
+        has_another_version_results = obj.versions.exclude(code_version=code_version).count() > 0
+
+        if obj.problem:
+            problem = obj.problem
+        elif not has_results and has_another_version_results:
+            problem = 'Unable to find changelog.'
+        else:
+            problem = None
+
+        result['package'] = package_data
+        result['has_results'] = has_results
+        result['problem'] = problem
+        result['show_sources'] = True
+        return result
+
+    def post(self, *args, **kwargs):
+        preview = Preview.objects.get(pk=kwargs['pk'])
+
+        def parse_list(text):
+            for line in re.split(r'[\n,]', text):
+                yield line.strip()
+
+        if preview.light_user == self.request.light_user or (
+                self.request.user.is_authenticated() and
+                self.request.user == preview.user):
+            data = anyjson.deserialize(self.request.read())
+
+            preview.set_check_list(
+                parse_list(data.get('search_list', '')))
+            preview.set_ignore_list(
+                parse_list(data.get('ignore_list', '')))
+            preview.source = data.get('source')
+
+            preview.versions.all().delete()
+            preview.updated_at = timezone.now()
+            preview.save()
+
+            update_preview_task.delay(preview.pk)
+
+        return HttpResponse('ok')

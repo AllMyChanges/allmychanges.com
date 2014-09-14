@@ -175,6 +175,7 @@ select {
   font-size: 1em;
   padding: 0.066666666666667em;
   margin: 0;
+  width: 100%;
 }
 .text-input__error,
 .dropdown__error {
@@ -183,8 +184,9 @@ select {
 .button {
   color: #333;
   background-color: #fff;
+  border: 1px solid #e6e6e6;
+  cursor: pointer;
   text-decoration: none;
-  border: 1px solid #808080;
   font-size: 0.8em;
   line-height: 1.583333333333333em;
   padding-top: 0.083333333333333em;
@@ -197,21 +199,44 @@ select {
 .button:hover {
   background-color: #ccc;
 }
+.button:disabled {
+  color: #858585;
+  cursor: not-allowed;
+}
+.button:disabled:hover {
+  background-color: #fff;
+}
 .button_good {
-  color: #f1f1f1;
-  background-color: #6cb636;
-  border-color: #518929;
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4bad4b;
 }
 .button_good:hover {
-  background-color: #56922b;
+  background-color: #439a43;
+}
+.button_good:disabled {
+  color: #fff;
+  background-color: #aedcae;
+  border-color: #ceeace;
+}
+.button_good:disabled:hover {
+  background-color: #aedcae;
 }
 .button_bad {
   color: #fff;
   background-color: #d9534f;
-  border-color: #518929;
+  border-color: #d43b37;
 }
 .button_bad:hover {
   background-color: #c32e2a;
+}
+.button_bad:disabled {
+  color: #fff;
+  background-color: #eca9a7;
+  border-color: #f4cbca;
+}
+.button_bad:disabled:hover {
+  background-color: #eca9a7;
 }
 .button_medium {
   font-size: 1em;
@@ -220,6 +245,13 @@ select {
 .button_large {
   font-size: 2em;
   line-height: 1.333333333333333em;
+}
+.input {
+  margin-top: 16px;
+}
+.input__error {
+  margin-left: 10px;
+  color: #f00;
 }
 .box {
   background-color: #fff;
@@ -302,12 +334,16 @@ select {
   color: #333;
 }
 .plate {
-  background-color: #6cb636;
-  line-height: 2.666666666666667em;
-  padding-left: 0.666666666666667em;
-  margin-left: -0.666666666666667em;
+  background-color: #5cb85c;
+  font-size: 15px;
+  line-height: 22px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-top: 7px;
   color: #fefefe;
-  border: 1px solid #518929;
+  border: 1px solid #3f903f;
 }
 .plate_warning {
   background-color: #d9534f;
@@ -622,4 +658,103 @@ body.email {
 .large-login-button:hover {
   color: #fefefe;
   background: #0c82c5;
+}
+.magic-prompt {
+  margin-top: 24px;
+  margin-left: 100px;
+  margin-right: 200px;
+}
+.magic-prompt__text {
+  font-size: 24px;
+  line-height: 24px;
+  margin-top: -8px;
+  padding-bottom: 0px;
+  padding-top: 4px;
+  padding-left: 4px;
+}
+.magic-prompt__autocomplete {
+  width: 80%;
+  display: inline-block;
+}
+.magic-prompt__submit {
+  font-size: 24px;
+  line-height: 32px;
+  margin-top: -10px;
+  margin-left: 20px;
+}
+.magic-prompt__apply {
+  font-size: 24px;
+  line-height: 32px;
+  margin-top: 10px;
+}
+.new-package__greeting {
+  font-size: 24px;
+  line-height: 32px;
+}
+.new-package__url {
+  font-weight: bold;
+}
+.new-package__fields-table {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  width: 100%;
+  max-width: 800px;
+}
+.new-package__search-input,
+.new-package__ignore-input {
+  width: 100%;
+}
+.new-package__search-label,
+.new-package__ignore-label {
+  padding-top: 12px;
+}
+.new-package__search-label,
+.new-package__search-input-wrap,
+.new-package__namespace-name-cell {
+  padding-right: 10px;
+}
+.new-package__ignore-label,
+.new-package__ignore-input-wrap {
+  padding-left: 10px;
+}
+.new-package__search-input,
+.new-package__ignore-input {
+  height: 140px;
+}
+.new-package__button-cell {
+  vertical-align: bottom;
+  text-align: right;
+}
+.new-package__save-tooltip {
+  position: absolute;
+  width: 200px;
+  color: #fe7649;
+}
+.new-package__rename-warning {
+  color: #fe7649;
+}
+.results-spin {
+  height: 50px;
+}
+.results-spin__wrapper {
+  position: absolute;
+  width: 100%;
+  max-width: 800px;
+}
+.namespace-name-cell__table {
+  width: 100%;
+}
+.namespace-name-cell__namespace-cell,
+.namespace-name-cell__name-cell {
+  width: 50%;
+}
+.preview-error {
+  color: #f00;
+}
+.namespace-name-cell__namespace-cell {
+  padding-right: 10px;
+  vertical-align: bottom;
+}
+.autocomplete-input {
+  width: 100%;
 }

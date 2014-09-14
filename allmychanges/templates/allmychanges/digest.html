@@ -3,12 +3,12 @@
 {% block content %}
   {% if no_packages %}
      <div class="plate plate_warning">
-         You have only default package in the list. Please <a class="button button_good button_medium" href="{% url "edit-digest" %}">add some</a> of you favorite libraries to the list.
+         You have only default package in the list. Please add your favorite libraries entering their repository URLs into the search field above.
      </div>
   {% endif %}
 
   <h1 class="page-header">Digest</h1>
-  <h2 class="page-subheader"><a href="{% url "edit-digest" %}" class="button button_good">Edit track list</a>{% if request.user.username == 'svetlyak40wt' %}
+  <h2 class="page-subheader">{% if request.user.username == 'svetlyak40wt' %}
       {% if code_version == 'v1' %}
         <a href="?code_version=v2">New parser</a>
       {% else %}
@@ -18,7 +18,7 @@
 
   {% if no_data %}
     <h1 class="page-header">No data available</h1>
-    <p>Data is not available yet. Please, keep calm and add <a href="{% url "edit-digest" %}">add more packages</a> while you are waiting.</p>
+    <p>Data is not available yet. Please, keep calm and add more packages while you are waiting.</p>
   {% else %}
     {% include "allmychanges/digest-partial.html" with changes=today_changes title="Last 24 hours" %}
     {% include "allmychanges/digest-partial.html" with changes=week_changes title="This week" %}

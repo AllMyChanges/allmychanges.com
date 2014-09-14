@@ -8,6 +8,7 @@ CURRENT_USER = os.environ.get('USER', os.environ.get('LOGNAME', 'root'))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
+DEBUG_JOBS = False
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -104,7 +105,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
 )
 
 #X_FRAME_OPTIONS = 'ALLOW-FROM metrika.yandex.ru'
@@ -173,6 +173,12 @@ REPO_ROOT = root('data')
 
 RQ_QUEUES = {
     'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'PASSWORD': '',
+    },
+    'preview': {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,

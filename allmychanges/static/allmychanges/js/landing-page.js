@@ -78,7 +78,7 @@ app.controller('LandingPageCtrl', function ($scope, $http, $cookies, $log) {
         }
         if ($scope.tracked_len >= 5) {
             console.log('receiving digest');
-            $http.get('/landing-digest/?packages=' + $scope.tracked.join(','))
+            $http.get('/landing-digest/?changelogs=' + $scope.tracked.join(','))
                 .success(function(data) {
                     $('.package-selector__digest').html(data);
                 });

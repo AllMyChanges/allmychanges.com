@@ -24,7 +24,10 @@ METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'
 
 LOG_FILENAME = '/var/log/allmychanges/django-root.log'
-init_logging(LOG_FILENAME, logstash=True)
+try:
+    init_logging(LOG_FILENAME, logstash=True)
+except OSError:
+    pass
 
 
 if not os.path.exists(TEMP_DIR):

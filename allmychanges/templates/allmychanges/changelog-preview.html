@@ -1,0 +1,15 @@
+{% if has_results %}
+  <div class="package-changes">
+    <ul class="package-changes__version">
+      {% include "allmychanges/blocks/package-changes.html" %}
+    </ul>
+  </div>
+{% else %}
+  {% if problem %}
+    <p class="preview-error">{{ problem }}</p>
+    <p>You can't track this project right now, but please, leave us a message
+      if you think, that our robot was unable to find changelog.</p>
+  {% else %}
+    <div class="please-wait">Please, wait while changelog will be processed</div>
+  {% endif %}
+{% endif %}

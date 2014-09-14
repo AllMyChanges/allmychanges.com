@@ -76,9 +76,9 @@ def send_digest_to(user, code_version='v1'):
             else:
                 actual_subject = subject
 
-            # обычным пользователям отправляем только v1 дайжесты
+            # обычным пользователям отправляем только v2 дайжесты
             # мне — все остальные
-            if code_version == 'v1' or email.startswith('svetlyak.40wt'):
+            if code_version == 'v2' or email.startswith('svetlyak.40wt'):
                 message = EmailMultiAlternatives(actual_subject,
                           None,
                           'AllMyChanges.com <noreply@allmychanges.com>',
@@ -105,14 +105,14 @@ class Command(LogMixin, BaseCommand):
             'timezone', flat=True).distinct()
         send_for_timezones = [tz for tz in all_timezones
                               if tz and dt_in_window(tz, utc_now, 9)]
-        
+
         users = get_user_model().objects.exclude(email='')
-        
+
         if args:
             users = users.filter(username__in=args)
         else:
             users = users.filter(timezone__in=send_for_timezones)
-        
+
         for user in users:
             send_digest_to(user, code_version='v1')
             send_digest_to(user, code_version='v2')

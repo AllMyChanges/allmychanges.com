@@ -3,13 +3,13 @@ import os
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 
-from allmychanges.crawler import search_changelog, _parse_changelog_text
+from allmychanges.crawler import search_changelog
 from allmychanges.models import Repo
 from allmychanges.utils import cd, get_package_metadata, download_repo
 
 
 class Command(LogMixin, BaseCommand):
-    help = u"""Updates single project."""
+    help = u"""Updates single project (broken)"""
 
     def handle(self, *args, **options):
         for path in args:

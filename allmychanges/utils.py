@@ -22,7 +22,7 @@ from django.conf import settings
 from django.utils.encoding import force_text
 from django.utils import timezone
 
-from allmychanges.crawler import search_changelog, parse_changelog
+from allmychanges.crawler import search_changelog, parse_changelog, _extract_date
 
 
 MINUTE = 60
@@ -85,7 +85,7 @@ def normalize_url(url, for_checkout=True):
         github_template = 'https://github.com/{username}/{repo}'
 
     url = url.replace('git+', '')
-    
+
     if 'github' in url:
         regex = r'[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>.*?)(?:\.git|/|$)'
         match = re.search(regex, url)
@@ -94,14 +94,14 @@ def normalize_url(url, for_checkout=True):
             return (github_template.format(**locals()),
                     username,
                     repo)
-            
+
     elif 'bitbucket' in url:
         regex = r'bitbucket.org/(?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]*)'
         username, repo = re.search(regex, url).groups()
         return (bitbucket_template.format(**locals()),
                 username,
                 repo)
-        
+
     return (url, None, url.rsplit('/')[-1])
 
 
@@ -271,7 +271,7 @@ def fill_missing_dates(raw_data):
     today = discard_seconds(datetime.datetime.utcnow())
     month = datetime.timedelta(30)
     current_date = None
-        
+
     for idx, item in enumerate(reversed(raw_data)):
         item = copy.deepcopy(item)
         has_date = item.get('date')
@@ -288,7 +288,7 @@ def fill_missing_dates(raw_data):
             current_date = item['date']
             item['discovered_at'] = current_date
         result.append(item)
-        
+
     result.reverse()
     return result
 
@@ -307,7 +307,7 @@ def fill_missing_dates2(raw_data):
     today = discard_seconds(datetime.datetime.utcnow())
     month = datetime.timedelta(30)
     current_date = None
-        
+
     for idx, item in enumerate(reversed(raw_data)):
         item = copy.deepcopy(item)
         has_date = getattr(item, 'date', None)
@@ -324,15 +324,14 @@ def fill_missing_dates2(raw_data):
             current_date = item.date
             item.discovered_at = current_date
         result.append(item)
-        
+
     result.reverse()
     return result
 
 
-def update_changelog_from_raw_data(changelog, raw_data):
+def update_changelog_from_raw_data(changelog, raw_data, code_version='v1', preview_id=None, from_vcs=False):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
-    code_version = 'v1'
 
     if changelog.versions.count() == 0:
         # for initial filling, we should set all missing dates to some values
@@ -345,14 +344,18 @@ def update_changelog_from_raw_data(changelog, raw_data):
             # unreleased versions into the changelog.
             # Example: https://github.com/kraih/mojo/blob/master/Changes
             continue
-            
+
         version, created = changelog.versions.get_or_create(
             number=raw_version['version'],
             unreleased=raw_version.get('unreleased', False),
             code_version=code_version)
 
+        if from_vcs:
+            version.filename = 'VCS'
+
         version.date = raw_version.get('date')
-        
+        version.preview_id = preview_id
+
         if version.discovered_at is None:
             version.discovered_at = raw_version.get('discovered_at', timezone.now())
 
@@ -366,7 +369,7 @@ def update_changelog_from_raw_data(changelog, raw_data):
                 section.items.create(text=raw_item, type=get_commit_type(raw_item))
 
 
-def update_changelog_from_raw_data2(changelog, raw_data):
+def update_changelog_from_raw_data2(changelog, raw_data, preview_id=None):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
     code_version = 'v2'
@@ -383,7 +386,8 @@ def update_changelog_from_raw_data2(changelog, raw_data):
         version.unreleased = getattr(raw_version, 'unreleased', False)
         version.filename = getattr(raw_version, 'filename', None)
         version.date = getattr(raw_version, 'date', None)
-        
+        version.preview_id = preview_id
+
         if version.discovered_at is None:
             version.discovered_at = getattr(raw_version, 'discovered_at', timezone.now())
 
@@ -401,17 +405,25 @@ def update_changelog_from_raw_data2(changelog, raw_data):
                                                   code_version=code_version)
 
 
-def fake_downloader(changelog):
+def fake_downloader(source):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    shutil.copyfile(
-        changelog.source.replace('test+', ''),
-        os.path.join(path, 'CHANGELOG'))
-    return path
 
-    
-def git_downloader(changelog):
+    source = source.replace('test+', '')
+
+    if os.path.isfile(source):
+        shutil.copyfile(
+            source,
+            os.path.join(path, 'CHANGELOG'))
+        return path
+    else:
+        destination = os.path.join(path, 'project')
+        shutil.copytree(source, destination)
+        return destination
+
+
+def git_downloader(source):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    url, username, repo_name = normalize_url(changelog.source)
+    url, username, repo_name = normalize_url(source)
 
     with cd(path):
         response = envoy.run('git clone {url} {path}'.format(url=url,
@@ -426,9 +438,9 @@ def git_downloader(changelog):
     return path
 
 
-def hg_downloader(changelog):
+def hg_downloader(source):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    url = changelog.source.replace('hg+', '')
+    url = source.replace('hg+', '')
 
     with cd(path):
         response = envoy.run('hg clone {url} {path}'.format(url=url,
@@ -443,10 +455,10 @@ def hg_downloader(changelog):
     return path
 
 
-def http_downloader(changelog):
+def http_downloader(source):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    url = changelog.source.replace('http+', '')
-    
+    url = source.replace('http+', '')
+
     try:
         with cd(path):
             response = requests.get(url)
@@ -460,10 +472,8 @@ def http_downloader(changelog):
             e, url))
     return path
 
-    
-def choose_downloader(changelog):
-    source = changelog.source
-    
+
+def choose_downloader(source):
     if source.startswith('test+'):
         return fake_downloader
 
@@ -475,7 +485,7 @@ def choose_downloader(changelog):
 
     if source.startswith('http+'):
         return http_downloader
-        
+
     if 'git' in source:
         return git_downloader
 
@@ -509,7 +519,7 @@ def git_history_extractor(path):
 
             r = envoy.run('git checkout {revision}'.format(revision=_hash))
             assert r.status_code == 0
-            yield times.parse(date.strip()), msg.strip('\n -')
+            yield _extract_date(date.strip()), msg.strip('\n -')
 
 
 def choose_history_extractor(path):
@@ -527,7 +537,7 @@ def python_version_extractor(path):
     if os.path.exists(os.path.join(path, 'setup.py')):
         if os.path.exists(os.path.join(path, 'setup.pyc')):
             os.unlink(os.path.join(path, 'setup.pyc'))
-            
+
         try:
             metadata = {}
 
@@ -585,9 +595,10 @@ def choose_version_extractor(path):
     if os.path.exists(os.path.join(path, 'package.json')):
         return npm_version_extractor
 
+    # TODO: raise exception because we unable to extract versions
     null_extractor = lambda path: None
     return null_extractor
-    
+
 
 def extract_changelog_from_vcs(path):
     walk_through_history = choose_history_extractor(path)
@@ -628,9 +639,9 @@ class UpdateError(Exception):
 def search_changelog2(path):
     """Searches a file which contains large
     amount of changelog-like records"""
-    
+
     filenames = search_changelog(path)
-    
+
     raw_data = [(parse_changelog_file(filename), filename)
                 for filename in filenames]
     if raw_data:
@@ -641,16 +652,27 @@ def search_changelog2(path):
         # only return data if we found some records
         if len(raw_data) > 1 or 'changelog' in filename.lower():
             return filename, raw_data
-            
-    return None, None
-    
 
-def update_changelog(changelog):
+    return None, None
+
+
+def update_changelog(changelog, preview_id=None):
     changelog.filename = None
 
+    if preview_id is None:
+        ignore_list = changelog.get_ignore_list()
+        check_list = changelog.get_check_list()
+        source = changelog.source
+    else:
+        preview = changelog.previews.get(pk=preview_id)
+        ignore_list = preview.get_ignore_list()
+        check_list = preview.get_check_list()
+        source = preview.source
+
+
     try:
-        download = choose_downloader(changelog)
-        path = download(changelog)
+        download = choose_downloader(source)
+        path = download(source)
     except UpdateError:
         raise
     except Exception:
@@ -661,12 +683,17 @@ def update_changelog(changelog):
         try:
             from allmychanges.parsing.pipeline import processing_pipe
             versions = processing_pipe(path,
-                                       changelog.get_ignore_list(),
-                                       changelog.get_check_list())
-            update_changelog_from_raw_data2(changelog, versions)
+                                       ignore_list,
+                                       check_list)
+            if versions:
+                update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)
+            else:
+                logging.getLogger('update-changelog2').debug('updating v2 from vcs')
+                raw_data = extract_changelog_from_vcs(path)
+                update_changelog_from_raw_data(changelog, raw_data, code_version='v2', preview_id=preview_id, from_vcs=True)
+
         except Exception:
             logging.getLogger('update-changelog2').exception('unhandled')
-
 
         try:
             filename, raw_data = search_changelog2(path)
@@ -682,22 +709,38 @@ def update_changelog(changelog):
         except Exception:
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to parse or extract sources')
-            
+
         if not raw_data:
             raise UpdateError('Changelog not found')
 
         try:
-            update_changelog_from_raw_data(changelog, raw_data)
+            update_changelog_from_raw_data(changelog, raw_data, preview_id=preview_id)
         except Exception:
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to update database')
 
     finally:
         shutil.rmtree(path)
-        changelog.updated_at = timezone.now()
-        changelog.save()
+
+        # we only need to change updated_at if this
+        # wasn't preview update
+        if preview_id is None:
+            changelog.updated_at = timezone.now()
+            changelog.save()
 
 
 def dt_in_window(tz, system_time, hour):
     local = times.to_local(system_time, tz)
     return local.hour == hour
+
+
+def parse_ints(text):
+    """Parses text with comma-separated list of integers
+    and returns python list of itegers."""
+    return map(int, filter(None, text.split(',')))
+
+
+def join_ints(ints):
+    """Joins list of intergers into the ordered comma-separated text.
+    """
+    return ','.join(map(str, sorted(ints)))

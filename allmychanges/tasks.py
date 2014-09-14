@@ -6,6 +6,7 @@ import time
 from django.db.models import Count
 from django.db import transaction
 from django.utils import timezone
+from django.conf import settings
 
 from allmychanges.utils import (
     count,
@@ -22,6 +23,33 @@ from django_rq.queues import get_queue
 import inspect
 
 
+if settings.DEBUG_JOBS == True:
+    _task_log = []
+    _orig_job = job
+    def job(func, *args, **kwargs):
+        """Dont be afraid, this magic is necessary only for unittests
+        to be track all delayed tasks."""
+        result = _orig_job(func, *args, **kwargs)
+
+        if callable(func):
+            def new_delay(*args, **kwargs):
+                _task_log.append((func.__name__, args, kwargs))
+                return result.delay(*args, **kwargs)
+            result.delay = new_delay
+            return result
+        else:
+            def decorator(func):
+                new_func = result(func)
+                orig_delay = new_func.delay
+
+                def new_delay(*args, **kwargs):
+                    _task_log.append((func.__name__, args, kwargs))
+                    return orig_delay(*args, **kwargs)
+                new_func.delay = new_delay
+                return new_func
+            return decorator
+
+
 def get_func_name(func):
     """Helper to get same name for the job function as rq does.
     """
@@ -33,36 +61,41 @@ def get_func_name(func):
     raise RuntimeError('unable to get func name')
 
 
-def singletone(func):
-    """A decorator for rq's `delay` method which
-    ensures there is no a job with same name
-    and arguments already in the queue.
-    """
-    orig_delay = func.delay
-    func_name = get_func_name(func)
+def singletone(queue='default'):
+    def decorator(func):
+        """A decorator for rq's `delay` method which
+        ensures there is no a job with same name
+        and arguments already in the queue.
+        """
+        orig_delay = func.delay
+        func_name = get_func_name(func)
 
-    @wraps(func.delay)
-    def wrapper(*args, **kwargs):
-        queue = get_queue('default')
-        jobs = queue.get_jobs()
+        @wraps(func.delay)
+        def wrapper(*args, **kwargs):
+            queue_obj = get_queue(queue)
+            already_in_the_queue = False
 
-        already_in_the_queue = False
-        for j in jobs:
-            if j.func_name == func_name \
-               and j.args == args \
-               and j.kwargs == kwargs:
-                already_in_the_queue = True
-                break
-        if not already_in_the_queue:
-            return orig_delay(*args, **kwargs)
+            # if queue is not async, then we don't need
+            # to check if job already there
+            if queue_obj._async:
+                jobs = queue_obj.get_jobs()
+                for j in jobs:
+                    if j.func_name == func_name \
+                       and j.args == args \
+                       and j.kwargs == kwargs:
+                        already_in_the_queue = True
+                        break
+            if not already_in_the_queue:
+                return orig_delay(*args, **kwargs)
 
-    func.delay = wrapper
-    return func
+        func.delay = wrapper
+        return func
+    return decorator
 
 
-@singletone
+@singletone()
 @job
-@transaction.commit_on_success
+@transaction.atomic
 def update_repo(repo_id):
     try:
         with count_time('task.update_repo.time'):
@@ -76,9 +109,9 @@ def update_repo(repo_id):
         raise
 
 
-@singletone
+@singletone()
 @job
-@transaction.commit_on_success
+@transaction.atomic
 def schedule_updates(reschedule=False, packages=[]):
     from .models import Changelog
 
@@ -86,7 +119,7 @@ def schedule_updates(reschedule=False, packages=[]):
         processing_started_at__lt=timezone.now() - datetime.timedelta(0, 60 * 60))
 
     num_stale = len(stale_changelogs)
-    
+
     if num_stale > 0:
         log.info('{0} stale changelogs were found', num_stale)
         count('task.schedule_updates.stale.count', num_stale)
@@ -110,9 +143,9 @@ def schedule_updates(reschedule=False, packages=[]):
     delete_empty_changelogs.delay()
 
 
-@singletone
+@singletone()
 @job
-@transaction.commit_on_success
+@transaction.atomic
 def delete_empty_changelogs():
     from .models import Changelog
     Changelog.objects.annotate(Count('packages'), Count('versions')) \
@@ -120,16 +153,18 @@ def delete_empty_changelogs():
                      .delete()
 
 
-@singletone
+
+@singletone()
 @job('default', timeout=600)
-@transaction.commit_on_success
-def update_changelog_task(source):
+@transaction.atomic
+def update_changelog_task(source, preview_id=None):
     with log.fields(source=source):
         log.info('Starting task')
-        from .models import Changelog
+        from .models import Changelog, Preview
 
         changelog = None
         tries = 10
+
         while changelog is None and tries > 0:
             try:
                 changelog = Changelog.objects.get(source=source)
@@ -145,37 +180,69 @@ def update_changelog_task(source):
         assert changelog is not None, 'Changelog with source={source} not found'.format(
                     **locals())
 
-        with log.fields(packages=u', '.join(map(unicode, changelog.packages.all()))):
-            log.info('processing changelog')
+        log.info('processing changelog')
 
-        if changelog.processing_started_at is not None:
-            log.info('somebody already processing this changelog')
-            return
+        if preview_id is None:
+            if changelog.processing_started_at is not None:
+                log.info('somebody already processing this changelog')
+                return
 
+        problem = None
         try:
-            changelog.problem = None
-            changelog.processing_started_at = timezone.now()
-            changelog.save()
+            if preview_id is None:
+                changelog.processing_started_at = timezone.now()
+                changelog.save()
 
-            update_changelog(changelog)
-            # TODO: create more complext algorithm to calculate this time
-            changelog.next_update_at = timezone.now() + datetime.timedelta(0, 60 * 60)
-            changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
+            update_changelog(changelog, preview_id=preview_id)
+
+            if preview_id is None:
+                # TODO: create more complex algorithm to calculate this time
+                changelog.next_update_at = timezone.now() + datetime.timedelta(0, 60 * 60)
+                changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
         except UpdateError as e:
-            changelog.problem = ', '.join(e.args)
+            problem = ', '.join(e.args)
+            log.trace().error('Unable to update changelog')
         except Exception as e:
-            changelog.problem = unicode(e)
+            problem = unicode(e)
+            log.trace().error('Unable to update changelog')
         finally:
-            if changelog.problem is not None:
-                log.warning(changelog.problem)
+            if problem is not None:
+                log.warning(problem)
                 next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
                 changelog.next_update_at = next_update_if_error
 
-            changelog.processing_started_at = None
-            changelog.save()
+
+                if preview_id:
+                    preview = Preview.objects.get(pk=preview_id)
+                    preview.problem = problem
+                    preview.save(update_fields=('problem',))
+                else:
+                    changelog.problem = problem
+                    changelog.save(update_fields=('problem',))
+
+            if preview_id is None:
+                changelog.processing_started_at = None
+                changelog.save()
+
+
+@singletone('preview')
+@job('preview', timeout=600)
+@transaction.atomic
+def update_preview_task(preview_id):
+    with log.fields(preview_id=preview_id):
+        log.info('Starting task')
+        from .models import Preview
+        preview = Preview.objects.get(pk=preview_id)
+        preview.versions.all().delete()
+
+        update_changelog_task(preview.changelog.source,
+                              preview_id=preview_id)
+        preview.updated_at = timezone.now()
+
+        preview.save()
+
 
 
 @job
 def raise_exception():
     1/0
-

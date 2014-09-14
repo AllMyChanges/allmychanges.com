@@ -7,3 +7,19 @@ def update_requirements():
 def shell():
     local('./manage.py shell_plus')
 
+
+def test():
+    local('nosetests')
+
+
+def test_failed():
+    local('nosetests --failed')
+
+
+def coverage():
+    local('nosetests --with-coverage --cover-package=allmychanges --cover-html --cover-erase --cover-inclusive --cover-html-dir=static/coverage')
+    local('ssh back open http://art.dev.allmychanges.com:8000/static/coverage/index.html')
+
+
+def kill_server():
+    local('pkill -f runserver_plus')

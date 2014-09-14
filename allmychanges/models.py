@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.template.defaultfilters import linebreaksbr, urlize
 import os
+import re
 import datetime
 
 from django.db import models
@@ -56,14 +57,14 @@ class UserManager(BaseUserManager):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
         return super(UserManager, self).create(*args, **kwargs)
-        
+
     def create_user(self, username, email=None, password=None, **extra_fields):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
         return self._create_user(username, email, password,
                                  **extra_fields)
 
- 
+
 class User(AbstractBaseUser):
     """
     A fully featured User model with admin-compliant permissions that uses
@@ -77,6 +78,10 @@ class User(AbstractBaseUser):
     timezone = models.CharField(max_length=100,
                                 choices=TIMEZONE_CHOICES,
                                 default='UTC')
+    changelogs = models.ManyToManyField('Changelog', through='ChangelogTrack',
+                                        related_name='trackers')
+    moderated_changelogs = models.ManyToManyField('Changelog', through='Moderator',
+                                                  related_name='moderators')
 
     objects = UserManager()
 
@@ -86,6 +91,22 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = 'user'
         verbose_name_plural = 'users'
+
+    def does_track(self, changelog):
+        """Check if this user tracks given changelog."""
+        return self.changelogs.filter(pk=changelog.pk).count() == 1
+
+    def track(self, changelog):
+        if not self.does_track(changelog):
+            ChangelogTrack.objects.create(
+                user=self,
+                changelog=changelog)
+
+    def untrack(self, changelog):
+        if self.does_track(changelog):
+            ChangelogTrack.objects.filter(
+                user=self,
+                changelog=changelog).delete()
 
 
 class Repo(models.Model):
@@ -313,9 +334,52 @@ class Subscription(models.Model):
         return self.email
 
 
-class Changelog(models.Model):
+class IgnoreCheckSetters(object):
+    """A mixin to get/set ignore and check lists on a model.
+    """
+    def _split(self, text):
+        return re.split(r'[\n,]', text)
+
+    def get_ignore_list(self):
+        """Returns a list with all filenames and directories to ignore
+        when searching a changelog."""
+        filenames = [name.strip()
+                     for name in self._split(self.ignore_list)]
+        filenames = filter(None, filenames)
+        return filenames
+
+    def set_ignore_list(self, items):
+        self.ignore_list = u'\n'.join(items)
+
+    def get_check_list(self):
+        """Returns a list with all filenames and directories to check
+        when searching a changelog."""
+        def process(name):
+            name = name.strip()
+            if not name:
+                return None
+            elif ':' in name:
+                return name.split(':', 1)
+            else:
+                return (name, None)
+
+        filenames = map(process, self._split(self.check_list))
+        filenames = filter(None, filenames)
+        return filenames
+
+    def set_check_list(self, items):
+        def process(item):
+            if isinstance(item, tuple) and item[1]:
+                return u':'.join(item)
+            else:
+                return item
+        self.check_list = u'\n'.join(map(process, items))
+
+
+
+class Changelog(IgnoreCheckSetters, models.Model):
     source = models.URLField(unique=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     processing_started_at = models.DateTimeField(blank=True, null=True)
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
@@ -334,54 +398,23 @@ class Changelog(models.Model):
                                    default='',
                                    help_text=('Comma-separated list of directories'
                                               ' and filenames to ignore searching'
-                                              ' changelog.'))
+                                              ' changelog.'),
+                                   blank=True)
     check_list = models.CharField(max_length=1000,
                                   default='',
                                   help_text=('Comma-separated list of directories'
                                               ' and filenames to search'
-                                              ' changelog.'))
-    namespace = models.CharField(max_length=NAMESPACE_LENGTH,
-                                 null=True)
-    name = models.CharField(max_length=NAME_LENGTH,
-                            null=True)
-    
+                                              ' changelog.'),
+                                  blank=True)
+    namespace = models.CharField(max_length=NAMESPACE_LENGTH, blank=True, null=True)
+    name = models.CharField(max_length=NAME_LENGTH, blank=True, null=True)
+
+
+    class Meta:
+        unique_together = ('namespace', 'name')
+
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)
-
-    def get_ignore_list(self):
-        """Returns a list with all filenames and directories to ignore
-        when searching a changelog."""
-        filenames = [name.strip()
-                     for name in self.ignore_list.split(',')]
-        filenames = filter(None, filenames)
-        return filenames
-
-    def set_ignore_list(self, items):
-        self.ignore_list = u','.join(items)
-
-    def get_check_list(self):
-        """Returns a list with all filenames and directories to check
-        when searching a changelog."""
-        def process(name):
-            name = name.strip()
-            if not name:
-                return None
-            elif ':' in name:
-                return name.split(':', 1)
-            else:
-                return (name, None)
-
-        filenames = map(process, self.check_list.split(','))
-        filenames = filter(None, filenames)
-        return filenames
-
-    def set_check_list(self, items):
-        def process(item):
-            if item[1]:
-                return u':'.join(item)
-            else:
-                return item
-        self.check_list = u','.join(map(process, items))
 
     def latest_version(self):
         versions = list(
@@ -389,6 +422,119 @@ class Changelog(models.Model):
                          .order_by('-discovered_at', '-number')[:1])
         if versions:
             return versions[0]
+
+
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('package', kwargs=dict(
+            namespace=self.namespace,
+            name=self.name))
+
+    def editable_by(self, user, light_user=None):
+        light_moderators = set(self.light_moderators.values_list('light_user', flat=True))
+        moderators = set(self.moderators.values_list('id', flat=True))
+
+        if user.is_authenticated():
+            if moderators or light_moderators:
+                return user.id in moderators
+        else:
+            if moderators or light_moderators:
+                return light_user in light_moderators
+        return True
+
+    def is_moderator(self, user, light_user=None):
+        light_moderators = set(self.light_moderators.values_list('light_user', flat=True))
+        moderators = set(self.moderators.values_list('id', flat=True))
+
+        if user.is_authenticated():
+            return user.id in moderators
+        else:
+            return light_user in light_moderators
+
+    def add_to_moderators(self, user, light_user=None):
+        """Adds user to moderators and returns 'normal' or 'light'
+        if it really added him.
+        In case if user already was a moderator, returns None."""
+
+        if not self.is_moderator(user, light_user):
+            if user.is_authenticated():
+                Moderator.objects.create(changelog=self, user=user)
+                return 'normal'
+            else:
+                if light_user is not None:
+                    self.light_moderators.create(light_user=light_user)
+                    return 'light'
+
+
+class ChangelogTrack(models.Model):
+    user = models.ForeignKey(User)
+    changelog = models.ForeignKey(Changelog)
+    created_at = models.DateTimeField(default=timezone.now)
+
+
+class LightModerator(models.Model):
+    """These entries are created when anonymouse user
+    adds another package into the system.
+    When user signs up, these entries should be
+    transformed into the Moderator entries.
+    """
+    changelog = models.ForeignKey(Changelog,
+                                  related_name='light_moderators')
+    light_user = models.CharField(max_length=40)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def merge(user, light_user):
+        entries = LightModerator.objects.filter(light_user=light_user)
+        for entry in entries:
+            with log.fields(username=user.username,
+                            light_user=light_user):
+                log.info('Transforming light moderator into the permanent')
+                Moderator.objects.create(
+                    changelog=entry.changelog,
+                    user=user,
+                    from_light_user=light_user)
+        entries.delete()
+
+    @staticmethod
+    def remove_stale_moderators():
+        LightModerator.objects.filter(
+            created_at__lte=timezone.now() - datetime.timedelta(1)).delete()
+
+
+class Moderator(models.Model):
+    changelog = models.ForeignKey(Changelog)
+    user = models.ForeignKey(User)
+    created_at = models.DateTimeField(auto_now_add=True)
+    from_light_user = models.CharField(max_length=40, blank=True, null=True)
+
+
+class Preview(IgnoreCheckSetters, models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name='previews',
+                             blank=True,
+                             null=True)
+    changelog = models.ForeignKey(Changelog,
+                                  related_name='previews')
+    light_user = models.CharField(max_length=40)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    source = models.URLField()
+    ignore_list = models.CharField(max_length=1000,
+                                   default='',
+                                   help_text=('Comma-separated list of directories'
+                                              ' and filenames to ignore searching'
+                                              ' changelog.'),
+                                   blank=True)
+    check_list = models.CharField(max_length=1000,
+                                  default='',
+                                  help_text=('Comma-separated list of directories'
+                                              ' and filenames to search'
+                                              ' changelog.'),
+                                  blank=True)
+    problem = models.CharField(max_length=1000,
+                               help_text='Latest error message',
+                               blank=True, null=True)
 
 
 class VersionManager(models.Manager):
@@ -404,6 +550,12 @@ CODE_VERSIONS = [
 
 class Version(models.Model):
     changelog = models.ForeignKey(Changelog, related_name='versions')
+    preview = models.ForeignKey(Preview,
+                                related_name='versions',
+                                blank=True,
+                                null=True,
+                                on_delete=models.SET_NULL)
+
     date = models.DateField(blank=True, null=True)
     number = models.CharField(max_length=255)
     unreleased = models.BooleanField(default=False)
@@ -416,7 +568,7 @@ class Version(models.Model):
 
     class Meta:
         get_latest_by = 'discovered_at'
-        
+
     def __unicode__(self):
         return self.number
 
@@ -457,6 +609,9 @@ class Package(models.Model):
                                   blank=True, null=True,
                                   on_delete=models.SET_NULL)
 
+    def __init__(self, *args, **kwargs):
+        raise RuntimeError('Dont use packages anymore!')
+
     class Meta:
         unique_together = ('user', 'namespace', 'name')
 
@@ -472,7 +627,7 @@ class Package(models.Model):
             username=self.user.username,
             namespace=self.namespace,
             name=self.name))
-    
+
     def save(self, *args, **kwargs):
         """Create corresponding changelog object"""
         super(Package, self).save(*args, **kwargs)
@@ -488,7 +643,7 @@ class Package(models.Model):
 
             self.changelog = changelog
             self.save()
-        
+
     def update(self):
         if self.repo is None:
             self.repo, created = Repo.objects.get_or_create(url=self.source)

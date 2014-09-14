@@ -1,0 +1,43 @@
+(= gulp   (require "gulp")
+   plug   ((require "gulp-load-plugins")))
+
+(def handle stream
+  (stream.on "error" (fn err (do
+    (plug.util.log err)
+    (plug.util.log "\x07\x07\x07\x07\x07")
+    (stream.end)))))
+
+(mac task name pre ...args (do
+  (if (and (not (Array.isArray pre)) (? pre))
+    (do (args.unshift pre)
+        (= pre ``())))
+  (if (is args.length 0)
+    (= pipeline `())
+    (do (= pipeline `(do (console.log (+ "Running task " ,name))
+                         (handle (,(args.shift) ,(args.shift)))))
+        (while (> args.length 0) (do
+          (= left  (args.shift)
+             right (args.shift))
+          (pipeline.push `(.pipe (handle (,left ,right))))))))
+  `(gulp.task ,name ,pre (fn ,pipeline))))
+
+
+(task "css"
+      gulp.src "allmychanges/static/allmychanges/stylus/{allmychanges,email}.styl"
+      plug.stylus ()
+      gulp.dest "allmychanges/static/allmychanges/css/")
+
+
+(task         "jisp"
+  gulp.src    "allmychanges/static/allmychanges/jisp/*.jisp"
+  plug.concat "allmychanges.jisp"
+  plug.jisp   ()
+  gulp.dest   "allmychanges/static/allmychanges/js/")
+
+
+(gulp.task "watch" (fn (do
+                           (gulp.watch "allmychanges/static/allmychanges/jisp/*.jisp" `("jisp"))
+                           (gulp.watch "allmychanges/static/allmychanges/stylus/*.styl" `("css")))))
+
+
+(task "default" `("jisp" "watch"))

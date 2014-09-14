@@ -11,9 +11,12 @@
     <link href="{% static 'angular/angucomplete-alt.css' %}" rel="stylesheet">
     {% endcompress %}
 
+    {% comment react-js %}
+      <script src="http://fb.me/react-0.11.2.js"></script>
+    {% endcomment %}
 
     {% block anjular-js %}
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js" type="text/javascript" charset="utf-8">
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.js" type="text/javascript" charset="utf-8">
       </script>
       <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8">
       </script>
@@ -28,10 +31,13 @@
     {% compress js %}
       <script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/share.js" type="text/javascript" charset="utf-8"></script>
-      <script src="/static/allmychanges/js/digest.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/allmychanges/js/track-button.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/landing-page.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/allmychanges/js/add-new.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/allmychanges/js/magic-prompt.js" type="text/javascript" charset="utf-8"></script>
     {% endcompress %}
 
       <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
@@ -57,6 +63,8 @@
         </div>
         {% endblock %}
         <div class="clear"></div>
+
+        <magic-prompt data-query="{{q}}"/>
       </div>
       {% endblock header %}
 
@@ -136,5 +144,8 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 <!-- /Google.Analytics counter -->
 {% endif %}
 
+{% comment %}
+<script src="/static/allmychanges/js/allmychanges.js" type="text/javascript" charset="utf-8"></script>
+{% endcomment %}
 </body>
 </html>

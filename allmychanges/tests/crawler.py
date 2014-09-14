@@ -1,9 +1,10 @@
 from datetime import date
 from nose.tools import eq_
 
-from . import (_filter_changelog_files, parse_changelog,
-               _extract_version, _starts_with_ident, _parse_item,
-               _extract_date,)
+from allmychanges.crawler import (
+    _filter_changelog_files, parse_changelog,
+    _extract_version, _starts_with_ident, _parse_item,
+    _extract_date)
 from allmychanges.utils import normalize_url, get_markup_type, get_commit_type
 
 
@@ -111,8 +112,7 @@ Each paragraph should be separated with empty line.
 Like that.
 """
     parsed = parse_changelog(input)
-    eq_("""Some note with few paragraphs. Each paragraph should be separated with empty line. 
-Like that.""", parsed[0]['sections'][0]['notes'])
+    eq_("""Some note with few paragraphs. Each paragraph should be separated with empty line. \nLike that.""", parsed[0]['sections'][0]['notes'])
 
 
 def test_use_date_even_from_next_string():
@@ -160,7 +160,7 @@ Change in a way how unreleased notes are parsed.
 """)
     eq_(None, parsed[0].get('unreleased'))
 
-    
+
 
 def test_extract_version():
     eq_(None, _extract_version('Just a text with some 1 33 nubers'))
@@ -216,7 +216,7 @@ def test_extract_date():
     eq_(date(2014, 5, 23), _extract_date('(bugfix release, released on May 23rd 2014)'))
     eq_(date(2014, 5, 21), _extract_date('(no codename, released on May 21st 2014)'))
     eq_(date(2014, 8, 13), _extract_date('August 13th 2014'))
-    
+
 
     # from https://github.com/ingydotnet/boolean-pm/blob/master/Changes
     # https://github.com/miyagawa/Perlbal-Plugin-PSGI/blob/master/Changes
