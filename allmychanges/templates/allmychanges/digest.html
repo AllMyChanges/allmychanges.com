@@ -8,7 +8,7 @@
   {% endif %}
 
   <h1 class="page-header">Digest</h1>
-  <h2 class="page-subheader"><a href="{% url "edit-digest" %}">Edit digest</a>{% if request.user.username == 'svetlyak40wt' %}
+  <h2 class="page-subheader"><a href="{% url "edit-digest" %}" class="button button_good">Edit track list</a>{% if request.user.username == 'svetlyak40wt' %}
       {% if code_version == 'v1' %}
         <a href="?code_version=v2">New parser</a>
       {% else %}
