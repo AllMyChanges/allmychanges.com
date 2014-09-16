@@ -541,7 +541,7 @@ class UserHistoryLog(models.Model):
 
     @staticmethod
     def write(user, light_user, action, description):
-        user = user if user.is_authenticated() else None
+        user = user if user is not None and user.is_authenticated() else None
         UserHistoryLog.objects.create(user=user,
                                       light_user=light_user,
                                       action=action,

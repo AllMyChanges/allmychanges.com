@@ -62,9 +62,10 @@ class IndexView(CommonContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         result = super(IndexView, self).get_context_data(**kwargs)
 
-        UserHistoryLog.objects.create(light_user=self.request.light_user,
-                                      action='landing-digest-view',
-                                      description='User opened a landing page with digest.')
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'landing-digest-view',
+                             'User opened a landing page with digest.')
         return result
 
     def get(self, *args, **kwargs):
@@ -284,6 +285,10 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
     def get(self, *args, **kwargs):
         if self.request.user.packages.count() == 0:
             return HttpResponseRedirect(reverse('edit-digest'))
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'digest-view',
+                             'User viewed the digest')
         return super(DigestView, self).get(*args, **kwargs)
 
 
@@ -346,6 +351,12 @@ class LoginView(CommonContextMixin, TemplateView):
 
 class EditDigestView(LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/edit_digest.html'
+    def get(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'edit-digest-view',
+                             'User opened the track list editing page')
+        return super(EditDigestView, self).get(*args, **kwargs)
 
 
 class PackageView(CommonContextMixin, TemplateView):
@@ -381,6 +392,13 @@ class PackageView(CommonContextMixin, TemplateView):
 
         result['package'] = package_data
         return result
+
+    def get(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'package-view',
+                             u'User opened package ' + self.request.path)
+        return super(PackageView, self).get(*args, **kwargs)
 
 
 class BadgeView(View):
@@ -557,6 +575,20 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         
     def get_object(self, queryset=None):
         return self.request.user
+
+    def get(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'profile-view',
+                             'User opened his profile settings')
+        return super(ProfileView, self).get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'profile-update',
+                             'User saved his profile settings')
+        return super(ProfileView, self).post(*args, **kwargs)
 
 
 class TokenForm(forms.Form):
