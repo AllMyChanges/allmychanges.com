@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.conf import settings
 
+from allmychanges.models import UserHistoryLog
 from allmychanges.views import get_digest_for
 from allmychanges.utils import dt_in_window
 from premailer import Premailer
@@ -29,6 +30,11 @@ def send_digest_to(user, code_version='v1'):
 
     if today_changes:
         print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
+        if code_version == 'v1':
+            UserHistoryLog.write(user, '',
+                                 'digest-sent',
+                                 'We send user an email with digest')
+                
         for package in today_changes:
             print '\t{namespace}/{name}'.format(**package)
             for version in package['versions']:

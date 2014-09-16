@@ -18,6 +18,8 @@ Here is a list of event which are tracked:
 * package-view: 'User opened package /u/allmychanges/web/allmychanges/'
 * profile-view: 'User opened his profile settings'
 * profile-update: 'User saved his profile settings'
+* digest-sent: 'We send user an email with digest'
+  This event is created by management command send_digests.
 
 
 To track new events
