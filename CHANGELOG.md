@@ -8,7 +8,7 @@ Only two visible changes are introduced in this version.
   This should fix they rendering in some mail clients, if don't, then contact us
   via [support@allmychanges.com](mail-to:support@allmychanges.com).
 
-Another big feature is under development now - global magic pony search. Stay tuned!
+Another big feature which will come soon - global magic pony search. Stay tuned!
 
 0.8.2 (2014-09-04)
 ==================
