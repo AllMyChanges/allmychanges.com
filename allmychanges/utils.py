@@ -659,6 +659,16 @@ def update_changelog(changelog):
 
     try:
         try:
+            from allmychanges.parsing.pipeline import processing_pipe
+            versions = processing_pipe(path,
+                                       changelog.get_ignore_list(),
+                                       changelog.get_check_list())
+            update_changelog_from_raw_data2(changelog, versions)
+        except Exception:
+            logging.getLogger('update-changelog2').exception('unhandled')
+
+
+        try:
             filename, raw_data = search_changelog2(path)
 
             if raw_data:
@@ -681,15 +691,6 @@ def update_changelog(changelog):
         except Exception:
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to update database')
-
-        try:
-            from allmychanges.parsing.pipeline import processing_pipe
-            versions = processing_pipe(path,
-                                       changelog.get_ignore_list(),
-                                       changelog.get_check_list())
-            update_changelog_from_raw_data2(changelog, versions)
-        except Exception:
-            logging.getLogger('update-changelog2').exception('unhandled')
 
     finally:
         shutil.rmtree(path)
