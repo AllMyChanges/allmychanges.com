@@ -1,7 +1,7 @@
 app.directive('magicPrompt', [function(){
     var link = function (scope, element, attrs) {
         scope.submit = function () {
-            window.location = '/search/?q=' + scope.query.originalObject;
+            window.location = '/search/?q=' + encodeURIComponent(scope.query.originalObject);
         }
     }
 
