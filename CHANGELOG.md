@@ -1,3 +1,33 @@
+0.9.0 (2014-10-27)
+==================
+
+This is a big release which completely changes a way how packages
+are tracked. Previously, you have to open "Edit Digest" page and
+to add packages one by one to the list. This interface
+was completely replaced by the new one. Now each page contains
+a magic search prompt. Try to enter there a package repository's
+URL or just "namespace name" pair. The latter works only for `python`
+and `perl` namespaces but will be extended to `npm` and `ruby gems` soon.
+
+If allmychanges.com know nothing about entered source url, it will
+offer you to add it and track. At the same time, it will try to fetch
+changelog data and display them as soon as possible, allowing to
+tune some crawler's parameters.
+
+Another big change is new changelog parser which now works for everyone
+by default. It is still immature, but we'll do our best to improve it's
+quality. If you'll discover any errors or have ideas, please,
+[write us an email][support-email].
+
+Future plans
+------------
+
+* Improve new parser's quality.
+* Simplify entering package description by automatic data gathering.
+* Add an index page for logged in users. It will suggest packages to track.
+
+Try new features and stay tuned!
+
 0.8.3 (2014-09-14)
 ==================
 
@@ -233,3 +263,5 @@ about. Right now, second approach only works with python modules, whose
 setup.py uses setuptools.
 
 There are plenty directions for approvement. Stay tuned.
+
+[support-email]: mailto:help@allmychanges.com
