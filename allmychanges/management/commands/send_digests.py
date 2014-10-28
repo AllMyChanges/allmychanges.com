@@ -19,29 +19,29 @@ from allmychanges.utils import dt_in_window
 from premailer import Premailer
 
 
-def send_digest_to(user, code_version='v1'):
+def send_digest_to(user, code_version='v2'):
     now = timezone.now()
     day_ago = now - datetime.timedelta(1)
     week_ago = now - datetime.timedelta(7)
 
-    today_changes = get_digest_for(user.packages,
+    today_changes = get_digest_for(user.changelogs,
                                    after_date=day_ago,
                                    code_version=code_version)
 
     if today_changes:
         print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
-        if code_version == 'v1':
+        if code_version == 'v2':
             UserHistoryLog.write(user, '',
                                  'digest-sent',
                                  'We send user an email with digest')
-                
+
         for package in today_changes:
             print '\t{namespace}/{name}'.format(**package)
             for version in package['versions']:
                 print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
                     **version)
 
-        week_changes = get_digest_for(user.packages,
+        week_changes = get_digest_for(user.changelogs,
                                       before_date=day_ago,
                                       after_date=week_ago,
                                       code_version=code_version)
@@ -109,10 +109,11 @@ class Command(LogMixin, BaseCommand):
         users = get_user_model().objects.exclude(email='')
 
         if args:
-            users = users.filter(username__in=args)
+            if args[0] != 'all':
+                users = users.filter(username__in=args)
         else:
             users = users.filter(timezone__in=send_for_timezones)
 
         for user in users:
-            send_digest_to(user, code_version='v1')
+#            send_digest_to(user, code_version='v1')
             send_digest_to(user, code_version='v2')
