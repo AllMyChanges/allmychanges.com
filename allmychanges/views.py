@@ -892,3 +892,8 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
             update_preview_task.delay(preview.pk)
 
         return HttpResponse('ok')
+
+
+
+class ToolsView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/tools.html'
