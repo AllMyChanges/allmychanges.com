@@ -293,6 +293,10 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         return result
 
     def get(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'digest-view',
+                             'User viewed the digest')
         return super(DigestView, self).get(*args, **kwargs)
 
 
