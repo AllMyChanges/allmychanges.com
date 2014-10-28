@@ -1,3 +1,18 @@
+0.9.1 (2014-10-28)
+==================
+
+At the beginning of the project, we've had
+a separate workflow when you come across interesting
+project at the GitHub, click a bookmarklet and
+allmychanges.com searches and displays project's
+changelog.
+
+This behaviour was broken because of refactoring,
+but now it come back.
+
+Go to the [/tools/](http://allmychanges.com/tools/) page
+to install new bookmarklet!
+
 0.9.0 (2014-10-27)
 ==================
 
