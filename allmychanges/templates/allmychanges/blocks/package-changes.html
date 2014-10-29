@@ -2,7 +2,7 @@
 
 {% for version in package.versions %}
 <li class="package-version">
-  <h4 class="package-version__number"><a href="{% url 'package' namespace=package.namespace name=package.name %}#{{version.number}}">{{version.number}}</a></h4>
+  <h4 class="package-version__number"><a href="{% url 'package' namespace=package.namespace name=package.name %}#{{version.number}}" name="{{version.number}}">{{version.number}}</a></h4>
   <h5 class="package-version__date">{% if version.unreleased %}Unreleased{% else %}{% if version.date %}Released at {{version.date}}{% endif %}{% if not version.date or version.show_discovered_as_well %}{% if version.show_discovered_as_well %}, d{% else %}D{% endif %}iscovered at {{ version.discovered_at }}{% endif %}{% endif %}</h5>
   {% if show_sources and version.filename %}<h6 class="package-version__source">Source: {{ version.filename }}</h6>{% endif %}
   {% for section in version.sections %}

@@ -16,11 +16,15 @@ from allmychanges.crawler.git_crawler import aggregate_git_log
 from allmychanges.utils import (
     cd,
     get_package_metadata,
-    download_repo,
-    get_commit_type,
     get_markup_type,
     get_clean_text_from_markup_text,
+    get_change_type,
 )
+from allmychanges.downloader import (
+    guess_downloader,
+    get_downloader,
+    download_repo)
+
 from allmychanges.tasks import update_repo
 
 
@@ -273,7 +277,7 @@ class Repo(models.Model):
 
                     for section_item in section['items']:
                         item.changes.create(
-                            type=get_commit_type(section_item),
+                            type=get_change_type(section_item),
                             text=get_clean_text_from_markup_text(
                                 section_item,
                                 markup_type=self.changelog_markup))
@@ -376,8 +380,24 @@ class IgnoreCheckSetters(object):
         self.check_list = u'\n'.join(map(process, items))
 
 
+class Downloadable(object):
+    """Adds method download, which uses attribute `source`
+    to update attribute `downloader` if needed and then to
+    download repository into a temporary directory.
+    """
+    def download(self):
+        """This method fetches repository into a temporary directory
+        and returns path to this directory.
+        """
+        if self.downloader is None:
+            self.downloader = guess_downloader(self.source)
+            self.save(update_fields=('downloader',))
 
-class Changelog(IgnoreCheckSetters, models.Model):
+        download = get_downloader(self.downloader)
+        return download(self.source)
+
+
+class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
     source = models.URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     processing_started_at = models.DateTimeField(blank=True, null=True)
@@ -408,6 +428,7 @@ class Changelog(IgnoreCheckSetters, models.Model):
                                   blank=True)
     namespace = models.CharField(max_length=NAMESPACE_LENGTH, blank=True, null=True)
     name = models.CharField(max_length=NAME_LENGTH, blank=True, null=True)
+    downloader = models.CharField(max_length=10, blank=True, null=True)
 
 
     class Meta:
@@ -509,7 +530,7 @@ class Moderator(models.Model):
     from_light_user = models.CharField(max_length=40, blank=True, null=True)
 
 
-class Preview(IgnoreCheckSetters, models.Model):
+class Preview(Downloadable, IgnoreCheckSetters, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              related_name='previews',
                              blank=True,
@@ -535,6 +556,7 @@ class Preview(IgnoreCheckSetters, models.Model):
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)
+    downloader = models.CharField(max_length=10, blank=True, null=True)
 
 
 class VersionManager(models.Manager):

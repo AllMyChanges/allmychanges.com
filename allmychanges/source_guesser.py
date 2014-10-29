@@ -1,7 +1,7 @@
 import requests
 import re
 
-from .utils import normalize_url
+from allmychanges.downloader import normalize_url
 
 
 def _get_data(data, path):
@@ -41,7 +41,7 @@ def _python_guesser(name):
 
 def _perl_guesser(name):
     name = name.replace('::', '-')
-    
+
     results = []
     hits = []
 
@@ -52,7 +52,7 @@ def _perl_guesser(name):
 
     # next try to search because first match coculd be
     response = requests.get('http://api.metacpan.org/v0/release/_search?q=' + name.lower())
-    
+
     if response.status_code == 200:
         data = response.json()
         hits.extend([_get_data(item, '_source.metadata')

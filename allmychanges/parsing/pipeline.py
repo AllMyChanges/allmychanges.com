@@ -12,7 +12,7 @@ from operator import itemgetter
 from collections import defaultdict
 
 from allmychanges.crawler import _extract_version, _extract_date
-from allmychanges.utils import get_commit_type
+from allmychanges.utils import get_change_type
 from allmychanges.env import Environment
 from django.conf import settings
 
@@ -480,7 +480,7 @@ def extract_metadata(version):
             return content_part
         else:
             # here we process list items
-            return [{'type': get_commit_type(item),
+            return [{'type': get_change_type(item),
                      'text': item}
                     for item in content_part]
     new_version.content = [process_content(idx, content)

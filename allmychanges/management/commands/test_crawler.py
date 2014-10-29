@@ -5,7 +5,8 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.crawler import search_changelog, parse_changelog
-from allmychanges.utils import cd, load_data, download_repo
+from allmychanges.utils import cd, load_data
+from allmychanges.downloader import download_repo
 
 
 def fetch_with_crawler_this(url):

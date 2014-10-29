@@ -8,6 +8,7 @@ from nose.tools import eq_
 from urllib import urlencode
 from django.test import Client, TransactionTestCase, TestCase
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from allmychanges.auth.pipeline import add_default_package
 from allmychanges.parsing.pipeline import filter_trash_versions
@@ -16,14 +17,14 @@ from allmychanges.models import (Version,
                                  Changelog,
                                  Preview)
 from allmychanges.utils import (
-    update_changelog_from_raw_data,
-    update_changelog,
-    fake_downloader,
-    fill_missing_dates2,
     dt_in_window,
-    discard_seconds,
-    timezone,
-    extract_changelog_from_vcs)
+    discard_seconds)
+from allmychanges.downloader import fake_downloader
+from allmychanges.changelog_updater import (
+    update_changelog_from_raw_data,
+    fill_missing_dates2,
+    update_changelog)
+from allmychanges.vcs_extractor import extract_changelog_from_vcs
 from allmychanges.parsing.pipeline import get_files
 from allmychanges.tasks import _task_log, update_preview_task
 from allmychanges.env  import Environment
@@ -81,7 +82,7 @@ def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw
     assert v.date is None
     assert discovered_at is not None
 
-    with mock.patch('allmychanges.utils.timezone') as timezone:
+    with mock.patch('allmychanges.changelog_updater.timezone') as timezone:
         timezone.now.return_value = datetime.datetime.now() + datetime.timedelta(10)
         update_changelog_from_raw_data(changelog, structure)
 

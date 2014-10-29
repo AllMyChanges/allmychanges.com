@@ -249,7 +249,7 @@ class ChangelogViewSet(HandleExceptionMixin,
                                                self.request.light_user)
         if result:
             messages.info(self.request,
-                          'Congratulations, you\'ve become a moderator of this changelog. Now you have rights to edit and care about this changelog in future.')
+                          'Congratulations, you\'ve become a moderator of this changelog. Now you have rights to edit and to care about this changelog in future.')
         if result == 'light':
             messages.warning(self.request,
                              'Because you are not logged in, we\'ll remember that you are a moderator for 24 hour. To make this permanent, please, login or sign up as soon as possible.')

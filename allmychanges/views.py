@@ -26,7 +26,6 @@ from twiggy_goodies.threading import log
 
 from allmychanges.models import (Package,
                                  LightModerator,
-                                 Version,
                                  Subscription,
                                  Changelog,
                                  User,
@@ -36,9 +35,9 @@ from allmychanges.models import (Package,
 from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import (HOUR,
-                                normalize_url,
                                 parse_ints,
                                 join_ints)
+from allmychanges.downloader import normalize_url
 from allmychanges.tasks import update_preview_task
 
 

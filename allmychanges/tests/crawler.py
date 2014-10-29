@@ -5,7 +5,8 @@ from allmychanges.crawler import (
     _filter_changelog_files, parse_changelog,
     _extract_version, _starts_with_ident, _parse_item,
     _extract_date)
-from allmychanges.utils import normalize_url, get_markup_type, get_commit_type
+from allmychanges.utils import get_markup_type, get_change_type
+from allmychanges.downloader import normalize_url
 
 
 def test_changelog_finder():
@@ -278,15 +279,15 @@ def test_get_markup_type():
     eq_(None, get_markup_type('readme.rst.'))
 
 
-def test_get_commit_type():
-    eq_('new', get_commit_type('add new feature'))
-    eq_('new', get_commit_type('new feature was added'))
-    eq_('fix', get_commit_type('fix 100 bags'))
-    eq_('fix', get_commit_type('100 bags were fixed'))
-    eq_('fix', get_commit_type('change some bugfix'))
-    eq_('fix', get_commit_type('some fixes'))
-    eq_('fix', get_commit_type('[Fix] Resolved'))
-    eq_('new', get_commit_type('change something'))
-    eq_('sec', get_commit_type('This issue solves CVE-2014-3556 report'))
-    eq_('dep', get_commit_type('pip install --build and pip install --no-clean are now deprecated'))
-    eq_('inc', get_commit_type('BACKWARD INCOMPATIBLE Removed the bundle support which was deprecated in 1.4.'))
+def test_get_change_type():
+    eq_('new', get_change_type('add new feature'))
+    eq_('new', get_change_type('new feature was added'))
+    eq_('fix', get_change_type('fix 100 bags'))
+    eq_('fix', get_change_type('100 bags were fixed'))
+    eq_('fix', get_change_type('change some bugfix'))
+    eq_('fix', get_change_type('some fixes'))
+    eq_('fix', get_change_type('[Fix] Resolved'))
+    eq_('new', get_change_type('change something'))
+    eq_('sec', get_change_type('This issue solves CVE-2014-3556 report'))
+    eq_('dep', get_change_type('pip install --build and pip install --no-clean are now deprecated'))
+    eq_('inc', get_change_type('BACKWARD INCOMPATIBLE Removed the bundle support which was deprecated in 1.4.'))
