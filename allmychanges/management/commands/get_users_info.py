@@ -10,19 +10,17 @@ class Command(LogMixin, BaseCommand):
     help = u"""Drops user and all his packages."""
 
     def handle(self, *args, **options):
-        for user in User.objects.all():
+        for user in User.objects.order_by('-id'):
             print user.username
             print '\tJoined:', timesince(user.date_joined) + ' ago'
             print '\tEmail:', user.email
-            packages = list(user.packages.all())
+            packages = list(user.changelogs.all())
 
             if packages:
                 print '\tPackages:'
-                for package in user.packages.all():
-                    print '\t\t', package.namespace, package.name, package.source, '(http://allmychanges.com' + package.get_absolute_url() + ')'
+                for changelog in user.changelogs.all():
+                    print '\t\t', changelog.namespace, changelog.name, '(http://allmychanges.com' + changelog.get_absolute_url() + ')'
             else:
                 print '\tPackages: NO'
 
             print ''
-                
-            
