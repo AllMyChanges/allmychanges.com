@@ -695,24 +695,13 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
         if namespace:
             params['namespace'] = namespace.strip()
 
-        user_changelogs = []
-        if self.request.user.is_authenticated():
-            user_changelogs = self.request.user.changelogs.filter(**params)
-            if user_changelogs.count() == 1:
-                user_changelog = user_changelogs[0]
-                raise ImmediateResponse(
-                    HttpResponseRedirect(reverse('package', kwargs=dict(
-                        username=self.request.user.username,
-                        name=user_changelog.name,
-                        namespace=user_changelog.namespace))))
-
-        canonical_changelogs = Changelog.objects.filter(**params)
-        if canonical_changelogs.count() == 1:
-            canonical_changelog = canonical_changelogs[0]
+        changelogs = Changelog.objects.filter(**params)
+        if changelogs.count() == 1:
+            changelog = changelogs[0]
             raise ImmediateResponse(
                 HttpResponseRedirect(reverse('package', kwargs=dict(
-                    name=canonical_changelog.name,
-                    namespace=canonical_changelog.namespace))))
+                    name=changelog.name,
+                    namespace=changelog.namespace))))
 
         if '://' in q:
             # then might be it is a URL?
@@ -734,8 +723,7 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
                                          + urllib.urlencode({'url': normalized_url})))
 
         return dict(params,
-                    user_changelogs=user_changelogs,
-                    canonical_changelogs=canonical_changelogs,
+                    changelogs=changelogs,
                     q=q)
 
 
