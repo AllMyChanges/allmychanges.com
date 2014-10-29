@@ -140,7 +140,7 @@ class AutocompletePackageNameView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         filter_args = dict(name__startswith=request.GET.get('q'))
         queryset = Package.objects.filter(**filter_args)
-        this_users_packages = request.user.packages.filter(**filter_args).values_list('name', flat=True)
+        this_users_packages = request.user.changelogs.filter(**filter_args).values_list('name', flat=True)
         queryset = queryset.exclude(name__in=this_users_packages)
         names = list(queryset.values_list('name', flat=True).distinct())
         names.sort()

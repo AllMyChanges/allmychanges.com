@@ -697,7 +697,7 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
 
         user_changelogs = []
         if self.request.user.is_authenticated():
-            user_changelogs = self.request.user.packages.filter(**params)
+            user_changelogs = self.request.user.changelogs.filter(**params)
             if user_changelogs.count() == 1:
                 user_changelog = user_changelogs[0]
                 raise ImmediateResponse(
