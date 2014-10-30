@@ -194,7 +194,8 @@ def get_digest_for(changelogs,
     # because they are not interesting
     # probably we should make it a user preference
     filter_args = {'unreleased': False,
-                   'code_version': code_version}
+                   'code_version': code_version,
+                   'preview_id': None}
 
     if before_date and after_date:
         filter_args['discovered_at__range'] = (after_date, before_date)

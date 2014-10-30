@@ -592,3 +592,27 @@ def test_trash_versions_filtering():
     new = filter_trash_versions(versions)
     filenames = {v.filename for v in new}
     eq_(['CHANGELOG.md'], list(filenames))
+
+
+def test_digest_does_not_include_preview_versions():
+    today = datetime.datetime(2014, 1, 1, 9, 0, tzinfo=timezone.UTC()) # 9am
+    week = datetime.timedelta(7)
+    day = datetime.timedelta(1)
+    code_version = 'v2'
+
+    foo = Changelog.objects.create(namespace='test', name='foo', source='foo')
+    foo.versions.create(number='0.1.0',
+                        discovered_at=today - week,
+                        code_version=code_version)
+
+    preview = Preview.objects.create(changelog=foo)
+    preview.versions.create(changelog=foo,
+                            number='0.1.0',
+                            discovered_at=today,
+                            code_version=code_version)
+
+    digest = get_digest_for(Changelog.objects.filter(pk=foo.pk),
+                            after_date=today - day,
+                            code_version=code_version)
+
+    eq_(0, len(digest))
