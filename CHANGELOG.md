@@ -1,3 +1,11 @@
+0.9.2 (2014-10-30)
+==================
+
+* Fixed error when old versions appeared in the digest.
+* Magic prompt's "Search" button was fixed.
+* Now source downloader is selected automatically.
+  URL prefixes like `http+` or `hg+` are obsolete now.
+
 0.9.1 (2014-10-28)
 ==================
 
