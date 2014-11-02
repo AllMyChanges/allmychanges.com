@@ -39,10 +39,11 @@ var Package = React.createClass({
           );
       });
 
+    var url = '/p/' + this.props.namespace + '/' + this.props.name + '/';
     return (
     <li className="package-selector__item">
     <div className="package-selector__package">
-      <h1 className="package-selector__title"><a href="/p/{this.props.namespace}/{this.props.name}/">{this.props.namespace}/{this.props.name}</a></h1>
+      <h1 className="package-selector__title"><a href={url}>{this.props.namespace}/{this.props.name}</a></h1>
       <ul className="package-selector__versions">
             {versions}
       </ul>
