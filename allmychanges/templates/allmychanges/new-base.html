@@ -11,9 +11,8 @@
     <link href="{% static 'angular/angucomplete-alt.css' %}" rel="stylesheet">
     {% endcompress %}
 
-    {% comment react-js %}
-      <script src="http://fb.me/react-0.11.2.js"></script>
-    {% endcomment %}
+    <script src="http://fb.me/react-0.12.0.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.0.js"></script>
 
     {% block anjular-js %}
       <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.js" type="text/javascript" charset="utf-8">
@@ -26,11 +25,12 @@
       </script>
     {% endblock %}
 
-      <script src="//yastatic.net/jquery/2.1.1/jquery.js" type="text/javascript" charset="utf-8"></script>
 
     {% compress js %}
+      <script src="/static/bower_components/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>w
       <script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
-      <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/bower_components/jquery.cookie/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+
       <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/share.js" type="text/javascript" charset="utf-8"></script>
@@ -144,8 +144,5 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 <!-- /Google.Analytics counter -->
 {% endif %}
 
-{% comment %}
-<script src="/static/allmychanges/js/allmychanges.js" type="text/javascript" charset="utf-8"></script>
-{% endcomment %}
 </body>
 </html>

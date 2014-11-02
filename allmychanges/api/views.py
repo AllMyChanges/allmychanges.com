@@ -189,6 +189,8 @@ class LandingPackageSuggestView(viewsets.ViewSet):
 
         tracked = parse_ints(request.GET.get('tracked', ''))
         ignored = parse_ints(request.GET.get('ignored', ''))
+        limit = int(request.GET.get('limit', '3'))
+        versions_limit = int(request.GET.get('versions_limit', '3'))
         skip = parse_ints(request.GET.get('skip', ''))
         skip += tracked + ignored
 
@@ -206,14 +208,22 @@ class LandingPackageSuggestView(viewsets.ViewSet):
                 'User has ignored changelog:{0}'.format(ignore_id))
 
         changelogs = Changelog.objects.exclude(name=None).exclude(pk__in=skip).annotate(latest_date=Max('versions__discovered_at')).order_by('-latest_date')
-        changelogs = islice((ch for ch in changelogs
-                            if ch.versions.filter(code_version='v2').count() > 0),
-                            3)
+
+        changelogs = (ch for ch in changelogs
+                      if ch.versions.filter(code_version='v2').count() > 0)
+
+        # we won't suggest changlogs which are already tracked
+        if self.request.user.is_authenticated():
+            tracked_changelogs = set(self.request.user.changelogs.values_list('id', flat=True))
+            changelogs = (ch for ch in changelogs
+                          if ch.pk not in tracked_changelogs)
+
+        changelogs = islice(changelogs, limit)
 
         return Response({'results': [{'id': ch.id,
                                       'name': ch.name,
                                       'namespace': ch.namespace,
-                                      'versions': process_versions(ch.versions.filter(code_version='v2')[:3])}
+                                      'versions': process_versions(ch.versions.filter(code_version='v2')[:versions_limit])}
                                      for ch in changelogs]})
 
 

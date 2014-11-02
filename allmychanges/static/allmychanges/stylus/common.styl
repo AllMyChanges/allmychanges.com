@@ -264,10 +264,16 @@ level-4-header() {
     list-style: none;
 }
 
+.package-selector {
+    margin-top: 20px;
+}
+
 .package-selector__item {
     display: inline-block;
     list-style: none;
     margin-right: 44px;
+    margin-bottom: 20px;
+    vertical-align: top;
 }
 
 .package-selector__version {
@@ -280,6 +286,7 @@ level-4-header() {
 
 .package-selector__date {
     color: gray;
+    margin-left: 10px;
 }
 
 .package-selector__versions {
@@ -295,8 +302,17 @@ level-4-header() {
     cursor: pointer;
 }
 
+.package-select__track-button_tracked {
+    background: #E8FED9;
+    cursor: default;
+}
+
 .package-select__track-button:hover {
     background: #AAFF72 - #222;
+}
+
+.package-select__track-button_tracked:hover {
+    background: #E8FED9;
 }
 
 .package-select__ignore-button {
@@ -306,6 +322,7 @@ level-4-header() {
     font-size: 18px;
     line-height: 22px;
     cursor: pointer;
+    margin-left: 10px;
 }
 
 .package-select__ignore-button:hover {

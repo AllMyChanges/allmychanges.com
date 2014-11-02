@@ -885,3 +885,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
 
 class ToolsView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/tools.html'
+
+
+class LoginIndexView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/login-index.html'

@@ -164,3 +164,24 @@ def test_if_after_login_will_track_changelogs_from_cookie():
 
     eq_(1, user.changelogs.count())
     eq_('', cl.cookies['tracked-changelogs'].value)
+
+
+def test_package_suggest_ignores_tracked_packages():
+    cl = Client()
+    thebot = Changelog.objects.create(name='thebot', namespace='python',
+                                      source='http://github.com/svetlyak40wt/thebot')
+    thebot.versions.create(number='0.1.0', discovered_at=timezone.now(), code_version='v2')
+    fields = Changelog.objects.create(name='fields', namespace='python',
+                                      source='http://github.com/svetlyak40wt/django-fields')
+    fields.versions.create(number='0.1.0', discovered_at=timezone.now(), code_version='v2')
+
+    user = create_user('art')
+    user.track(thebot)
+
+    cl.login(username='art', password='art')
+
+    response = cl.get(reverse('landing-package-suggest-list'))
+
+    data = anyjson.deserialize(response.content)
+
+    eq_(1, len(data['results']))

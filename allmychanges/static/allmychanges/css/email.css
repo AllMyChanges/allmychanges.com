@@ -678,10 +678,15 @@ body.email {
 .front-steps__step {
   list-style: none;
 }
+.package-selector {
+  margin-top: 20px;
+}
 .package-selector__item {
   display: inline-block;
   list-style: none;
   margin-right: 44px;
+  margin-bottom: 20px;
+  vertical-align: top;
 }
 .package-selector__version {
   list-style: none;
@@ -691,6 +696,7 @@ body.email {
 }
 .package-selector__date {
   color: #808080;
+  margin-left: 10px;
 }
 .package-selector__versions {
   margin-bottom: 22px;
@@ -703,8 +709,15 @@ body.email {
   line-height: 22px;
   cursor: pointer;
 }
+.package-select__track-button_tracked {
+  background: #e8fed9;
+  cursor: default;
+}
 .package-select__track-button:hover {
   background: #88dd50;
+}
+.package-select__track-button_tracked:hover {
+  background: #e8fed9;
 }
 .package-select__ignore-button {
   background: #ffd738;
@@ -713,6 +726,7 @@ body.email {
   font-size: 18px;
   line-height: 22px;
   cursor: pointer;
+  margin-left: 10px;
 }
 .package-select__ignore-button:hover {
   background: #ddb516;
