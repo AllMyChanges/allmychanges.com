@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import math
 import logging
 import datetime
 import time
@@ -196,9 +197,16 @@ def update_changelog_task(source, preview_id=None):
             update_changelog(changelog, preview_id=preview_id)
 
             if preview_id is None:
-                # TODO: create more complex algorithm to calculate this time
-                changelog.next_update_at = timezone.now() + datetime.timedelta(0, 60 * 60)
                 changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
+
+                time_to_next_update = 4 * 60 * 60
+                time_to_next_update = time_to_next_update / math.log(max(math.e,
+                                                                         changelog.trackers.count()))
+
+                time_to_next_update = max(time_to_next_update,
+                                          2 * changelog.last_update_took)
+
+                changelog.next_update_at = timezone.now() + datetime.timedelta(0, time_to_next_update)
         except UpdateError as e:
             problem = ', '.join(e.args)
             log.trace().error('Unable to update changelog')
@@ -223,6 +231,8 @@ def update_changelog_task(source, preview_id=None):
             if preview_id is None:
                 changelog.processing_started_at = None
                 changelog.save()
+
+            log.info('Task done')
 
 
 @singletone('preview')
