@@ -159,7 +159,7 @@ def delete_empty_changelogs():
 @job('default', timeout=600)
 @transaction.atomic
 def update_changelog_task(source, preview_id=None):
-    with log.fields(source=source):
+    with log.fields(source=source, preview_id=preview_id):
         log.info('Starting task')
         from .models import Changelog, Preview
 
