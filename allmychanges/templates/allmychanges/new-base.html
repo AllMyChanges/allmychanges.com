@@ -144,5 +144,8 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 <!-- /Google.Analytics counter -->
 {% endif %}
 
+{% compress js %}
+<script src="/static/allmychanges/js/react-site-compiled.js" type="text/javascript" charset="utf-8"></script>
+{% endcompress %}
 </body>
 </html>
