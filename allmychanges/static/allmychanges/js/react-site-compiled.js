@@ -55,10 +55,13 @@
 
 	module.exports = {
 	    render: function () {
-	        React.render(
+	        var element = document.getElementById('login-index');
+
+	        if (element !== null) {
+	            React.render(
 	                React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=20&versions_limit=5"}),
-	            document.getElementById('login-index')
-	        );
+	                element);
+	        }
 	    }
 	}
 
@@ -88,7 +91,8 @@
 	    render: function() {
 	        var packages_list = this.state.packages.map(function (package) {
 	            return (
-	                React.createElement(Package, {changelog_id: package.id, 
+	                React.createElement(Package, {key: package.id, 
+	                         changelog_id: package.id, 
 	                         namespace: package.namespace, 
 	                         name: package.name, 
 	                         versions: package.versions})
@@ -113,7 +117,7 @@
 	  render: function() {
 	      var versions = this.props.versions.map(function(version) {
 	          return  (
-	                  React.createElement("li", {className: "package-selector__version"}, 
+	                  React.createElement("li", {className: "package-selector__version", key: version.number}, 
 	                    React.createElement("span", {className: "package-selector__number"}, version.number), 
 	                    React.createElement("span", {className: "package-selector__date"}, "Released at ", version.date)
 	                  )

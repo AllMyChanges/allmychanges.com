@@ -19,7 +19,8 @@ module.exports = React.createClass({
     render: function() {
         var packages_list = this.state.packages.map(function (package) {
             return (
-                <Package changelog_id={package.id}
+                <Package key={package.id}
+                         changelog_id={package.id}
                          namespace={package.namespace}
                          name={package.name}
                          versions={package.versions}/>

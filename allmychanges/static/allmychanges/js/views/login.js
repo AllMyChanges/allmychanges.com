@@ -2,9 +2,12 @@ var PackageSelector = require('../components/package-selector/package-selector.j
 
 module.exports = {
     render: function () {
-        React.render(
+        var element = document.getElementById('login-index');
+
+        if (element !== null) {
+            React.render(
                 <PackageSelector url='/v1/landing-package-suggest/?limit=20&amp;versions_limit=5'/>,
-            document.getElementById('login-index')
-        );
+                element);
+        }
     }
 }
