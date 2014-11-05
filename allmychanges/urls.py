@@ -4,7 +4,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 from .views import (OldIndexView,
-                    LoginIndexView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
@@ -37,7 +36,6 @@ sitemaps = {'packages': PackagesSitemap}
 urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^login-index/$', LoginIndexView.as_view(), name='login-index'),
     url(r'^sitemap\.xml$',
          'django.contrib.sitemaps.views.sitemap',
          {'sitemaps': sitemaps}),

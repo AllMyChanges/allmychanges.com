@@ -66,24 +66,6 @@ class OldIndexView(TemplateView):
         return result
 
 
-class IndexView(CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/new-index.html'
-
-    def get_context_data(self, **kwargs):
-        result = super(IndexView, self).get_context_data(**kwargs)
-
-        UserHistoryLog.write(self.request.user,
-                             self.request.light_user,
-                             'landing-digest-view',
-                             'User opened a landing page with digest.')
-        return result
-
-    def get(self, *args, **kwargs):
-        if self.request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('digest'))
-        return super(IndexView, self).get(*args, **kwargs)
-
-
 class SubscriptionForm(forms.Form):
     email = forms.EmailField(label='Email')
     come_from = forms.CharField(widget=forms.HiddenInput)
@@ -887,5 +869,25 @@ class ToolsView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/tools.html'
 
 
-class LoginIndexView(CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/login-index.html'
+
+class IndexView(CommonContextMixin, TemplateView):
+    def get_context_data(self, **kwargs):
+        result = super(IndexView, self).get_context_data(**kwargs)
+
+        if self.request.user.is_authenticated():
+            UserHistoryLog.write(self.request.user,
+                                 self.request.light_user,
+                                 'index-view',
+                                 'User opened an index page.')
+        else:
+            UserHistoryLog.write(self.request.user,
+                                 self.request.light_user,
+                                 'landing-digest-view',
+                                 'User opened a landing page with digest.')
+        return result
+
+    def get_template_names(self):
+        if self.request.user.is_authenticated():
+            return ['allmychanges/login-index.html']
+
+        return ['allmychanges/new-index.html']
