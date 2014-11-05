@@ -1,3 +1,13 @@
+0.10.0 (2014-11-05)
+===================
+
+Today we releases a new feauture. Now service's main
+page don't redirect to http://allmychanges.com/digest/
+anymore but shows 20 most recently updated packages
+along with their versions.
+
+That way it is really easy to track new packages.
+
 0.9.2 (2014-10-30)
 ==================
 
