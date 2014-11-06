@@ -199,11 +199,14 @@ def update_changelog_task(source, preview_id=None):
             if preview_id is None:
                 changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
 
-                time_to_next_update = 4 * 60 * 60
+                hour = 60 * 60
+                min_update_interval = hour
+                time_to_next_update = 4 * hour
                 time_to_next_update = time_to_next_update / math.log(max(math.e,
                                                                          changelog.trackers.count()))
 
-                time_to_next_update = max(time_to_next_update,
+                time_to_next_update = max(min_update_interval,
+                                          time_to_next_update,
                                           2 * changelog.last_update_took)
 
                 changelog.next_update_at = timezone.now() + datetime.timedelta(0, time_to_next_update)
