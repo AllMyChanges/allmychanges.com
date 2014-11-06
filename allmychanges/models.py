@@ -102,12 +102,29 @@ class User(AbstractBaseUser):
 
     def track(self, changelog):
         if not self.does_track(changelog):
+            if changelog.namespace == 'web' and changelog.name == 'allmychanges':
+                action = 'track-allmychanges'
+                action_description = 'User tracked our project\'s changelog.'
+            else:
+                action = 'track'
+                action_description = 'User tracked changelog:{0}'.format(changelog.id)
+
+            UserHistoryLog.write(self, '', action, action_description)
+
             ChangelogTrack.objects.create(
                 user=self,
                 changelog=changelog)
 
     def untrack(self, changelog):
         if self.does_track(changelog):
+            if changelog.namespace == 'web' and changelog.name == 'allmychanges':
+                action = 'untrack-allmychanges'
+                action_description = 'User untracked our project\'s changelog.'
+            else:
+                action = 'untrack'
+                action_description = 'User untracked changelog:{0}'.format(changelog.id)
+
+            UserHistoryLog.write(self, '', action, action_description)
             ChangelogTrack.objects.filter(
                 user=self,
                 changelog=changelog).delete()
