@@ -1,7 +1,7 @@
 0.10.1 (2014-11-06)
 ===================
 
-* New account creation issue was fixed.
+* New account creation issue was fixed (thanks to Vasily Shmelev for report).
 * A bunch of grammar mistakes were fixed on the front
   page (thanks to Yury Artemenko).
 
