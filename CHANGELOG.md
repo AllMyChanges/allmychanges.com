@@ -1,7 +1,14 @@
+0.10.1 (2014-11-06)
+===================
+
+* New account creation issue was fixed.
+* A bunch of grammar mistakes were fixed on the front
+  page (thanks to Yury Artemenko).
+
 0.10.0 (2014-11-05)
 ===================
 
-Today we releases a new feauture. Now service's main
+Today we released a new feauture. Now service's main
 page don't redirect to http://allmychanges.com/digest/
 anymore but shows 20 most recently updated packages
 along with their versions.
