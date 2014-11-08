@@ -10,11 +10,13 @@ import envoy
 
 from operator import itemgetter
 from collections import defaultdict
+from functools import wraps
 
 from allmychanges.crawler import _extract_version, _extract_date
 from allmychanges.utils import get_change_type
 from allmychanges.env import Environment
 from django.conf import settings
+from twiggy_goodies.threading import log
 
 
 CHANGELOG_LIKE_FILENAMES = ('change', 'release', 'news', 'history')
@@ -601,6 +603,22 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
                       file_section=filter_version,
                       almost_version=extract_metadata,
                       prerender_items=prerender_items)
+
+    def catch_errors(processor):
+        @wraps(processor)
+        def wrapper(*args, **kwargs):
+
+            try:
+                for item in processor(*args, **kwargs):
+                    yield item
+            except Exception:
+                with log.name_and_fields('processing-pipe', processor=processor.__name__):
+                    log.trace().error('Unable to process items')
+
+        return wrapper
+
+    processors = dict((name, catch_errors(processor))
+                      for name, processor in processors.items())
 
     def run_pipeline(obj, get_processor=lambda obj: None):
         processor = get_processor(obj)
