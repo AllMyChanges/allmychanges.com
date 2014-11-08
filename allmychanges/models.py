@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.template.defaultfilters import linebreaksbr, urlize
 import os
-import re
 import datetime
 
 from django.db import models
@@ -15,6 +14,7 @@ from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.crawler.git_crawler import aggregate_git_log
 from allmychanges.utils import (
     cd,
+    split_filenames,
     get_package_metadata,
     get_markup_type,
     get_clean_text_from_markup_text,
@@ -208,6 +208,7 @@ class Repo(models.Model):
 
     def _update(self):
         """Updates changelog (usually in background)."""
+        # TODO: I suppose this method is not used anymore
         self.processing_state = 'in_progress'
         self.processing_status_message = 'Downloading code'
         self.processing_progress = 50
@@ -358,16 +359,10 @@ class Subscription(models.Model):
 class IgnoreCheckSetters(object):
     """A mixin to get/set ignore and check lists on a model.
     """
-    def _split(self, text):
-        return re.split(r'[\n,]', text)
-
     def get_ignore_list(self):
         """Returns a list with all filenames and directories to ignore
         when searching a changelog."""
-        filenames = [name.strip()
-                     for name in self._split(self.ignore_list)]
-        filenames = filter(None, filenames)
-        return filenames
+        return split_filenames(self.ignore_list)
 
     def set_ignore_list(self, items):
         self.ignore_list = u'\n'.join(items)
@@ -376,17 +371,13 @@ class IgnoreCheckSetters(object):
         """Returns a list with all filenames and directories to check
         when searching a changelog."""
         def process(name):
-            name = name.strip()
-            if not name:
-                return None
-            elif ':' in name:
+            if ':' in name:
                 return name.split(':', 1)
             else:
                 return (name, None)
 
-        filenames = map(process, self._split(self.check_list))
-        filenames = filter(None, filenames)
-        return filenames
+        filenames = split_filenames(self.check_list)
+        return map(process, filenames)
 
     def set_check_list(self, items):
         def process(item):

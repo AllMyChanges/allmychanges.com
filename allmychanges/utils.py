@@ -199,3 +199,12 @@ def join_ints(ints):
     """Joins list of intergers into the ordered comma-separated text.
     """
     return ','.join(map(str, sorted(ints)))
+
+
+def split_filenames(text):
+    """Splits comma or newline separated filenames
+    and returns them as a list.
+    """
+    names = [name.strip()
+             for name in re.split(r'[\n,]', text)]
+    return list(filter(None, names))
