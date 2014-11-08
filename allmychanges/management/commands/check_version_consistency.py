@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
-from allmychanges.models import Package
+from allmychanges.models import Changelog
 
 
 def parse_version(text):
@@ -20,8 +20,8 @@ def check_versions(versions):
     return None
 
 
-def check_package(package):
-    versions = package.changelog.versions.all().order_by('id')
+def check_changelog(changelog):
+    versions = changelog.versions.all().order_by('id')
     numbers = [parse_version(v.number) for v  in versions]
     return check_versions(numbers)
 
@@ -30,15 +30,15 @@ class Command(LogMixin, BaseCommand):
     help = u"""Tests crawler on selected projects."""
 
     def handle(self, *args, **options):
-        packages = Package.objects.all()
+        changelogs = Changelog.objects.all()
         num_problems = 0
-        
-        for package in packages:
-            result = check_package(package)
+
+        for changelog in changelogs:
+            result = check_changelog(changelog)
             if result:
                 num_problems += 1
                 prev_version, version = result
-                print package.namespace, package.name, '{0} > {1}'.format(
+                print changelog.namespace, changelog.name, '{0} > {1}'.format(
                     '.'.join(map(str, prev_version)),
                     '.'.join(map(str, version)))
 
