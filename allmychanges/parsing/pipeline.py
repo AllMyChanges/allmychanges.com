@@ -260,11 +260,13 @@ def parse_rst_file(obj):
         path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
         obj.cache['rst_builder_temp_path'] = path
 
-    conf_py = obj.cache.get('rst_conf_py')
+    conf_py_key = 'rst_conf_py:' + os.path.dirname(obj.filename)
+    conf_py = obj.cache.get(conf_py_key)
+
     if conf_py is None:
         conf_py = search_conf_py(obj.dirname, obj.filename)
         if conf_py:
-            obj.cache['rst_conf_py'] = conf_py
+            obj.cache[conf_py_key] = conf_py
 
             # if there is a config for sphinx
             # then use it!
@@ -284,7 +286,14 @@ def parse_rst_file(obj):
                     destination = os.path.join(path, name)
                     shutil.copytree(fullname, destination)
         else:
-            obj.cache['rst_conf_py'] = 'was created'
+            # тут две проблемы одна в том, что у пеликана кривой conf.py, который импортирует __version__
+            # вторая — что в кэш кладется один конфиг независимо от уровня. Когда обрабатываются
+            #  все файлы, то первым иде README.rst и для него генерится conf.py и это кэшируется
+            # и потом все doc/* файлы тоже с этим синтетическим конфигом запускаются
+            # однако если seach_list = docs, то алгоритм находит кривой пеликановский conf.py,
+            # пытается работать с ним и обламывается
+            print '************ rst_conf_py was created for {obj.dirname} {obj.filename}'.format(obj=obj)
+            obj.cache[conf_py_key] = 'was created'
 
         with codecs.open(os.path.join(path, 'conf.py'), 'a', 'utf-8') as f:
             f.write("master_doc = 'index'\n")
