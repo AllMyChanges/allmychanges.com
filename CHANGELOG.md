@@ -1,7 +1,17 @@
 0.11.0 (unreleased)
 ===================
 
- * More grammatic fixes from Yuri  Artemenko.
+Now downloader support branches for git repositories.
+For example, [Celery][] uses separate branch to maintain
+current stable version [3.1.x][celery-3.1]. And to gather
+correct changelog, you have to specify correct repository
+url: `https://github.com/celery/celery@3.1`. Pay attention
+to the `@3.1` suffix. This way you specify a branch to be
+checked out before our crawler will search and process
+changelog.
+
+Also, this release includes even more grammatic
+fixes by Yuri  Artemenko.
 
 0.10.1 (2014-11-06)
 ===================
@@ -310,3 +320,5 @@ setup.py uses setuptools.
 There are plenty directions for approvement. Stay tuned.
 
 [support-email]: mailto:help@allmychanges.com
+[Celery]: http://www.celeryproject.org/
+[celery-3.1]: https://github.com/celery/celery/tree/3.1

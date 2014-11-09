@@ -10,8 +10,11 @@ from allmychanges.utils import split_filenames
 def print_version(version):
     print u'{0.version} ({0.filename})'.format(version).encode('utf-8')
     for section in version.content:
-        for item in section:
-            print u'\t[{0[type]}] {0[text]}'.format(item).encode('utf-8')
+        if isinstance(section, basestring):
+            print section
+        else:
+            for item in section:
+                print u'\t[{0[type]}] {0[text]}'.format(item).encode('utf-8')
 
 
 class Command(LogMixin, BaseCommand):
