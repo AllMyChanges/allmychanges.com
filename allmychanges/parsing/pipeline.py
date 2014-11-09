@@ -103,6 +103,7 @@ def get_files(env, walk=os.walk):
                         if markup:
                             attrs['markup'] = markup
                         yield env.push(**attrs)
+
                 else:
                     yield env.push(**attrs)
 
@@ -155,7 +156,8 @@ def parse_file(env):
         markup = get_markup(env.filename, env.content)
 
     if markup is not None:
-        versions = globals().get('parse_{0}_file'.format(markup))(env)
+        parser = globals().get('parse_{0}_file'.format(markup))
+        versions = parser(env)
         for version in versions:
             yield version
 
@@ -257,22 +259,30 @@ def search_conf_py(root_dir, doc_filename):
 
 
 def parse_rst_file(obj):
-    path = obj.cache.get('rst_builder_temp_path')
-    if path is None:
-        path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-        obj.cache['rst_builder_temp_path'] = path
+    with log.fields(filename=obj.filename):
+        dirname = os.path.dirname(obj.filename)
 
-    conf_py_key = 'rst_conf_py:' + os.path.dirname(obj.filename)
-    conf_py = obj.cache.get(conf_py_key)
+        path_key = 'rst_builder_temp_path:' + dirname
+        path = obj.cache.get(path_key)
+        if path is None:
+            path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+            obj.cache[path_key] = path
 
-    if conf_py is None:
-        conf_py = search_conf_py(obj.dirname, obj.filename)
-        if conf_py:
-            obj.cache[conf_py_key] = conf_py
+        def create_conf_py():
+            filename = os.path.join(path, 'conf.py')
+            if os.path.exists(filename):
+                os.unlink(filename)
+            with codecs.open(filename, 'a', 'utf-8') as f:
+                f.write("master_doc = 'index'\n")
+                f.write("source_suffix = '.rst'\n")
+
+        def copy_conf_py():
+            filename = os.path.join(path, 'conf.py')
 
             # if there is a config for sphinx
             # then use it!
-            shutil.copy(conf_py, os.path.join(path, 'conf.py'))
+            log.info('Copying conf.py')
+            shutil.copy(conf_py, filename)
 
             # also, use all directories starting from underscore
             # for django it is _ext and _themes, for other
@@ -287,30 +297,54 @@ def parse_rst_file(obj):
                 if name.startswith('_') and os.path.isdir(fullname):
                     destination = os.path.join(path, name)
                     shutil.copytree(fullname, destination)
-        else:
-            # тут две проблемы одна в том, что у пеликана кривой conf.py, который импортирует __version__
-            # вторая — что в кэш кладется один конфиг независимо от уровня. Когда обрабатываются
-            #  все файлы, то первым иде README.rst и для него генерится conf.py и это кэшируется
-            # и потом все doc/* файлы тоже с этим синтетическим конфигом запускаются
-            # однако если seach_list = docs, то алгоритм находит кривой пеликановский conf.py,
-            # пытается работать с ним и обламывается
-            print '************ rst_conf_py was created for {obj.dirname} {obj.filename}'.format(obj=obj)
-            obj.cache[conf_py_key] = 'was created'
 
-        with codecs.open(os.path.join(path, 'conf.py'), 'a', 'utf-8') as f:
-            f.write("master_doc = 'index'\n")
-            f.write("source_suffix = '.rst'\n")
+            with codecs.open(os.path.join(path, 'conf.py'), 'a', 'utf-8') as f:
+                f.write("master_doc = 'index'\n")
+                f.write("source_suffix = '.rst'\n")
 
-    with codecs.open(os.path.join(path, 'index.rst'), 'w', 'utf-8') as f:
-        f.write(obj.content)
 
-    envoy.run('rm -fr {0}/output/index.html'.format(path))
-    envoy.run('sphinx-build -b html {0} {0}/output'.format(path))
+        def generate_html():
+            """Tries to generate HTML from reST with current config.
+            If operation was successful, returns content of HTML file.
+            """
+            with codecs.open(os.path.join(path, 'index.rst'), 'w', 'utf-8') as f:
+                f.write(obj.content)
 
-    with codecs.open(os.path.join(path, 'output', 'index.html'), 'r', 'utf-8') as f:
-        html = f.read()
+            envoy.run('rm -fr {0}/output/index.html'.format(path))
+            envoy.run('sphinx-build -b html {0} {0}/output'.format(path))
 
-    return parse_html_file(obj.push(content=html))
+            output_filename = os.path.join(path, 'output', 'index.html')
+            if os.path.exists(output_filename):
+                with codecs.open(output_filename, 'r', 'utf-8') as f:
+                    return f.read()
+
+
+        conf_py_key = 'rst_conf_py:' + dirname
+        conf_py = obj.cache.get(conf_py_key)
+
+        if conf_py is None:
+            conf_py = search_conf_py(obj.dirname, obj.filename)
+            if not conf_py:
+                conf_py = 'fake-conf.py'
+                log.info('Will use fake conf.py')
+
+        html = None
+        if conf_py != 'fake-conf.py':
+            copy_conf_py()
+            html = generate_html()
+        if html is None:
+            create_conf_py()
+            if conf_py != 'fake-conf.py':
+                log.info('Attempt to use package\'s conf.py has failed')
+            conf_py = 'fake-conf.py'
+            html = generate_html()
+
+        if html is None:
+            log.info('Unable to parse this rst file')
+            html = ''
+
+        obj.cache[conf_py_key] = conf_py
+        return parse_html_file(obj.push(content=html))
 
 
 # TODO: remove
