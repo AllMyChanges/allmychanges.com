@@ -9,7 +9,7 @@
     {% if version.code_version == 'v1' %}
       {% if section.notes %}<p class="package-version__notes">{{section.notes|process_cve|capfirst|markdown}}</p>{% endif %}
     {% else %}
-      {% if section.notes %}<p class="package-version__notes">{{section.notes|safe}}</p>{% endif %}
+      {% if section.notes %}<div class="package-version__notes">{{section.notes|safe}}</div>{% endif %}
     {% endif %}
   {% if section.items %}
   <ul class="package-version__items">
