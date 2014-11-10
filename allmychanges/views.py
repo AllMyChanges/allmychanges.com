@@ -348,7 +348,7 @@ class PackageView(CommonContextMixin, TemplateView):
         if self.request.user.is_authenticated():
             result['show_sources'] = self.request.user.username == "svetlyak40wt"
 
-        filter_args = {'code_version': code_version}
+        filter_args = {'code_version': code_version, 'preview_id': None}
 
         changelog = None
 

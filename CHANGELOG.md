@@ -10,8 +10,11 @@ to the `@3.1` suffix. This way you specify a branch to be
 checked out before our crawler will search and process
 changelog.
 
-Also, this release includes even more grammatic
-fixes by Yuri  Artemenko.
+Moreover, in this release:
+
+* crawler become smarter when parsing documents in reST format.
+* package view was fixed to not show versions created during preview.
+* more grammatic fixes by Yuri  Artemenko.
 
 0.10.1 (2014-11-06)
 ===================
