@@ -56,7 +56,7 @@ Small fixes.
 -----
 
 * Unittests were added.
-""")] 
+""")]
     raw_changelog = TestRawChangelog(fixture)
     parsed = parse_changelog(raw_changelog)
     eq_(3, len(parsed))
@@ -81,7 +81,7 @@ Minor changes
 This release has small importance.
 
 * Test case was introduced
-""")] 
+""")]
     raw_changelog = TestRawChangelog(fixture)
     parsed = parse_changelog(raw_changelog)
     eq_(2, len(parsed))
@@ -156,7 +156,7 @@ def test_markup_guesser_from_content():
 
     eq_('markdown', get_markup('CHANGES',
                                "Some [link](blah)"))
-    
+
     eq_('markdown', get_markup('CHANGES',
                                "Some [link][blah]"))
 
@@ -225,7 +225,7 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
               content=[])))
 
 
-    
+
 def test_grouping_by_path():
     env = Environment()
     env.type = 'version'
@@ -260,11 +260,23 @@ def test_strip_outer_tag():
     eq_('Added new\n feature.',
         strip_outer_tag('<li>Added new\n feature.</li>'))
 
-    
-    
+
+
     # and now multiline with embedded HTML
     eq_('Added new output <code>twiggy_goodies.logstash.LogstashOutput</code> which\nsends json encoded data via UDP to a logstash server.',
         strip_outer_tag('<li>Added new output <code>twiggy_goodies.logstash.LogstashOutput</code> which\nsends json encoded data via UDP to a logstash server.</li>'))
+
+    # also, it should remove several nested tags too
+    eq_('Some text',
+        strip_outer_tag('<li><p>Some text</p></li>'))
+
+    # and it shouldn't stuck at such strange things
+    eq_('Blah',
+        strip_outer_tag('<p>Blah'))
+
+    # but should leave as is if there isn't any common root node
+    eq_('<p>Blah</p><p>minor</p>',
+        strip_outer_tag('<p>Blah</p><p>minor</p>'))
 
 
 def test_parse_plain_text():
@@ -283,7 +295,7 @@ def test_parse_plain_text():
  * Added benchmarking script
  * Added support for more
    serializer modules""")
-    
+
     versions = list(parse_file(file))
     eq_(2, len(versions))
     v1, v2 = versions
@@ -313,7 +325,7 @@ def test_parse_redispy_style_plain_text():
     * Fixed a bug where Sentinel connections to a server that's no longer a
       master and receives a READONLY error will disconnect and reconnect to
       the master.""")
-    
+
     versions = list(parse_file(file))
 
     eq_(2, len(versions))
@@ -328,5 +340,3 @@ def test_parse_redispy_style_plain_text():
 
     eq_([['Fixed a bug where Sentinel connections to a server that\'s no longer a\nmaster and receives a READONLY error will disconnect and reconnect to\nthe master.']],
         v2.content)
-
-

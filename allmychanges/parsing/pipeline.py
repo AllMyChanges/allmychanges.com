@@ -7,6 +7,7 @@ import os
 import tempfile
 import shutil
 import envoy
+import lxml.html
 
 from operator import itemgetter
 from collections import defaultdict
@@ -48,17 +49,27 @@ def parse_changelog(raw_changelog):
 ##############################
 
 
+# TODO: move to utils
 def strip_outer_tag(text):
-    # TODO: move to utils
-    match = re.match('^<(.*?)>', text)
-    if match is not None:
-        tag = match.group(1)
-        closing = '</{}>'.format(tag)
-        if text.endswith(closing):
-            result = text[len(tag) + 2: - len(closing)]
-            return result
+    get_children = lxml.html.etree.XPath("text()|*")
 
-    return text
+    def tostring(node):
+        if isinstance(node, basestring):
+            return node
+        return lxml.html.tostring(node, with_tail=False)
+
+    def rec(items):
+        if len(items) == 1:
+            if isinstance(items[0], basestring):
+                return items[0]
+            return rec(get_children(items[0]))
+        else:
+            return u''.join(
+                map(tostring,
+                    items))
+
+    items = lxml.html.fragments_fromstring(text)
+    return rec(items)
 
 
 def get_files(env, walk=os.walk):
@@ -364,7 +375,6 @@ get_section_content = itemgetter('content')
 
 
 def parse_html_file(obj):
-    import lxml.html
     parsed = lxml.html.document_fromstring(obj.content)
     headers = [tag for tag in parsed.iter()
                if tag.tag in ('h1', 'h2', 'h3', 'h4')]
