@@ -20,11 +20,9 @@ RE_DATE_STR = r"""(?P<date>(
               \d{2}(rd|st|rd|th)?\ [A-Z][a-z]{2}\ \d{4} |
 
               # May 23rd 2014
-              \month\ \d{2}(rd|st|rd|th)?\ \d{4} |
-
               # April 28, 2014
               # Apr 01, 2013
-              \month\ \d{1,2},\ \d{4} |
+              \month\ \d{1,2}(rd|st|rd|th)?,?\ \d{4} |
 
               # Fri Aug  8 19:12:51 PDT 2014
               [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \d{4}
@@ -83,28 +81,32 @@ def search_changelog(path='.'):
     return filenames
 
 
+_version_regexes = [
+    # in the beginning
+    r'^{ver}.*',
+    # in the middle of line but not far from beginning
+    # version number should be preceeded by a star or whitespace
+    # i belive, star is used to make version number bold
+    # or emphasized in markdown
+    r'^[^ ].{{,20}}?[* ]{ver}',
+    # or this could be a similar case, when version number
+    # is a part of a filename like this
+    # release-notes/0.1.1.md
+    # but not in this case
+    # <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    r'/{ver}\.[^\d]',
+]
+
+_version_regexes = [item.format(ver=r'v?(?P<ver>(\d+\.\d+\.\d+|\d+\.\d+)(-[a-z0-9.]+[0-9])?)')
+                    for item in _version_regexes]
+
 
 def _extract_version(line):
     if line:
-        extract_regexps = [
-            # in the beginning
-            r'^(\d+\.\d+\.\d+|\d+\.\d+).*',
-            # in the middle of line but not far from beginning
-            # version number should be preceeded by a star or whitespace
-            # i belive, star is used to make version number bold
-            # or emphasized in markdown
-            r'^[^ ].{,20}?[* ](\d+\.\d+\.\d+|\d+\.\d+)',
-            # or this could be a similar case, when version number
-            # is a part of a filename like this
-            # release-notes/0.1.1.md
-            # but not in this case
-            # <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-            r'/(\d+\.\d+\.\d+|\d+\.\d+)\.[^\d]',
-        ]
-        for i in extract_regexps:
+        for i in _version_regexes:
             match = re.search(i, line)
             if match is not None:
-                return match.group(1)
+                return match.group('ver')
 
 
 def _extract_date(line):

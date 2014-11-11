@@ -1,3 +1,12 @@
+0.11.1 (2014-11-11)
+===================
+
+Now our parser works better with freak dates like `September 1st, 2014`
+and versions like `v2.0.0-beta.1`. This change will allow us
+to track [javascript/handlebars](http://allmychanges.com/p/javascript/handlebars)
+and some other projects.
+
+
 0.11.0 (2014-11-11)
 ===================
 
