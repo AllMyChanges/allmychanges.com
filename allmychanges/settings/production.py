@@ -23,6 +23,8 @@ ALLOWED_HOSTS = ['allmychanges.com', 'localhost']
 METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'
 
+SLACK_URL = 'https://hooks.slack.com/services/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'
+
 LOG_FILENAME = '/var/log/allmychanges/django-root.log'
 try:
     init_logging(LOG_FILENAME, logstash=True)
