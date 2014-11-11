@@ -665,6 +665,8 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/search.html'
 
     def get_context_data(self, **kwargs):
+        context = super(SearchView, self).get_context_data(**kwargs)
+
         q = self.request.GET.get('q').strip()
         if '/' in q:
             namespace, name = q.split('/', 1)
@@ -705,9 +707,10 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
                                          + '?' \
                                          + urllib.urlencode({'url': normalized_url})))
 
-        return dict(params,
-                    changelogs=changelogs,
-                    q=q)
+        context.update(params)
+        context['changelogs'] = changelogs
+        context['q'] = q
+        return context
 
 
 class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
