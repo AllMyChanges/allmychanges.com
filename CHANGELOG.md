@@ -1,4 +1,4 @@
-0.11.0 (unreleased)
+0.11.0 (2014-11-11)
 ===================
 
 Now downloader support branches for git repositories.
@@ -15,6 +15,8 @@ Moreover, in this release:
 * crawler become smarter when parsing documents in reST format.
 * package view was fixed to not show versions created during preview.
 * more grammatic fixes by Yuri  Artemenko.
+* also, there is an internal improvement which allows us to track
+  is our changelog parser was broken after latest release.
 
 0.10.1 (2014-11-06)
 ===================
