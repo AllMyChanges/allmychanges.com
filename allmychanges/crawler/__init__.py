@@ -45,10 +45,10 @@ def list_files(path='.'):
         for dir_to_ignore in IGNORE_DIRS:
             if dir_to_ignore in dirs:
                 dirs.remove(dir_to_ignore)
-                
-        for file in files:
+
+        for f in files:
             yield os.path.relpath(
-                os.path.join(root, file),
+                os.path.join(root, f),
                 path)
 
 
@@ -111,8 +111,10 @@ def _extract_date(line):
     """Return date that is in line"""
     for date_str in RE_DATE.finditer(line):
         try:
-            return date_parser(date_str.group('date'), dayfirst=True).date()
-        except:
+            parsed = date_parser(date_str.group('date'),
+                                 dayfirst=True)
+            return parsed.date()
+        except Exception:
             continue
 
 
@@ -195,7 +197,7 @@ def parse_changelog(text):
             else:
                 # if this is not item, then this is a note
                 if current_version is not None:
-                        
+
                     if not current_section or current_section['items']:
                         # if there is items in the current section
                         # and we found another plaintext part,
@@ -210,7 +212,7 @@ def parse_changelog(text):
             if current_version:
                 if line_in_current_version < 3 and 'unreleased' in line.lower():
                     current_version['unreleased'] = True
-                    
+
                 if v_date and current_version.get('date') is None:
                     current_version['date'] = v_date
 
@@ -229,7 +231,7 @@ def _finalize_changelog(changelog):
     # either add a space at the end, nor replace with
     # \n if empty
     process_note_line = lambda text: text + ' ' if text else '\n'
-            
+
     for version in changelog:
         # squash texts
         for section in version['sections']:
