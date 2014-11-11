@@ -225,6 +225,10 @@ def test_extract_date():
 
     # like click's but from handlebars.js
     eq_(date(2014, 9, 1), _extract_date('September 1st, 2014'))
+    # and this one from https://enterprise.github.com/releases
+    eq_(date(2012, 2, 9), _extract_date('February  9, 2012'))
+    eq_(date(2014, 9, 2), _extract_date('September  2, 2014'))
+
 
 
     # from https://github.com/ingydotnet/boolean-pm/blob/master/Changes

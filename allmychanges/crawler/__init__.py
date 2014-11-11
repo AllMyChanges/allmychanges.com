@@ -22,7 +22,7 @@ RE_DATE_STR = r"""(?P<date>(
               # May 23rd 2014
               # April 28, 2014
               # Apr 01, 2013
-              \month\ \d{1,2}(rd|st|rd|th)?,?\ \d{4} |
+              \month[ ]+\d{1,2}(rd|st|rd|th)?,?\ \d{4} |
 
               # Fri Aug  8 19:12:51 PDT 2014
               [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \d{4}

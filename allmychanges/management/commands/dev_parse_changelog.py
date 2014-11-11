@@ -15,7 +15,7 @@ def print_version(version):
 
     for section in version.content:
         if isinstance(section, basestring):
-            print section
+            print section.encode('utf-8')
         else:
             for item in section:
                 print u'\t[{0[type]}] {0[text]}'.format(item).encode('utf-8')

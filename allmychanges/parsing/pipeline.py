@@ -409,8 +409,9 @@ def parse_html_file(obj):
         if current_text:
             yield current_text.strip()
 
-    headers = [(header.tag, header.text, header.itersiblings())
+    headers = [(header.tag, header.text_content(), header.itersiblings())
                for header in headers]
+
 
     # use whole document and filename as a section
     headers.insert(0, ('h0',

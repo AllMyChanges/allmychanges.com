@@ -10,6 +10,9 @@
   understand that GitHub Enterprise's
   [changelog](http://allmychanges.com/p/soft/github-enterprise) should be
   downloaded via HTTP, not via Git.
+* Also, html changelog parsing was significantly improved
+  and now abovementioned GitHub Entreprise's log looks
+  relatively well.
 
 
 0.11.0 (2014-11-11)
