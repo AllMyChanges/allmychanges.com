@@ -6,8 +6,8 @@ import envoy
 import requests
 
 from django.conf import settings
+from urlparse import urlsplit
 from .utils import cd
-from .exceptions import UpdateError
 
 
 def normalize_url(url, for_checkout=True):
@@ -170,7 +170,9 @@ def http_downloader(source):
 
 
 def guess_downloader(url):
-    if 'github' in url:
+    parts = urlsplit(url)
+
+    if parts.hostname == 'github.com':
         return 'git'
     if url.startswith('test+'):
         return 'fake'

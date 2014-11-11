@@ -25,6 +25,7 @@ def test_guesser():
     eq_('hg', guess('https://code.google.com/p/my-hg-repository'))
 
     eq_('http', guess('http://allmychanges.com/CHANGELOG.md'))
+    eq_('http', guess('https://enterprise.github.com/releases'))
 
 #    eq_('svn', guess('http://svn.code.sf.net/p/mathgl/code/mathgl-2x/'))
 #    eq_('svn', guess('http://my-svn-repository-for-allmychanges.googlecode.com/svn/trunk/'))

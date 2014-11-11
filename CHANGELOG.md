@@ -1,11 +1,15 @@
 0.11.1 (2014-11-11)
 ===================
 
-Our parser now works better with freak dates like `September 1st, 2014`
-and versions like `v2.0.0-beta.1`. This change will allow us
-to track [javascript/handlebars](http://allmychanges.com/p/javascript/handlebars),
-[javascript/meteor](http://allmychanges.com/p/javascript/meteor)
-and some other projects.
+* Our parser now works better with freak dates like `September 1st, 2014`
+  and versions like `v2.0.0-beta.1`. This change will allow us
+  to track [javascript/handlebars](http://allmychanges.com/p/javascript/handlebars),
+  [javascript/meteor](http://allmychanges.com/p/javascript/meteor)
+  and some other projects.
+* Source type guesser was slightly improved and now is able to
+  understand that GitHub Enterprise's
+  [changelog](http://allmychanges.com/p/soft/github-enterprise) should be
+  downloaded via HTTP, not via Git.
 
 
 0.11.0 (2014-11-11)
