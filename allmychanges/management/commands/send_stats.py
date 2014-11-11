@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
-from allmychanges.models import Package, Changelog, Version, User
+from allmychanges.models import Changelog, ChangelogTrack, Version, User
 from django.utils import timezone
 from django.db.models import Count
 
@@ -56,15 +56,15 @@ def get_stats():
     stats['db.peruser-package-count.min'] = min(others)
     stats['db.peruser-package-count.max'] = max(others)
     stats['db.peruser-package-count.avg'] = sum(others) / len(others)
-    
-    stats['db.packages'] = Package.objects.count()
+
+    stats['db.tracks.count'] = ChangelogTrack.objects.count()
     stats['db.changelogs'] = Changelog.objects.count()
     stats['db.users'] = User.objects.count()
 
     stats['db.versions.v1-vcs'] = Version.objects.filter(code_version='v1', changelog__filename=None).count()
     stats['db.versions.v1'] = Version.objects.filter(code_version='v1').exclude(changelog__filename=None).count()
     stats['db.versions.v2'] = Version.objects.filter(code_version='v2').count()
-    
+
     stats['db.versions.v1-unreleased'] = Version.objects.filter(code_version='v1', unreleased=True).exclude(changelog__filename=None).count()
     stats['db.versions.v2-unreleased'] = Version.objects.filter(code_version='v2', unreleased=True).count()
     stats['db.users-with-emails'] = User.objects.exclude(email=None).count()
@@ -78,6 +78,10 @@ def get_stats():
     stats['crawler.discovered.v2.count'] = Version.objects.filter(
         code_version='v2',
         discovered_at__gte=minute_ago).count()
+
+    last_updates = Changelog.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(0, 60 * 60)).values_list('last_update_took', flat=True)
+    stats['crawler.last_update_took.average'] = float(sum(last_updates)) / len(last_updates)
+
 
     return stats
 
