@@ -164,6 +164,10 @@ Change in a way how unreleased notes are parsed.
 
 
 def test_extract_version():
+    eq_('1.0.12', _extract_version('v1.0.12'))
+    eq_('2.0.0-beta.1', _extract_version('2.0.0-beta.1'))
+    eq_('2.0.0-beta.1', _extract_version('v2.0.0-beta.1'))
+
     eq_(None, _extract_version('Just a text with some 1 33 nubers'))
     eq_('1.0', _extract_version('Version 1.0'))
     eq_('0.10.2', _extract_version('Version 0.10.2'))
@@ -192,6 +196,7 @@ def test_extract_date():
     eq_(None, _extract_date('2009 thouth 15 fne 04'))
     eq_(None, _extract_date('11'))
     eq_(None, _extract_date('12.2009'))
+
 
     eq_(date(2009, 5, 23), _extract_date('2009-05-23'))
     eq_(date(2009, 5, 23), _extract_date('2009-5-23'))

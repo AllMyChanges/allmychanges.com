@@ -153,7 +153,8 @@ def graphite_send(**kwargs):
 
 
 def slack_send(text):
-    requests.post(settings.SLACK_URL, data=anyjson.serialize(dict(text=text)))
+    if settings.SLACK_URL:
+        requests.post(settings.SLACK_URL, data=anyjson.serialize(dict(text=text)))
 
 
 def count(metric_key, value=1):
@@ -182,12 +183,6 @@ def show_debug_toolbar(request):
 
 def discard_seconds(dt):
     return datetime.datetime(*dt.timetuple()[:5])
-
-
-
-
-
-
 
 
 def dt_in_window(tz, system_time, hour):

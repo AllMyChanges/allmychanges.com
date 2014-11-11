@@ -27,3 +27,5 @@ for queue_options in RQ_QUEUES.itervalues():
 #DEBUG = False
 #TEMPLATE_DEBUG = False
 DEBUG_JOBS = True
+
+SLACK_URL = None
