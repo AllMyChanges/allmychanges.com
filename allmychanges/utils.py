@@ -1,3 +1,4 @@
+import anyjson
 import datetime
 import os
 import re
@@ -7,6 +8,7 @@ import logging
 import graphitesend
 import time
 import times
+import requests
 
 from lxml import html
 from contextlib import contextmanager
@@ -148,6 +150,10 @@ def graphite_send(**kwargs):
         g.send_dict(kwargs)
     except Exception:
         logging.getLogger('django').exception('Graphite is down')
+
+
+def slack_send(text):
+    requests.post(settings.SLACK_URL, data=anyjson.serialize(dict(text=text)))
 
 
 def count(metric_key, value=1):

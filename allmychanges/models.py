@@ -19,6 +19,7 @@ from allmychanges.utils import (
     get_markup_type,
     get_clean_text_from_markup_text,
     get_change_type,
+    slack_send,
 )
 from allmychanges.downloader import (
     guess_downloader,
@@ -500,7 +501,9 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
             if self.issues.filter(type=type, resolved_at=None).count() > 0:
                 return
 
-        self.issues.create(type=type, comment=comment)
+        issue = self.issues.create(type=type, comment=comment)
+        slack_send(u'New issue of type "{issue.type}" with comment: "{issue.comment} was created for <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
+            issue=issue))
 
     def resolve_issues(self, type):
         self.issues.filter(type=type, resolved_at=None).update(resolved_at=timezone.now())

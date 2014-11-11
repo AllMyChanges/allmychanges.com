@@ -194,6 +194,8 @@ TEMP_DIR = '/tmp/allmychanges'
 
 EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 
+SLACK_URL = 'https://hooks.slack.com/services/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'
+
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 
