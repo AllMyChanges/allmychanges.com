@@ -8,7 +8,7 @@ from allmychanges.utils import split_filenames
 
 
 def print_version(version):
-    print u'{0.version} ({0.filename})'.format(version).encode('utf-8')
+    print u'{0.version} ({0.filename}, {0.date})'.format(version).encode('utf-8')
     for section in version.content:
         if isinstance(section, basestring):
             print section

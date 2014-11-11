@@ -12,6 +12,7 @@ import lxml.html
 from operator import itemgetter
 from collections import defaultdict
 from functools import wraps
+from pkg_resources import parse_version
 
 from allmychanges.crawler import _extract_version, _extract_date
 from allmychanges.utils import get_change_type
@@ -685,8 +686,8 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
         try:
             # it is fair to compare version numbers
             # as tuples of integers
-            left = tuple(map(int, left.split('.')))
-            right = tuple(map(int, right.split('.')))
+            left = parse_version(left)
+            right = parse_version(right)
         except Exception:
             # but some versions can't be represented with integers only
             # in this case we'll fall back to lexicographical comparison
@@ -694,7 +695,7 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
         return cmp(left, right)
 
-    def compare_versions(left, right):
+    def compare_version_metadata(left, right):
         result = compare_version_numbers(left.version, right.version)
         if result != 0:
             return result
@@ -723,7 +724,7 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
     # using customized comparison we make versions which
     # have less metadata go first
-    versions.sort(cmp=compare_versions)
+    versions.sort(cmp=compare_version_metadata)
     # and grouping them by version number
     # we leave only unique versions with maximum number of metadata
 
