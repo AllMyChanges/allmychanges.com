@@ -7,13 +7,12 @@ import os.path
 
 from django.utils import timezone
 from allmychanges.utils import discard_seconds
-from allmychanges.downloader import (
-    get_downloader)
 from allmychanges.exceptions import (
     UpdateError)
 from allmychanges.vcs_extractor import extract_changelog_from_vcs
 from allmychanges.crawler import search_changelog
 from allmychanges.crawler import parse_changelog
+from sortedcontainers import SortedSet
 
 
 # TODO: remove
@@ -164,9 +163,42 @@ def update_changelog_from_raw_data2(changelog, raw_data, preview_id=None):
     more recent to the oldest."""
     code_version = 'v2'
 
-    if changelog.versions.filter(code_version=code_version).count() == 0:
+    current_versions = SortedSet(
+        changelog.versions.filter(
+            code_version=code_version,
+            preview_id=preview_id).values_list('number',flat=True))
+
+    discovered_versions = SortedSet(item.version
+                                    for item in raw_data)
+    new_versions = discovered_versions - current_versions
+
+    if not current_versions:
         # for initial filling, we should set all missing dates to some values
         raw_data = fill_missing_dates2(raw_data)
+    else:
+        # now new versions contains only those version numbers which were
+        # not discovered yet
+        if len(new_versions) > 1:
+            changelog.create_issue(type='too-many-new-versions',
+                                   comment='I found {0}'.format(
+                                       ', '.join(new_versions)))
+
+    latest_history_item = changelog.discovery_history.order_by('-id').last()
+
+    if latest_history_item is not None \
+       and len(discovered_versions) < latest_history_item.num_discovered_versions:
+        previously_discovered_versions = SortedSet(latest_history_item.discovered_versions.split(','))
+        missing_versions = previously_discovered_versions - discovered_versions
+
+        changelog.create_issue(type='lesser-version-count',
+                               comment='This time we didn\'t discover {0} versions'.format(
+                                   u', '.join(missing_versions)))
+
+    changelog.discovery_history.create(
+        discovered_versions=','.join(discovered_versions),
+        new_versions=','.join(new_versions),
+        num_discovered_versions=len(discovered_versions),
+        num_new_versions=len(new_versions))
 
     for raw_version in raw_data:
         version, created = changelog.versions.get_or_create(

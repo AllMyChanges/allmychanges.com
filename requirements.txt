@@ -44,3 +44,4 @@ sqlparse==0.1.11  # requirements.in:6 ~> django-debug-toolbar==1.2.1
 times==0.7  # requirements.in:18
 twiggy-goodies==0.4.1  # requirements.in:20
 twiggy==0.4.5  # requirements.in:20 ~> twiggy-goodies==0.4.1
+sortedcontainers==0.9.2

@@ -494,11 +494,54 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
                     self.light_moderators.create(light_user=light_user)
                     return 'light'
 
+    def create_issue(self, type, comment=''):
+        # for some types, only one issue at a time is allowed
+        if type == 'lesser-version-count':
+            if self.issues.filter(type=type, resolved_at=None).count() > 0:
+                return
+
+        self.issues.create(type=type, comment=comment)
+
+    def resolve_issues(self, type):
+        self.issues.filter(type=type, resolved_at=None).update(resolved_at=timezone.now())
+
 
 class ChangelogTrack(models.Model):
     user = models.ForeignKey(User)
     changelog = models.ForeignKey(Changelog)
     created_at = models.DateTimeField(default=timezone.now)
+
+
+class Issue(models.Model):
+    """Keeps track any issues, related to a changelog.
+    """
+    changelog = models.ForeignKey(Changelog,
+                                  related_name='issues')
+    type = models.CharField(max_length=40)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(blank=True, null=True)
+
+    def __repr__(self):
+        return """
+Issue(changelog={self.changelog},
+      type={self.type},
+      comment={self.comment},
+      created_at={self.created_at},
+      resolved_at={self.resolved_at})""".format(self=self).strip()
+
+
+class DiscoveryHistory(models.Model):
+    """Keeps track any issues, related to a changelog.
+    """
+    changelog = models.ForeignKey(Changelog,
+                                  related_name='discovery_history')
+    discovered_versions = models.TextField()
+    new_versions = models.TextField()
+    num_discovered_versions = models.IntegerField()
+    num_new_versions = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
 
 class LightModerator(models.Model):

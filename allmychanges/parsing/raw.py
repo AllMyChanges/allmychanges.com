@@ -1,6 +1,6 @@
 from allmychanges.crawler import parse_changelog
 
-
+# TODO: remove all these classes
 class RawVersion(object):
     def __init__(self, number, date=None):
         self.number = number
