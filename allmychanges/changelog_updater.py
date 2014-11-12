@@ -178,7 +178,7 @@ def update_changelog_from_raw_data2(changelog, raw_data, preview_id=None):
     else:
         # now new versions contains only those version numbers which were
         # not discovered yet
-        if len(new_versions) > 1:
+        if len(new_versions) > 1 and preview_id is None:
             changelog.create_issue(type='too-many-new-versions',
                                    comment='I found {0}'.format(
                                        ', '.join(new_versions)))
@@ -190,9 +190,10 @@ def update_changelog_from_raw_data2(changelog, raw_data, preview_id=None):
         previously_discovered_versions = SortedSet(latest_history_item.discovered_versions.split(','))
         missing_versions = previously_discovered_versions - discovered_versions
 
-        changelog.create_issue(type='lesser-version-count',
-                               comment='This time we didn\'t discover {0} versions'.format(
-                                   u', '.join(missing_versions)))
+        if preview_id is None:
+            changelog.create_issue(type='lesser-version-count',
+                                   comment='This time we didn\'t discover {0} versions'.format(
+                                       u', '.join(missing_versions)))
 
     changelog.discovery_history.create(
         discovered_versions=','.join(discovered_versions),
