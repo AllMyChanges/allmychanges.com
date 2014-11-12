@@ -251,7 +251,14 @@ class ChangelogViewSet(HandleExceptionMixin,
         if self.request.GET.get('tracked', 'False') == 'True':
             return self.request.user.changelogs.all()
         else:
-            return super(ChangelogViewSet, self).get_queryset(*args, **kwargs)
+            queryset = super(ChangelogViewSet, self).get_queryset(*args, **kwargs)
+            namespace = self.request.GET.get('namespace')
+            name = self.request.GET.get('name')
+            if namespace is not None:
+                queryset = queryset.filter(namespace=namespace)
+            if name is not None:
+                queryset = queryset.filter(name=name)
+            return queryset
 
     def update(self, *args, **kwargs):
         response = super(ChangelogViewSet, self).update(*args, **kwargs)
