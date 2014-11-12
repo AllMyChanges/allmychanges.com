@@ -386,21 +386,12 @@ class PackageView(CommonContextMixin, TemplateView):
 
 class BadgeView(View):
     def get(self, *args, **kwargs):
+        changelog = get_object_or_404(
+            Changelog.objects.prefetch_related('versions__sections__items'),
+            namespace=kwargs['namespace'],
+            name=kwargs['name'])
 
-        if 'username' in kwargs:
-            package_or_changelog = get_object_or_404(
-                Package.objects.select_related('changelog') \
-                              .prefetch_related('changelog__versions__sections__items'),
-                user=get_user_model().objects.get(username=kwargs['username']),
-                namespace=kwargs['namespace'],
-                name=kwargs['name'])
-        else:
-            package_or_changelog = get_object_or_404(
-                Changelog.objects.prefetch_related('versions__sections__items'),
-                namespace=kwargs['namespace'],
-                name=kwargs['name'])
-
-        version = package_or_changelog.latest_version()
+        version = changelog.latest_version()
         if version is not None:
             version = version.number
         else:

@@ -448,7 +448,8 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
 
     def latest_version(self):
         versions = list(
-            self.versions.exclude(unreleased=True) \
+            self.versions.filter(preview=None) \
+                         .exclude(unreleased=True) \
                          .order_by('-discovered_at', '-number')[:1])
         if versions:
             return versions[0]
