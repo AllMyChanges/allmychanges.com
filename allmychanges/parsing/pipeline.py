@@ -277,7 +277,8 @@ def parse_rst_file(obj):
         path_key = 'rst_builder_temp_path:' + dirname
         path = obj.cache.get(path_key)
         if path is None:
-            path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+            path = tempfile.mkdtemp(dir=obj.cache['tmp-dir'])
+            print 'Created {0} for rst file {1}'.format(path, obj.filename)
             obj.cache[path_key] = path
 
         def create_conf_py():
@@ -635,14 +636,6 @@ def filter_trash_versions(versions):
 
 
 def processing_pipe(root, ignore_list=[], check_list=[]):
-    root_env = Environment()
-    root_env.type = 'directory'
-    root_env.dirname = root
-    root_env.ignore_list = ignore_list
-    root_env.check_list = check_list
-    # a dictionary to keep data between different processor's invocations
-    root_env.cache = {}
-
     processors = dict(directory=get_files,
                       filename=read_file,
                       file_content=parse_file,
@@ -676,9 +669,21 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
                                         get_processor=get_processor):
                     yield obj
 
-    versions = list(
-        run_pipeline(root_env,
-                     get_processor=lambda obj: processors.get(obj.type)))
+    root_env = Environment()
+    root_env.type = 'directory'
+    root_env.dirname = root
+    root_env.ignore_list = ignore_list
+    root_env.check_list = check_list
+    # a dictionary to keep data between different processor's invocations
+    root_env.cache = {'tmp-dir': tempfile.mkdtemp(dir=settings.TEMP_DIR)}
+    print 'Created root tmp dir {tmp-dir}'.format(**root_env.cache)
+
+    try:
+        versions = list(
+            run_pipeline(root_env,
+                         get_processor=lambda obj: processors.get(obj.type)))
+    finally:
+        shutil.rmtree(root_env.cache['tmp-dir'])
 
     if not versions:
         return []
@@ -736,10 +741,6 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
     versions = versions.values()
     versions.sort(cmp=lambda left, right: \
                   compare_version_numbers(left.version, right.version))
-
-    for key, value in root_env.cache.items():
-        if key.endswith('_temp_path'):
-            shutil.rmtree(value)
 
     return versions
 
