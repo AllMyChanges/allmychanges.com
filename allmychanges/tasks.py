@@ -219,19 +219,19 @@ def update_changelog_task(source, preview_id=None):
         finally:
             if problem is not None:
                 log.warning(problem)
-                next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
-                changelog.next_update_at = next_update_if_error
-
 
                 if preview_id:
                     preview = Preview.objects.get(pk=preview_id)
                     preview.problem = problem
-                    preview.save(update_fields=('problem',))
+                    preview.updated_at = timezone.now()
+                    preview.save(update_fields=('problem', 'updated_at'))
+
                 else:
                     changelog.problem = problem
-                    changelog.save(update_fields=('problem',))
 
             if preview_id is None:
+                next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
+                changelog.next_update_at = next_update_if_error
                 changelog.processing_started_at = None
                 changelog.save()
 
@@ -250,9 +250,6 @@ def update_preview_task(preview_id):
 
         update_changelog_task(preview.changelog.source,
                               preview_id=preview_id)
-        preview.updated_at = timezone.now()
-
-        preview.save()
 
 
 

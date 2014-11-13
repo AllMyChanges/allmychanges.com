@@ -784,16 +784,17 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
     def get_cache_params(self, *args, **kwargs):
         preview_id = kwargs['pk']
         self.preview = Preview.objects.get(pk=preview_id)
-        cache_key = 'changelog-preview-{0}:{1}'.format(
+
+        cache_key = 'changelog-preview-{0}:{1}:{2}'.format(
             self.preview.id,
             int(time.mktime(self.preview.updated_at.timetuple()))
             if self.preview.updated_at is not None
-            else 'missing')
+            else 'missing',
+            0 if self.preview.problem is None else 1)
         return cache_key, 4 * HOUR
 
     def get_context_data(self, **kwargs):
         result = super(PreviewView, self).get_context_data(**kwargs)
-
         # initially there is no versions in the preview
         # and we'll show versions from changelog if any exist
         if self.preview.updated_at is None:

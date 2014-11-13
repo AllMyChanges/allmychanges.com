@@ -278,7 +278,6 @@ def parse_rst_file(obj):
         path = obj.cache.get(path_key)
         if path is None:
             path = tempfile.mkdtemp(dir=obj.cache['tmp-dir'])
-            print 'Created {0} for rst file {1}'.format(path, obj.filename)
             obj.cache[path_key] = path
 
         def create_conf_py():
@@ -676,7 +675,6 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
     root_env.check_list = check_list
     # a dictionary to keep data between different processor's invocations
     root_env.cache = {'tmp-dir': tempfile.mkdtemp(dir=settings.TEMP_DIR)}
-    print 'Created root tmp dir {tmp-dir}'.format(**root_env.cache)
 
     try:
         versions = list(
