@@ -791,6 +791,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
             if self.preview.updated_at is not None
             else 'missing',
             0 if self.preview.problem is None else 1)
+#        print 'Cache key:', cache_key
         return cache_key, 4 * HOUR
 
     def get_context_data(self, **kwargs):
@@ -806,6 +807,8 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         filter_args = {'code_version': code_version}
         if self.preview.updated_at is not None:
             filter_args['preview'] = self.preview
+        else:
+            filter_args['preview'] = None
 
         changelog = self.preview.changelog
         package_data = get_package_data_for_template(
@@ -815,15 +818,15 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
             None,
             code_version=code_version)
 
-        has_results = obj.versions.filter(code_version=code_version).count() > 0
-        has_another_version_results = obj.versions.exclude(code_version=code_version).count() > 0
+        has_results = len(package_data['versions'])
 
         if obj.problem:
             problem = obj.problem
-        elif not has_results and has_another_version_results:
-            problem = 'Unable to find changelog.'
         else:
-            problem = None
+            if isinstance(obj, Preview) and not has_results:
+                problem = 'Unable to find changelog.'
+            else:
+                problem = None
 
         result['package'] = package_data
         result['has_results'] = has_results
