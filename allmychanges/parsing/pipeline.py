@@ -13,6 +13,7 @@ from operator import itemgetter
 from collections import defaultdict
 from functools import wraps
 from pkg_resources import parse_version
+from rq.timeouts import JobTimeoutException
 
 from allmychanges.crawler import _extract_version, _extract_date
 from allmychanges.utils import get_change_type
@@ -650,6 +651,8 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
             try:
                 for item in processor(*args, **kwargs):
                     yield item
+            except JobTimeoutException:
+                raise
             except Exception:
                 with log.name_and_fields('processing-pipe', processor=processor.__name__):
                     log.trace().error('Unable to process items')
