@@ -612,7 +612,7 @@ class Preview(Downloadable, IgnoreCheckSetters, models.Model):
                                help_text='Latest error message',
                                blank=True, null=True)
     downloader = models.CharField(max_length=10, blank=True, null=True)
-
+    done = models.BooleanField(default=False)
 
 class VersionManager(models.Manager):
     def get_query_set(self):

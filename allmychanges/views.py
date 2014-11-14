@@ -785,12 +785,11 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         preview_id = kwargs['pk']
         self.preview = Preview.objects.get(pk=preview_id)
 
-        cache_key = 'changelog-preview-{0}:{1}:{2}'.format(
+        cache_key = 'changelog-preview-{0}:{1}'.format(
             self.preview.id,
             int(time.mktime(self.preview.updated_at.timetuple()))
             if self.preview.updated_at is not None
-            else 'missing',
-            0 if self.preview.problem is None else 1)
+            else 'missing')
 #        print 'Cache key:', cache_key
         return cache_key, 4 * HOUR
 
@@ -823,7 +822,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         if obj.problem:
             problem = obj.problem
         else:
-            if isinstance(obj, Preview) and not has_results:
+            if self.preview.done and not has_results:
                 problem = 'Unable to find changelog.'
             else:
                 problem = None
@@ -854,6 +853,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
 
             preview.versions.all().delete()
             preview.updated_at = timezone.now()
+            preview.done = False
             preview.save()
 
             update_preview_task.delay(preview.pk)

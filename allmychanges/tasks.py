@@ -234,6 +234,10 @@ def update_changelog_task(source, preview_id=None):
                 changelog.next_update_at = next_update_if_error
                 changelog.processing_started_at = None
                 changelog.save()
+            else:
+                preview = Preview.objects.get(pk=preview_id)
+                preview.updated_at = timezone.now()
+                preview.save(update_fields=('updated_at',))
 
             log.info('Task done')
 
@@ -252,6 +256,8 @@ def update_preview_task(preview_id):
             update_changelog_task(preview.changelog.source,
                                   preview_id=preview_id)
         finally:
+            preview.done = True
+            preview.save(update_fields=('done',))
             log.info('Task done')
 
 
