@@ -244,12 +244,15 @@ def update_changelog_task(source, preview_id=None):
 def update_preview_task(preview_id):
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
-        from .models import Preview
-        preview = Preview.objects.get(pk=preview_id)
-        preview.versions.all().delete()
+        try:
+            from .models import Preview
+            preview = Preview.objects.get(pk=preview_id)
+            preview.versions.all().delete()
 
-        update_changelog_task(preview.changelog.source,
-                              preview_id=preview_id)
+            update_changelog_task(preview.changelog.source,
+                                  preview_id=preview_id)
+        finally:
+            log.info('Task done')
 
 
 
