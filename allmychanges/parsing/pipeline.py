@@ -308,7 +308,8 @@ def parse_rst_file(obj):
                 fullname = os.path.join(conf_py_dir, name)
                 if name.startswith('_') and os.path.isdir(fullname):
                     destination = os.path.join(path, name)
-                    shutil.copytree(fullname, destination)
+                    if not os.path.exists(destination):
+                        shutil.copytree(fullname, destination)
 
             with codecs.open(os.path.join(path, 'conf.py'), 'a', 'utf-8') as f:
                 f.write("master_doc = 'index'\n")
