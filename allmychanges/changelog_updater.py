@@ -289,24 +289,16 @@ def update_changelog(changelog, preview_id=None):
             versions = processing_pipe(path,
                                        ignore_list,
                                        check_list)
+            #print 'Num versions from pipeline:', len(versions)
             if versions:
                 update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)
             else:
                 logging.getLogger('update-changelog2').debug('updating v2 from vcs')
                 raw_data = extract_changelog_from_vcs(path)
+                #print 'Num versions from VCS:', len(raw_data)
+                if not raw_data:
+                    raise UpdateError('Changelog not found')
                 update_changelog_from_raw_data(changelog, raw_data, code_version='v2', preview_id=preview_id, from_vcs=True)
-
-        except Exception:
-            logging.getLogger('update-changelog2').exception('unhandled')
-
-        try:
-            filename, raw_data = search_changelog2(path)
-
-            if raw_data:
-                changelog.filename = os.path.relpath(filename, path)
-                changelog.save()
-            else:
-                raw_data = extract_changelog_from_vcs(path)
 
         except UpdateError:
             raise
@@ -314,14 +306,29 @@ def update_changelog(changelog, preview_id=None):
             logging.getLogger('update-changelog').exception('unhandled')
             raise UpdateError('Unable to parse or extract sources')
 
-        if not raw_data:
-            raise UpdateError('Changelog not found')
+        # try:
+        #     filename, raw_data = search_changelog2(path)
 
-        try:
-            update_changelog_from_raw_data(changelog, raw_data, preview_id=preview_id)
-        except Exception:
-            logging.getLogger('update-changelog').exception('unhandled')
-            raise UpdateError('Unable to update database')
+        #     if raw_data:
+        #         changelog.filename = os.path.relpath(filename, path)
+        #         changelog.save()
+        #     else:
+        #         raw_data = extract_changelog_from_vcs(path)
+
+        # except UpdateError:
+        #     raise
+        # except Exception:
+        #     logging.getLogger('update-changelog').exception('unhandled')
+        #     raise UpdateError('Unable to parse or extract sources')
+
+        # if not raw_data:
+        #     raise UpdateError('Changelog not found')
+
+        # try:
+        #     update_changelog_from_raw_data(changelog, raw_data, preview_id=preview_id)
+        # except Exception:
+        #     logging.getLogger('update-changelog').exception('unhandled')
+        #     raise UpdateError('Unable to update database')
 
     finally:
         shutil.rmtree(path)
