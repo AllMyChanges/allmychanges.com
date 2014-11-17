@@ -151,11 +151,6 @@ def test_update_package_using_full_pipeline():
 
     update_changelog(changelog)
 
-    versions = list(changelog.versions.filter(code_version='v1'))
-    eq_(2, len(versions))
-    eq_('Some bugfix.', versions[0].sections.all()[0].items.all()[0].text)
-    eq_('Initial release.', versions[1].sections.all()[0].items.all()[0].text)
-
     versions = list(changelog.versions.filter(code_version='v2'))
     eq_(2, len(versions))
     eq_('Some bugfix.', versions[0].sections.all()[0].items.all()[0].text)
