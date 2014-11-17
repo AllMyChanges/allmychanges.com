@@ -20,9 +20,14 @@ class Environment(object):
         return all(getattr(self, key) == getattr(other, key, undefined)
                    for key in self.keys())
 
-    def __repr__(self):
+    def __repr__(self, only=None):
         attrs = [(key, getattr(self, key))
                  for key in self.keys()]
+
+        if only is not None:
+            attrs = [(key, value)
+                     for key, value in attrs
+                     if key in only]
 
         attrs = map('{0[0]}={0[1]}'.format, attrs)
         return '<{0} {1}>'.format(

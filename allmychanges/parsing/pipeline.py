@@ -644,12 +644,26 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
                       almost_version=extract_metadata,
                       prerender_items=prerender_items)
 
+    def print_(item):
+        t = item.type
+        if t == 'filename':
+            print item.__repr__(('filename',))
+        elif t == 'file_content':
+            print item.__repr__(('filename', 'content'))
+        elif t == 'file_section':
+            print item.__repr__(('content',))
+        elif t in ('almost_version', 'prerender_items', 'version'):
+            print item.__repr__(('filename', 'content', 'version', 'title'))
+        else:
+            print item
+
     def catch_errors(processor):
         @wraps(processor)
         def wrapper(*args, **kwargs):
 
             try:
                 for item in processor(*args, **kwargs):
+#                    print_(item)
                     yield item
             except JobTimeoutException:
                 raise
