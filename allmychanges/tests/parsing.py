@@ -176,6 +176,12 @@ def test_markup_guesser_from_content():
  * Added benchmarking script
  * Added support for more serializer modules"""))
 
+    # part of the sbcl's html changelog
+    eq_('html', get_markup('Changelog', """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+    <html
+    ><head
+     >"""))
+
 
 def test_filter_versions():
     input_data = [

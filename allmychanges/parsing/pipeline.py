@@ -443,6 +443,7 @@ get_file_content = itemgetter('content')
 
 def get_markup(filename, content):
     filename = filename.lower()
+    content_head = content[:1000].lower()
 
     if filename.endswith('.rst') \
        or':func:`' in content:
@@ -454,6 +455,10 @@ def get_markup(filename, content):
        or re.search('\[.*?\]\(.*\)', content, re.MULTILINE) is not None \
        or re.search('\[.*?\]\[.*\]', content, re.MULTILINE) is not None:
         return 'markdown'
+
+    if content_head.startswith('<!doctype ') \
+       or content_head.startswith('<html'):
+        return 'html'
 
     return 'plain'
 
