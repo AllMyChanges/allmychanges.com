@@ -28,8 +28,12 @@ class Command(LogMixin, BaseCommand):
         check_list = ignore_list = []
 
         if len(args) >= 1:
-            check_list = [(name, None)
-                          for name in split_filenames(args[0])]
+            def parse_check(text):
+                if ':' in text:
+                    return text.split(':', 1)
+                return text, None
+
+            check_list = map(parse_check, split_filenames(args[0]))
         if len(args) >= 2:
             ignore_list = split_filenames(args[1])
 
