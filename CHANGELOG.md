@@ -1,3 +1,10 @@
+0.11.2 (2014-11-17)
+===================
+
+* Was fixed html changelogs type guesser and now [sbcl's][sbcl] changelog
+  is parsed correctly.
+* Fixed changelog items classification for [sbcl][] and [haproxy][].
+
 0.11.1 (2014-11-11)
 ===================
 
@@ -344,3 +351,5 @@ There are plenty directions for approvement. Stay tuned.
 [support-email]: mailto:help@allmychanges.com
 [Celery]: http://www.celeryproject.org/
 [celery-3.1]: https://github.com/celery/celery/tree/3.1
+[sbcl]: http://allmychanges.com/p/common-lisp/sbcl/
+[haproxy]: http://allmychanges.com/p/soft/haproxy/
