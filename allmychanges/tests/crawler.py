@@ -303,3 +303,5 @@ def test_get_change_type():
     eq_('sec', get_change_type('This issue solves CVE-2014-3556 report'))
     eq_('dep', get_change_type('pip install --build and pip install --no-clean are now deprecated'))
     eq_('inc', get_change_type('BACKWARD INCOMPATIBLE Removed the bundle support which was deprecated in 1.4.'))
+    eq_('fix', get_change_type('bug fix: HANDLER-{BIND,CASE} no longer drop into ldb when a clause'))
+    eq_('fix', get_change_type('BUG/MINOR: http: fix typos in previous patch'))

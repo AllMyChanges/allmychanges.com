@@ -135,6 +135,8 @@ def get_change_type(text):
         return 'fix'
     elif 'bugfix' in text:
         return 'fix'
+    elif 'bug' in text:
+        return 'fix'
     elif '[fix]' in text:
         return 'fix'
     return 'new'
