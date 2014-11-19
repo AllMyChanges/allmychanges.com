@@ -25,12 +25,16 @@ class Environment(object):
                  for key in self.keys()]
 
         if only is not None:
-            attrs = [(key, value)
+            only = dict(key
+                        if isinstance(key, tuple)
+                        else (key, lambda text: text)
+                        for key in only)
+            attrs = [(key, only[key](value))
                      for key, value in attrs
                      if key in only]
 
-        attrs = map('{0[0]}={0[1]}'.format, attrs)
-        return '<{0} {1}>'.format(
+        attrs = map(u'{0[0]}={0[1]}'.format, attrs)
+        return u'<{0} {1}>'.format(
             getattr(self, 'type', 'unknown'), ', '.join(attrs))
 
     def push(self, **kwargs):

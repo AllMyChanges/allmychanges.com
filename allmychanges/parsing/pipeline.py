@@ -16,7 +16,7 @@ from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
 
 from allmychanges.crawler import _extract_version, _extract_date
-from allmychanges.utils import get_change_type
+from allmychanges.utils import get_change_type, strip_long_text
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -165,6 +165,7 @@ def parse_file(env):
     from every file.
     """
     markup = getattr(env, 'markup', None)
+
     if not markup:
         markup = get_markup(env.filename, env.content)
 
@@ -561,15 +562,7 @@ def prerender_items(version):
     from django.template.defaultfilters import capfirst
     from bleach import clean
 
-    def remove_html_markup(text):
-        # import pdb; pdb.set_trace()  # DEBUG
-        # bleach.ALLOWED_TAGS
-        # [u'a', u'abbr', u'acronym', u'b', u'blockquote', u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul']
-        # bleach.ALLOWED_ATTRIBUTES
-        # {u'a': [u'href', u'title'], u'acronym': [u'title'], u'abbr': [u'title']}
-        # bleach.ALLOWED_STYLES
-        # []
-        #
+    def remove_html_markup(text, *args, **kwargs):
         return clean(text,
                      tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote',
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
@@ -653,14 +646,26 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
     def print_(item):
         t = item.type
+        def get_content(content):
+            if isinstance(content, basestring):
+                return strip_long_text(content, 20)
+            if isinstance(content, dict):
+                return dict(content, text=get_content(content['text']))
+            return map(get_content, content)
+
+        print ''
+
         if t == 'filename':
             print item.__repr__(('filename',))
         elif t == 'file_content':
-            print item.__repr__(('filename', 'content'))
+            print item.__repr__(('filename',
+                                 ('content', get_content)))
         elif t == 'file_section':
-            print item.__repr__(('content',))
+            print item.__repr__((('content', get_content),))
         elif t in ('almost_version', 'prerender_items', 'version'):
-            print item.__repr__(('filename', 'content', 'version', 'title'))
+            print item.__repr__(('filename',
+                                 ('content', get_content),
+                                 'version', 'title'))
         else:
             print item
 
@@ -670,7 +675,8 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
 
             try:
                 for item in processor(*args, **kwargs):
-#                    print_(item)
+                    # if processor.__name__ in ('get_files', 'prerender_items'):
+                    #     print_(item)
                     yield item
             except JobTimeoutException:
                 raise
