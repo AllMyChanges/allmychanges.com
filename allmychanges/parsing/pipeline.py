@@ -446,7 +446,9 @@ def get_markup(filename, content):
     content_head = content[:1000].lower()
 
     if filename.endswith('.rst') \
-       or':func:`' in content:
+       or':func:`' in content \
+       or re.search('`[^` ]+`_', content, re.MULTILINE) is not None \
+       or re.search('``[^` ]+``', content, re.MULTILINE) is not None:
         return 'rst'
 
     if filename.endswith('.md') \

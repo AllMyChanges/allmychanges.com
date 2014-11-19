@@ -143,6 +143,13 @@ def test_markup_guesser_from_content():
     eq_('rst', get_markup('CHANGES',
                            "Some text with :func:`foo` mentioned."))
 
+    # from https://github.com/celery/celery/blob/3.1/Changelog
+    eq_('rst', get_markup('CHANGES',
+                           "* [Security: `CELERYSA-0002`_] Insecure default umask."))
+
+    eq_('rst', get_markup('CHANGES',
+                           "- **Results**: ``result.get()`` was misbehaving."))
+
     eq_('markdown', get_markup('CHANGES',
                                """Some header
 =========="""))
