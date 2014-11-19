@@ -2,6 +2,7 @@ import types
 import datetime
 
 from nose.tools import eq_ as orig_eq_
+from allmychanges.utils import first
 from allmychanges.parsing.pipeline import (
     create_section,
     parse_changelog,
@@ -10,6 +11,7 @@ from allmychanges.parsing.pipeline import (
     extract_metadata,
     group_by_path,
     strip_outer_tag,
+    prerender_items,
     parse_file)
 from allmychanges.parsing.raw import RawChangelog
 from allmychanges.env import Environment
@@ -214,6 +216,28 @@ def test_extract_metadata():
                       'text': 'Fixed issue'}]],
            date=datetime.date(2014, 6, 24))],
         extract_metadata(input_data))
+
+
+def test_prerender_inserts_labels_into_content_items():
+    env = Environment()
+    env.type = 'almost_version'
+    v = lambda **kwargs: env.push(**kwargs)
+
+    input_data = v(type='prerender_items',
+                   title='1.0 (2014-06-24)',
+                   content=[[{'type': 'fix',
+                              'text': '<p>Some bug was <em>fixed</em> issue</p>'}]],
+                   date=datetime.date(2014, 6, 24))
+    expected = '<p><span class="changelog-item-type changelog-item-type_fix">fix</span>Some bug was <em>fixed</em> issue</p>'
+    eq_(expected, first(prerender_items(input_data)).content[0][0]['text'])
+
+    input_data = v(type='prerender_items',
+                   title='1.0 (2014-06-24)',
+                   content=[[{'type': 'fix',
+                              'text': 'Fixed issue'}]],
+                   date=datetime.date(2014, 6, 24))
+    expected = '<span class="changelog-item-type changelog-item-type_fix">fix</span>Fixed issue'
+    eq_(expected, first(prerender_items(input_data)).content[0][0]['text'])
 
 
 def test_extract_metadata_is_able_to_detect_unreleased_version():

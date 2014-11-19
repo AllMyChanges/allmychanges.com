@@ -153,8 +153,10 @@ def test_update_package_using_full_pipeline():
 
     versions = list(changelog.versions.filter(code_version='v2'))
     eq_(2, len(versions))
-    eq_('Some bugfix.', versions[0].sections.all()[0].items.all()[0].text)
-    eq_('Initial release.', versions[1].sections.all()[0].items.all()[0].text)
+    eq_('<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
+        versions[0].sections.all()[0].items.all()[0].text)
+    eq_('<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.',
+        versions[1].sections.all()[0].items.all()[0].text)
 
 
 def test_environment_cloning():
@@ -505,7 +507,9 @@ def test_update_package_preview_versions():
         return map(first_item, versions)
 
     versions = preview.versions.filter(code_version='v2')
-    eq_(['Some crap', 'Some bugfix.', 'Initial release.'],
+    eq_(['<span class="changelog-item-type changelog-item-type_new">new</span>Some crap',
+         '<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
+         '<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.'],
         first_items(versions))
 
     # now we'll check if ignore list works
@@ -514,7 +518,8 @@ def test_update_package_preview_versions():
     update_preview_task.delay(preview.pk)
 
     versions = preview.versions.filter(code_version='v2')
-    eq_(['Some bugfix.', 'Initial release.'],
+    eq_(['<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
+         '<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.'],
         first_items(versions))
 
 

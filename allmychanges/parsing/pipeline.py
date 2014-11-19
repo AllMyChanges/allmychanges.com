@@ -578,19 +578,49 @@ def prerender_items(version):
                                  u'abbr': [u'title']},
                      styles=[])
 
-    def apply_filters(text):
+    def embedd_label(text, item):
+        """Embedds a span to show item type as a label."""
+        if not item:
+            return text
 
-        for flt in [remove_html_markup, process_cve, capfirst]:
-            text = flt(text)
-        return text
+        label = lxml.html.fragment_fromstring('<span class="changelog-item-type changelog-item-type_{0[type]}">{0[type]}</span>'.format(
+            item))
+        items = lxml.html.fragments_fromstring(text)
+
+        if isinstance(items[0], basestring):
+            items.insert(0, lxml.html.tostring(label))
+            return u''.join(items)
+        else:
+            element = items[0]
+            label.tail = element.text
+            element.text = ''
+            items[0].insert(0, label)
+            return u''.join(map(lxml.html.tostring, items))
+
+    def apply_filters(item):
+        """Accepts whole item and returns another item with processed text.
+        Item could be a dictionary or plain text."""
+        if isinstance(item, basestring):
+            text = item
+            item = None
+        else:
+            text = item['text']
+
+        for flt in [remove_html_markup,
+                    lambda text, *args, **kwargs: process_cve(text),
+                    lambda text, *args, **kwargs: capfirst(text),
+                    embedd_label]:
+            text = flt(text, item)
+
+        if item is None:
+            return text
+        return dict(item, text=text)
 
     def process_content(content):
         if isinstance(content, basestring):
             return apply_filters(content)
         else:
-            return [dict(item,
-                         text=apply_filters(item['text']))
-                    for item in content]
+            return map(apply_filters, content)
 
     new_version.content = map(process_content, version.content)
     yield new_version

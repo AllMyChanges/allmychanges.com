@@ -1,3 +1,4 @@
+# coding: utf-8
 import anyjson
 import datetime
 import os
@@ -28,6 +29,11 @@ def load_data(filename):
                 tuple(map(string.strip, line.split(';', 1))))
 
     return data
+
+
+def first(iterable):
+    iterator = iter(iterable)
+    return iterator.next()
 
 
 @contextmanager
@@ -211,3 +217,13 @@ def split_filenames(text):
     names = [name.strip()
              for name in re.split(r'[\n,]', text)]
     return list(filter(None, names))
+
+
+def strip_long_text(text, max_len, append=u'…'):
+    """Returns text which len is less or equal max_len.
+    If text is stripped, then `append` is added,
+    but resulting text will have `max_len` length anyway.
+    """
+    if len(text) < max_len - 1:
+        return text
+    return text[:max_len - len(append)] + append
