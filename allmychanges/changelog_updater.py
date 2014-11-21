@@ -3,7 +3,6 @@ import datetime
 import copy
 import logging
 import shutil
-import os.path
 
 from django.utils import timezone
 from allmychanges.utils import discard_seconds
@@ -394,7 +393,7 @@ def update_preview_or_changelog(obj):
                 obj.set_processing_status('searching-versions')
                 versions = processing_pipe(path,
                                            obj.get_ignore_list(),
-                                           obj.get_check_list())
+                                           obj.get_search_list())
                 #print 'Num versions from pipeline:', len(versions)
                 if versions:
                     obj.set_processing_status('updating-database')
@@ -437,12 +436,12 @@ def update_changelog(changelog, preview_id=None):
 
     if preview_id is None:
         ignore_list = changelog.get_ignore_list()
-        check_list = changelog.get_check_list()
+        search_list = changelog.get_search_list()
         download = changelog.download
     else:
         preview = changelog.previews.get(pk=preview_id)
         ignore_list = preview.get_ignore_list()
-        check_list = preview.get_check_list()
+        search_list = preview.get_search_list()
         download = preview.download
 
 
@@ -459,7 +458,7 @@ def update_changelog(changelog, preview_id=None):
             from allmychanges.parsing.pipeline import processing_pipe
             versions = processing_pipe(path,
                                        ignore_list,
-                                       check_list)
+                                       search_list)
             #print 'Num versions from pipeline:', len(versions)
             if versions:
                 update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)

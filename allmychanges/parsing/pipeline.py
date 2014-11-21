@@ -50,15 +50,18 @@ def parse_changelog(raw_changelog):
 ## NEW
 ##############################
 
+def node_tostring(node):
+    """Convert's html node to string if it is not a string yet.
+    """
+    if isinstance(node, basestring):
+        return node
+    return lxml.html.tostring(node, with_tail=False)
+
+
 
 # TODO: move to utils
 def strip_outer_tag(text):
     get_children = lxml.html.etree.XPath("text()|*")
-
-    def tostring(node):
-        if isinstance(node, basestring):
-            return node
-        return lxml.html.tostring(node, with_tail=False)
 
     def rec(items):
         if len(items) == 1:
@@ -67,7 +70,7 @@ def strip_outer_tag(text):
             return rec(get_children(items[0]))
         else:
             return u''.join(
-                map(tostring,
+                map(node_tostring,
                     items))
 
     items = lxml.html.fragments_fromstring(text)
@@ -76,11 +79,11 @@ def strip_outer_tag(text):
 
 def get_files(env, walk=os.walk):
     """
-    Uses: env.ignore_list, env.check_list and env.dirname.
+    Uses: env.ignore_list, env.search_list and env.dirname.
     """
 
     ignore_list = env.ignore_list
-    check_list = env.check_list
+    search_list = env.search_list
 
     def in_ignore_list(filename):
         for ignore_prefix in ignore_list:
@@ -88,8 +91,8 @@ def get_files(env, walk=os.walk):
                 return True
         return False
 
-    def search_in_check_list(filename):
-        for prefix, markup in check_list:
+    def search_in_search_list(filename):
+        for prefix, markup in search_list:
             if filename.startswith(prefix):
                 return True, markup
         return False, None
@@ -110,8 +113,8 @@ def get_files(env, walk=os.walk):
                 attrs = dict(type='filename',
                              filename=full_filename)
 
-                if check_list:
-                    found, markup = search_in_check_list(rel_filename)
+                if search_list:
+                    found, markup = search_in_search_list(rel_filename)
                     if found:
                         if markup:
                             attrs['markup'] = markup
@@ -583,13 +586,19 @@ def prerender_items(version):
         if not item:
             return text
 
+        def html_escape(text):
+            if isinstance(text, basestring):
+                return text.replace('<', '&lt;').replace('>', '&gt;')
+            return text
+
         label = lxml.html.fragment_fromstring('<span class="changelog-item-type changelog-item-type_{0[type]}">{0[type]}</span>'.format(
             item))
-        items = lxml.html.fragments_fromstring(text)
+        items = map(html_escape,
+                    lxml.html.fragments_fromstring(text))
 
         if isinstance(items[0], basestring):
             items.insert(0, lxml.html.tostring(label))
-            return u''.join(items)
+            return u''.join(map(node_tostring, items))
         else:
             element = items[0]
             label.tail = element.text
@@ -666,7 +675,7 @@ def filter_trash_versions(versions):
     return grouped[best_source]
 
 
-def processing_pipe(root, ignore_list=[], check_list=[]):
+def processing_pipe(root, ignore_list=[], search_list=[]):
     processors = dict(directory=get_files,
                       filename=read_file,
                       file_content=parse_file,
@@ -733,7 +742,7 @@ def processing_pipe(root, ignore_list=[], check_list=[]):
     root_env.type = 'directory'
     root_env.dirname = root
     root_env.ignore_list = ignore_list
-    root_env.check_list = check_list
+    root_env.search_list = search_list
     # a dictionary to keep data between different processor's invocations
     root_env.cache = {'tmp-dir': tempfile.mkdtemp(dir=settings.TEMP_DIR)}
 

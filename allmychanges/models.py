@@ -27,7 +27,7 @@ from allmychanges.downloader import (
     get_downloader,
     download_repo)
 
-from allmychanges.tasks import update_repo, update_preview_task
+from allmychanges.tasks import update_repo, update_preview_task, update_changelog_task
 
 MARKUP_CHOICES = (
     ('markdown', 'markdown'),
@@ -368,7 +368,7 @@ class IgnoreCheckSetters(object):
     def set_ignore_list(self, items):
         self.ignore_list = u'\n'.join(items)
 
-    def get_check_list(self):
+    def get_search_list(self):
         """Returns a list with all filenames and directories to check
         when searching a changelog."""
         def process(name):
@@ -377,16 +377,16 @@ class IgnoreCheckSetters(object):
             else:
                 return (name, None)
 
-        filenames = split_filenames(self.check_list)
+        filenames = split_filenames(self.search_list)
         return map(process, filenames)
 
-    def set_check_list(self, items):
+    def set_search_list(self, items):
         def process(item):
             if isinstance(item, tuple) and item[1]:
                 return u':'.join(item)
             else:
                 return item
-        self.check_list = u'\n'.join(map(process, items))
+        self.search_list = u'\n'.join(map(process, items))
 
 
 class Downloadable(object):
@@ -430,6 +430,12 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
                                               ' changelog.'),
                                    blank=True)
     check_list = models.CharField(max_length=1000,
+                                   default='',
+                                   help_text=('Comma-separated list of directories'
+                                              ' and filenames to search'
+                                              ' changelog.'),
+                                   blank=True)
+    search_list = models.CharField(max_length=1000,
                                   default='',
                                   help_text=('Comma-separated list of directories'
                                               ' and filenames to search'
@@ -438,7 +444,8 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
     namespace = models.CharField(max_length=NAMESPACE_LENGTH, blank=True, null=True)
     name = models.CharField(max_length=NAME_LENGTH, blank=True, null=True)
     downloader = models.CharField(max_length=10, blank=True, null=True)
-
+    status = models.CharField(max_length=40, default='created')
+    processing_status = models.CharField(max_length=40)
 
     class Meta:
         unique_together = ('namespace', 'name')
@@ -448,12 +455,10 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
 
     def latest_version(self):
         versions = list(
-            self.versions.filter(preview=None) \
-                         .exclude(unreleased=True) \
+            self.versions.exclude(unreleased=True) \
                          .order_by('-discovered_at', '-number')[:1])
         if versions:
             return versions[0]
-
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
@@ -513,10 +518,56 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         preview = self.previews.create(
             source=self.source,
             ignore_list=self.ignore_list,
-            check_list=self.check_list,
+            search_list=self.search_list,
             user=user,
             light_user=light_user)
         return preview
+
+    def set_status(self, status, **kwargs):
+        changed_fields = ['status', 'updated_at']
+        if status == 'processing':
+            self.versions.all().delete()
+            self.updated_at = timezone.now()
+            changed_fields.append('updated_at')
+
+        elif status == 'error':
+            self.problem = kwargs.get('problem')
+            changed_fields.append('problem')
+
+        self.status = status
+        self.updated_at = timezone.now()
+        self.save(update_fields=changed_fields)
+
+    def set_processing_status(self, status):
+        print 'New processing status:', status
+        self.processing_status = status
+        self.updated_at = timezone.now()
+        self.save(update_fields=('processing_status',
+                                 'updated_at'))
+        key = 'preview-processing-status:{0}'.format(self.id)
+        cache.set(key, status, 10 * 60)
+
+    def get_processing_status(self):
+        key = 'preview-processing-status:{0}'.format(self.id)
+        result = cache.get(key, self.processing_status)
+        print 'result from get_processing_status:', result
+        return result
+
+    def schedule_update(self, async=True, full=False):
+        self.set_status('processing')
+        self.set_processing_status('waiting-in-the-queue')
+
+        self.problem = None
+        self.save()
+
+        if full:
+            self.versions.all().delete()
+
+        if async:
+            update_changelog_task.delay(self.source)
+        else:
+            update_changelog_task(self.source)
+
 
 
 class ChangelogTrack(models.Model):
@@ -611,12 +662,19 @@ class Preview(Downloadable, IgnoreCheckSetters, models.Model):
                                               ' and filenames to ignore searching'
                                               ' changelog.'),
                                    blank=True)
+    # TODO: remove this field after migration on production
     check_list = models.CharField(max_length=1000,
                                   default='',
                                   help_text=('Comma-separated list of directories'
                                               ' and filenames to search'
                                               ' changelog.'),
                                   blank=True)
+    search_list = models.CharField(max_length=1000,
+                                   default='',
+                                   help_text=('Comma-separated list of directories'
+                                              ' and filenames to search'
+                                              ' changelog.'),
+                                   blank=True)
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)

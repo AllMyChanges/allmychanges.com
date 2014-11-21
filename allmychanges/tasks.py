@@ -139,7 +139,7 @@ def schedule_updates(reschedule=False, packages=[]):
     log.info('Rescheduling {0} changelogs update'.format(num_changelogs))
 
     for changelog in changelogs:
-        update_changelog_task.delay(changelog.source)
+        changelog.schedule_update()
 
     delete_empty_changelogs.delay()
 
@@ -158,7 +158,7 @@ def delete_empty_changelogs():
 @singletone()
 @job('default', timeout=600)
 @transaction.atomic
-def update_changelog_task(source, preview_id=None):
+def update_changelog_task_to_remove(source, preview_id=None):
     with log.fields(source=source, preview_id=preview_id):
         log.info('Starting task')
         from .models import Changelog, Preview
@@ -255,6 +255,19 @@ def update_preview_task(preview_id):
         finally:
             log.info('Task done')
 
+
+@singletone()
+@job('default', timeout=600)
+@transaction.atomic
+def update_changelog_task(source):
+    with log.fields(source=source):
+        log.info('Starting task')
+        try:
+            from .models import Changelog
+            preview = Changelog.objects.get(source=source)
+            update_preview_or_changelog(preview)
+        finally:
+            log.info('Task done')
 
 
 @job

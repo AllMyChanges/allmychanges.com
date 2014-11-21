@@ -344,7 +344,7 @@ class PackageView(CommonContextMixin, TemplateView):
 
         result['show_sources'] = self.request.GET.get('show_sources', None)
 
-        filter_args = {'code_version': code_version, 'preview_id': None}
+        filter_args = {'code_version': code_version}
 
         changelog = None
 
@@ -751,6 +751,9 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
             user=self.request.user if self.request.user.is_authenticated() else None,
             light_user=self.request.light_user)
 
+        if changelog.versions.count() == 0:
+            preview.schedule_update()
+
         context['changelog'] = changelog
         context['preview'] = preview
         context['mode'] = 'edit'
@@ -842,7 +845,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
                 self.request.user == preview.user):
             data = anyjson.deserialize(self.request.read())
 
-            preview.set_check_list(
+            preview.set_search_list(
                 parse_list(data.get('search_list', '')))
             preview.set_ignore_list(
                 parse_list(data.get('ignore_list', '')))

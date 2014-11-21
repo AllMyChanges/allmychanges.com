@@ -5,7 +5,7 @@ from nose.tools import eq_
 from allmychanges.models import Changelog, Preview
 from django.test import Client
 from django.core.urlresolvers import reverse
-from allmychanges.tasks import _task_log, update_preview_task
+from allmychanges.tasks import _task_log
 from .utils import refresh
 
 
@@ -51,7 +51,7 @@ def test_preview():
     preview = refresh(preview)
     eq_('another source', preview.source)
     eq_('NEWS', preview.ignore_list)
-    eq_('docs', preview.check_list)
+    eq_('docs', preview.search_list)
 
     # and another preview task was scheduled
     eq_([('update_preview_task', (1,), {}),

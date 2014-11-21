@@ -149,7 +149,7 @@ class ChangelogSerializer(serializers.ModelSerializer):
             'problem',
             'latest_version',
             'ignore_list',
-            'check_list',
+            'search_list',
         )
 
 

@@ -25,7 +25,7 @@ class Command(LogMixin, BaseCommand):
     help = u"""Search changelog like data in given path on disk."""
 
     def handle(self, path, *args, **options):
-        check_list = ignore_list = []
+        search_list = ignore_list = []
 
         if len(args) >= 1:
             def parse_check(text):
@@ -33,12 +33,12 @@ class Command(LogMixin, BaseCommand):
                     return text.split(':', 1)
                 return text, None
 
-            check_list = map(parse_check, split_filenames(args[0]))
+            search_list = map(parse_check, split_filenames(args[0]))
         if len(args) >= 2:
             ignore_list = split_filenames(args[1])
 
         versions = processing_pipe(path,
                                    ignore_list,
-                                   check_list)
+                                   search_list)
         for version in versions:
             print_version(version)

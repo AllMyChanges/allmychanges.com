@@ -431,7 +431,7 @@ def test_landing_digest_keeps_tracked_in_cookie():
     eq_('1,2,3', response.cookies['tracked-changelogs'].value)
 
 
-def test_get_files_respect_ignore_and_check_lists():
+def test_get_files_respect_ignore_and_search_lists():
     def walk(root):
         return [('samples/markdown-release-notes/', ['docs'], ['unrelated-crap.md']),
                 ('samples/markdown-release-notes/docs',
@@ -440,7 +440,7 @@ def test_get_files_respect_ignore_and_check_lists():
     env = Environment()
     env.dirname = 'samples/markdown-release-notes'
     env.ignore_list = []
-    env.check_list = []
+    env.search_list = []
     result = [item.filename for item in get_files(env, walk)]
     eq_(['samples/markdown-release-notes/unrelated-crap.md',
          'samples/markdown-release-notes/docs/0.1.0.md',
@@ -449,7 +449,7 @@ def test_get_files_respect_ignore_and_check_lists():
 
 
     env.ignore_list = ['unrelated-crap.md']
-    env.check_list = []
+    env.search_list = []
     result = [item.filename for item in get_files(env, walk)]
     eq_(['samples/markdown-release-notes/docs/0.1.0.md',
          'samples/markdown-release-notes/docs/0.1.1.md'],
@@ -457,19 +457,19 @@ def test_get_files_respect_ignore_and_check_lists():
 
 
     env.ignore_list = ['docs']
-    env.check_list = []
+    env.search_list = []
     result = [item.filename for item in get_files(env, walk)]
     eq_(['samples/markdown-release-notes/unrelated-crap.md'],
         result)
 
     env.ignore_list = []
-    env.check_list = [('unrelated-crap.md', None)]
+    env.search_list = [('unrelated-crap.md', None)]
     result = [item.filename for item in get_files(env, walk)]
     eq_(['samples/markdown-release-notes/unrelated-crap.md'],
         result)
 
     env.ignore_list = []
-    env.check_list = [('doc', None)]
+    env.search_list = [('doc', None)]
     result = [item.filename for item in get_files(env, walk)]
     eq_(['samples/markdown-release-notes/docs/0.1.0.md',
          'samples/markdown-release-notes/docs/0.1.1.md'],
