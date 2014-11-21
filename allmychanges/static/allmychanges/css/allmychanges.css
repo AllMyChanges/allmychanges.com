@@ -490,17 +490,28 @@ body.email {
   list-style: none;
   line-height: 1.667em;
 }
-.package-version__section-item > p:first-child {
+.package-version__section-item > :first-child {
   margin-left: 0;
 }
-.package-version__section-item > p {
-  margin-left: 1em;
+.package-version__section-item > p,
+.package-version__section-item > blockquote,
+.package-version__section-item > dl,
+.package-version__section-item > div {
+  margin-left: 38px;
+}
+.package-version__section-item ul,
+.package-version__section-item ol {
+  margin-left: 16px;
 }
 .package-version__notes {
   margin-left: 1em;
   margin-top: 0.5em;
   font-family: proxima-nova, sans-serif;
   font-weight: 300;
+}
+.package-version__notes ul,
+.package-version__notes ol {
+  margin-left: 16px;
 }
 .package-changes__package-title {
   margin-top: 1em;
@@ -536,6 +547,9 @@ body.email {
   padding: 2px 4px;
   border-radius: 3px;
   color: #fff;
+  margin-right: 8px;
+  position: relative;
+  top: -2px;
 }
 .changelog-item-type_fix {
   background-color: #ee883d;

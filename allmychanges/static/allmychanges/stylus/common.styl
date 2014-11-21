@@ -98,12 +98,19 @@ body.email {
     &__section-item {
         list-style: none;
         line-height: 1.667em;
-        
-        > p:first-child {
+
+        > :first-child {
             margin-left: 0;
         }
-        > p {
-            margin-left: 1em;
+        > p,
+        > blockquote,
+        > dl,
+        > div {
+            margin-left: 38px;
+        }
+
+        ul, ol {
+           margin-left: 16px;
         }
     }
 
@@ -112,6 +119,10 @@ body.email {
         margin-top: 0.5em;
         font-family: generic-font;
         font-weight: 300;
+
+        ul, ol {
+           margin-left: 16px;
+        }
     }
 }
 
@@ -157,6 +168,9 @@ body.email {
       padding: 2px 4px;
       border-radius: 3px;
       color: white;
+      margin-right: 8px;
+      position: relative;
+      top: -2px;
 }
 
 .changelog-item-type_fix {
