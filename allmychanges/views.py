@@ -342,7 +342,10 @@ class PackageView(CommonContextMixin, TemplateView):
         code_version = self.request.GET.get('code_version', 'v2')
         result['code_version'] = code_version
 
-        result['show_sources'] = self.request.GET.get('show_sources', None)
+        if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
+            result['show_sources'] = True
+        else:
+            result['show_sources'] = self.request.GET.get('show_sources', None)
 
         filter_args = {'code_version': code_version}
 
