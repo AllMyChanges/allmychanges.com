@@ -13,7 +13,7 @@ from allmychanges.utils import (
     count,
     count_time)
 from allmychanges.exceptions import UpdateError
-from allmychanges.changelog_updater import update_changelog
+from allmychanges.changelog_updater import update_changelog, update_preview_or_changelog
 
 from twiggy_goodies.django_rq import job
 from twiggy_goodies.threading import log
@@ -251,13 +251,8 @@ def update_preview_task(preview_id):
         try:
             from .models import Preview
             preview = Preview.objects.get(pk=preview_id)
-            preview.versions.all().delete()
-
-            update_changelog_task(preview.changelog.source,
-                                  preview_id=preview_id)
+            update_preview_or_changelog(preview)
         finally:
-            preview.done = True
-            preview.save(update_fields=('done',))
             log.info('Task done')
 
 

@@ -105,6 +105,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
                 var data = $(data);
 
                 if (data.hasClass('please-wait')) {
+                    $('.progress-text').html(data);
                     setTimeout(wait_for_preview, 1000);
                 } else {
                     $scope.waiting = false;

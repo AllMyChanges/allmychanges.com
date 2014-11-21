@@ -37,16 +37,22 @@
 Определяет, можно ли показывать на странице preview результат, или нужно
 показывать информацию о процессе обработки.
 
-* created
-* processing
-* error
-* success
+* created (результата нет)
+* processing (показываем processing_status)
+* error (показываем self.problem)
+* success (показываем результаты)
+
+### Для Changelog тот же status ###
+
+Но тут он управляет отображением информации в метаанных.
+Версии показываем если они есть.
 
 ## Статус процесса обработки данных (processing_status) ##
 
-* waiting in the queue
+* waiting-in-the-queue
 * downloading
-* searching versions
-* processing VCS history
+* searching-versions
+* processing-vcs-history
+* updating-database
 
 Определяет стадию обработки данных при получении списка версий.

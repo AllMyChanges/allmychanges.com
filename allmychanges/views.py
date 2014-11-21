@@ -17,7 +17,6 @@ from django.views.generic import (TemplateView,
 from django.db.models import Q
 from django.conf import settings
 from django.utils import timezone
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django import forms
@@ -38,7 +37,6 @@ from allmychanges.utils import (HOUR,
                                 parse_ints,
                                 join_ints)
 from allmychanges.downloader import normalize_url
-from allmychanges.tasks import update_preview_task
 
 
 class CommonContextMixin(object):
@@ -157,8 +155,7 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
                 changelog=dict(
                     id=changelog.id,
                     updated_at=changelog.updated_at,
-                    next_update_at=changelog.next_update_at,
-                    filename=changelog.filename,
+                    next_update_at=getattr(changelog, 'next_update_at', None),
                     problem=changelog.problem,
                 ),
                 versions=versions)
@@ -728,12 +725,11 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         changelog.save()
 
 
-        preview = changelog.previews.create(
-            source=changelog.source,
+        preview = changelog.create_preview(
             user=self.request.user if self.request.user.is_authenticated() else None,
             light_user=self.request.light_user)
 
-        update_preview_task.delay(preview.id)
+        preview.schedule_update()
 
         context['changelog'] = changelog
         context['preview'] = preview
@@ -751,19 +747,9 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         changelog = Changelog.objects.get(namespace=kwargs['namespace'],
                                           name=kwargs['name'])
 
-        preview = changelog.previews.create(
-            source=changelog.source,
-            ignore_list=changelog.ignore_list,
-            check_list=changelog.check_list,
+        preview = changelog.create_preview(
             user=self.request.user if self.request.user.is_authenticated() else None,
             light_user=self.request.light_user)
-
-        def attrs_to_copy(obj, exclude=()):
-            exclude_fields = set(exclude)
-            exclude_fields.add('id')
-            return {f.name: getattr(obj, f.name)
-                    for f in obj.__class__._meta.fields
-                    if f.name not in exclude_fields}
 
         context['changelog'] = changelog
         context['preview'] = preview
@@ -785,11 +771,12 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         preview_id = kwargs['pk']
         self.preview = Preview.objects.get(pk=preview_id)
 
-        cache_key = 'changelog-preview-{0}:{1}'.format(
+        cache_key = 'changelog-preview-{0}:{1}:{2}'.format(
             self.preview.id,
             int(time.mktime(self.preview.updated_at.timetuple()))
             if self.preview.updated_at is not None
-            else 'missing')
+            else 'missing',
+            self.preview.get_processing_status())
 #        print 'Cache key:', cache_key
         return cache_key, 4 * HOUR
 
@@ -797,10 +784,11 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result = super(PreviewView, self).get_context_data(**kwargs)
         # initially there is no versions in the preview
         # and we'll show versions from changelog if any exist
-        if self.preview.updated_at is None:
+        if self.preview.status == 'created':
             obj = self.preview.changelog
         else:
             obj = self.preview
+
 
         code_version = 'v2'
         filter_args = {'code_version': code_version}
@@ -809,9 +797,8 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         else:
             filter_args['preview'] = None
 
-        changelog = self.preview.changelog
         package_data = get_package_data_for_template(
-            changelog,
+            obj,
             filter_args,
             10,
             None,
@@ -819,10 +806,10 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
 
         has_results = len(package_data['versions'])
 
-        if obj.problem:
-            problem = obj.problem
+        if self.preview.status == 'error':
+            problem = self.preview.problem
         else:
-            if self.preview.done and not has_results:
+            if self.preview.status == 'success' and not has_results:
                 problem = 'Unable to find changelog.'
             else:
                 problem = None
@@ -831,6 +818,16 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result['has_results'] = has_results
         result['problem'] = problem
         result['show_sources'] = True
+
+        HUMANIZED = {
+            'waiting-in-the-queue': 'Wating in the queue.',
+            'downloading': 'Downloading sources.',
+            'searching-versions': 'Searching versions.',
+            'processing-vcs-history': 'Processing VCS history.',
+            'updating-database': 'Updating database.',
+        }
+        status = self.preview.get_processing_status()
+        result['processing_status'] = HUMANIZED.get(status, status)
         return result
 
     def post(self, *args, **kwargs):
@@ -850,16 +847,11 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
             preview.set_ignore_list(
                 parse_list(data.get('ignore_list', '')))
             preview.source = data.get('source')
-
-            preview.versions.all().delete()
-            preview.updated_at = timezone.now()
-            preview.done = False
+            preview.set_status('processing')
             preview.save()
-
-            update_preview_task.delay(preview.pk)
+            preview.schedule_update()
 
         return HttpResponse('ok')
-
 
 
 class ToolsView(CommonContextMixin, TemplateView):

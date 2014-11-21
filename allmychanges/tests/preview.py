@@ -31,11 +31,17 @@ def test_preview():
     preview_url = reverse('preview', kwargs=dict(pk=preview.pk))
     response = cl.get(preview_url)
     eq_(200, response.status_code)
+
     assert 'Some bugfix.' in response.content
     assert 'Initial release.' in response.content
 
+    # при этом, у объекта preview должны быть версии, а у changelog нет
+    changelog = Changelog.objects.all()[0]
+    eq_(0, changelog.versions.count())
+    eq_(2, preview.versions.count())
 
-    # теперь обновим preview
+
+    # теперь обновим preview на несуществующий источник
     response = cl.post(preview_url,
                        data=anyjson.serialize(dict(source='another source',
                                                    ignore_list='NEWS',
@@ -51,6 +57,13 @@ def test_preview():
     eq_([('update_preview_task', (1,), {}),
          ('update_preview_task', (1,), {})], _task_log)
 
+    # версии должны были удалиться
+    eq_(0, changelog.versions.count())
+    eq_(0, preview.versions.count())
+    # а само preview перейти в состояние error
+    eq_('error', preview.status)
+
+
 
 
 def test_update_package_preview_versions():
@@ -59,7 +72,7 @@ def test_update_package_preview_versions():
     preview = changelog.previews.create(light_user='anonymous',
                                         source=changelog.source)
 
-    update_preview_task.delay(preview.pk)
+    preview.schedule_update()
 
     eq_(0, changelog.versions.filter(preview=None).count())
 
@@ -78,7 +91,7 @@ def test_update_package_preview_versions():
     # now we'll check if ignore list works
     preview.set_ignore_list(['docs/unrelated-crap.md'])
     preview.save()
-    update_preview_task.delay(preview.pk)
+    preview.schedule_update()
 
     versions = preview.versions.filter(code_version='v2')
     eq_(['<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',

@@ -7,6 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
+from django.core.cache import cache
 
 from twiggy_goodies.threading import log
 
@@ -26,8 +27,7 @@ from allmychanges.downloader import (
     get_downloader,
     download_repo)
 
-from allmychanges.tasks import update_repo
-
+from allmychanges.tasks import update_repo, update_preview_task
 
 MARKUP_CHOICES = (
     ('markdown', 'markdown'),
@@ -509,6 +509,15 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
     def resolve_issues(self, type):
         self.issues.filter(type=type, resolved_at=None).update(resolved_at=timezone.now())
 
+    def create_preview(self, user, light_user):
+        preview = self.previews.create(
+            source=self.source,
+            ignore_list=self.ignore_list,
+            check_list=self.check_list,
+            user=user,
+            light_user=light_user)
+        return preview
+
 
 class ChangelogTrack(models.Model):
     user = models.ForeignKey(User)
@@ -613,6 +622,54 @@ class Preview(Downloadable, IgnoreCheckSetters, models.Model):
                                blank=True, null=True)
     downloader = models.CharField(max_length=10, blank=True, null=True)
     done = models.BooleanField(default=False)
+    status = models.CharField(max_length=40, default='created')
+    processing_status = models.CharField(max_length=40)
+
+    @property
+    def namespace(self):
+        return self.changelog.namespace
+
+    @property
+    def name(self):
+        return self.changelog.name
+
+    def set_status(self, status, **kwargs):
+        changed_fields = ['status', 'updated_at']
+        if status == 'processing':
+            self.versions.all().delete()
+            self.updated_at = timezone.now()
+            changed_fields.append('updated_at')
+
+        elif status == 'error':
+            self.problem = kwargs.get('problem')
+            changed_fields.append('problem')
+
+        self.status = status
+        self.updated_at = timezone.now()
+        self.save(update_fields=changed_fields)
+
+
+    def set_processing_status(self, status):
+        print 'New processing status:', status
+        self.processing_status = status
+        self.updated_at = timezone.now()
+        self.save(update_fields=('processing_status',
+                                 'updated_at'))
+        key = 'preview-processing-status:{0}'.format(self.id)
+        cache.set(key, status, 10 * 60)
+
+    def get_processing_status(self):
+        key = 'preview-processing-status:{0}'.format(self.id)
+        result = cache.get(key, self.processing_status)
+        print 'result from get_processing_status:', result
+        return result
+
+    def schedule_update(self):
+        self.set_status('processing')
+        self.set_processing_status('waiting-in-the-queue')
+        self.versions.all().delete()
+        update_preview_task.delay(self.pk)
+
 
 class VersionManager(models.Manager):
     def get_query_set(self):
@@ -626,7 +683,11 @@ CODE_VERSIONS = [
 
 
 class Version(models.Model):
-    changelog = models.ForeignKey(Changelog, related_name='versions')
+    changelog = models.ForeignKey(Changelog,
+                                  related_name='versions',
+                                  blank=True,
+                                  null=True,
+                                  on_delete=models.SET_NULL)
     preview = models.ForeignKey(Preview,
                                 related_name='versions',
                                 blank=True,

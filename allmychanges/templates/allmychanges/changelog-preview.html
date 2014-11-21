@@ -10,6 +10,7 @@
     <p>You can't track this project right now, but please, leave us a message
       if you think, that our robot was unable to find changelog.</p>
   {% else %}
-    <div class="please-wait">Please, wait while changelog will be processed</div>
+    <div class="please-wait">{{processing_status}}</div>
+    <!--div class="please-wait">Please, wait while changelog will be processed</div-->
   {% endif %}
 {% endif %}
