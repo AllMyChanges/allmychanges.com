@@ -5,8 +5,10 @@ from allmychanges.downloader import guess_downloader
 from allmychanges.models import Changelog
 from allmychanges.tests.utils import refresh
 from nose.tools import eq_
+from unittest.case import skip
 
 
+@skip
 def test_guesser():
     def guess(url):
         start = time.time()
