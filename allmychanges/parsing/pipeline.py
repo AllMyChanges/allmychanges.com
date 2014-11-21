@@ -566,8 +566,12 @@ def prerender_items(version):
     from bleach import clean
 
     def remove_html_markup(text, *args, **kwargs):
-        return clean(text,
-                     tags=[u'a', u'abbr', u'acronym', u'b', u'blockquote',
+        # removing reST's fucking field-list from our nice changelog item
+        text = re.sub(ur'<table class="docutils field-list".*?</table>', u'', text, flags=re.DOTALL | re.M)
+
+        text = clean(text,
+                     tags=[u'table', 'colgroup', 'col', 'tr', 'td', 'th', 'tbody', 'thead',
+                           u'a', u'abbr', u'acronym', u'b', u'blockquote',
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
                            u'p', # we allow paragraphs cause they are fine
                            u'h1', u'h2', u'h3', u'h4', # headers are ok too
@@ -580,6 +584,7 @@ def prerender_items(version):
                                  u'acronym': [u'title'],
                                  u'abbr': [u'title']},
                      styles=[])
+        return text
 
     def embedd_label(text, item):
         """Embedds a span to show item type as a label."""
