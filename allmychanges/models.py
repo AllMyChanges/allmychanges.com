@@ -539,7 +539,6 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         self.save(update_fields=changed_fields)
 
     def set_processing_status(self, status):
-        print 'New processing status:', status
         self.processing_status = status
         self.updated_at = timezone.now()
         self.save(update_fields=('processing_status',
@@ -550,7 +549,6 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
     def get_processing_status(self):
         key = 'preview-processing-status:{0}'.format(self.id)
         result = cache.get(key, self.processing_status)
-        print 'result from get_processing_status:', result
         return result
 
     def schedule_update(self, async=True, full=False):
@@ -708,7 +706,6 @@ class Preview(Downloadable, IgnoreCheckSetters, models.Model):
 
 
     def set_processing_status(self, status):
-        print 'New processing status:', status
         self.processing_status = status
         self.updated_at = timezone.now()
         self.save(update_fields=('processing_status',
@@ -719,7 +716,6 @@ class Preview(Downloadable, IgnoreCheckSetters, models.Model):
     def get_processing_status(self):
         key = 'preview-processing-status:{0}'.format(self.id)
         result = cache.get(key, self.processing_status)
-        print 'result from get_processing_status:', result
         return result
 
     def schedule_update(self):

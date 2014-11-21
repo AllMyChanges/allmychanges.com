@@ -1,3 +1,23 @@
+0.12.0 (2014-11-22)
+===================
+
+This release includes big refactoring of changelog and
+preview update process. It is almost invisible for the end
+users, except now you will see separate preview stages
+during preview generation. I have ideas how to improve
+it even more, but will leave this for a while.
+
+Also, this release includes these minor changes:
+
+* reST format recognizer was improved.
+* And now reST parser removes field-list tables, so,
+  for example, [Celery][celery-changelog]'s changelog looks much nicer now.
+* Now changelog items's type labels are embedded into the HTML when changelog is parsed.
+  This should improve changelog's rendering when items contains complex markup like
+  paragraphs in the lists.
+* Changelog styles was changed a little, to fix inner lists' margins.
+* Also, search list saving on 'tune' page was fixed.
+
 0.11.2 (2014-11-17)
 ===================
 
@@ -353,3 +373,4 @@ There are plenty directions for approvement. Stay tuned.
 [celery-3.1]: https://github.com/celery/celery/tree/3.1
 [sbcl]: http://allmychanges.com/p/common-lisp/sbcl/
 [haproxy]: http://allmychanges.com/p/soft/haproxy/
+[celery-changelog]: http://allmychanges.com/p/python/celery/
