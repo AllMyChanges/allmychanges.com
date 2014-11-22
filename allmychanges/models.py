@@ -525,12 +525,7 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
 
     def set_status(self, status, **kwargs):
         changed_fields = ['status', 'updated_at']
-        if status == 'processing':
-            self.versions.all().delete()
-            self.updated_at = timezone.now()
-            changed_fields.append('updated_at')
-
-        elif status == 'error':
+        if status == 'error':
             self.problem = kwargs.get('problem')
             changed_fields.append('problem')
 
