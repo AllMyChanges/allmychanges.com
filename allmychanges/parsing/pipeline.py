@@ -449,14 +449,21 @@ def get_markup(filename, content):
     filename = filename.lower()
     content_head = content[:1000].lower()
 
-    if filename.endswith('.rst') \
-       or':func:`' in content \
+    if filename.endswith('.rst'):
+        return 'rst'
+
+    if filename.endswith('.md'):
+        return 'markdown'
+
+    if filename.endswith('.html') or filename.endswith('.htm'):
+        return 'html'
+
+    if ':func:`' in content \
        or re.search('`[^` ]+`_', content, re.MULTILINE) is not None \
        or re.search('``[^` ]+``', content, re.MULTILINE) is not None:
         return 'rst'
 
-    if filename.endswith('.md') \
-       or re.search('^[=-]{3,}', content, re.MULTILINE) is not None \
+    if re.search('^[=-]{3,}', content, re.MULTILINE) is not None \
        or re.search('^#{2,}', content, re.MULTILINE) is not None \
        or re.search('\[.*?\]\(.*\)', content, re.MULTILINE) is not None \
        or re.search('\[.*?\]\[.*\]', content, re.MULTILINE) is not None:
@@ -475,6 +482,7 @@ def filter_versions(sections):
     """
     for section in sections:
         version = _extract_version(get_section_title(section))
+
         if version:
             new_section = copy.deepcopy(section)
             new_section['version'] = version
@@ -717,12 +725,15 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
             print item.__repr__(('filename',))
         elif t == 'file_content':
             print item.__repr__(('filename',
-                                 ('content', get_content)))
+                             #    ('content', get_content)
+                             ))
         elif t == 'file_section':
-            print item.__repr__((('content', get_content),))
+            print item.__repr__(('title',
+                             #    ('content', get_content)
+                             ))
         elif t in ('almost_version', 'prerender_items', 'version'):
             print item.__repr__(('filename',
-                                 ('content', get_content),
+              #                   ('content', get_content),
                                  'version', 'title'))
         else:
             print item
