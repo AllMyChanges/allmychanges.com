@@ -758,6 +758,8 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     processors = dict((name, catch_errors(processor))
                       for name, processor in processors.items())
 
+    # pipeline's core engine which executes all steps for each item
+    # passing it from one processor to another
     def run_pipeline(obj, get_processor=lambda obj: None):
         processor = get_processor(obj)
         if processor is None:
@@ -839,6 +841,18 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     versions = versions.values()
     versions.sort(cmp=lambda left, right: \
                   compare_version_numbers(left.version, right.version))
+
+    # and will try to figure out if only one version has no date
+    # and thus unreleased yet
+    # only 5 latest versions take a part in this calculations
+    without_date = [version
+                    for version in versions[-5:]
+                    if getattr(version, 'date', None) is None]
+
+    # if there is at least 2 versions with dates, then
+    # consider version without date as unreleased
+    if len(without_date) == 1 and len(versions[-5:]) >= 3:
+        without_date[0].unreleased = True
 
     return versions
 
