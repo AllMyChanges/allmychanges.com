@@ -402,26 +402,28 @@ def update_preview_or_changelog(obj):
     if path:
         try:
             try:
-                from allmychanges.parsing.pipeline import processing_pipe
+                from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
                 obj.set_processing_status('searching-versions')
                 versions = processing_pipe(path,
                                            obj.get_ignore_list(),
                                            obj.get_search_list())
                 #print 'Num versions from pipeline:', len(versions)
+
+                if not versions:
+                    log.debug('updating v2 from vcs')
+                    obj.set_processing_status('processing-vcs-history')
+                    versions = vcs_processing_pipe(path,
+                                                   obj.get_ignore_list(),
+                                                   obj.get_search_list())
+
+                    #print 'Num versions from VCS:', len(raw_data)
+
                 if versions:
                     obj.set_processing_status('updating-database')
                     update_changelog_from_raw_data3(obj, versions)
                 else:
-                    log.debug('updating v2 from vcs')
-                    obj.set_processing_status('processing-vcs-history')
-                    raw_data = extract_changelog_from_vcs(path)
+                    raise UpdateError('Changelog not found')
 
-                    #print 'Num versions from VCS:', len(raw_data)
-                    if not raw_data:
-                        raise UpdateError('Changelog not found')
-
-                    obj.set_processing_status('updating-database')
-                    update_changelog_from_raw_data1_3(obj, raw_data, from_vcs=True)
             except UpdateError as e:
                 problem = u', '.join(e.args)
                 log.trace().error('Unable to update changelog')
@@ -469,19 +471,16 @@ def update_changelog(changelog, preview_id=None):
     try:
         try:
             from allmychanges.parsing.pipeline import processing_pipe
-            versions = processing_pipe(path,
-                                       ignore_list,
-                                       search_list)
+            versions = processing_pipe(path, ignore_list, search_list)
             #print 'Num versions from pipeline:', len(versions)
-            if versions:
-                update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)
-            else:
+            if not versions:
                 logging.getLogger('update-changelog2').debug('updating v2 from vcs')
-                raw_data = extract_changelog_from_vcs(path)
+                versions = vcs_processing_pipe(path, ignore_list, search_list)
                 #print 'Num versions from VCS:', len(raw_data)
-                if not raw_data:
-                    raise UpdateError('Changelog not found')
-                update_changelog_from_raw_data(changelog, raw_data, code_version='v2', preview_id=preview_id, from_vcs=True)
+
+            if not versions:
+                raise UpdateError('Changelog not found')
+            update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)
 
         except UpdateError:
             raise

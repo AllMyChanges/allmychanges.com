@@ -103,6 +103,39 @@ def choose_version_extractor(path):
     return null_extractor
 
 
+def get_versions_from_vcs(env):
+    path = env.dirname
+
+    walk_through_history = choose_history_extractor(path)
+    extract_version = choose_version_extractor(path)
+    current_version = None
+    current_commits = []
+
+    def create_version(date, unreleased=False):
+        return env.push(type='almost_version',
+                        title=current_version,
+                        version=current_version,
+                        filename='VCS',
+                        date=None if unreleased else date,
+                        unreleased=unreleased,
+                        content=[current_commits])
+
+    for date, message in walk_through_history(path):
+        version = extract_version(path)
+
+        if message:
+            current_commits.append(message)
+
+        if version != current_version and version is not None:
+            current_version = version
+            yield create_version(date)
+            current_commits = []
+
+    if current_commits:
+        current_version = 'x.x.x'
+        yield create_version(date, unreleased=True)
+
+
 def extract_changelog_from_vcs(path):
     walk_through_history = choose_history_extractor(path)
     extract_version = choose_version_extractor(path)

@@ -1,7 +1,7 @@
 # coding: utf-8
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
-from allmychanges.parsing.pipeline import processing_pipe
+from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
 from allmychanges.utils import split_filenames
 
 
@@ -37,8 +37,10 @@ class Command(LogMixin, BaseCommand):
         if len(args) >= 2:
             ignore_list = split_filenames(args[1])
 
-        versions = processing_pipe(path,
-                                   ignore_list,
-                                   search_list)
+        pipe = processing_pipe
+        if search_list and search_list[0][0] == 'VCS':
+            pipe = vcs_processing_pipe
+
+        versions = pipe(path, ignore_list, search_list)
         for version in versions:
             print_version(version)

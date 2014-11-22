@@ -680,14 +680,28 @@ def filter_trash_versions(versions):
     return grouped[best_source]
 
 
-def processing_pipe(root, ignore_list=[], search_list=[]):
+def processing_pipe(*args, **kwargs):
     processors = dict(directory=get_files,
                       filename=read_file,
                       file_content=parse_file,
                       file_section=filter_version,
                       almost_version=extract_metadata,
                       prerender_items=prerender_items)
+    return _processing_pipe(processors, *args, **kwargs)
 
+
+from allmychanges.vcs_extractor import (
+    get_versions_from_vcs
+)
+
+def vcs_processing_pipe(*args, **kwargs):
+    processors = dict(directory=get_versions_from_vcs,
+                      almost_version=extract_metadata,
+                      prerender_items=prerender_items)
+    return _processing_pipe(processors, *args, **kwargs)
+
+
+def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     def print_(item):
         t = item.type
         def get_content(content):
