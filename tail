@@ -28,7 +28,7 @@ def print_item(item):
     print u'{ts} {msg}'.format(
         ts = item['@timestamp'].replace('T', ' '),
         msg = item['@message'])
-    
+
     for kv in item['@fields'].iteritems():
         echo((u' ' * 20 + u'{0} = {1}').format(*kv))
 
@@ -49,15 +49,15 @@ def process(filename, cross_finger, message, name):
             if re.search(message, item['@message'], re.I) is None:
                 return
         if name:
-            if re.search(name, item['@fields']['name'], re.I) is None:
+            if re.search(name, item['@fields'].get('name', ''), re.I) is None:
                 return
         print_item(item)
-            
+
 
     for line in tailer.follow(open(filename)):
         item = anyjson.deserialize(line)
         fields = item['@fields']
-        
+
         if cross_finger:
             if 'uuid' in fields:
                 uuid = fields['uuid']
