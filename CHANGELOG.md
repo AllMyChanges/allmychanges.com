@@ -1,3 +1,15 @@
+0.12.3 (2014-11-22)
+===================
+
+* Fixed error when file with .md extension could be considered having a reST format.
+  This caused wrong changelog parsing for [Ansible][]
+* Improved discovery of unreleased versions.
+  Now we have a special checker which compares if latest version hasn't a release
+  date but few  previous have. In this case, version without a date considered unreleased.
+  This could be checked on the same project — [Ansible][]. It's maintainers add
+  new feature and bugs description in a changelog and when they decide to ship a new
+  version, they just specify a release date. Currently they are working on [1.8][ansible-1.8] version.
+  
 0.12.2 (2014-11-22)
 ===================
 
@@ -384,3 +396,5 @@ There are plenty directions for approvement. Stay tuned.
 [sbcl]: http://allmychanges.com/p/common-lisp/sbcl/
 [haproxy]: http://allmychanges.com/p/soft/haproxy/
 [celery-changelog]: http://allmychanges.com/p/python/celery/
+[Ansible]: http://allmychanges.com/p/python/ansible/
+[ansible-1.8]: http://allmychanges.com/p/python/ansible/#1.8
