@@ -9,7 +9,6 @@ from django.utils import timezone
 from allmychanges.utils import discard_seconds
 from allmychanges.exceptions import (
     UpdateError)
-from allmychanges.vcs_extractor import extract_changelog_from_vcs
 from allmychanges.crawler import search_changelog
 from allmychanges.crawler import parse_changelog
 from sortedcontainers import SortedSet
@@ -36,7 +35,7 @@ def fill_missing_dates(raw_data):
     is a now() - month and act like we have it.
     """
     result = []
-    today = discard_seconds(datetime.datetime.utcnow())
+    today = discard_seconds(timezone.now())
     month = datetime.timedelta(30)
     current_date = None
 
@@ -74,7 +73,7 @@ def fill_missing_dates2(raw_data):
     is a now() - month and act like we have it.
     """
     result = []
-    today = discard_seconds(datetime.datetime.utcnow())
+    today = discard_seconds(timezone.now())
     month = datetime.timedelta(30)
     current_date = None
 

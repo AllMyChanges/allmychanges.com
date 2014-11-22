@@ -1,6 +1,6 @@
 # coding: utf-8
 import anyjson
-import datetime
+import arrow
 import os
 import re
 import string
@@ -190,7 +190,9 @@ def show_debug_toolbar(request):
 
 
 def discard_seconds(dt):
-    return datetime.datetime(*dt.timetuple()[:5])
+    dt = arrow.get(dt)
+    dt = dt.replace(second=0, microsecond=0)
+    return dt.datetime
 
 
 def dt_in_window(tz, system_time, hour):

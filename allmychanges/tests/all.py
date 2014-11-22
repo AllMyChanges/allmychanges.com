@@ -253,9 +253,8 @@ def test_source_guesser():
 
 
 def test_filling_missing_dates_when_there_arent_any_dates():
-    from datetime import datetime
     from datetime import timedelta
-    today = discard_seconds(datetime.utcnow())
+    today = discard_seconds(timezone.now())
     month = timedelta(30)
     env = Environment()
     item = lambda dt: env.push(discovered_at=dt)
