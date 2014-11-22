@@ -1,3 +1,8 @@
+0.12.1 (2014-11-22)
+===================
+
+* Critical error was fixed, when all changelog's version were deleted before each update scheduling.
+
 0.12.0 (2014-11-22)
 ===================
 
