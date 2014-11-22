@@ -141,18 +141,6 @@ def schedule_updates(reschedule=False, packages=[]):
     for changelog in changelogs:
         changelog.schedule_update()
 
-    delete_empty_changelogs.delay()
-
-
-@singletone()
-@job
-@transaction.atomic
-def delete_empty_changelogs():
-    from .models import Changelog
-    Changelog.objects.annotate(Count('packages'), Count('versions')) \
-                     .filter(packages__count=0, versions__count=0) \
-                     .delete()
-
 
 
 @singletone()
@@ -264,8 +252,8 @@ def update_changelog_task(source):
         log.info('Starting task')
         try:
             from .models import Changelog
-            preview = Changelog.objects.get(source=source)
-            update_preview_or_changelog(preview)
+            changelog = Changelog.objects.get(source=source)
+            update_preview_or_changelog(changelog)
         finally:
             log.info('Task done')
 
