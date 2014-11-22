@@ -3,6 +3,7 @@ import datetime
 import copy
 import logging
 import shutil
+import arrow
 
 from django.utils import timezone
 from allmychanges.utils import discard_seconds
@@ -13,6 +14,14 @@ from allmychanges.crawler import search_changelog
 from allmychanges.crawler import parse_changelog
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
+
+
+def has_tzinfo(obj):
+    return getattr(obj, 'tzinfo', None) is not None
+
+
+def add_tzinfo(obj):
+    return arrow.get(obj).datetime
 
 
 # TODO: remove
@@ -46,6 +55,8 @@ def fill_missing_dates(raw_data):
         else:
             current_date = item['date']
             item['discovered_at'] = current_date
+
+        item['discovered_at'] = add_tzinfo(item['discovered_at'])
         result.append(item)
 
     result.reverse()
@@ -82,6 +93,8 @@ def fill_missing_dates2(raw_data):
         else:
             current_date = item.date
             item.discovered_at = current_date
+
+        item.discovered_at = add_tzinfo(item.discovered_at)
         result.append(item)
 
     result.reverse()
