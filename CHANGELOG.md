@@ -1,3 +1,8 @@
+0.12.2 (2014-11-22)
+===================
+
+* Now VCS history extractor uses a new pipelined workflow and items' labels were fixed.
+
 0.12.1 (2014-11-22)
 ===================
 
