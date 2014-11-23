@@ -706,7 +706,13 @@ def vcs_processing_pipe(*args, **kwargs):
     processors = dict(directory=get_versions_from_vcs,
                       almost_version=extract_metadata,
                       prerender_items=prerender_items)
-    return _processing_pipe(processors, *args, **kwargs)
+    versions = _processing_pipe(processors, *args, **kwargs)
+
+    # don't show single unreleased version because it means we found nothing
+    if len(versions) == 1 and versions[0].unreleased:
+        versions = []
+
+    return versions
 
 
 def _processing_pipe(processors, root, ignore_list=[], search_list=[]):

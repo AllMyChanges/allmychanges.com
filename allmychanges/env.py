@@ -1,7 +1,7 @@
 class Environment(object):
-    def __init__(self, parent=None):
-        self.__dict__['_parent'] = parent
-        self.__dict__['_data'] = {}
+    def __init__(self, _parent=None, **kwargs):
+        self.__dict__['_parent'] = _parent
+        self.__dict__['_data'] = kwargs.copy()
 
     def __getattr__(self, name):
         if name in self._data:
@@ -38,9 +38,7 @@ class Environment(object):
             getattr(self, 'type', 'unknown'), ', '.join(attrs))
 
     def push(self, **kwargs):
-        new_env = Environment(self)
-        for key, value in kwargs.items():
-            setattr(new_env, key, value)
+        new_env = Environment(_parent=self, **kwargs)
         return new_env
 
     def keys(self):

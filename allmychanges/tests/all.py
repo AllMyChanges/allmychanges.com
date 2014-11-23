@@ -21,9 +21,7 @@ from allmychanges.utils import (
 from allmychanges.downloader import fake_downloader
 from allmychanges.changelog_updater import (
     update_changelog_from_raw_data,
-    fill_missing_dates2,
-    update_changelog)
-from allmychanges.vcs_extractor import extract_changelog_from_vcs
+    fill_missing_dates2)
 from allmychanges.parsing.pipeline import get_files
 from allmychanges.env  import Environment
 
@@ -191,43 +189,6 @@ def test_get_env_keys():
             .push(bar=2) \
             .push(baz=3) \
             .keys())
-
-
-def test_extract_from_vcs():
-    date = datetime.date
-    raw_data = extract_changelog_from_vcs(
-        [(None,    date(2014, 1, 15), 'Initial commit'),
-         (None,    date(2014, 1, 15), 'Feature was added'),
-         ('0.1.0', date(2014, 1, 16), 'Tests were added'),
-         (None,    date(2014, 2, 9),  'Repackaging'), # such gaps should be considered
-                                                      # as having previous version
-         ('0.2.0', date(2014, 2, 10), 'Some new functions'),
-         ('0.2.0', date(2014, 2, 11), 'Other feature'),
-         ('0.3.0', date(2014, 2, 14), 'Version bump'),
-         ('0.3.0', date(2014, 3, 20), 'First unreleased feature'),
-         ('0.3.0', date(2014, 3, 21), 'Second unreleased feature')])
-
-    eq_([{'version': '0.1.0',
-          'date': date(2014, 1, 16),
-          'sections': [{'items': ['Initial commit',
-                                  'Feature was added',
-                                  'Tests were added']}]},
-         {'version': '0.2.0',
-          'date': date(2014, 2, 10),
-          'sections': [{'items': ['Repackaging',
-                                  'Some new functions']}]},
-         {'version': '0.3.0',
-          'date': date(2014, 2, 14),
-          'sections': [{'items': ['Other feature',
-                                  'Version bump']}]},
-         {'version': 'x.x.x',
-          'unreleased': True,
-          'date': date(2014, 3, 21),
-          'sections': [{'items': ['First unreleased feature',
-                                  'Second unreleased feature']}]},
-     ],
-
-        raw_data)
 
 
 def test_source_guesser():

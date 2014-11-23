@@ -7,7 +7,6 @@ import sys
 
 from allmychanges.utils import cd
 from allmychanges.crawler import _extract_date
-from allmychanges.exceptions import UpdateError
 
 
 def git_history_extractor(path):
@@ -163,6 +162,6 @@ def extract_changelog_from_vcs(path):
                         'sections': [{'items': current_commits}]})
 
     if len(results) < 2:
-        raise UpdateError('Unable to extract versions from VCS history')
+        return []
 
     return results

@@ -7,3 +7,4 @@ from .downloader import *
 from .issues import *
 from .pipeline import *
 from .preview import *
+from .vcs import *
