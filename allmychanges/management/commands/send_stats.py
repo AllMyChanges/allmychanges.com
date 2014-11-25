@@ -92,7 +92,7 @@ def get_stats():
     stats['crawler.stale.packages.seconds-behind'] = seconds_behind
 
     last_updates = Changelog.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(0, 60 * 60)).values_list('last_update_took', flat=True)
-    stats['crawler.last_update_took.average'] = float(sum(last_updates)) / len(last_updates)
+    stats['crawler.last_update_took.average'] = float(sum(last_updates)) / len(last_updates) if last_updates else 0
 
 
     return stats
