@@ -426,7 +426,6 @@ def update_preview_or_changelog(obj):
             except UpdateError as e:
                 problem = u', '.join(e.args)
                 log.trace().error('Unable to update changelog')
-                raise
             except Exception as e:
                 problem = unicode(e)
                 log.trace().error('Unable to update changelog')
