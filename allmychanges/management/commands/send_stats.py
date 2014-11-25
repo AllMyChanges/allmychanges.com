@@ -79,6 +79,18 @@ def get_stats():
         code_version='v2',
         discovered_at__gte=minute_ago).count()
 
+    # if package wasn't updated within 10 minutes from planned time
+    # it is considered stale
+    # because 10 minutes is job timeout and this is means that it will
+    # never be updated
+    stale_margin = timezone.now() - datetime.timedelta(0, 10 * 60)
+    stale = Changelog.objects.filter(next_update_at__lte=stale_margin)
+    stats['crawler.stale.packages.count'] = stale.count()
+
+    next_update_times = stale.values_list('next_update_at', flat=True)
+    seconds_behind = sum((stale_margin - time).total_seconds() for time in next_update_times)
+    stats['crawler.stale.packages.seconds-behind'] = seconds_behind
+
     last_updates = Changelog.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(0, 60 * 60)).values_list('last_update_took', flat=True)
     stats['crawler.last_update_took.average'] = float(sum(last_updates)) / len(last_updates)
 
