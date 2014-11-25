@@ -547,19 +547,25 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         return result
 
     def schedule_update(self, async=True, full=False):
-        self.set_status('processing')
-        self.set_processing_status('waiting-in-the-queue')
+        with log.fields(changelog_name=self.name,
+                        changelog_namespace=self.namespace,
+                        async=async,
+                        full=full):
+            log.info('Scheduling changelog update')
 
-        self.problem = None
-        self.save()
+            self.set_status('processing')
+            self.set_processing_status('waiting-in-the-queue')
 
-        if full:
-            self.versions.all().delete()
+            self.problem = None
+            self.save()
 
-        if async:
-            update_changelog_task.delay(self.source)
-        else:
-            update_changelog_task(self.source)
+            if full:
+                self.versions.all().delete()
+
+            if async:
+                update_changelog_task.delay(self.source)
+            else:
+                update_changelog_task(self.source)
 
 
 
