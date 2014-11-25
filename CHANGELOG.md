@@ -1,3 +1,8 @@
+0.12.4 (2014-11-25)
+===================
+
+* Fixed issue when newly added packages were not updated regularly.
+
 0.12.3 (2014-11-22)
 ===================
 
