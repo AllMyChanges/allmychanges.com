@@ -164,6 +164,7 @@ class Repo(models.Model):
 
     @classmethod
     def start_changelog_processing_for_url(cls, url):
+        # TODO: remove
         repo, is_created = Repo.objects.get_or_create(url=url)
         repo.requested_count += 1
         if is_created:
@@ -173,6 +174,7 @@ class Repo(models.Model):
         return repo
 
     def start_processing_if_needed(self):
+        # TODO: remove
         if self.is_need_processing:
             self.start_changelog_processing()
             return True
@@ -181,6 +183,7 @@ class Repo(models.Model):
 
     @property
     def is_need_processing(self):
+        # TODO: remove
         if self.processing_state == 'ready_for_job':
             return True
         elif not self.processing_date_started:
@@ -197,10 +200,12 @@ class Repo(models.Model):
             return False
 
     def is_processing_started_more_than_minutes_ago(self, minutes):
+        # TODO: remove
         return timezone.now() > (self.processing_date_started +
                         datetime.timedelta(minutes=minutes))
 
     def start_changelog_processing(self):
+        # TODO: remove
         self.processing_state = 'ready_for_job'
         self.processing_status_message = 'Ready for job'
         self.processing_progress = 10
@@ -209,7 +214,7 @@ class Repo(models.Model):
 
     def _update(self):
         """Updates changelog (usually in background)."""
-        # TODO: I suppose this method is not used anymore
+        # TODO: remove
         self.processing_state = 'in_progress'
         self.processing_status_message = 'Downloading code'
         self.processing_progress = 50
@@ -248,6 +253,7 @@ class Repo(models.Model):
             raise
 
     def _update_from_git_log(self, path):
+        # TODO: remove
         progress = self.processing_progress
         progress_on_this_step = 30
 
@@ -261,6 +267,7 @@ class Repo(models.Model):
             self._update_from_changes(changes)
 
     def _update_from_filename(self, filename):
+        # TODO: remove
         with open(filename) as f:
             self.changelog_markup = get_markup_type(filename)
             self.processing_status_message = 'Parsing changelog'
@@ -270,6 +277,7 @@ class Repo(models.Model):
             self._update_from_changes(changes)
 
     def _update_from_changes(self, changes):
+        # TODO: remove
         """Update changelog in database, taking data
         from python-structured changelog."""
         self.title = get_package_metadata('.', 'Name')
@@ -409,6 +417,7 @@ class Downloadable(object):
 class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
     source = models.URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # TODO: remove
     processing_started_at = models.DateTimeField(blank=True, null=True)
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',

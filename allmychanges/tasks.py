@@ -116,20 +116,10 @@ def update_repo(repo_id):
 def schedule_updates(reschedule=False, packages=[]):
     from .models import Changelog
 
-    stale_changelogs = Changelog.objects.filter(
-        processing_started_at__lt=timezone.now() - datetime.timedelta(0, 60 * 60))
-
-    num_stale = len(stale_changelogs)
-
-    if num_stale > 0:
-        log.info('{0} stale changelogs were found', num_stale)
-        count('task.schedule_updates.stale.count', num_stale)
-        stale_changelogs.update(processing_started_at=None)
-
     if packages:
-        changelogs = Changelog.objects.filter(packages__name__in=packages).distinct()
+        changelogs = Changelog.objects.filter(name__in=packages).distinct()
     else:
-        changelogs = Changelog.objects.annotate(Count('packages')).filter(packages__count__gt=0)
+        changelogs = Changelog.objects.all()
 
     if not reschedule:
         changelogs = changelogs.filter(next_update_at__lte=timezone.now())
