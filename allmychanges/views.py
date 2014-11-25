@@ -24,6 +24,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from twiggy_goodies.threading import log
 
 from allmychanges.models import (Package,
+                                 Issue,
                                  LightModerator,
                                  Subscription,
                                  Changelog,
@@ -886,3 +887,40 @@ class IndexView(CommonContextMixin, TemplateView):
             return ['allmychanges/login-index.html']
 
         return ['allmychanges/new-index.html']
+
+
+class IssuesFilterForm(forms.Form):
+    page_size = forms.IntegerField(required=False)
+    namespace = forms.CharField(required=False)
+    name = forms.CharField(required=False)
+    type = forms.CharField(required=False)
+
+
+class IssuesView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/issues.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(IssuesView, self).get_context_data(**kwargs)
+        queryset = Issue.objects.filter(resolved_at=None).order_by('-id')
+
+        page_size = 5
+        form = IssuesFilterForm(self.request.GET, initial={'page_size': page_size})
+
+        if form.is_valid():
+            page_size = form.cleaned_data['page_size']
+
+            if form.cleaned_data['namespace']:
+                queryset = queryset.filter(changelog__namespace=form.cleaned_data['namespace'])
+            if form.cleaned_data['name']:
+                queryset = queryset.filter(changelog__name=form.cleaned_data['name'])
+            if form.cleaned_data['type']:
+                queryset = queryset.filter(type=form.cleaned_data['type'])
+
+        result['issues'] = queryset[:page_size]
+        url = self.request.build_absolute_uri()
+        if not '?' in url:
+            url += '?'
+        else:
+            url += '&'
+        result['current_url'] = url
+        return result

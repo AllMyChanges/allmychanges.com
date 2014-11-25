@@ -1,0 +1,34 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block content %}
+  <h1 class="page-header">Issues</h1>
+  {% if issues %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Package</th>
+          <th>Comment</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for issue in issues %}
+        <tr>
+          <td>#{{ issue.id }}</td>
+          <td>{{ issue.created_at }}</td>
+          <td><a href="{{ current_url }}type={{ issue.type }}">{{ issue.type }}</a></td>
+          <td><a href="{{ current_url }}namespace={{ issue.changelog.namespace }}&name={{ issue.changelog.name }}">{{ issue.changelog.namespace }}/{{ issue.changelog.name }}</a></td>
+          <td>{{ issue.comment }}</td>
+          <td><button class="button">Resolve</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No issues</p>
+  {% endif %}
+{% endblock content %}

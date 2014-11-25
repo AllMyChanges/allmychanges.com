@@ -4,6 +4,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from .views import (OldIndexView,
+                    IssuesView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
@@ -57,6 +58,8 @@ urlpatterns = patterns(
     url(r'^preview/(?P<pk>.*?)/$', PreviewView.as_view(), name='preview'),
 
     url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),
+
+    url(r'^issues/$', IssuesView.as_view(), name='issues'),
 
     url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
