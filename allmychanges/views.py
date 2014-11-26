@@ -398,7 +398,9 @@ class BadgeView(View):
         else:
             version = '?.?.?'
 
-        url = 'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
+        # replacing to dash because repl.ca uses minus as a separator
+        version = version.replace(u'-', u'–')
+        url = u'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
             version)
 
         content = cache.get(url)
