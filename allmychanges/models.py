@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.template.defaultfilters import linebreaksbr, urlize
+import math
 import os
 import datetime
 
@@ -554,6 +555,25 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         key = 'preview-processing-status:{0}'.format(self.id)
         result = cache.get(key, self.processing_status)
         return result
+
+    def calc_next_update_interval(self):
+        """Returns number seconds to sleep before next update.
+        """
+        hour = 60 * 60
+        min_update_interval = hour
+        time_to_next_update = 4 * hour
+        num_trackers = self.trackers.count()
+        time_to_next_update = time_to_next_update / math.log(max(math.e,
+                                                                 num_trackers))
+
+        time_to_next_update = max(min_update_interval,
+                                  time_to_next_update,
+                                  2 * self.last_update_took)
+
+        return timezone.now() + datetime.timedelta(0, time_to_next_update)
+
+    def calc_next_update_if_error(self):
+        return timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
 
     def schedule_update(self, async=True, full=False):
         with log.fields(changelog_name=self.name,

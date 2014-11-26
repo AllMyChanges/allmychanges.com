@@ -249,27 +249,17 @@ def update_changelog_task(source):
             update_preview_or_changelog(changelog)
 
             changelog.last_update_took = (timezone.now() - processing_started_at).seconds
-
-            hour = 60 * 60
-            min_update_interval = hour
-            time_to_next_update = 4 * hour
-            time_to_next_update = time_to_next_update / math.log(max(math.e,
-                                                                     changelog.trackers.count()))
-
-            time_to_next_update = max(min_update_interval,
-                                      time_to_next_update,
-                                      2 * changelog.last_update_took)
-
-            changelog.next_update_at = timezone.now() + datetime.timedelta(0, time_to_next_update)
+            changelog.next_update_at = timezone.now() \
+                                       + datetime.timedelta(
+                                           0,
+                                           changelog.calc_next_update_interval())
             changelog.save()
         except Exception:
             log.trace().error('Error during changelog update')
             error = True
         finally:
             if error or changelog.status == 'error':
-                next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
-                changelog.next_update_at = next_update_if_error
-                changelog.processing_started_at = None
+                changelog.next_update_at = changelog.calc_next_update_if_error()
                 changelog.save()
 
             log.info('Task done')
