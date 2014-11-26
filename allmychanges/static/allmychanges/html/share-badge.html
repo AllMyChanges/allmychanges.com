@@ -1,14 +1,26 @@
-<div class="share-badge">
-      <img class="share-badge__example" src="{{origin}}{{package_url}}/badge/">
-      
-      <textarea readonly="1"  wrap="off" rows="1" ng-if="markdown" class="text-input share-badge__text">[![changelog]({{origin}}{{package_url}}/badge/)]({{origin}}{{package_url}}/?utm_source=badge)</textarea>
-      <textarea readonly="1" wrap="off" rows="2" ng-if="rst" class="text-input share-badge__text">.. image:: {{origin}}{{package_url}}/badge/
-   :target: {{origin}}{{package_url}}/?utm_source=badge</textarea>
-      <textarea readonly="1" wrap="off" rows="1" ng-if="html" class="text-input share-badge__text" type="text">&lt;a href=&quot;{{origin}}{{package_url}}/?utm_source=badge&quot;>&lt;img title=&quot;changelog&quot; src=&quot;{{origin}}{{package_url}}/badge/&quot;/>&lt;/a></textarea>
+<table class="share-badge">
+  <tbody>
+    <tr>
+      <td></td>
+      <td>
+        <ul class="share-badge__tabs">
+          <li ng-class="{tab_active: markdown}" class="tab" ng-click="show('markdown')">markdown</li>
+          <li ng-class="{tab_active: rst}" class="tab" ng-click="show('rst')">reST</li>
+          <li ng-class="{tab_active: html}" class="tab" ng-click="show('html')">html</li>
+        </ul>
+      </td>
+    </tr>
 
-      <ul class="share-badge__tabs">
-        <li ng-class="{tab_active: markdown}" class="tab" ng-click="show('markdown')">markdown</li>
-        <li ng-class="{tab_active: rst}" class="tab" ng-click="show('rst')">reST</a></li>
-        <li ng-class="{tab_active: html}" class="tab" ng-click="show('html')">html</a></li>
-      </ul>
-</div>
+    <tr>
+      <td>
+        <img class="share-badge__example" src="{{origin}}{{package_url}}/badge/">
+      </td>
+      <td>
+        <textarea readonly="1"  wrap="off" rows="1" ng-if="markdown" class="text-input share-badge__text">[![changelog]({{origin}}{{package_url}}/badge/)]({{origin}}{{package_url}}/?utm_source=badge)</textarea>
+        <textarea readonly="1" wrap="off" rows="2" ng-if="rst" class="text-input share-badge__text">.. image:: {{origin}}{{package_url}}/badge/
+   :target: {{origin}}{{package_url}}/?utm_source=badge</textarea>
+        <textarea readonly="1" wrap="off" rows="1" ng-if="html" class="text-input share-badge__text" type="text">&lt;a href=&quot;{{origin}}{{package_url}}/?utm_source=badge&quot;>&lt;img title=&quot;changelog&quot; src=&quot;{{origin}}{{package_url}}/badge/&quot;/>&lt;/a></textarea>
+      </td>
+    </tr>
+  </tbody>
+</table>
