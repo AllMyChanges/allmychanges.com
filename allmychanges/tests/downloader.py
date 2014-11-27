@@ -8,7 +8,7 @@ from nose.tools import eq_
 from unittest.case import skip
 
 
-#@skip
+@skip
 def test_guesser():
     def guess(url):
         start = time.time()

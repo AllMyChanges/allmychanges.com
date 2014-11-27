@@ -1,8 +1,12 @@
+# coding: utf-8
 from nose.tools import eq_
 from allmychanges.models import Changelog
 from .utils import create_user
 from allmychanges.changelog_updater import (
     update_changelog)
+from allmychanges.env import Environment
+from allmychanges.parsing.pipeline import parse_html_file
+
 
 def test_update_package_using_full_pipeline():
     art = create_user('art')
@@ -18,3 +22,55 @@ def test_update_package_using_full_pipeline():
         versions[0].sections.all()[0].items.all()[0].text)
     eq_('<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.',
         versions[1].sections.all()[0].items.all()[0].text)
+
+
+def test_html_parser():
+    env = Environment(filename='Changelog',
+                      content="""
+<div class="markdown-body">
+<h2>
+<a id="user-content-v021" class="anchor" href="#v021" aria-hidden="true"><span class="octicon octicon-link"></span></a><sub>v0.2.1</sub>
+</h2>
+
+<h4>
+<a id="user-content-may-24-2012--diff--docs" class="anchor" href="#may-24-2012--diff--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>May 24, 2012</em> — <a href="https://github.com/lodash/lodash/compare/0.2.0...0.2.1">Diff</a> — <a href="https://github.com/lodash/lodash/blob/0.2.1/doc/README.md">Docs</a>
+</h4>
+
+<ul class="task-list">
+<li>Adjusted the Lo-Dash export order for r.js</li>
+<li>Ensured <code>_.groupBy</code> values are added to own, not inherited, properties</li>
+<li>Made <code>_.bind</code> follow ES5 spec to support a popular Backbone.js pattern</li>
+<li>Removed the alias <code>_.intersect</code>
+</li>
+<li>Simplified <code>_.bind</code>, <code>_.flatten</code>, <code>_.groupBy</code>, <code>_.max</code>, &amp; <code>_.min</code>
+</li>
+</ul>
+
+<h2>
+<a id="user-content-v010" class="anchor" href="#v010" aria-hidden="true"><span class="octicon octicon-link"></span></a><sub>v0.1.0</sub>
+</h2>
+
+<h4>
+<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> — <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>
+</h4>
+
+<ul class="task-list">
+<li>Initial release</li>
+</ul>
+
+    </div>
+                      """)
+
+    sections = list(parse_html_file(env))
+    eq_(5, len(sections))
+
+    eq_(['Changelog',
+         'v0.2.1',
+         u'May 24, 2012 \xe2\x80\x94 Diff \xe2\x80\x94 Docs',
+         'v0.1.0',
+         u'Apr. 23, 2012 \xe2\x80\x94 Docs'],
+        [s.title for s in sections])
+
+    eq_(['<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#226;&#128;&#148; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>',
+         ['Initial release']],
+        sections[3].content)

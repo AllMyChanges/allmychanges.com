@@ -382,6 +382,9 @@ get_section_content = itemgetter('content')
 
 
 def parse_html_file(obj):
+    """
+    Uses fields `content` and `filename` to generate new file_sections.
+    """
     parsed = lxml.html.document_fromstring(obj.content)
     headers = [tag for tag in parsed.iter()
                if tag.tag in ('h1', 'h2', 'h3', 'h4')]
@@ -434,7 +437,7 @@ def parse_html_file(obj):
             all_children)
         sections = list(create_notes(children))
         yield obj.push(type='file_section',
-                       title=text,
+                       title=text.strip(),
                        content=sections)
 
 
