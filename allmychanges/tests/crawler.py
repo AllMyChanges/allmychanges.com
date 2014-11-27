@@ -200,6 +200,8 @@ def test_extract_date():
     eq_(None, _extract_date('2009-05/23'))
 
 
+    # https://github.com/lodash/lodash/wiki/Changelog#aug-17-2012--diff--docs
+    eq_(date(2012, 8, 17), _extract_date('Aug. 17, 2012'))
     eq_(date(2009, 5, 23), _extract_date('2009-05-23'))
     eq_(date(2009, 5, 23), _extract_date('2009-5-23'))
     eq_(date(2009, 5, 3), _extract_date('2009-05-03'))

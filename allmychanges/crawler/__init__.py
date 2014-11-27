@@ -7,7 +7,15 @@ from html2text import html2text
 #RE_DATE = re.compile(r'(.*\s|\s?|.*\()(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')
 _months = ('January', 'February', 'March', 'April', 'May', 'June',
            'July', 'August', 'September', 'October', 'November', 'December')
-_months = _months + tuple(name[:3] for name in _months)
+
+def abbr_month(name):
+    if len(name) > 3:
+        return name[:3] + '.'
+    return name
+
+_months = _months \
+          + tuple(name[:3] for name in _months) \
+          + tuple(abbr_month(name) for name in _months)
 
 RE_DATE_STR = r"""(?P<date>(
               # 2009-05-23, 2009.05.23, 2009/05/23 but not 2009.05-23
@@ -22,6 +30,7 @@ RE_DATE_STR = r"""(?P<date>(
               # May 23rd 2014
               # April 28, 2014
               # Apr 01, 2013
+              # Aug. 17, 2012
               \month[ ]+\d{1,2}(rd|st|rd|th)?,?\ \d{4} |
 
               # Fri Aug  8 19:12:51 PDT 2014
