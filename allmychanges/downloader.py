@@ -26,7 +26,7 @@ def normalize_url(url, for_checkout=True):
     url = url.replace('git+', '')
 
     if 'github' in url:
-        regex = r'github.com[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]+?)(?:\.git$|/$|$)'
+        regex = r'github.com[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]+?)(?:\.git$|/$|/tree/master$|$)'
         match = re.search(regex, url)
         if match is None:
             # some url to a raw file or github wiki

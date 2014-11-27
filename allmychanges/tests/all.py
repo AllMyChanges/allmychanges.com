@@ -208,7 +208,7 @@ def test_source_guesser():
 
         eq_(['https://github.com/alex/django-filter',
              'https://bitbucket.org/antocuni/pdb',
-             'https://github.com/tony/tmuxp'],
+             'https://raw.github.com/tony/tmuxp/master/doc/_static/tmuxp-dev-screenshot.png'],
             urls)
 
 
