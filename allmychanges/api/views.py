@@ -260,8 +260,19 @@ class ChangelogViewSet(HandleExceptionMixin,
                 queryset = queryset.filter(name=name)
             return queryset
 
+    def get_object(self, *args, **kwargs):
+        obj = super(ChangelogViewSet, self).get_object(*args, **kwargs)
+        # saving to be able to check in `update` if the source was changed
+        self.original_source = obj.source
+        return obj
+
     def update(self, *args, **kwargs):
         response = super(ChangelogViewSet, self).update(*args, **kwargs)
+
+        if self.original_source != self.object.source:
+            self.object.downloader = None
+            self.object.save(update_fields=('downloader',))
+
         result = self.object.add_to_moderators(self.request.user,
                                                self.request.light_user)
         if result:

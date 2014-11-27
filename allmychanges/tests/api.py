@@ -86,6 +86,41 @@ def test_put_does_not_affect_created_at_field():
     eq_(created_at, Changelog.objects.get(pk=changelog.pk).created_at)
 
 
+def test_put_drops_cached_downloader_type():
+    cl = Client()
+
+    create_user('art')
+    cl.login(username='art', password='art')
+
+    source = 'https://github.com/pip/pip'
+    changelog = Changelog.objects.create(namespace='python',
+                                         name='pip',
+                                         source=source)
+    changelog.downloader = 'git'
+    changelog.save()
+
+    # first try not changing source
+    response = cl.put('/v1/changelogs/{0}/'.format(changelog.id),
+                      anyjson.serialize(dict(namespace='python',
+                                             name='pip',
+                                             source=source)),
+                      content_type='application/json')
+
+    check_status_code(200, response)
+    eq_('git', Changelog.objects.get(pk=changelog.pk).downloader)
+
+    # now, update the source
+    new_source = 'https://github.com/pipa/pip/wiki/Changelog'
+    response = cl.put('/v1/changelogs/{0}/'.format(changelog.id),
+                      anyjson.serialize(dict(namespace='python',
+                                             name='pip',
+                                             source=new_source)),
+                      content_type='application/json')
+
+    check_status_code(200, response)
+    # in this case we should drop downloader field to be guessed on next update
+    eq_(None, Changelog.objects.get(pk=changelog.pk).downloader)
+
 
 class TransactionTests(TestCase):
 #    use_transaction_isolation = False
