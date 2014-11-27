@@ -1,3 +1,11 @@
+0.12.5 (2014-11-27)
+===================
+
+* Fixed date parsing for cases like in
+  [Synology's Disk Station's log](http://allmychanges.com/p/soft/synology-DS209j/),
+  where version numbers like 4.2-3252 were parsed as dates.
+* Fixed graphic badge generation for version with minus sign in them like `2.3-pre`.
+
 0.12.4 (2014-11-25)
 ===================
 
