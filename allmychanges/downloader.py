@@ -177,7 +177,12 @@ def guess_downloader(url):
     parts = urlsplit(url)
 
     if parts.hostname == 'github.com':
-        return 'git'
+        url, username, repo = normalize_url(url)
+        if username and repo:
+            # then we sure it is a git repo
+            # otherwise, we have to try downloaders one after another
+            return 'git'
+
     if url.startswith('test+'):
         return 'fake'
 

@@ -8,7 +8,7 @@ from nose.tools import eq_
 from unittest.case import skip
 
 
-@skip
+#@skip
 def test_guesser():
     def guess(url):
         start = time.time()
@@ -17,6 +17,7 @@ def test_guesser():
             result, url, time.time() - start)
         return result
 
+    eq_('http', guess('https://github.com/lodash/lodash/wiki/Changelog'))
     eq_('git', guess('https://github.com/svetlyak40wt/django-fields'))
     eq_('git', guess('git://code.call-cc.org/chicken-core'))
     eq_('git', guess('http://git.haproxy.org/git/haproxy.git/'))
