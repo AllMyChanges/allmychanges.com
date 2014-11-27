@@ -855,6 +855,10 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
                 parse_list(data.get('search_list', '')))
             preview.set_ignore_list(
                 parse_list(data.get('ignore_list', '')))
+
+            if preview.source != data.get('source'):
+                preview.downloader = None
+
             preview.source = data.get('source')
             preview.set_status('processing')
             preview.save()
