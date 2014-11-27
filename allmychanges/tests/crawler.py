@@ -256,6 +256,8 @@ def test_starts_with_ident():
 
 
 def test_url_normalization():
+    eq_(('https://github.com/lodash/lodash/wiki/Changelog', None, None),
+        normalize_url('https://github.com/lodash/lodash/wiki/Changelog'))
     eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),
         normalize_url('https://github.com/svetlyak40wt/blah'))
     eq_(('git://github.com/svetlyak40wt/blah', 'svetlyak40wt', 'blah'),

@@ -26,13 +26,17 @@ def normalize_url(url, for_checkout=True):
     url = url.replace('git+', '')
 
     if 'github' in url:
-        regex = r'[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>.*?)(?:\.git|/|$)'
+        regex = r'github.com[/:](?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]+?)(?:\.git$|/$|$)'
         match = re.search(regex, url)
-        if match is not None:
+        if match is None:
+            # some url to a raw file or github wiki
+            return (url, None, None)
+        else:
             username, repo = match.groups()
             return (github_template.format(**locals()),
                     username,
                     repo)
+
 
     elif 'bitbucket' in url:
         regex = r'bitbucket.org/(?P<username>[A-Za-z0-9-_]+)/(?P<repo>[^/]*)'
