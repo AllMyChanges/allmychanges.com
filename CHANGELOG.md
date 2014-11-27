@@ -5,6 +5,7 @@
   [Synology's Disk Station's log](http://allmychanges.com/p/soft/synology-DS209j/),
   where version numbers like 4.2-3252 were parsed as dates.
 * Fixed graphic badge generation for version with minus sign in them like `2.3-pre`.
+* Now links to github's wiki or direct links to a raw files could be used as a changelog's source.
 
 0.12.4 (2014-11-25)
 ===================
