@@ -31,9 +31,13 @@ def load_data(filename):
     return data
 
 
-def first(iterable):
+def first(iterable, default=None):
+    """Returns first item or `default`."""
     iterator = iter(iterable)
-    return iterator.next()
+    try:
+        return iterator.next()
+    except StopIteration:
+        return default
 
 
 @contextmanager

@@ -16,7 +16,7 @@ from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
 
 from allmychanges.crawler import _extract_version, _extract_date
-from allmychanges.utils import get_change_type, strip_long_text
+from allmychanges.utils import get_change_type, strip_long_text, first
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -447,7 +447,7 @@ get_file_content = itemgetter('content')
 
 def get_markup(filename, content):
     filename = filename.lower()
-    content_head = content[:1000].lower()
+    content_head = content[:1000].lower().strip()
 
     if filename.endswith('.rst'):
         return 'rst'
@@ -533,14 +533,13 @@ def extract_metadata(version):
                 return True
         return False
 
-    all_dates = _all_dates(itertools.chain([version.title],
-                                           _all_list_items()))
+    all_dates = list(_all_dates(itertools.chain([version.title],
+                                                _all_list_items())))
 
     new_version = version.push(type='prerender_items')
-    try:
-        new_version.date = all_dates.next()
-    except StopIteration:
-        pass
+
+    if all_dates:
+        new_version.date = first(all_dates)
 
     if mention_unreleased(version.title):
         new_version.unreleased = True
@@ -750,8 +749,8 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
 
             try:
                 for item in processor(*args, **kwargs):
-                    # if processor.__name__ in ('get_files', 'prerender_items'):
-                    #     print_(item)
+#                    if processor.__name__ in ('get_files', 'prerender_items'):
+#                    print_(item)
                     yield item
             except JobTimeoutException:
                 raise
