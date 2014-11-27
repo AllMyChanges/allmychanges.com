@@ -5,6 +5,7 @@
   [Synology's Disk Station's log](http://allmychanges.com/p/soft/synology-DS209j/),
   where version numbers like 4.2-3252 were parsed as dates.
 * Fixed date parsing when date contains abbreviated month ending with dot like `Aug. 17, 2012`.
+* Version parser's error was fixed. Previously it parsed `v3.0.0-pre` as `3.0.0`.
 * Strip newlines and spaces from file section's titles when parsing html changelog.
   This fixes [lodash's changelog](https://github.com/lodash/lodash/wiki/Changelog) parsing.
 * Fixed graphic badge generation for version with minus sign in them like `2.3-pre`.

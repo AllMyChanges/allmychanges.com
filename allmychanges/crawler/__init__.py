@@ -106,7 +106,7 @@ _version_regexes = [
     r'/{ver}\.[^\d]',
 ]
 
-_version_regexes = [item.format(ver=r'v?(?P<ver>(\d+\.\d+\.\d+|\d+\.\d+)(-[a-z0-9.]+[0-9])?)')
+_version_regexes = [item.format(ver=r'v?(?P<ver>(\d+\.\d+\.\d+(-[a-z0-9.]+[a-z0-9])?|\d+\.\d+)(-[a-z0-9.]+[a-z0-9])?)')
                     for item in _version_regexes]
 
 

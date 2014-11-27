@@ -164,6 +164,7 @@ Change in a way how unreleased notes are parsed.
 
 
 def test_extract_version():
+    eq_('3.0.0-pre', _extract_version('v3.0.0-pre (wip)'))
     eq_('1.0.12', _extract_version('v1.0.12'))
     eq_('2.0.0-beta.1', _extract_version('2.0.0-beta.1'))
     eq_('2.0.0-beta.1', _extract_version('v2.0.0-beta.1'))
