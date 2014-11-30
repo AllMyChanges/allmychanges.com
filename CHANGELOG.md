@@ -1,3 +1,21 @@
+0.13.0 (2014-11-30)
+===================
+
+An issue reporting was added for packages.
+Use new button "Report" to open popup and fill the issue.
+You will find this button near a package's title.
+
+Please, write about any bugs, problems and inconsistencies, found
+on site. This could be missing or wrong versions, bugs in a text or
+date parsing, etc.
+
+Right now this feature is in it's alfa stage. There is no ability
+to communicate or even view issues you've filed. But we are
+working on improving this feedback tool and will add comments
+and email notifications in near future.
+
+Leave your feedback, it is highly valuable for us.
+
 0.12.5 (2014-11-27)
 ===================
 
