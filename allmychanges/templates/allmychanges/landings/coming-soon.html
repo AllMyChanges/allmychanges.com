@@ -4,12 +4,13 @@
 {% block login-plate %}{% endblock %}
 
 {% block content %}
+  <!-- TODO: remove this page along with styles -->
   <div class="box box_coming-soon">
     <h1 class="page-header page-header_coming-soon">A new version of AllMyChanges.com is coming soon!</h1>
     <form class="form form_large" action="." method="POST">
-      Leave email and we'll drop you a line right before the launch:
+      <p class="large-text">Leave email and we'll drop you a line right before the launch:</p>
 
-      <span class="nowrap"><input name="email" type="text" placeholder="your@email.com" class="text-input {% if form.errors.email %}text-input__error{% endif %}"/> <input type="submit" value="Subscribe!" class="button button_good"/></span>
+      <span class="nowrap"><input name="email" type="text" placeholder="your@email.com" class="text-input {% if form.errors.email %}text-input__error{% endif %}"/> <input type="submit" value="Subscribe!" class="button _good"/></span>
 
       {{ form.come_from }}
       {% csrf_token %}

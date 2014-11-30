@@ -4,7 +4,7 @@
 
 
 {% block content %}
-  <h1 class="page-header">{{package.namespace}}/{{package.name}} <a href="{% url "edit-package" namespace=namespace name=name %}" class="button">Tune</a> <track-button data-changelog="{{package.changelog.id}}" data-already-tracked="{{already_tracked|lower}}"/></h1>
+  <h1 class="page-header">{{package.namespace}}/{{package.name}} <a href="{% url "edit-package" namespace=namespace name=name %}" class="button"><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <track-button data-changelog="{{package.changelog.id}}" data-already-tracked="{{already_tracked|lower}}"/></h1>
   <h2 class="page-subheader"><a href="{% url "digest" %}">Back to the digest</a>, <a href="{{package.source|remove_source_prefix}}">go to sources</a>{% if request.user.username == 'svetlyak40wt' %}
       {% if code_version == 'v1' %}
         <a href="?code_version=v2">New parser</a>

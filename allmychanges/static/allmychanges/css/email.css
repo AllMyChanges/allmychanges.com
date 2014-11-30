@@ -272,8 +272,10 @@ a {
    a:hover { color: green; }
    */
 .form {
-  margin-top: 1em;
-  margin-bottom: 1em;
+  font-size: 15px;
+  font-weight: normal;
+  font-family: proxima-nova, sans-serif;
+  line-height: 20px;
 }
 .form__help {
   color: #808080;
@@ -285,40 +287,56 @@ a {
 .form__layout__right-column {
   padding-bottom: 1.333333333333333em;
 }
-.form_large {
-  font-size: 2em;
-  line-height: 1.333333333333333em;
+.form._large {
+  font-size: 30px;
+  line-height: 40px;
 }
 .label {
   margin-right: 1em;
   white-space: nowrap;
 }
 .text-input,
-.dropdown {
+.select-box,
+.textarea {
   border: 1px solid #808080;
-  font-size: 1em;
-  padding: 0.066666666666667em;
+  font-size: 15px;
+  padding: 3px;
   margin: 0;
+  margin-bottom: 15px;
   width: 100%;
+  box-sizing: border-box;
 }
 .text-input__error,
-.dropdown__error {
+.select-box__error,
+.textarea__error {
   border: 1px solid #ff8080;
 }
+.text-input._large,
+.select-box._large,
+.textarea._large {
+  font-size: 30px;
+}
+.textarea {
+  height: 200px;
+}
 .button {
+  display: inline-block;
+  font-size: 15px;
+  font-family: arial;
+  font-weight: normal;
+  line-height: 15px;
   color: #333;
   background-color: #fff;
+  box-sizing: border-box;
   border: 1px solid #e6e6e6;
   cursor: pointer;
   text-decoration: none;
-  font-size: 0.8em;
-  line-height: 1.583333333333333em;
-  padding-top: 0.083333333333333em;
-  padding-bottom: 0.083333333333333em;
-  padding-left: 0.25em;
-  padding-right: 0.25em;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
   margin: 0;
-  border-radius: 0.166666666666667em;
+  border-radius: 3px;
 }
 .button:hover {
   background-color: #ccc;
@@ -330,45 +348,45 @@ a {
 .button:disabled:hover {
   background-color: #fff;
 }
-.button_good {
+.button._good {
   color: #fff;
   background-color: #5cb85c;
   border-color: #4bad4b;
 }
-.button_good:hover {
+.button._good:hover {
   background-color: #439a43;
 }
-.button_good:disabled {
+.button._good:disabled {
   color: #fff;
   background-color: #aedcae;
   border-color: #ceeace;
 }
-.button_good:disabled:hover {
+.button._good:disabled:hover {
   background-color: #aedcae;
 }
-.button_bad {
+.button._bad {
   color: #fff;
   background-color: #d9534f;
   border-color: #d43b37;
 }
-.button_bad:hover {
+.button._bad:hover {
   background-color: #c32e2a;
 }
-.button_bad:disabled {
+.button._bad:disabled {
   color: #fff;
   background-color: #eca9a7;
   border-color: #f4cbca;
 }
-.button_bad:disabled:hover {
+.button._bad:disabled:hover {
   background-color: #eca9a7;
 }
-.button_medium {
-  font-size: 1em;
-  line-height: 1.266666666666667em;
+.button._medium {
+  font-size: 20px;
+  line-height: 20px;
 }
-.button_large {
-  font-size: 2em;
-  line-height: 1.333333333333333em;
+.button._large {
+  font-size: 30px;
+  line-height: 30px;
 }
 .input {
   margin-top: 16px;
@@ -376,6 +394,9 @@ a {
 .input__error {
   margin-left: 10px;
   color: #f00;
+}
+.form-buttons__back {
+  width: 100%;
 }
 .box {
   background-color: #fff;
@@ -795,7 +816,7 @@ body.email {
 .magic-prompt__submit {
   font-size: 24px;
   line-height: 32px;
-  margin-top: -10px;
+  margin-top: -25px;
   margin-left: 20px;
 }
 .magic-prompt__apply {
@@ -873,4 +894,21 @@ body.email {
 }
 .autocomplete-input {
   width: 100%;
+}
+.dropdown {
+  display: inline-block;
+}
+.report-button {
+  display: inline-block;
+}
+.popup {
+  position: absolute;
+  margin-top: 10px;
+  z-index: 30000;
+  width: 400px;
+  background-color: #fff;
+  padding: 10px;
+  display: block;
+  border: 1px solid #cbcbcb;
+  box-shadow: 0px 10px 20px -4px rgba(0,0,0,0.4);
 }

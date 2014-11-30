@@ -14,6 +14,7 @@ from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
 from allmychanges.models import (Repo, Subscription, Package,
+                                 Issue,
                                  Version,
                                  Changelog, UserHistoryLog)
 
@@ -23,6 +24,7 @@ from allmychanges.api.serializers import (
     CreateChangelogSerializer,
     SubscriptionSerializer,
     ChangelogSerializer,
+    IssueSerializer,
     VersionSerializer,
 )
 from allmychanges.utils import (count,
@@ -227,7 +229,7 @@ class LandingPackageSuggestView(viewsets.ViewSet):
                                      for ch in changelogs]})
 
 
-class OnlyModeratorCouldModify(object):
+class OnlyOwnerCouldModify(object):
     def has_permission(self, request, view, obj=None):
         return True
 
@@ -243,7 +245,7 @@ class ChangelogViewSet(HandleExceptionMixin,
                        viewsets.ModelViewSet):
     serializer_class = ChangelogSerializer
     serializer_detail_class = ChangelogSerializer
-    permission_classes = [OnlyModeratorCouldModify]
+    permission_classes = [OnlyOwnerCouldModify]
     paginate_by = None
     model = Changelog
 
@@ -374,3 +376,27 @@ class MessagesView(viewsets.ViewSet):
                  'tags': m.tags,
                  'message': m.message} for m in storage]
         return Response(msgs)
+
+
+class IssueViewSet(HandleExceptionMixin,
+                   DetailSerializerMixin,
+                   viewsets.ModelViewSet):
+    serializer_detail_class = IssueSerializer
+    permission_classes = [OnlyOwnerCouldModify]
+    paginate_by = 20
+    model = Issue
+
+    def pre_save(self, obj):
+        super(IssueViewSet, self).pre_save(obj)
+        if not obj.light_user:
+            obj.light_user = self.request.light_user
+        if not obj.user and self.request.user.is_authenticated():
+            obj.user = self.request.user
+
+    def post_save(self, obj, created=False):
+        if created:
+            UserHistoryLog.write(
+                self.request.user,
+                self.request.light_user,
+                'create-issue',
+                'Created issue for <changelog:{0}>'.format(obj.changelog_id))

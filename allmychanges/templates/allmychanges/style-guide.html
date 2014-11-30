@@ -125,10 +125,10 @@
 
   <div class="box box_guide">
     <h2 class="page-subheader">A form with large inputs</h2>
-    <form class="form form_large">
+    <form class="form">
       <label for="field">Some field:</label>
-      <input name="field" class="text-input" type="text" value="Blah minor" />
-      <input class="button" type="submit" value="Submit" />
+      <input name="field" class="text-input _large" type="text" value="Blah minor" />
+      <input class="button _large" type="submit" value="Submit" />
     </form>
   </div>
 
@@ -136,15 +136,15 @@
     <h2 class="page-subheader">Colored buttons</h2>
     <form class="form">
       <input class="button" type="submit" value="Generic" />
-      <input class="button button_good" type="submit" value="Good" />
-      <input class="button button_bad" type="submit" value="Bad" />
+      <input class="button _good" type="submit" value="Good" />
+      <input class="button _bad" type="submit" value="Bad" />
     </form>
 
     <h2 class="page-subheader">Colored but disabled buttons</h2>
     <form class="form">
       <input class="button" type="submit" value="Generic" disabled/>
-      <input class="button button_good" type="submit" value="Good" disabled/>
-      <input class="button button_bad" type="submit" value="Bad" disabled/>
+      <input class="button _good" type="submit" value="Good" disabled/>
+      <input class="button _bad" type="submit" value="Bad" disabled/>
     </form>
   </div>
 
@@ -153,21 +153,21 @@
     <h2 class="page-subheader">Different size of buttons</h2>
     <form class="form">
       <input class="button" type="submit" value="Normal" />
-      <input class="button button_medium" type="submit" value="Medium" />
-      <input class="button button_large" type="submit" value="Large" />
+      <input class="button _medium" type="submit" value="Medium" />
+      <input class="button _large" type="submit" value="Large" />
     </form>
   </div>
 
   <div class="box box_guide">
     <h2 class="page-subheader">Link buttons</h2>
       <a href="" class="button">Generic</a>
-      <a href="" class="button button_good">Good</a>
-      <a href="" class="button button_bad">Bad</a>
+      <a href="" class="button _good">Good</a>
+      <a href="" class="button _bad">Bad</a>
     </form>
   </div>
 
   <div class="box box_guide">
-    <h2 class="page-subheader">Complex form with dropdown</h2>
+    <h2 class="page-subheader">Complex form with select box</h2>
 
     <form class="form">
       <table class="form__layout">
@@ -183,7 +183,7 @@
         <tr class="form__layout__row">
           <td class="form__layout__left-column"><label class="label" for="timezone">Timezone:</label></td>
           <td class="form__layout__right-column">
-            <select class="dropdown" name="timezone">
+            <select class="select-box" name="timezone">
               <option value="" selected="selected">---------</option>
               <option value="Africa/Abidjan">Africa/Abidjan</option>
               <option value="Africa/Accra">Africa/Accra</option>
@@ -201,7 +201,7 @@
         <tr class="form__layout__row">
           <td class="form__layout__left-column"></td>
           <td class="form__layout__right-column">
-            <input class="button button_good" type="submit" value="Submit" />
+            <input class="button _good" type="submit" value="Submit" />
           </td>
         </tr>
       </table>

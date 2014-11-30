@@ -8,7 +8,7 @@ from django.test import Client, TestCase
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 
-from allmychanges.models import Package, Changelog
+from allmychanges.models import Package, Changelog, Issue, UserHistoryLog
 from .utils import check_status_code, create_user
 
 # схема урлов
@@ -17,6 +17,12 @@ from .utils import check_status_code, create_user
 # /packages/
 # /package/:namespace/:name/
 
+
+def put_json(cl, url, **data):
+    response = cl.put(url,
+                      anyjson.serialize(data),
+                      content_type='application/json')
+    return response
 
 def setup():
     Package.objects.all().delete()
@@ -75,12 +81,11 @@ def test_put_does_not_affect_created_at_field():
     created_at = Changelog.objects.get(pk=changelog.pk).created_at
 
     time.sleep(1)
-    response = cl.put('/v1/changelogs/{0}/'.format(changelog.id),
-                      anyjson.serialize(dict(namespace='python',
-                                             name='pip',
-                                             source='https://github.com/pipa/pip')),
-                      content_type='application/json')
-
+    response = put_json(cl,
+                        '/v1/changelogs/{0}/'.format(changelog.id),
+                        namespace='python',
+                        name='pip',
+                        source='https://github.com/pipa/pip')
     check_status_code(200, response)
 
     eq_(created_at, Changelog.objects.get(pk=changelog.pk).created_at)
@@ -100,23 +105,21 @@ def test_put_drops_cached_downloader_type():
     changelog.save()
 
     # first try not changing source
-    response = cl.put('/v1/changelogs/{0}/'.format(changelog.id),
-                      anyjson.serialize(dict(namespace='python',
-                                             name='pip',
-                                             source=source)),
-                      content_type='application/json')
-
+    response = put_json(cl,
+                        '/v1/changelogs/{0}/'.format(changelog.id),
+                        namespace='python',
+                        name='pip',
+                        source=source)
     check_status_code(200, response)
     eq_('git', Changelog.objects.get(pk=changelog.pk).downloader)
 
     # now, update the source
     new_source = 'https://github.com/pipa/pip/wiki/Changelog'
-    response = cl.put('/v1/changelogs/{0}/'.format(changelog.id),
-                      anyjson.serialize(dict(namespace='python',
-                                             name='pip',
-                                             source=new_source)),
-                      content_type='application/json')
-
+    response = put_json(cl,
+                        '/v1/changelogs/{0}/'.format(changelog.id),
+                        namespace='python',
+                        name='pip',
+                        source=new_source)
     check_status_code(200, response)
     # in this case we should drop downloader field to be guessed on next update
     eq_(None, Changelog.objects.get(pk=changelog.pk).downloader)
@@ -220,3 +223,74 @@ def test_package_suggest_ignores_tracked_packages():
     data = anyjson.deserialize(response.content)
 
     eq_(1, len(data['results']))
+
+
+def test_anonymous_can_create_an_issue_and_it_is_tied_to_his_light_user():
+    cl = Client()
+    thebot = Changelog.objects.create(name='thebot', namespace='python',
+                                      source='http://github.com/svetlyak40wt/thebot')
+    response = cl.post(reverse('issues-list'),
+                       data={'changelog': thebot.id,
+                             'type': 'other',
+                             'comment': 'The test'})
+    check_status_code(201, response)
+
+    eq_(1, Issue.objects.count())
+    issue = Issue.objects.all()[0]
+    eq_(None, issue.user)
+    assert issue.light_user != None
+
+    eq_(1, UserHistoryLog.objects.filter(
+        light_user=issue.light_user).count())
+
+
+def test_normal_user_can_create_an_issue_and_it_is_tied_to_him():
+    cl = Client()
+    thebot = Changelog.objects.create(name='thebot', namespace='python',
+                                      source='http://github.com/svetlyak40wt/thebot')
+
+    user = create_user('art')
+    cl.login(username='art', password='art')
+
+    response = cl.post(reverse('issues-list'),
+                       data={'changelog': thebot.id,
+                             'type': 'other',
+                             'comment': 'The test'})
+    check_status_code(201, response)
+
+    eq_(1, Issue.objects.count())
+    issue = Issue.objects.all()[0]
+    eq_(user, issue.user)
+    assert issue.light_user != None
+
+    eq_(1, UserHistoryLog.objects.filter(
+        user=user).count())
+
+
+def test_nor_anonymous_nor_normal_user_are_unable_to_update_issue():
+    cl = Client()
+    moderator_bob = create_user('bob')
+    thebot = Changelog.objects.create(name='thebot', namespace='python',
+                                      source='http://github.com/svetlyak40wt/thebot')
+    thebot.add_to_moderators(moderator_bob)
+    issue = thebot.issues.create(type='test', comment='some issue')
+
+    response = put_json(cl,
+                        reverse('issues-detail', kwargs=dict(pk=issue.pk)),
+                        changelog=thebot.id,
+                        type='other',
+                        comment='Changed')
+    check_status_code(403, response)
+
+    user = create_user('art')
+    cl.login(username='art', password='art')
+
+    response = put_json(cl,
+                        reverse('issues-detail', kwargs=dict(pk=issue.pk)),
+                        changelog=thebot.id,
+                        type='other',
+                        comment='Changed')
+    check_status_code(403, response)
+
+    eq_(0, UserHistoryLog.objects.filter(
+        user=user).count())

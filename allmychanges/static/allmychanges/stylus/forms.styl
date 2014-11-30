@@ -1,8 +1,10 @@
 @require "variables"
 
 .form
-    margin-top: 1em
-    margin-bottom: 1em
+    font-size: 15px
+    font-weight: normal
+    font-family: generic-font
+    line-height: 20px
 
     &__help
         color: gray
@@ -14,28 +16,41 @@
         &__right-column
             padding-bottom: (20em / 15)
 
-    &_large
-        font-size: (30em / 15)
-        line-height: (40em / 30) 
+    &._large
+        font-size: 30px
+        line-height: 40px
 
 
 .label
     margin-right: 1em
     white-space: nowrap
 
-.text-input, .dropdown
+.text-input, .select-box, .textarea
     border: 1px solid input-border-color
-    font-size: 1em
-    padding: (1em/15)
+    font-size: 15px
+    padding: 3px
     margin: 0
+    margin-bottom: 15px
     width: 100%;
+    box-sizing: border-box;
     
     &__error
         border: 1px solid (input-border-color + #f00)
+    &._large
+      font-size: 30px
+
+.textarea
+    height: 200px
 
 .button
+    display: inline-block
+    font-size: 15px
+    font-family: arial
+    font-weight: normal
+    line-height: 15px
     color: button-text-color
     background-color: button-color
+    box-sizing: border-box
     border: 1px solid (button-color - 10%)
     cursor: pointer
     &:hover
@@ -49,17 +64,15 @@
 
 
     text-decoration: none
-    font-size: (12em / 15)
-    line-height: (19em / 12)
-    padding-top: (1em / 12)
+    padding-top: 5px
     padding-bottom: @padding-top
-    padding-left: (1em / 4)
+    padding-left: 5px
     padding-right: @padding-left
     margin: 0
 
-    border-radius: (1em / 6)
+    border-radius: 3px
 
-    &_good
+    &._good
         color: good-button-text-color
         background-color: good-button-color
         border-color: (@background-color - 10%)
@@ -74,7 +87,7 @@
                 background-color: @background-color
 
 
-    &_bad
+    &._bad
         color: bad-button-text-color
         background-color: bad-button-color
         border-color: (@background-color - 10%)
@@ -88,18 +101,23 @@
             &:hover
                 background-color: @background-color
 
-    &_medium
-        font-size: (15em / 15)
-        line-height: (19em / 15)
+    &._medium
+        font-size: 20px
+        line-height: 20px
 
-    &_large
-        font-size: (30em / 15)
-        line-height: (40em / 30)
-        
+    &._large
+        font-size: 30px
+        line-height: 30px
 
 
+// it is used on add-new page to display
+// inputs with labels and errors
 .input
     margin-top: 16px
     &__error
         margin-left: 10px
         color: red
+
+
+.form-buttons__back
+    width: 100%

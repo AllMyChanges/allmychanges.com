@@ -72,11 +72,11 @@
        </tr>
        <tr class="ng-cloak">
         <td class="new-package__button-cell" colspan="2">
-          <input type="submit" class="button button_large magic-prompt__apply" value="Update Preview" ng-click="update_preview()" ng-disabled="is_apply_button_disabled()"/>
+          <input type="submit" class="button _large magic-prompt__apply" value="Update Preview" ng-click="update_preview()" ng-disabled="is_apply_button_disabled()"/>
           {% if mode == 'edit' %}
-            <input type="submit" class="button button_good button_large magic-prompt__apply" ng-value="save_button_title" ng-click="save()" ng-disabled="!can_save()"/>
+            <input type="submit" class="button _good _large magic-prompt__apply" ng-value="save_button_title" ng-click="save()" ng-disabled="!can_save()"/>
           {% else %}
-            <input type="submit" class="button button_good button_large magic-prompt__apply" ng-value="save_button_title" ng-click="save_and_track()" ng-disabled="!can_track()"/>
+            <input type="submit" class="button _good _large magic-prompt__apply" ng-value="save_button_title" ng-click="save_and_track()" ng-disabled="!can_track()"/>
           {% endif %}
             <span class="new-package__save-tooltip" ng-show="!can_save() && !saving">Please, update preview to ensure that we able to get some data about this packages's changelog.</span>
         </td>

@@ -609,6 +609,8 @@ class Issue(models.Model):
     """
     changelog = models.ForeignKey(Changelog,
                                   related_name='issues')
+    user = models.ForeignKey(User, blank=True, null=True)
+    light_user = models.CharField(max_length=40, blank=True, null=True)
     type = models.CharField(max_length=40)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -621,6 +623,20 @@ Issue(changelog={self.changelog},
       comment={self.comment},
       created_at={self.created_at},
       resolved_at={self.resolved_at})""".format(self=self).strip()
+
+    @staticmethod
+    def merge(user, light_user):
+        entries = Issue.objects.filter(user=None,
+                                                light_user=light_user)
+        if entries.count() > 0:
+            with log.fields(username=user.username,
+                            num_entries=entries.count(),
+                            light_user=light_user):
+                log.info('Merging issues')
+                entries.update(user=user)
+
+    def editable_by(self, user, light_user=None):
+        return self.changelog.editable_by(user, light_user)
 
 
 class DiscoveryHistory(models.Model):

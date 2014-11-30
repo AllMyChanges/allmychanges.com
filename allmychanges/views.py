@@ -424,6 +424,7 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
         with log.name_and_fields('after-login', username=user.username):
             UserHistoryLog.merge(user, self.request.light_user)
             LightModerator.merge(user, self.request.light_user)
+            Issue.merge(user, self.request.light_user)
 
             if timezone.now() - self.request.user.date_joined < datetime.timedelta(0, 60):
                 # if account was registere no more than minute ago, then show

@@ -12,6 +12,7 @@ from allmychanges.api.views import (
     MessagesView,
     ChangelogViewSet,
     VersionViewSet,
+    IssueViewSet,
     ValidateChangelogName)
 #    PackageViewSet)
 
@@ -23,6 +24,7 @@ router.register(r'subscriptions', SubscriptionViewSet, base_name='repo')
 #xrouter.register(r'packages', PackageViewSet, base_name='package')
 router.register(r'versions', VersionViewSet, base_name='version')
 router.register(r'changelogs', ChangelogViewSet, base_name='changelog')
+router.register(r'issues', IssueViewSet, base_name='issues')
 router.register(r'messages', MessagesView, base_name='messages')
 router.register(r'autocomplete-namespaces', AutocompleteNamespaceView, base_name='autocomplete-namespaces')
 router.register(r'autocomplete-package-name', AutocompletePackageNameView, base_name='autocomplete-package-name')

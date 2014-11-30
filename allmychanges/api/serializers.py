@@ -9,6 +9,7 @@ from allmychanges.models import (
     Subscription,
     Version,
     Changelog,
+    Issue,
     Package)
 
 
@@ -156,3 +157,8 @@ class ChangelogSerializer(serializers.ModelSerializer):
 class VersionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Version
+
+
+class IssueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Issue
