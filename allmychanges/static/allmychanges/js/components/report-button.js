@@ -55,9 +55,11 @@ module.exports = React.createClass({
                   <label htmlFor="type">Problem type:</label>
                   <select className="select-box" ref="type" placeholder="Some issue type">
                     <option value="other">---</option>
-                    <option value="version-missing">Version is missing</option>
-                    <option value="wrong-version">Wrong version</option>
-                    <option value="other">Other</option>
+                    <option value="version-missing">Some version is missing</option>
+                    <option value="wrong-version">I found version which is wrong</option>
+                    <option value="wrong-dates">There is some problem with dates</option>
+                    <option value="wrong-version-content">A problem with content parsing</option>
+                    <option value="other">Other issue</option>
                   </select><br/>
                   <textarea className="textarea" ref="comment" placeholder="Please, describe issue here"></textarea><br/>
                   <table className="form-buttons">

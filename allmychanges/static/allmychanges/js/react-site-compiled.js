@@ -145,9 +145,11 @@
 	                  React.createElement("label", {htmlFor: "type"}, "Problem type:"), 
 	                  React.createElement("select", {className: "select-box", ref: "type", placeholder: "Some issue type"}, 
 	                    React.createElement("option", {value: "other"}, "---"), 
-	                    React.createElement("option", {value: "version-missing"}, "Version is missing"), 
-	                    React.createElement("option", {value: "wrong-version"}, "Wrong version"), 
-	                    React.createElement("option", {value: "other"}, "Other")
+	                    React.createElement("option", {value: "version-missing"}, "Some version is missing"), 
+	                    React.createElement("option", {value: "wrong-version"}, "I found version which is wrong"), 
+	                    React.createElement("option", {value: "wrong-dates"}, "There is some problem with dates"), 
+	                    React.createElement("option", {value: "wrong-version-content"}, "A problem with content parsing"), 
+	                    React.createElement("option", {value: "other"}, "Other issue")
 	                  ), React.createElement("br", null), 
 	                  React.createElement("textarea", {className: "textarea", ref: "comment", placeholder: "Please, describe issue here"}), React.createElement("br", null), 
 	                  React.createElement("table", {className: "form-buttons"}, 
