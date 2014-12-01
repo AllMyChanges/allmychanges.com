@@ -27,6 +27,7 @@ Sphinx
 bleach
 django-compressor
 sortedcontainers
+plumbum
 
 -e git+https://github.com/svetlyak40wt/django-oauth-toolkit
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
