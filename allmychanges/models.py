@@ -63,14 +63,14 @@ class UserManager(BaseUserManager):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
 
-        chat.send('New user "{0}" with email "{1}" (from create)'.format(kwargs.get('username'), email))
+        chat.send('New user <http://allmychanges/u/{0}/|{0}> with email "{1}" (from create)'.format(kwargs.get('username'), email))
         return super(UserManager, self).create(*args, **kwargs)
 
     def create_user(self, username, email=None, password=None, **extra_fields):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
 
-        chat.send('New user "{0}" with email "{1}" (from create_user)'.format(username, email))
+        chat.send('New user <http://allmychanges/u/{0}/|{0}> with email "{1}" (from create_user)'.format(username, email))
         return self._create_user(username, email, password,
                                  **extra_fields)
 
