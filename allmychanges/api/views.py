@@ -17,7 +17,7 @@ from allmychanges.models import (Repo, Subscription, Package,
                                  Issue,
                                  Version,
                                  Changelog, UserHistoryLog)
-
+from allmychanges import chat
 from allmychanges.api.serializers import (
     RepoSerializer,
     RepoDetailSerializer,
@@ -395,8 +395,12 @@ class IssueViewSet(HandleExceptionMixin,
 
     def post_save(self, obj, created=False):
         if created:
+            changelog = obj.changelog
             UserHistoryLog.write(
                 self.request.user,
                 self.request.light_user,
                 'create-issue',
-                'Created issue for <changelog:{0}>'.format(obj.changelog_id))
+                'Created issue for <changelog:{0}>'.format(changelog.id))
+            chat.send('New issue was created for <http://allmychanges.com/issues/?namespace={namespace}&name={name}|{namespace}/{name}>.'.format(
+                namespace=changelog.namespace,
+                name=changelog.name))

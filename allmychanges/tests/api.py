@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse
 
 from allmychanges.models import Package, Changelog, Issue, UserHistoryLog
+from allmychanges import chat
 from .utils import check_status_code, create_user
 
 # схема урлов
@@ -252,6 +253,7 @@ def test_normal_user_can_create_an_issue_and_it_is_tied_to_him():
     user = create_user('art')
     cl.login(username='art', password='art')
 
+    chat.clear_messages()
     response = cl.post(reverse('issues-list'),
                        data={'changelog': thebot.id,
                              'type': 'other',
@@ -265,6 +267,9 @@ def test_normal_user_can_create_an_issue_and_it_is_tied_to_him():
 
     eq_(1, UserHistoryLog.objects.filter(
         user=user).count())
+
+    # also, it should post message into a chat
+    eq_(1, len(chat.messages))
 
 
 def test_nor_anonymous_nor_normal_user_are_unable_to_update_issue():
