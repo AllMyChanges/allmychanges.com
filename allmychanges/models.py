@@ -21,8 +21,8 @@ from allmychanges.utils import (
     get_markup_type,
     get_clean_text_from_markup_text,
     get_change_type,
-    slack_send,
 )
+from allmychanges import chat
 from allmychanges.downloader import (
     guess_downloader,
     get_downloader,
@@ -62,11 +62,15 @@ class UserManager(BaseUserManager):
         email = kwargs.get('email')
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
+
+        chat.send('New user "{0}" with email "{1}" (from create)'.format(kwargs.get('username'), email))
         return super(UserManager, self).create(*args, **kwargs)
 
     def create_user(self, username, email=None, password=None, **extra_fields):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
+
+        chat.send('New user "{0}" with email "{1}" (from create_user)'.format(username, email))
         return self._create_user(username, email, password,
                                  **extra_fields)
 
@@ -518,7 +522,7 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
                 return
 
         issue = self.issues.create(type=type, comment=comment)
-        slack_send(u'New issue of type "{issue.type}" with comment: "{issue.comment} was created for <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
+        chat.send(u'New issue of type "{issue.type}" with comment: "{issue.comment} was created for <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
             issue=issue))
 
     def resolve_issues(self, type):

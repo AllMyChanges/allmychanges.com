@@ -152,8 +152,6 @@ def get_change_type(text):
     return 'new'
 
 
-
-
 def graphite_send(**kwargs):
     try:
         g = graphitesend.init(prefix=settings.GRAPHITE_PREFIX,
@@ -162,11 +160,6 @@ def graphite_send(**kwargs):
         g.send_dict(kwargs)
     except Exception:
         logging.getLogger('django').exception('Graphite is down')
-
-
-def slack_send(text):
-    if settings.SLACK_URL:
-        requests.post(settings.SLACK_URL, data=anyjson.serialize(dict(text=text)))
 
 
 def count(metric_key, value=1):

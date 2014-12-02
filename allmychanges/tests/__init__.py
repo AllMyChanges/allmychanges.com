@@ -8,3 +8,4 @@ from .issues import *
 from .pipeline import *
 from .preview import *
 from .vcs import *
+from .registration import *

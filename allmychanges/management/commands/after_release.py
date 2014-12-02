@@ -2,7 +2,10 @@ import os.path
 
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
-from allmychanges.utils import graphite_send, slack_send
+from allmychanges.utils import graphite_send
+from allmychanges import chat
+
+
 from plumbum.cmd import git
 
 
@@ -23,9 +26,9 @@ class Command(LogMixin, BaseCommand):
                     *item.split(' ', 1))
                            for item in changes]
                 changes = u'\n'.join(changes)
-                slack_send('Deployed {current_hash}:\n{changes}'.format(
+                chat.send('Deployed {current_hash}:\n{changes}'.format(
                     current_hash=current_hash,
                     changes=changes))
         else:
-            slack_send('Deployed {current_hash}'.format(
+            chat.send('Deployed {current_hash}'.format(
                     current_hash=current_hash))
