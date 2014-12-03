@@ -1,3 +1,12 @@
+0.13.1 (2014-12-03)
+===================
+
+* Version description's typography was significantly improved.
+  Now you can read [Django's changelog][django-1.7] and it won't hurt your eyes.
+* Now preview's results are copied to an added package's changelog.
+  This improves user experience, and seems more natural because
+  you haven't to wait anymore.
+
 0.13.0 (2014-11-30)
 ===================
 
@@ -434,3 +443,4 @@ There are plenty directions for approvement. Stay tuned.
 [celery-changelog]: http://allmychanges.com/p/python/celery/
 [Ansible]: http://allmychanges.com/p/python/ansible/
 [ansible-1.8]: http://allmychanges.com/p/python/ansible/#1.8
+[django-1.7]: http://allmychanges.com/p/python/django/#1.7
