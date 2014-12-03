@@ -543,12 +543,14 @@ body.email {
 }
 .package-version__notes h2 {
   font-size: 22px;
+  font-family: pragmatica-web-condensed, sans-serif;
   line-height: 22px;
   margin-top: 16px;
   margin-bottom: 6px;
 }
 .package-version__notes h3 {
   font-size: 16px;
+  font-family: pragmatica-web-condensed, sans-serif;
   line-height: 22px;
   font-variant: small-caps;
   margin-top: 16px;
@@ -556,6 +558,7 @@ body.email {
 }
 .package-version__notes h4 {
   font-size: 16px;
+  font-family: pragmatica-web-condensed, sans-serif;
   line-height: 22px;
   font-variant: small-caps;
   margin-top: 16px;
