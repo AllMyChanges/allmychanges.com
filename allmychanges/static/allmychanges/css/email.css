@@ -615,12 +615,58 @@ body.email {
 .package-version__notes {
   margin-left: 1em;
   margin-top: 0.5em;
+  font-size: 16px;
+  line-height: 22px;
   font-family: proxima-nova, sans-serif;
   font-weight: 300;
 }
 .package-version__notes ul,
 .package-version__notes ol {
   margin-left: 16px;
+}
+.package-version__notes h2 {
+  font-size: 22px;
+  line-height: 22px;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+.package-version__notes h3 {
+  font-size: 16px;
+  line-height: 22px;
+  font-variant: small-caps;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+.package-version__notes h4 {
+  font-size: 16px;
+  line-height: 22px;
+  font-variant: small-caps;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  color: #808080;
+}
+.package-version__notes h1 tt,
+.package-version__notes h2 tt,
+.package-version__notes h3 tt,
+.package-version__notes h4 tt {
+  font-weight: normal;
+}
+.package-version__notes p {
+  font-size: 16px;
+  line-height: 22px;
+  margin-bottom: 11px;
+}
+.package-version__notes p:last-child {
+  margin-bottom: 0px;
+}
+.package-version__notes pre {
+  font-size: 12px;
+  background-color: #fafafa;
+  border: 1px solid #dfdfdf;
+  padding: 11px;
+}
+.package-version__notes a[title="Permalink to this headline"] {
+  display: none;
 }
 .package-changes__package-title {
   margin-top: 1em;

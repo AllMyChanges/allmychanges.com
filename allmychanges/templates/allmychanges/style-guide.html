@@ -5,6 +5,110 @@
   <h1 class="page-header">Style Guide</h1>
 
   <div class="box box_guide">
+    <h2 class="page-subheader">Text size and headers inside of changelog</h2>
+<div class="package-version__notes"><p><em>September 2, 2014</em></p>
+<p>Welcome to Django 1.7!</p>
+<p>These release notes cover the <a href="#what-s-new-in-django-1-7">new features</a>, as well as some <a href="#backwards-incompatible-changes-in-1-7">backwards
+incompatible changes</a> you’ll want to be aware of when upgrading from Django
+1.6 or older versions. We’ve <a href="#features-deprecated-in-1-7">begun the deprecation process for some features</a>,
+and some features have reached the end of their deprecation process and
+<a href="#features-removed-in-1-7">have been removed</a>.</p>
+<div>
+<span></span><h2>Python compatibility<a href="#python-compatibility" title="Permalink to this headline">¶</a></h2>
+<p>Django 1.7 requires Python 2.7 or above, though we <strong>highly recommend</strong>
+the latest minor release. Support for Python 2.6 has been dropped and support
+for Python 3.4 has been added.</p>
+<p>This change should affect only a small number of Django users, as most
+operating-system vendors today are shipping Python 2.7 or newer as their default
+version. If you’re still using Python 2.6, however, you’ll need to stick to
+Django 1.6 until you can upgrade your Python version. Per <tt><span>our</span> <span>support</span>
+<span>policy</span></tt>, Django 1.6 will continue to receive
+security support until the release of Django 1.8.</p>
+</div>
+<div>
+<span></span><h2>What’s new in Django 1.7<a href="#what-s-new-in-django-1-7" title="Permalink to this headline">¶</a></h2>
+<div>
+<span></span><h3>Schema migrations<a href="#schema-migrations" title="Permalink to this headline">¶</a></h3>
+<p>Django now has built-in support for schema migrations. It allows models
+to be updated, changed, and deleted by creating migration files that represent
+the model changes and which can be run on any development, staging or production
+database.</p>
+<p>Migrations are covered in <tt><span>their</span> <span>own</span> <span>documentation</span></tt>,
+but a few of the key features are:</p>
+<ul>
+<li><p><tt><span>syncdb</span></tt> has been deprecated and replaced by <tt><span>migrate</span></tt>. Don’t worry -
+calls to <tt><span>syncdb</span></tt> will still work as before.</p>
+</li>
+<li><p>A new <tt><span>makemigrations</span></tt> command provides an easy way to autodetect changes
+to your models and make migrations for them.</p>
+<p><tt><span>pre_syncdb</span></tt> and
+<tt><span>post_syncdb</span></tt> have been deprecated,
+to be replaced by <tt><span>pre_migrate</span></tt> and
+<tt><span>post_migrate</span></tt> respectively. These
+new signals have slightly different arguments. Check the
+documentation for details.</p>
+</li>
+<li><p>The <tt><span>allow_syncdb</span></tt> method on database routers is now called <tt><span>allow_migrate</span></tt>,
+but still performs the same function. Routers with <tt><span>allow_syncdb</span></tt> methods
+will still work, but that method name is deprecated and you should change
+it as soon as possible (nothing more than renaming is required).</p>
+</li>
+<li><p><tt><span>initial_data</span></tt> fixtures are no longer loaded for apps with migrations; if
+you want to load initial data for an app, we suggest you create a migration for
+your application and define a <tt><span>RunPython</span></tt>
+or <tt><span>RunSQL</span></tt> operation in the <tt><span>operations</span></tt> section of the migration.</p>
+</li>
+<li><p>Test rollback behavior is different for apps with migrations; in particular,
+Django will no longer emulate rollbacks on non-transactional databases or
+inside <tt><span>TransactionTestCase</span></tt> <em>unless specifically requested</em>.</p>
+</li>
+<li><p>It is not advised to have apps without migrations depend on (have a
+<em>ForeignKey</em> or <em>ManyToManyField</em> to) apps with migrations. Read the
+<em>dependencies documentation</em> for more.</p>
+</li>
+<li><p>If you are upgrading from South, see our <em>upgrading-from-south</em>
+documentation, and third-party app authors should read the
+<a href="http://south.readthedocs.org/en/latest/releasenotes/1.0.html#library-migration-path">South 1.0 release notes</a>
+for details on how to support South and Django migrations simultaneously.</p>
+</li>
+</ul>
+</div>
+<div>
+<span></span><span></span><span></span><h3>App-loading refactor<a href="#app-loading-refactor" title="Permalink to this headline">¶</a></h3>
+<p>Historically, Django applications were tightly linked to models. A singleton
+known as the “app cache” dealt with both installed applications and models.
+The models module was used as an identifier for applications in many APIs.</p>
+<p>As the concept of <tt><span>Django</span> <span>applications</span></tt> matured, this
+code showed some shortcomings. It has been refactored into an “app registry”
+where models modules no longer have a central role and where it’s possible to
+attach configuration data to applications.</p>
+<p>Improvements thus far include:</p>
+<ul>
+<li>Applications can run code at startup, before Django does anything else, with
+the <tt><span>ready()</span></tt> method of their configuration.</li>
+<li>Application labels are assigned correctly to models even when they’re
+defined outside of <tt><span>models.py</span></tt>. You don’t have to set
+<tt><span>app_label</span></tt> explicitly any more.</li>
+<li>It is possible to omit <tt><span>models.py</span></tt> entirely if an application doesn’t
+have any models.</li>
+<li>Applications can be relabeled with the <tt><span>label</span></tt>
+attribute of application configurations, to work around label conflicts.</li>
+<li>The name of applications can be customized in the admin with the
+<tt><span>verbose_name</span></tt> of application configurations.</li>
+<li>The admin automatically calls <tt><span>autodiscover()</span></tt>
+when Django starts. You can consequently remove this line from your
+URLconf.</li>
+<li>Django imports all application configurations and models as soon as it
+starts, through a deterministic and straightforward process. This should
+make it easier to diagnose import issues such as import loops.</li>
+</ul>
+</div>
+</div>
+</div>
+
+  </div>
+
+  <div class="box box_guide">
     <h2 class="page-subheader">Table</h2>
 
     <table class="table">

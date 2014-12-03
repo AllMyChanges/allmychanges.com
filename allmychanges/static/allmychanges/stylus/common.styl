@@ -117,11 +117,57 @@ body.email {
     &__notes {
         margin-left: 1em;
         margin-top: 0.5em;
+        font-size: 16px;
+        line-height: 22px;
         font-family: generic-font;
         font-weight: 300;
 
         ul, ol {
            margin-left: 16px;
+        }
+
+        h2 {
+           font-size: 22px;
+           line-height: 22px;
+           margin-top: 16px;
+           margin-bottom: 6px;
+        }
+        h3 {
+           font-size: 16px;
+           line-height: 22px;
+           font-variant: small-caps;
+           margin-top: 16px;
+           margin-bottom: 6px;
+        }
+        h4 {
+           font-size: 16px;
+           line-height: 22px;
+           font-variant: small-caps;
+           margin-top: 16px;
+           margin-bottom: 6px;
+           color: gray;
+        }
+        h1 tt, h2 tt, h3 tt, h4 tt {
+           font-weight: normal;
+        }
+        p {
+           font-size: 16px;
+           line-height: 22px;
+           margin-bottom: 11px;
+        }
+        p:last-child {
+           margin-bottom: 0px;
+        }
+        // show code blocks nicely
+        pre {
+           font-size: 12px;
+           background-color: #FAFAFA;
+           border: 1px solid #DFDFDF;
+           padding: 11px;
+        }
+        // hide Django's permalinks
+        a[title="Permalink to this headline"] {
+           display: none;
         }
     }
 }
