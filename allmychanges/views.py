@@ -32,6 +32,7 @@ from allmychanges.models import (Package,
                                  UserHistoryLog,
                                  Preview,
                                  Item)
+from allmychanges import chat
 from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import (HOUR,
@@ -712,6 +713,8 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AddNewView, self).get_context_data(**kwargs)
+        user = self.request.user if self.request.user.is_authenticated() else None
+
         url = self.request.GET.get('url')
         if url is None:
             return Http404
@@ -727,13 +730,19 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                         namespace=changelog.namespace))))
         except Changelog.DoesNotExist:
             changelog = Changelog.objects.create(source=normalized_url)
+            if user:
+                chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
+                    user.username, normalized_url))
+            else:
+                chat.send('Wow, light user {0} added new changelog with url: <{1}>'.format(
+                    self.request.light_user, normalized_url))
 
         changelog.problem = None
         changelog.save()
 
 
         preview = changelog.create_preview(
-            user=self.request.user if self.request.user.is_authenticated() else None,
+            user=user,
             light_user=self.request.light_user)
 
         preview.schedule_update()
