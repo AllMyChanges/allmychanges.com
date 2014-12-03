@@ -275,6 +275,17 @@ class ChangelogViewSet(HandleExceptionMixin,
             self.object.downloader = None
             self.object.save(update_fields=('downloader',))
 
+        if self.object.versions.count() == 0:
+            # try to move preview's versions
+
+            preview = list(self.object.previews.filter(light_user=self.request.light_user).order_by('-id')[:1])
+            if preview:
+                preview = preview[0]
+                for version in preview.versions.all():
+                    version.preview = None
+                    version.changelog = self.object
+                    version.save()
+
         result = self.object.add_to_moderators(self.request.user,
                                                self.request.light_user)
         if result:

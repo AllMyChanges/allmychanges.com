@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 
 from allmychanges.models import Package, Changelog, Issue, UserHistoryLog
 from allmychanges import chat
-from .utils import check_status_code, create_user
+from .utils import check_status_code, create_user, put_json
 
 # схема урлов
 # / - список доступных урлов
@@ -18,12 +18,6 @@ from .utils import check_status_code, create_user
 # /packages/
 # /package/:namespace/:name/
 
-
-def put_json(cl, url, **data):
-    response = cl.put(url,
-                      anyjson.serialize(data),
-                      content_type='application/json')
-    return response
 
 def setup():
     Package.objects.all().delete()

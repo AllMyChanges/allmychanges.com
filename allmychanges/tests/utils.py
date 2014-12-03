@@ -1,6 +1,7 @@
 # coding: utf-8
-from nose.tools import eq_
+import anyjson
 
+from nose.tools import eq_
 from allmychanges.models import User
 
 
@@ -27,3 +28,10 @@ def create_user(username):
             username, username + '@example.yandex.ru', username)
         user.save()
         return user
+
+
+def put_json(cl, url, **data):
+    response = cl.put(url,
+                      anyjson.serialize(data),
+                      content_type='application/json')
+    return response

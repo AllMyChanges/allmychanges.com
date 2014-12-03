@@ -6,8 +6,8 @@ from allmychanges.models import Changelog, Preview
 from django.test import Client
 from django.core.urlresolvers import reverse
 from allmychanges.tasks import _task_log
-from .utils import refresh
-
+from .utils import (refresh, check_status_code,
+                    create_user, put_json)
 
 def test_preview():
     cl = Client()
@@ -97,3 +97,35 @@ def test_update_package_preview_versions():
     eq_(['<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
          '<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.'],
         first_items(versions))
+
+
+def test_when_preview_saved_versions_are_copied_to_changelog():
+    # this only should happen when changelog is empty
+    user = create_user('art')
+
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/markdown-release-notes')
+    changelog.add_to_moderators(user)
+
+    cl = Client()
+    cl.login(username='art', password='art')
+    response = cl.get(reverse('changelog-list'))
+
+    preview = changelog.previews.create(light_user=response.cookies.get('light_user_id').value,
+                                        source=changelog.source)
+    preview.schedule_update()
+
+    eq_(0, changelog.versions.count())
+    eq_(3, preview.versions.count())
+
+
+    response  = put_json(cl,
+                         reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
+                         namespace=changelog.namespace,
+                         name=changelog.name,
+                         source='http://github.com/svetlyak40wt/django-fields')
+    check_status_code(200, response)
+
+    # versions now moved to the changelog
+    eq_(3, changelog.versions.count())
+    eq_(0, preview.versions.count())
