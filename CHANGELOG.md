@@ -1,3 +1,10 @@
+0.13.2 (2014-12-04)
+===================
+
+* Fixed issue when parser ate some parts of text.
+* Fixed way how changelogs are parsed when they are in a separate files where
+  filenames include version number like in case of [Go][].
+
 0.13.1 (2014-12-03)
 ===================
 
@@ -444,3 +451,4 @@ There are plenty directions for approvement. Stay tuned.
 [Ansible]: http://allmychanges.com/p/python/ansible/
 [ansible-1.8]: http://allmychanges.com/p/python/ansible/#1.8
 [django-1.7]: http://allmychanges.com/p/python/django/#1.7
+[Go]: http://allmychanges.com/p/golang/go/
