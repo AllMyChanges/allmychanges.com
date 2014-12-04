@@ -77,15 +77,21 @@ def test_update_package_preview_versions():
     eq_(0, changelog.versions.filter(preview=None).count())
 
     def first_item(version):
-        return version.sections.all()[0].items.all()[0].text
+        first_section = version.sections.all()[0]
+        result = first_section.notes or ''
+
+        items = list(first_section.items.all())
+        if items:
+            result += items[0].text
+        return result
 
     def first_items(versions):
         return map(first_item, versions)
 
     versions = preview.versions.filter(code_version='v2')
+
     eq_(['<span class="changelog-item-type changelog-item-type_new">new</span>Some crap',
-         '<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
-         '<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.'],
+         u'<h1>0.1.1</h1>', u'<h1>0.1.0</h1>'],
         first_items(versions))
 
     # now we'll check if ignore list works
@@ -94,8 +100,7 @@ def test_update_package_preview_versions():
     preview.schedule_update()
 
     versions = preview.versions.filter(code_version='v2')
-    eq_(['<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
-         '<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.'],
+    eq_([u'<h1>0.1.1</h1>', u'<h1>0.1.0</h1>'],
         first_items(versions))
 
 

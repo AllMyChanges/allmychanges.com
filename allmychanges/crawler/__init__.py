@@ -103,7 +103,7 @@ _version_regexes = [
     # release-notes/0.1.1.md
     # but not in this case
     # <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    r'/{ver}\.[^\d]',
+    r'[/a-zA-Z-]{ver}\.[^\d]',
 ]
 
 _version_regexes = [item.format(ver=r'v?(?P<ver>(\d+\.\d+\.\d+(-[a-z0-9.]+[a-z0-9])?|\d+\.\d+)(-[a-z0-9.]+[a-z0-9])?)')

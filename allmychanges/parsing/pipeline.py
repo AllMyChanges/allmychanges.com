@@ -826,6 +826,14 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
         if left_keys_count > right_keys_count:
             return 1
 
+        left_content_length = len(left.content)
+        right_content_length = len(right.content)
+
+        if left_content_length < right_content_length:
+            return -1
+        if left_content_length > right_content_length:
+            return 1
+
         return 0
 
     # TODO: вот это надо будет использовать для сбора статистику по исходникам
@@ -843,6 +851,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     # using customized comparison we make versions which
     # have less metadata go first
     versions.sort(cmp=compare_version_metadata)
+
     # and grouping them by version number
     # we leave only unique versions with maximum number of metadata
 
