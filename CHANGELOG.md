@@ -4,6 +4,7 @@
 * Fixed issue when parser ate some parts of text.
 * Fixed way how changelogs are parsed when they are in a separate files where
   filenames include version number like in case of [Go][].
+* Now algorithm ignores lines with more than 5 words when searching version numbers.
 
 0.13.1 (2014-12-03)
 ===================
