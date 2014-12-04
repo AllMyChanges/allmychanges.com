@@ -164,7 +164,6 @@ Change in a way how unreleased notes are parsed.
 
 
 def test_extract_version():
-    eq_('1.3', _extract_version('doc/go1.3.html'))
     eq_('3.0.0-pre', _extract_version('v3.0.0-pre (wip)'))
     eq_('1.0.12', _extract_version('v1.0.12'))
     eq_('2.0.0-beta.1', _extract_version('2.0.0-beta.1'))
@@ -176,8 +175,10 @@ def test_extract_version():
     eq_('2.0.0', _extract_version('2.0.0 (2013-09-24)'))
     eq_('1.5.6', _extract_version('**1.5.6 (2014-05-16)**'))
     eq_('0.1.1', _extract_version('release-notes/0.1.1.md'))
+    eq_('1.3', _extract_version('doc/go1.3.html'))
     eq_(None, _extract_version('  some number in the item\'s text 0.1'))
     eq_(None, _extract_version('This is the first version compatible with Django 1.7.'))
+    eq_(None, _extract_version('SWIG 3.0 required for programs that use SWIG'))
     eq_(None, _extract_version('HTTP/1.1 302 Found'))
     eq_(None, _extract_version('<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>'))
 

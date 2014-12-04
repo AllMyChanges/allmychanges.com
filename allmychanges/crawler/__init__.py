@@ -112,6 +112,12 @@ _version_regexes = [item.format(ver=r'v?(?P<ver>(\d+\.\d+\.\d+(-[a-z0-9.]+[a-z0-
 
 def _extract_version(line):
     if line:
+        tokens = line.split()
+        # we ignore long lines because probably
+        # they are not headers we are looking for
+        if len(tokens) > 5:
+            return None
+
         for i in _version_regexes:
             match = re.search(i, line)
             if match is not None:
