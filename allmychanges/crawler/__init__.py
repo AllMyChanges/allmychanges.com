@@ -121,6 +121,7 @@ def _extract_version(line):
         for date_str in RE_DATE.finditer(line):
             line = line.replace(date_str.group('date'), u'')
 
+        line = line.strip()
         tokens = line.split()
         # we ignore long lines because probably
         # they are not headers we are looking for
