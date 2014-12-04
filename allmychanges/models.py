@@ -522,7 +522,7 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
                 return
 
         issue = self.issues.create(type=type, comment=comment)
-        chat.send(u'New issue of type "{issue.type}" with comment: "{issue.comment} was created for <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
+        chat.send(u'New issue of type "{issue.type}" with comment: "{issue.comment}" was created for <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
             issue=issue))
 
     def resolve_issues(self, type):
