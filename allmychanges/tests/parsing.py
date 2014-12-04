@@ -12,6 +12,7 @@ from allmychanges.parsing.pipeline import (
     group_by_path,
     strip_outer_tag,
     prerender_items,
+    embedd_label,
     parse_file)
 from allmychanges.parsing.raw import RawChangelog
 from allmychanges.env import Environment
@@ -314,6 +315,12 @@ def test_strip_outer_tag():
     # but should leave as is if there isn't any common root node
     eq_('<p>Blah</p><p>minor</p>',
         strip_outer_tag('<p>Blah</p><p>minor</p>'))
+
+
+def test_label_embedding():
+    text = u'Version description\'s typography was significantly improved.\nNow you can read <a href="http://allmychanges.com/p/python/django/#1.7">Django\'s changelog</a> and it won\'t hurt your eyes.'
+    expected = u'<span class="changelog-item-type changelog-item-type_new">new</span>' + text
+    eq_(expected, embedd_label(text, {'type': 'new'}))
 
 
 def test_parse_plain_text():

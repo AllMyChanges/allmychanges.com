@@ -50,12 +50,12 @@ def parse_changelog(raw_changelog):
 ## NEW
 ##############################
 
-def node_tostring(node):
+def node_tostring(node, with_tail=False):
     """Convert's html node to string if it is not a string yet.
     """
     if isinstance(node, basestring):
         return node
-    return lxml.html.tostring(node, with_tail=False)
+    return lxml.html.tostring(node, with_tail=with_tail)
 
 
 
@@ -569,6 +569,35 @@ def extract_metadata(version):
     yield new_version
 
 
+def embedd_label(text, item):
+    """Embedds a span to show item type as a label."""
+    if not item:
+        return text
+
+    def html_escape(text):
+        if isinstance(text, basestring):
+            return text.replace('<', '&lt;').replace('>', '&gt;')
+        return text
+
+    label = lxml.html.fragment_fromstring('<span class="changelog-item-type changelog-item-type_{0[type]}">{0[type]}</span>'.format(
+        item))
+    items = map(html_escape,
+                lxml.html.fragments_fromstring(text))
+
+    if isinstance(items[0], basestring):
+        items.insert(0, label)
+        # here with_tail needed to not eat text after html elements
+        # see `test_label_embedding` test for details
+        return u''.join(node_tostring(node, with_tail=True)
+                        for node in items)
+    else:
+        element = items[0]
+        label.tail = element.text
+        element.text = ''
+        items[0].insert(0, label)
+        return u''.join(map(lxml.html.tostring, items))
+
+
 def prerender_items(version):
     new_version = version.push(type='version')
     from ..templatetags.allmychanges_tags import process_cve
@@ -595,31 +624,6 @@ def prerender_items(version):
                                  u'abbr': [u'title']},
                      styles=[])
         return text
-
-    def embedd_label(text, item):
-        """Embedds a span to show item type as a label."""
-        if not item:
-            return text
-
-        def html_escape(text):
-            if isinstance(text, basestring):
-                return text.replace('<', '&lt;').replace('>', '&gt;')
-            return text
-
-        label = lxml.html.fragment_fromstring('<span class="changelog-item-type changelog-item-type_{0[type]}">{0[type]}</span>'.format(
-            item))
-        items = map(html_escape,
-                    lxml.html.fragments_fromstring(text))
-
-        if isinstance(items[0], basestring):
-            items.insert(0, lxml.html.tostring(label))
-            return u''.join(map(node_tostring, items))
-        else:
-            element = items[0]
-            label.tail = element.text
-            element.text = ''
-            items[0].insert(0, label)
-            return u''.join(map(lxml.html.tostring, items))
 
     def apply_filters(item):
         """Accepts whole item and returns another item with processed text.
