@@ -164,6 +164,10 @@ Change in a way how unreleased notes are parsed.
 
 
 def test_extract_version():
+    # this horror is from the https://github.com/Test-More/TB2/blob/master/Changes
+    eq_('1.005000_003', _extract_version('1.005000_003'))
+    eq_('1.005000_003', _extract_version('1.005000_003 Thu Mar 22 17:48:08 GMT 2012'))
+
     eq_('3.0.0-pre', _extract_version('v3.0.0-pre (wip)'))
     eq_('1.0.12', _extract_version('v1.0.12'))
     eq_('2.0.0-beta.1', _extract_version('2.0.0-beta.1'))

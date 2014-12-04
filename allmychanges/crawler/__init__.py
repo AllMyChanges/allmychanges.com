@@ -106,12 +106,21 @@ _version_regexes = [
     r'[/a-zA-Z-]{ver}\.[^\d]',
 ]
 
-_version_regexes = [item.format(ver=r'v?(?P<ver>(\d+\.\d+\.\d+(-[a-z0-9.]+[a-z0-9])?|\d+\.\d+)(-[a-z0-9.]+[a-z0-9])?)')
+_version_regexes = [item.format(ver=(r'v?(?P<ver>('
+                                     r'\d+\.\d+\.\d+(-[a-z0-9.]+[a-z0-9])?'
+                                     r'|\d+\.\d+'
+                                     r')'
+                                     r'(-[a-z0-9.]+[a-z0-9])?' # possbile -something123 like suffix
+                                     r'(_\d+)?'                # or _12343 suffix like in the damn https://github.com/Test-More/TB2/blob/master/Changes
+                                     r')'))
                     for item in _version_regexes]
 
 
 def _extract_version(line):
     if line:
+        for date_str in RE_DATE.finditer(line):
+            line = line.replace(date_str.group('date'), u'')
+
         tokens = line.split()
         # we ignore long lines because probably
         # they are not headers we are looking for
