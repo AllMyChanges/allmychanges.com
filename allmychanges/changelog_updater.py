@@ -231,7 +231,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
     else:
         # now new versions contains only those version numbers which were
         # not discovered yet
-        if len(new_versions) > 1 and hasattr('obj', 'create_issue'):
+        if len(new_versions) > 1 and hasattr(obj, 'create_issue'):
             obj.create_issue(type='too-many-new-versions',
                              comment='I found {0}'.format(
                                  ', '.join(new_versions)))
