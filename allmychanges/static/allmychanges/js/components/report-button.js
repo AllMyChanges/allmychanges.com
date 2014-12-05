@@ -22,6 +22,11 @@ module.exports = React.createClass({
             this.setState({show_popup: true});
         }
     },
+    handle_form_keypress: function (e) {
+        if (e.key == 'Enter' && (e.metaKey || e.ctrlKey)) {
+            this.handle_post(e);
+        }
+    },
     handle_popup_click: function (e) {
         console.log('Popup click');
         e.nativeEvent.stopImmediatePropagation();
@@ -61,7 +66,11 @@ module.exports = React.createClass({
                     <option value="wrong-version-content">A problem with content parsing</option>
                     <option value="other">Other issue</option>
                   </select><br/>
-                  <textarea className="textarea" ref="comment" placeholder="Please, describe issue here"></textarea><br/>
+                  <textarea className="textarea"
+                            ref="comment"
+                            onKeyPress={this.handle_form_keypress}
+                            placeholder="Please, describe issue here">
+                  </textarea><br/>
                   <table className="form-buttons">
                     <tr>
                       <td className="form-buttons__back"></td>

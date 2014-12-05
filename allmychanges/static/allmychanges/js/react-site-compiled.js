@@ -72,6 +72,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var ReportButton = __webpack_require__(3)
+	var ResolveButton = __webpack_require__(4)
 
 	module.exports = {
 	    render: function () {
@@ -80,14 +81,7 @@
 	                React.createElement(ReportButton, {changelog_id: element.dataset['changelogId']}),
 	                element);
 	        });
-	    }
-	}
 
-
-	var ResolveButton = __webpack_require__(4)
-
-	module.exports = {
-	    render: function () {
 	        $('.resolve-button-container').each(function (idx, element) {
 	            React.render(
 	                React.createElement(ResolveButton, {issue_id: element.dataset['issueId']}),
@@ -123,6 +117,11 @@
 	            this.setState({show_popup: false});
 	        } else {
 	            this.setState({show_popup: true});
+	        }
+	    },
+	    handle_form_keypress: function (e) {
+	        if (e.key == 'Enter' && (e.metaKey || e.ctrlKey)) {
+	            this.handle_post(e);
 	        }
 	    },
 	    handle_popup_click: function (e) {
@@ -164,7 +163,11 @@
 	                    React.createElement("option", {value: "wrong-version-content"}, "A problem with content parsing"), 
 	                    React.createElement("option", {value: "other"}, "Other issue")
 	                  ), React.createElement("br", null), 
-	                  React.createElement("textarea", {className: "textarea", ref: "comment", placeholder: "Please, describe issue here"}), React.createElement("br", null), 
+	                  React.createElement("textarea", {className: "textarea", 
+	                            ref: "comment", 
+	                            onKeyPress: this.handle_form_keypress, 
+	                            placeholder: "Please, describe issue here"}
+	                  ), React.createElement("br", null), 
 	                  React.createElement("table", {className: "form-buttons"}, 
 	                    React.createElement("tr", null, 
 	                      React.createElement("td", {className: "form-buttons__back"}), 

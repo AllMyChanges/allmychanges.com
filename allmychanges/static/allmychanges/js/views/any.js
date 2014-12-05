@@ -1,4 +1,5 @@
 var ReportButton = require('../components/report-button.js')
+var ResolveButton = require('../components/resolve-button.js')
 
 module.exports = {
     render: function () {
@@ -7,14 +8,7 @@ module.exports = {
                 <ReportButton changelog_id={element.dataset['changelogId']}/>,
                 element);
         });
-    }
-}
 
-
-var ResolveButton = require('../components/resolve-button.js')
-
-module.exports = {
-    render: function () {
         $('.resolve-button-container').each(function (idx, element) {
             React.render(
                 <ResolveButton issue_id={element.dataset['issueId']}/>,
