@@ -41,6 +41,12 @@ class AlreadyExists(APIException):
     status_code = 400
     default_detail = 'Object already exists'
 
+
+class AccessDenied(APIException):
+    status_code = 403
+    default_detail = 'You are not allowed to perform this action'
+
+
 from django.db import transaction
 
 
@@ -415,3 +421,14 @@ class IssueViewSet(HandleExceptionMixin,
             chat.send('New issue was created for <http://allmychanges.com/issues/?namespace={namespace}&name={name}|{namespace}/{name}>.'.format(
                 namespace=changelog.namespace,
                 name=changelog.name))
+
+    @action()
+    def resolve(self, request, pk=None):
+        user = self.request.user
+        issue = Issue.objects.get(pk=pk)
+
+        if issue.editable_by(user, self.request.light_user):
+            issue.resolved_at = timezone.now()
+            issue.save(update_fields=('resolved_at',))
+            return Response({'result': 'ok'})
+        raise AccessDenied()

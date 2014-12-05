@@ -52,7 +52,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(4)
+	var PackageSelector = __webpack_require__(5)
 
 	module.exports = {
 	    render: function () {
@@ -78,6 +78,19 @@
 	        $('.report-button').each(function (idx, element) {
 	            React.render(
 	                React.createElement(ReportButton, {changelog_id: element.dataset['changelogId']}),
+	                element);
+	        });
+	    }
+	}
+
+
+	var ResolveButton = __webpack_require__(4)
+
+	module.exports = {
+	    render: function () {
+	        $('.resolve-button-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(ResolveButton, {issue_id: element.dataset['issueId']}),
 	                element);
 	        });
 	    }
@@ -172,7 +185,40 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(5)
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {resolved: false};
+	    },
+	    handle_click: function (e) {
+	        e.preventDefault();
+	        $.ajax({
+	            url: '/v1/issues/' + this.props.issue_id + '/resolve/',
+	            method: 'POST',
+	            dataType: 'json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            success: function(data) {
+	                this.setState({resolved: true});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error('Unable to resolve issue', status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        if (this.state.resolved) {
+	            return (React.createElement("button", {className: "button", disabled: "disabled"}, "Resolved"));
+	        } else {
+	            return (React.createElement("button", {className: "button", onClick: this.handle_click}, "Resolve"));
+	        }
+	    }
+	});
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Package = __webpack_require__(6)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -210,10 +256,10 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	TrackButton = __webpack_require__(6)
+	TrackButton = __webpack_require__(7)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -243,7 +289,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',

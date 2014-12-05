@@ -926,10 +926,12 @@ class IssuesView(CommonContextMixin, TemplateView):
             page_size = form.cleaned_data['page_size']
 
             if form.cleaned_data['namespace']:
+                result['show_back_button'] = True
                 queryset = queryset.filter(changelog__namespace=form.cleaned_data['namespace'])
             if form.cleaned_data['name']:
                 queryset = queryset.filter(changelog__name=form.cleaned_data['name'])
             if form.cleaned_data['type']:
+                result['show_back_button'] = True
                 queryset = queryset.filter(type=form.cleaned_data['type'])
 
         result['issues'] = queryset[:page_size]
