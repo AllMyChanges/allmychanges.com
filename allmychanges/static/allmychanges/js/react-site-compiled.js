@@ -52,7 +52,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(5)
+	var PackageSelector = __webpack_require__(6)
 
 	module.exports = {
 	    render: function () {
@@ -73,6 +73,7 @@
 
 	var ReportButton = __webpack_require__(3)
 	var ResolveButton = __webpack_require__(4)
+	var DeleteButton = __webpack_require__(5)
 
 	module.exports = {
 	    render: function () {
@@ -85,6 +86,11 @@
 	        $('.resolve-button-container').each(function (idx, element) {
 	            React.render(
 	                React.createElement(ResolveButton, {issue_id: element.dataset['issueId']}),
+	                element);
+	        });
+	        $('.delete-button-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(DeleteButton, {version_id: element.dataset['versionId']}),
 	                element);
 	        });
 	    }
@@ -221,7 +227,40 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(6)
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {deleted: false};
+	    },
+	    handle_click: function (e) {
+	        e.preventDefault();
+	        $.ajax({
+	            url: '/v1/versions/' + this.props.version_id + '/',
+	            method: 'DELETE',
+	            dataType: 'json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            success: function(data) {
+	                this.setState({deleted: true});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error('Unable to delete version', status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        if (this.state.deleted) {
+	            return (React.createElement("button", {className: "button", disabled: "disabled"}, "Deleted"));
+	        } else {
+	            return (React.createElement("button", {className: "button", onClick: this.handle_click}, "Delete"));
+	        }
+	    }
+	});
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Package = __webpack_require__(7)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -259,10 +298,10 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	TrackButton = __webpack_require__(7)
+	TrackButton = __webpack_require__(8)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -292,7 +331,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',

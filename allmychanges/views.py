@@ -140,7 +140,8 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
         else:
             show_discovered_as_well = False
 
-        versions.append(dict(number=version.number,
+        versions.append(dict(id=version.id,
+                             number=version.number,
                              date=version.date,
                              discovered_at=version.discovered_at.date(),
                              show_discovered_as_well=show_discovered_as_well,
