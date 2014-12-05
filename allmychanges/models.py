@@ -485,6 +485,10 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         moderators = set(self.moderators.values_list('id', flat=True))
 
         if user.is_authenticated():
+            # Any changelog could be edited by me
+            if user.username == 'svetlyak40wt':
+                return True
+
             if moderators or light_moderators:
                 return user.id in moderators
         else:
