@@ -290,8 +290,15 @@ def parse_rst_file(obj):
             if os.path.exists(filename):
                 os.unlink(filename)
             with codecs.open(filename, 'a', 'utf-8') as f:
-                f.write("master_doc = 'index'\n")
-                f.write("source_suffix = '.rst'\n")
+                f.write("""
+html_theme = 'epub'
+html_theme_options = {
+    'relbar1': 'false',
+    'footer': 'false',
+}
+master_doc = 'index'
+source_suffix = '.rst'
+""")
 
         def copy_conf_py():
             filename = os.path.join(path, 'conf.py')
@@ -418,6 +425,12 @@ def parse_html_file(obj):
         if current_text:
             yield current_text.strip()
 
+    def create_full_content(children):
+        """Just serialize all childrens and join result."""
+        strings = map(lxml.html.tostring, children)
+        return u''.join(strings)
+
+
     headers = [(header.tag, header.text_content(), header.itersiblings())
                for header in headers]
 
@@ -432,13 +445,16 @@ def parse_html_file(obj):
             return not ch.tag.startswith('h') or ch.tag > tag
 
     for tag, text, all_children in headers:
-        children = itertools.takewhile(
+        children = list(itertools.takewhile(
             is_header_tag,
-            all_children)
+            all_children))
         sections = list(create_notes(children))
+
+        full_content = create_full_content(children)
         yield obj.push(type='file_section',
                        title=text.strip(),
-                       content=sections)
+                       content=sections,
+                       full_content=full_content)
 
 
 def create_file(name, content):
@@ -851,6 +867,57 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     # using customized comparison we make versions which
     # have less metadata go first
     versions.sort(cmp=compare_version_metadata)
+
+    # ====================================================================
+    # now we'll exclude versions which content includes few other versions
+    # first we need to numerate all versions
+    # logic is following;
+    #
+
+    for idx, version in enumerate(versions):
+        version.id = idx
+
+    # these are for debugging purposes
+    # by_number = {v.version: v
+    #              for v in versions}
+    by_id = {v.id: v
+             for v in versions}
+
+    inclusions = defaultdict(list)
+    for i in versions:
+        for j in versions:
+            i_full_content = getattr(i, 'full_content', '')
+            j_full_content = getattr(j, 'full_content', '')
+            if i != j and i_full_content and j_full_content \
+               and j_full_content in i_full_content:
+                inclusions[i.id].append(j.id)
+
+    to_filter_out = set()
+
+    for key, values in inclusions.items():
+        if len(values) > 2:
+            # if filename has 3.1 in it, but there are versions like 3.1, 3.1.1 and 3.1.2,
+            # then version bigger 3.1 should be filtered out.
+            to_filter_out.add(key)
+        else:
+            outer_id = key
+            inner_id = values[0]
+            outer_number = by_id[outer_id].version
+            inner_number = by_id[inner_id].version
+            if outer_number == inner_number:
+                # if filename has 3.1 in it, and it's content is another (single) version with number 3.1
+                # then latter should be excluded as it could miss some information.
+                to_filter_out.add(inner_id)
+            else:
+                # if filename has 3.1 in it and it's content includes a single 3.1.1 version in it
+                # then 3.1 should be filtered out.
+                to_filter_out.add(outer_id)
+
+
+    # and filter them out
+    versions = [version
+                for version in versions
+                if version.id not in to_filter_out]
 
     # and grouping them by version number
     # we leave only unique versions with maximum number of metadata

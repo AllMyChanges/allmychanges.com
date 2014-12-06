@@ -1,4 +1,6 @@
 # coding: utf-8
+import re
+
 from nose.tools import eq_
 from allmychanges.models import Changelog
 from .utils import create_user
@@ -74,3 +76,51 @@ def test_html_parser():
     eq_(['<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#226;&#128;&#148; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>',
          ['Initial release']],
         sections[3].content)
+
+
+def test_exclude_version_if_it_includes_few_other_versions():
+    art = create_user('art')
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/celery/1')
+    art.track(changelog)
+
+    update_changelog(changelog)
+
+    # there shouldn't be 3.1 version because it is just number from a filename
+    eq_(0, changelog.versions.filter(number='3.1').count())
+
+
+def test_exclude_version_if_it_included_in_the_version_with_same_number_and_bigger_content():
+    art = create_user('art')
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/celery/2')
+    art.track(changelog)
+
+    update_changelog(changelog)
+
+    # there should be 3.1 version and it's content should include entire file
+    # with a header because there aren't any versions there yet
+    eq_(1, changelog.versions.filter(number='3.1').count())
+    eq_(1, changelog.versions.all().count())
+
+    version = changelog.versions.all()[0]
+    eq_(u'<h1>3.1<a href="#id1" title="Permalink to this headline">\xb6</a></h1><p>Version description.</p>',
+        re.sub(ur' +', u' ',
+               re.sub(ur'[\n ]+\n *|\n|<div>|</div>', u'', version.sections.all()[0].notes)).strip())
+
+
+def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_number():
+    art = create_user('art')
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/celery/3')
+    art.track(changelog)
+
+    update_changelog(changelog)
+
+    # there should be 3.1.0 version only because now it is only version in a 3.1.rst file
+    # with a header because there aren't any versions there yet
+    eq_(1, changelog.versions.filter(number='3.1.0').count())
+    eq_(1, changelog.versions.all().count())
+
+    version = changelog.versions.all()[0]
+    eq_(u'<p>Version description.</p>', version.sections.all()[0].notes)
