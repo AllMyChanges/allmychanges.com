@@ -29,6 +29,11 @@ def send_digest_to(user, code_version='v2'):
                                    code_version=code_version)
 
     if today_changes:
+        # if True, then this digest includes only our own changelog
+        # and we don't need to send a copy to me
+        only_allmychanges = (len(today_changes) == 1
+                             and today_changes[0]['name'] == 'allmychanges.com')
+
         print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
         if code_version == 'v2':
             UserHistoryLog.write(user, '',
@@ -65,7 +70,9 @@ def send_digest_to(user, code_version='v2'):
         subject = 'Changelogs digest on {0:%d %B %Y}'.format(now)
 
         def send_to(email):
-            if user.username != 'svetlyak40wt' and not email.startswith('svetlyak.40wt'):
+            if user.username != 'svetlyak40wt' \
+               and not email.startswith('svetlyak.40wt') \
+               and not only_allmychanges:
                 # все чужие дайжесты дублируем ко мне на email
                 send_to('svetlyak.40wt+changes@gmail.com')
 
