@@ -1,3 +1,9 @@
+0.13.3 (2014-12-05)
+===================
+
+* Better filtering of versions when there is version number in a filename
+  and it is absent in the content.
+
 0.13.2 (2014-12-04)
 ===================
 
