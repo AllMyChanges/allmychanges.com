@@ -32,7 +32,7 @@ def send_digest_to(user, code_version='v2'):
         # if True, then this digest includes only our own changelog
         # and we don't need to send a copy to me
         only_allmychanges = (len(today_changes) == 1
-                             and today_changes[0]['name'] == 'allmychanges.com')
+                             and today_changes[0]['name'] == 'allmychanges')
 
         print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
         if code_version == 'v2':
