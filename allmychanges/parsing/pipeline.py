@@ -435,26 +435,31 @@ def parse_html_file(obj):
                for header in headers]
 
 
-    # use whole document and filename as a section
-    headers.insert(0, ('h0',
-                       obj.filename,
-                       parsed.find('body').iterchildren()))
-
     def is_header_tag(ch):
         if isinstance(ch.tag, basestring):
             return not ch.tag.startswith('h') or ch.tag > tag
 
-    for tag, text, all_children in headers:
+
+    def process_header(parent, tag, text, all_children):
         children = list(itertools.takewhile(
             is_header_tag,
             all_children))
         sections = list(create_notes(children))
 
         full_content = create_full_content(children)
-        yield obj.push(type='file_section',
-                       title=text.strip(),
-                       content=sections,
-                       full_content=full_content)
+        return parent.push(type='file_section',
+                           title=text.strip(),
+                           content=sections,
+                           full_content=full_content)
+
+    # use whole document and filename as a section
+    root = process_header(obj, 'h0', obj.filename,
+                          parsed.find('body').iterchildren())
+    yield root
+
+    # and then process all other items
+    for tag, text, all_children in headers:
+        yield process_header(root, tag, text, all_children)
 
 
 def create_file(name, content):
@@ -766,6 +771,31 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
         else:
             print item
 
+    def print_tree(env):
+        while env._parent:
+            env = env._parent
+
+        def print_env(env, padding):
+            t = env.type
+            comment = u''
+            if t == 'version':
+                comment = env.version
+            elif t == 'filename':
+                comment = env.filename
+            elif t == 'file_section':
+                comment = env.title
+
+            print u'{padding}{t} {comment}'.format(
+                padding=u' ' * padding * 2,
+                t=t,
+                comment=comment)
+            for child in env._children:
+                child = child()
+                if child is not None:
+                    print_env(child, padding + 1)
+        print_env(env, 0)
+
+
     def catch_errors(processor):
         @wraps(processor)
         def wrapper(*args, **kwargs):
@@ -878,18 +908,24 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
         version.id = idx
 
     # these are for debugging purposes
-    # by_number = {v.version: v
-    #              for v in versions}
+    by_number = {v.version: v
+                 for v in versions}
+
     by_id = {v.id: v
              for v in versions}
+
+    #print_tree(root_env)
 
     inclusions = defaultdict(list)
     for i in versions:
         for j in versions:
             i_full_content = getattr(i, 'full_content', '')
             j_full_content = getattr(j, 'full_content', '')
+            i_file_section = i.find_parent_of_type('file_section')
+
             if i != j and i_full_content and j_full_content \
-               and j_full_content in i_full_content:
+               and j_full_content in i_full_content \
+               and i_file_section.is_parent_for(j):
                 inclusions[i.id].append(j.id)
 
     to_filter_out = set()
@@ -899,6 +935,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
             # if filename has 3.1 in it, but there are versions like 3.1, 3.1.1 and 3.1.2,
             # then version bigger 3.1 should be filtered out.
             to_filter_out.add(key)
+
         else:
             outer_id = key
             inner_id = values[0]

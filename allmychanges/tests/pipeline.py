@@ -124,3 +124,29 @@ def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_numbe
 
     version = changelog.versions.all()[0]
     eq_(u'<p>Version description.</p>', version.sections.all()[0].notes)
+
+
+def test_not_exclude_two_versions_with_same_content():
+    # sometimes there may be a bugfix, which is backported
+    # to a few older versions. In this case these versions has the same
+    # content an none of them should be excluded
+    art = create_user('art')
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/express.js')
+    art.track(changelog)
+
+    update_changelog(changelog)
+
+    # there should be 4.9.3 and 3.17.3 with same content
+    eq_(1, changelog.versions.filter(number='3.17.3').count())
+    eq_(1, changelog.versions.filter(number='4.9.3').count())
+
+
+def test_environment_parent():
+    parent = Environment(name='parent')
+    child = parent.push(name='child')
+    unrelated = Environment(name='unrelated')
+
+    eq_(True, parent.is_parent_for(child))
+    eq_(False, child.is_parent_for(parent))
+    eq_(False, parent.is_parent_for(unrelated))

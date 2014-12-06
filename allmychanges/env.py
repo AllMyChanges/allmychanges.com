@@ -1,6 +1,9 @@
+import weakref
+
 class Environment(object):
     def __init__(self, _parent=None, **kwargs):
         self.__dict__['_parent'] = _parent
+        self.__dict__['_children'] = []
         self.__dict__['_data'] = kwargs.copy()
 
     def __getattr__(self, name):
@@ -39,6 +42,7 @@ class Environment(object):
 
     def push(self, **kwargs):
         new_env = Environment(_parent=self, **kwargs)
+        self._children.append(weakref.ref(new_env))
         return new_env
 
     def keys(self):
@@ -48,3 +52,17 @@ class Environment(object):
         result = list(set(result))
         result.sort()
         return result
+
+    def is_parent_for(self, env):
+        if env._parent is None:
+            return False
+        elif env._parent == self:
+            return True
+        else:
+            return self.is_parent_for(env._parent)
+
+    def find_parent_of_type(self, type_):
+        if self._parent:
+            if self._parent.type == type_:
+                return self._parent
+            return self._parent.find_parent_of_type(type_)
