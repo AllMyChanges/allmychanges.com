@@ -918,13 +918,20 @@ class IssuesView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(IssuesView, self).get_context_data(**kwargs)
-        queryset = Issue.objects.filter(resolved_at=None).order_by('-id')
+        queryset = Issue.objects.order_by('-id')
 
-        page_size = 5
-        form = IssuesFilterForm(self.request.GET, initial={'page_size': page_size})
+        if 'resolved' in self.request.GET:
+            queryset = queryset.exclude(resolved_at=None)
+            result['title'] = 'Resolved issues'
+        else:
+            queryset = queryset.filter(resolved_at=None)
+            result['title'] = 'Issues'
+
+        form = IssuesFilterForm(self.request.GET)
 
         if form.is_valid():
-            page_size = form.cleaned_data['page_size']
+            page_size = form.cleaned_data['page_size'] or 20
+
 
             if form.cleaned_data['namespace']:
                 result['show_back_button'] = True
@@ -935,6 +942,7 @@ class IssuesView(CommonContextMixin, TemplateView):
                 result['show_back_button'] = True
                 queryset = queryset.filter(type=form.cleaned_data['type'])
 
+        result['total_issues'] = queryset.count()
         result['issues'] = queryset[:page_size]
         url = self.request.build_absolute_uri()
         if not '?' in url:
