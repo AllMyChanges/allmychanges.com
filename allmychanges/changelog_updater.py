@@ -1,7 +1,6 @@
 import re
 import datetime
 import copy
-import logging
 import shutil
 import arrow
 
@@ -11,6 +10,7 @@ from allmychanges.exceptions import (
     UpdateError)
 from allmychanges.crawler import search_changelog
 from allmychanges.crawler import parse_changelog
+from allmychanges import chat
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
 
@@ -248,6 +248,9 @@ def update_changelog_from_raw_data3(obj, raw_data):
                 issue.resolved_at = timezone.now()
                 issue.save(update_fields=('resolved_at',))
                 issue.comments.create(message='Autoresolved')
+                chat.send(u'Issue of type "{issue.type}" was autoresolved: <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
+                    issue=issue))
+
 
         latest_history_item = obj.discovery_history.order_by('id').last()
 
