@@ -248,7 +248,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
                 issue.resolved_at = timezone.now()
                 issue.save(update_fields=('resolved_at',))
                 issue.comments.create(message='Autoresolved')
-                chat.send(u'Issue of type "{issue.type}" was autoresolved: <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
+                chat.send(u'Issue of type "{issue.type}" was autoresolved: <http://allmychanges.com/issues/?namespace={issue.changelog.namespace}&name={issue.changelog.name}&resolved|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
                     issue=issue))
 
 
