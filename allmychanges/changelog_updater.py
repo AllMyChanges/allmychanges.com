@@ -237,6 +237,18 @@ def update_changelog_from_raw_data3(obj, raw_data):
                              related_versions=new_versions)
 
     if hasattr(obj, 'discovery_history'):
+        # first, we need to check if some old lesser-version-count issues
+        # should be closed
+        old_issues = obj.issues.filter(type='lesser-version-count',
+                                       resolved_at=None)
+        for issue in old_issues:
+            # we are closing issue if all mentioned versions
+            # were discovered during this pass
+            if discovered_versions.issuperset(issue.get_related_versions()):
+                issue.resolved_at = timezone.now()
+                issue.save(update_fields=('resolved_at',))
+                issue.comments.create(message='Autoresolved')
+
         latest_history_item = obj.discovery_history.order_by('id').last()
 
         if latest_history_item is not None \

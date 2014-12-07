@@ -658,6 +658,14 @@ Issue(changelog={self.changelog},
         return filter(None, response)
 
 
+class IssueComment(models.Model):
+    issue = models.ForeignKey(Issue, related_name='comments')
+    user = models.ForeignKey(User, blank=True, null=True,
+                             related_name='issue_comments')
+    created_at = models.DateTimeField(default=timezone.now)
+    message = models.TextField()
+
+
 class DiscoveryHistory(models.Model):
     """Keeps track any issues, related to a changelog.
     """
