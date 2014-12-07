@@ -1,8 +1,10 @@
 from nose.tools import eq_
 from django.utils import timezone
-from allmychanges.changelog_updater import update_changelog_from_raw_data2
+from allmychanges.changelog_updater import update_changelog_from_raw_data3
 from allmychanges.models import Changelog
 from allmychanges.env import Environment
+from allmychanges.utils import first
+
 
 def v(**kwargs):
     env = Environment()
@@ -23,7 +25,7 @@ def test_dont_add_issue_if_we_found_only_one_new_version():
     data = [v(version='0.2.0', content=[]),
             v(version='0.3.0', content=[])]
 
-    update_changelog_from_raw_data2(changelog, data)
+    update_changelog_from_raw_data3(changelog, data)
 
     eq_([],
         [i.type for i in changelog.issues.all()])
@@ -42,10 +44,13 @@ def test_add_issue_if_we_found_more_than_one_new_version():
             v(version='0.3.0', content=[]),
             v(version='0.4.0', content=[])]
 
-    update_changelog_from_raw_data2(changelog, data)
+    update_changelog_from_raw_data3(changelog, data)
 
     eq_(['too-many-new-versions'],
         [i.type for i in changelog.issues.all()])
+    i = first(changelog.issues)
+    eq_(['0.3.0', '0.4.0'],
+        i.get_related_versions())
 
 
 def test_add_issue_only_if_there_are_already_some_versions():
@@ -59,7 +64,7 @@ def test_add_issue_only_if_there_are_already_some_versions():
             v(version='0.3.0', content=[]),
             v(version='0.4.0', content=[])]
 
-    update_changelog_from_raw_data2(changelog, data)
+    update_changelog_from_raw_data3(changelog, data)
 
     # there isn't any versions in the changelog
     # so we shouldn't create an issue
@@ -76,7 +81,7 @@ def test_add_issue_if_subsequent_discovery_found_less_versions():
             v(version='0.3.0', content=[]),
             v(version='0.4.0', content=[])]
 
-    update_changelog_from_raw_data2(changelog, data)
+    update_changelog_from_raw_data3(changelog, data)
 
     eq_([],
         [i.type for i in changelog.issues.all()])
@@ -85,7 +90,7 @@ def test_add_issue_if_subsequent_discovery_found_less_versions():
     # second discovery found only one versions
     data = [v(version='0.2.0', content=[])]
 
-    update_changelog_from_raw_data2(changelog, data)
+    update_changelog_from_raw_data3(changelog, data)
 
     eq_(['lesser-version-count'],
         [i.type for i in changelog.issues.all()])
@@ -97,19 +102,73 @@ def test_add_issue_if_subsequent_discovery_found_less_versions():
     # create new issues until we resolve this one
     data = [v(version='0.2.0', content=[])]
 
-    update_changelog_from_raw_data2(changelog, data)
+    update_changelog_from_raw_data3(changelog, data)
 
     eq_(['lesser-version-count'],
         [i.type for i in changelog.issues.all()])
 
 
-    # but if we resolve the issue, then
-    # it could appear again
-    changelog.resolve_issues(type='lesser-version-count')
+def test_two_or_more_lesser_versions_issue_could_be_added_for_different_versions_sets():
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test')
 
-    update_changelog_from_raw_data2(changelog, data)
+    # first discovery found 3 versions
+    data = [v(version='0.2.0', content=[]),
+            v(version='0.3.0', content=[]),
+            v(version='0.4.0', content=[])]
 
-    eq_([('lesser-version-count', timezone.now().date()),
-         ('lesser-version-count', None)],
-        [(i.type, i.resolved_at.date() if i.resolved_at else None)
+    update_changelog_from_raw_data3(changelog, data)
+
+    eq_([],
+        [i.type for i in changelog.issues.all()])
+
+    # second discovery found only two versions
+    data = [v(version='0.3.0', content=[]),
+            v(version='0.4.0', content=[])]
+    update_changelog_from_raw_data3(changelog, data)
+
+    # and second time we discovered only 0.4.0
+    data = [v(version='0.4.0', content=[])]
+    update_changelog_from_raw_data3(changelog, data)
+
+    # this should create two issues
+    eq_([('lesser-version-count', '0.2.0'),
+         ('lesser-version-count', '0.3.0')],
+        [(i.type, i.related_versions)
          for i in changelog.issues.all()])
+
+
+def test_lesser_versions_autoresolve():
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test')
+
+    # first discovery found 3 versions
+    data = [v(version='0.2.0', content=[]),
+            v(version='0.3.0', content=[]),
+            v(version='0.4.0', content=[])]
+
+    update_changelog_from_raw_data3(changelog, data)
+
+    eq_([],
+        [i.type for i in changelog.issues.all()])
+
+    # second discovery found only two versions
+    data = [v(version='0.3.0', content=[]),
+            v(version='0.4.0', content=[])]
+    update_changelog_from_raw_data3(changelog, data)
+
+    # and now we again discovered all three versions
+    data = [v(version='0.2.0', content=[]),
+            v(version='0.3.0', content=[]),
+            v(version='0.4.0', content=[])]
+    update_changelog_from_raw_data3(changelog, data)
+
+    # this should create one issues
+    eq_([('lesser-version-count', '0.2.0')],
+        [(i.type, i.related_versions)
+         for i in changelog.issues.all()])
+
+    issue = changelog.issues.all()[0]
+    # and it should be resolved automatically
+    assert issue.resolved_at is not None
+    eq_('Autoresolved', issue.comments.all()[0].message)

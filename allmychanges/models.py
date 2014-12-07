@@ -519,13 +519,17 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
                     self.light_moderators.create(light_user=light_user)
                     return 'light'
 
-    def create_issue(self, type, comment=''):
+    def create_issue(self, type, comment='', related_versions=[]):
+        joined_versions = u', '.join(related_versions)
+
         # for some types, only one issue at a time is allowed
         if type == 'lesser-version-count':
-            if self.issues.filter(type=type, resolved_at=None).count() > 0:
+            if self.issues.filter(type=type, resolved_at=None, related_versions=joined_versions).count() > 0:
                 return
 
-        issue = self.issues.create(type=type, comment=comment)
+        issue = self.issues.create(type=type,
+                                   comment=comment.format(related_versions=joined_versions),
+                                   related_versions=joined_versions)
         chat.send(u'New issue of type "{issue.type}" with comment: "{issue.comment}" was created for <http://allmychanges.com/p/{issue.changelog.namespace}/{issue.changelog.name}/|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
             issue=issue))
 
@@ -623,6 +627,8 @@ class Issue(models.Model):
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(blank=True, null=True)
+    related_versions = models.TextField(default='', blank=True,
+                                        help_text='Comma-separated list of versions, related to this issue')
 
     def __repr__(self):
         return """
@@ -646,6 +652,11 @@ Issue(changelog={self.changelog},
     def editable_by(self, user, light_user=None):
         return self.changelog.editable_by(user, light_user)
 
+    def get_related_versions(self):
+        response = [version.strip()
+                    for version in self.related_versions.split(',')]
+        return filter(None, response)
+
 
 class DiscoveryHistory(models.Model):
     """Keeps track any issues, related to a changelog.
@@ -658,6 +669,10 @@ class DiscoveryHistory(models.Model):
     num_new_versions = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+    def __repr__(self):
+        return '<DiscoveryHistory versions={0.discovered_versions}'.format(
+            self)
 
 
 class LightModerator(models.Model):

@@ -5,7 +5,7 @@ from nose.tools import eq_
 from allmychanges.models import Changelog
 from .utils import create_user
 from allmychanges.changelog_updater import (
-    update_changelog)
+    update_preview_or_changelog)
 from allmychanges.env import Environment
 from allmychanges.parsing.pipeline import parse_html_file
 
@@ -16,7 +16,7 @@ def test_update_package_using_full_pipeline():
         namespace='python', name='pip', source='test+samples/very-simple.md')
     art.track(changelog)
 
-    update_changelog(changelog)
+    update_preview_or_changelog(changelog)
 
     versions = list(changelog.versions.filter(code_version='v2'))
     eq_(2, len(versions))
@@ -84,7 +84,7 @@ def test_exclude_version_if_it_includes_few_other_versions():
         namespace='python', name='pip', source='test+samples/celery/1')
     art.track(changelog)
 
-    update_changelog(changelog)
+    update_preview_or_changelog(changelog)
 
     # there shouldn't be 3.1 version because it is just number from a filename
     eq_(0, changelog.versions.filter(number='3.1').count())
@@ -96,7 +96,7 @@ def test_exclude_version_if_it_included_in_the_version_with_same_number_and_bigg
         namespace='python', name='pip', source='test+samples/celery/2')
     art.track(changelog)
 
-    update_changelog(changelog)
+    update_preview_or_changelog(changelog)
 
     # there should be 3.1 version and it's content should include entire file
     # with a header because there aren't any versions there yet
@@ -115,7 +115,7 @@ def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_numbe
         namespace='python', name='pip', source='test+samples/celery/3')
     art.track(changelog)
 
-    update_changelog(changelog)
+    update_preview_or_changelog(changelog)
 
     # there should be 3.1.0 version only because now it is only version in a 3.1.rst file
     # with a header because there aren't any versions there yet
@@ -135,7 +135,7 @@ def test_not_exclude_two_versions_with_same_content():
         namespace='python', name='pip', source='test+samples/express.js')
     art.track(changelog)
 
-    update_changelog(changelog)
+    update_preview_or_changelog(changelog)
 
     # there should be 4.9.3 and 3.17.3 with same content
     eq_(1, changelog.versions.filter(number='3.17.3').count())

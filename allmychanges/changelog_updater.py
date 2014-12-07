@@ -233,11 +233,11 @@ def update_changelog_from_raw_data3(obj, raw_data):
         # not discovered yet
         if len(new_versions) > 1 and hasattr(obj, 'create_issue'):
             obj.create_issue(type='too-many-new-versions',
-                             comment='I found {0}'.format(
-                                 ', '.join(new_versions)))
+                             comment='I found {related_versions}',
+                             related_versions=new_versions)
 
     if hasattr(obj, 'discovery_history'):
-        latest_history_item = obj.discovery_history.order_by('-id').last()
+        latest_history_item = obj.discovery_history.order_by('id').last()
 
         if latest_history_item is not None \
            and len(discovered_versions) < latest_history_item.num_discovered_versions:
@@ -245,8 +245,8 @@ def update_changelog_from_raw_data3(obj, raw_data):
             missing_versions = previously_discovered_versions - discovered_versions
 
             obj.create_issue(type='lesser-version-count',
-                             comment='This time we didn\'t discover {0} versions'.format(
-                                 u', '.join(missing_versions)))
+                             comment='This time we didn\'t discover {related_versions} versions',
+                             related_versions=missing_versions)
 
         obj.discovery_history.create(
             discovered_versions=','.join(discovered_versions),
@@ -281,74 +281,74 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
 
 # TODO: remove when new update_changelog_from_raw_data3 will be ready
-def update_changelog_from_raw_data2(changelog, raw_data, preview_id=None):
-    """ raw_data should be a list where versions come from
-    more recent to the oldest."""
-    code_version = 'v2'
+# def update_changelog_from_raw_data2(changelog, raw_data, preview_id=None):
+#     """ raw_data should be a list where versions come from
+#     more recent to the oldest."""
+#     code_version = 'v2'
 
-    current_versions = SortedSet(
-        changelog.versions.filter(
-            code_version=code_version,
-            preview_id=preview_id).values_list('number',flat=True))
+#     current_versions = SortedSet(
+#         changelog.versions.filter(
+#             code_version=code_version,
+#             preview_id=preview_id).values_list('number',flat=True))
 
-    discovered_versions = SortedSet(item.version
-                                    for item in raw_data)
-    new_versions = discovered_versions - current_versions
+#     discovered_versions = SortedSet(item.version
+#                                     for item in raw_data)
+#     new_versions = discovered_versions - current_versions
 
-    if not current_versions:
-        # for initial filling, we should set all missing dates to some values
-        raw_data = fill_missing_dates2(raw_data)
-    else:
-        # now new versions contains only those version numbers which were
-        # not discovered yet
-        if len(new_versions) > 1 and preview_id is None:
-            changelog.create_issue(type='too-many-new-versions',
-                                   comment='I found {0}'.format(
-                                       ', '.join(new_versions)))
+#     if not current_versions:
+#         # for initial filling, we should set all missing dates to some values
+#         raw_data = fill_missing_dates2(raw_data)
+#     else:
+#         # now new versions contains only those version numbers which were
+#         # not discovered yet
+#         if len(new_versions) > 1 and preview_id is None:
+#             changelog.create_issue(type='too-many-new-versions',
+#                                    comment='I found {0}'.format(
+#                                        ', '.join(new_versions)))
 
-    latest_history_item = changelog.discovery_history.order_by('-id').last()
+#     latest_history_item = changelog.discovery_history.order_by('-id').last()
 
-    if latest_history_item is not None \
-       and len(discovered_versions) < latest_history_item.num_discovered_versions:
-        previously_discovered_versions = SortedSet(latest_history_item.discovered_versions.split(','))
-        missing_versions = previously_discovered_versions - discovered_versions
+#     if latest_history_item is not None \
+#        and len(discovered_versions) < latest_history_item.num_discovered_versions:
+#         previously_discovered_versions = SortedSet(latest_history_item.discovered_versions.split(','))
+#         missing_versions = previously_discovered_versions - discovered_versions
 
-        if preview_id is None:
-            changelog.create_issue(type='lesser-version-count',
-                                   comment='This time we didn\'t discover {0} versions'.format(
-                                       u', '.join(missing_versions)))
+#         if preview_id is None:
+#             changelog.create_issue(type='lesser-version-count',
+#                                    comment='This time we didn\'t discover {0} versions'.format(
+#                                        u', '.join(missing_versions)))
 
-    changelog.discovery_history.create(
-        discovered_versions=','.join(discovered_versions),
-        new_versions=','.join(new_versions),
-        num_discovered_versions=len(discovered_versions),
-        num_new_versions=len(new_versions))
+#     changelog.discovery_history.create(
+#         discovered_versions=','.join(discovered_versions),
+#         new_versions=','.join(new_versions),
+#         num_discovered_versions=len(discovered_versions),
+#         num_new_versions=len(new_versions))
 
-    for raw_version in raw_data:
-        version, created = changelog.versions.get_or_create(
-            number=raw_version.version,
-            code_version=code_version,
-            preview_id=preview_id)
+#     for raw_version in raw_data:
+#         version, created = changelog.versions.get_or_create(
+#             number=raw_version.version,
+#             code_version=code_version,
+#             preview_id=preview_id)
 
-        version.unreleased = getattr(raw_version, 'unreleased', False)
-        version.filename = getattr(raw_version, 'filename', None)
-        version.date = getattr(raw_version, 'date', None)
+#         version.unreleased = getattr(raw_version, 'unreleased', False)
+#         version.filename = getattr(raw_version, 'filename', None)
+#         version.date = getattr(raw_version, 'date', None)
 
-        if version.discovered_at is None:
-            version.discovered_at = getattr(raw_version, 'discovered_at', timezone.now())
+#         if version.discovered_at is None:
+#             version.discovered_at = getattr(raw_version, 'discovered_at', timezone.now())
 
-        version.save()
+#         version.save()
 
-        version.sections.all().delete()
-        for raw_section in raw_version.content:
-            if isinstance(raw_section, list):
-                section = version.sections.create(code_version=code_version)
-                for raw_item in raw_section:
-                    section.items.create(text=raw_item['text'],
-                                         type=raw_item['type'])
-            else:
-                section = version.sections.create(notes=raw_section,
-                                                  code_version=code_version)
+#         version.sections.all().delete()
+#         for raw_section in raw_version.content:
+#             if isinstance(raw_section, list):
+#                 section = version.sections.create(code_version=code_version)
+#                 for raw_item in raw_section:
+#                     section.items.create(text=raw_item['text'],
+#                                          type=raw_item['type'])
+#             else:
+#                 section = version.sections.create(notes=raw_section,
+#                                                   code_version=code_version)
 
 
 def parse_changelog_file(filename):
@@ -443,78 +443,78 @@ def update_preview_or_changelog(obj):
     obj.save()
 
 
-def update_changelog(changelog, preview_id=None):
-    # TODO: remove when update_preview_or_changelog will be ready
-    changelog.filename = None
+# def update_changelog(changelog, preview_id=None):
+#     # TODO: remove when update_preview_or_changelog will be ready
+#     changelog.filename = None
 
-    if preview_id is None:
-        ignore_list = changelog.get_ignore_list()
-        search_list = changelog.get_search_list()
-        download = changelog.download
-    else:
-        preview = changelog.previews.get(pk=preview_id)
-        ignore_list = preview.get_ignore_list()
-        search_list = preview.get_search_list()
-        download = preview.download
+#     if preview_id is None:
+#         ignore_list = changelog.get_ignore_list()
+#         search_list = changelog.get_search_list()
+#         download = changelog.download
+#     else:
+#         preview = changelog.previews.get(pk=preview_id)
+#         ignore_list = preview.get_ignore_list()
+#         search_list = preview.get_search_list()
+#         download = preview.download
 
 
-    try:
-        path = download()
-    except UpdateError:
-        raise
-    except Exception:
-        logging.getLogger('update-changelog').exception('unhandled')
-        raise UpdateError('Unable to download sources')
+#     try:
+#         path = download()
+#     except UpdateError:
+#         raise
+#     except Exception:
+#         logging.getLogger('update-changelog').exception('unhandled')
+#         raise UpdateError('Unable to download sources')
 
-    try:
-        try:
-            from allmychanges.parsing.pipeline import processing_pipe
-            versions = processing_pipe(path, ignore_list, search_list)
-            #print 'Num versions from pipeline:', len(versions)
-            if not versions:
-                logging.getLogger('update-changelog2').debug('updating v2 from vcs')
-                versions = vcs_processing_pipe(path, ignore_list, search_list)
-                #print 'Num versions from VCS:', len(raw_data)
+#     try:
+#         try:
+#             from allmychanges.parsing.pipeline import processing_pipe
+#             versions = processing_pipe(path, ignore_list, search_list)
+#             #print 'Num versions from pipeline:', len(versions)
+#             if not versions:
+#                 logging.getLogger('update-changelog2').debug('updating v2 from vcs')
+#                 versions = vcs_processing_pipe(path, ignore_list, search_list)
+#                 #print 'Num versions from VCS:', len(raw_data)
 
-            if not versions:
-                raise UpdateError('Changelog not found')
-            update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)
+#             if not versions:
+#                 raise UpdateError('Changelog not found')
+#             update_changelog_from_raw_data2(changelog, versions, preview_id=preview_id)
 
-        except UpdateError:
-            raise
-        except Exception:
-            logging.getLogger('update-changelog').exception('unhandled')
-            raise UpdateError('Unable to parse or extract sources')
+#         except UpdateError:
+#             raise
+#         except Exception:
+#             logging.getLogger('update-changelog').exception('unhandled')
+#             raise UpdateError('Unable to parse or extract sources')
 
-        # try:
-        #     filename, raw_data = search_changelog2(path)
+#         # try:
+#         #     filename, raw_data = search_changelog2(path)
 
-        #     if raw_data:
-        #         changelog.filename = os.path.relpath(filename, path)
-        #         changelog.save()
-        #     else:
-        #         raw_data = extract_changelog_from_vcs(path)
+#         #     if raw_data:
+#         #         changelog.filename = os.path.relpath(filename, path)
+#         #         changelog.save()
+#         #     else:
+#         #         raw_data = extract_changelog_from_vcs(path)
 
-        # except UpdateError:
-        #     raise
-        # except Exception:
-        #     logging.getLogger('update-changelog').exception('unhandled')
-        #     raise UpdateError('Unable to parse or extract sources')
+#         # except UpdateError:
+#         #     raise
+#         # except Exception:
+#         #     logging.getLogger('update-changelog').exception('unhandled')
+#         #     raise UpdateError('Unable to parse or extract sources')
 
-        # if not raw_data:
-        #     raise UpdateError('Changelog not found')
+#         # if not raw_data:
+#         #     raise UpdateError('Changelog not found')
 
-        # try:
-        #     update_changelog_from_raw_data(changelog, raw_data, preview_id=preview_id)
-        # except Exception:
-        #     logging.getLogger('update-changelog').exception('unhandled')
-        #     raise UpdateError('Unable to update database')
+#         # try:
+#         #     update_changelog_from_raw_data(changelog, raw_data, preview_id=preview_id)
+#         # except Exception:
+#         #     logging.getLogger('update-changelog').exception('unhandled')
+#         #     raise UpdateError('Unable to update database')
 
-    finally:
-        shutil.rmtree(path)
+#     finally:
+#         shutil.rmtree(path)
 
-        # we only need to change updated_at if this
-        # wasn't preview update
-        if preview_id is None:
-            changelog.updated_at = timezone.now()
-            changelog.save()
+#         # we only need to change updated_at if this
+#         # wasn't preview update
+#         if preview_id is None:
+#             changelog.updated_at = timezone.now()
+#             changelog.save()

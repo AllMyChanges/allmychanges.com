@@ -13,7 +13,7 @@ from allmychanges.utils import (
     count,
     count_time)
 from allmychanges.exceptions import UpdateError
-from allmychanges.changelog_updater import update_changelog, update_preview_or_changelog
+from allmychanges.changelog_updater import update_preview_or_changelog
 
 from twiggy_goodies.django_rq import job
 from twiggy_goodies.threading import log
@@ -133,91 +133,91 @@ def schedule_updates(reschedule=False, packages=[]):
 
 
 
-@singletone()
-@job('default', timeout=600)
-@transaction.atomic
-def update_changelog_task_to_remove(source, preview_id=None):
-    with log.fields(source=source, preview_id=preview_id):
-        log.info('Starting task')
-        from .models import Changelog, Preview
+# @singletone()
+# @job('default', timeout=600)
+# @transaction.atomic
+# def update_changelog_task_to_remove(source, preview_id=None):
+#     with log.fields(source=source, preview_id=preview_id):
+#         log.info('Starting task')
+#         from .models import Changelog, Preview
 
-        changelog = None
-        tries = 10
+#         changelog = None
+#         tries = 10
 
-        while changelog is None and tries > 0:
-            try:
-                changelog = Changelog.objects.get(source=source)
-            except Changelog.DoesNotExist:
-                log.error('Changelog with source={source} not found'.format(
-                    **locals()))
-                time.sleep(1)
-                # we make commit to refresh transaction state and to
-                # look if changelog object appeared in the database
-                transaction.commit()
-                tries -= 1
+#         while changelog is None and tries > 0:
+#             try:
+#                 changelog = Changelog.objects.get(source=source)
+#             except Changelog.DoesNotExist:
+#                 log.error('Changelog with source={source} not found'.format(
+#                     **locals()))
+#                 time.sleep(1)
+#                 # we make commit to refresh transaction state and to
+#                 # look if changelog object appeared in the database
+#                 transaction.commit()
+#                 tries -= 1
 
-        assert changelog is not None, 'Changelog with source={source} not found'.format(
-                    **locals())
+#         assert changelog is not None, 'Changelog with source={source} not found'.format(
+#                     **locals())
 
-        log.info('processing changelog')
+#         log.info('processing changelog')
 
-        if preview_id is None:
-            if changelog.processing_started_at is not None:
-                log.info('somebody already processing this changelog')
-                return
+#         if preview_id is None:
+#             if changelog.processing_started_at is not None:
+#                 log.info('somebody already processing this changelog')
+#                 return
 
-        problem = None
-        try:
-            if preview_id is None:
-                changelog.processing_started_at = timezone.now()
-                changelog.save()
+#         problem = None
+#         try:
+#             if preview_id is None:
+#                 changelog.processing_started_at = timezone.now()
+#                 changelog.save()
 
-            update_changelog(changelog, preview_id=preview_id)
+#             update_changelog(changelog, preview_id=preview_id)
 
-            if preview_id is None:
-                changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
+#             if preview_id is None:
+#                 changelog.last_update_took = (timezone.now() - changelog.processing_started_at).seconds
 
-                hour = 60 * 60
-                min_update_interval = hour
-                time_to_next_update = 4 * hour
-                time_to_next_update = time_to_next_update / math.log(max(math.e,
-                                                                         changelog.trackers.count()))
+#                 hour = 60 * 60
+#                 min_update_interval = hour
+#                 time_to_next_update = 4 * hour
+#                 time_to_next_update = time_to_next_update / math.log(max(math.e,
+#                                                                          changelog.trackers.count()))
 
-                time_to_next_update = max(min_update_interval,
-                                          time_to_next_update,
-                                          2 * changelog.last_update_took)
+#                 time_to_next_update = max(min_update_interval,
+#                                           time_to_next_update,
+#                                           2 * changelog.last_update_took)
 
-                changelog.next_update_at = timezone.now() + datetime.timedelta(0, time_to_next_update)
-        except UpdateError as e:
-            problem = ', '.join(e.args)
-            log.trace().error('Unable to update changelog')
-        except Exception as e:
-            problem = unicode(e)
-            log.trace().error('Unable to update changelog')
-        finally:
-            if problem is not None:
-                log.warning(problem)
+#                 changelog.next_update_at = timezone.now() + datetime.timedelta(0, time_to_next_update)
+#         except UpdateError as e:
+#             problem = ', '.join(e.args)
+#             log.trace().error('Unable to update changelog')
+#         except Exception as e:
+#             problem = unicode(e)
+#             log.trace().error('Unable to update changelog')
+#         finally:
+#             if problem is not None:
+#                 log.warning(problem)
 
-                if preview_id:
-                    preview = Preview.objects.get(pk=preview_id)
-                    preview.problem = problem
-                    preview.updated_at = timezone.now()
-                    preview.save(update_fields=('problem', 'updated_at'))
+#                 if preview_id:
+#                     preview = Preview.objects.get(pk=preview_id)
+#                     preview.problem = problem
+#                     preview.updated_at = timezone.now()
+#                     preview.save(update_fields=('problem', 'updated_at'))
 
-                else:
-                    changelog.problem = problem
+#                 else:
+#                     changelog.problem = problem
 
-            if preview_id is None:
-                next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
-                changelog.next_update_at = next_update_if_error
-                changelog.processing_started_at = None
-                changelog.save()
-            else:
-                preview = Preview.objects.get(pk=preview_id)
-                preview.updated_at = timezone.now()
-                preview.save(update_fields=('updated_at',))
+#             if preview_id is None:
+#                 next_update_if_error = timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
+#                 changelog.next_update_at = next_update_if_error
+#                 changelog.processing_started_at = None
+#                 changelog.save()
+#             else:
+#                 preview = Preview.objects.get(pk=preview_id)
+#                 preview.updated_at = timezone.now()
+#                 preview.save(update_fields=('updated_at',))
 
-            log.info('Task done')
+#             log.info('Task done')
 
 
 @singletone('preview')

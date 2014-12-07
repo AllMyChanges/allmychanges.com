@@ -1,5 +1,4 @@
 # coding: utf-8
-import anyjson
 import arrow
 import os
 import re
@@ -9,7 +8,6 @@ import logging
 import graphitesend
 import time
 import times
-import requests
 
 from lxml import html
 from contextlib import contextmanager
@@ -33,6 +31,9 @@ def load_data(filename):
 
 def first(iterable, default=None):
     """Returns first item or `default`."""
+    if hasattr(iterable, 'all'):
+        iterable = iterable.all()
+
     iterator = iter(iterable)
     try:
         return iterator.next()
