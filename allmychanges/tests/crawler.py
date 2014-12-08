@@ -164,6 +164,9 @@ Change in a way how unreleased notes are parsed.
 
 
 def test_extract_version():
+    # from https://github.com/ansible/ansible/blob/devel/CHANGELOG.md
+    eq_('1.6.8', _extract_version('1.6.8 "And the Cradle Will Rock" - Jul 22, 2014'))
+
     eq_('0.2.1', _extract_version('2014-09-11 v0.2.1'))
     # this horror is from the https://github.com/Test-More/TB2/blob/master/Changes
     eq_('1.005000_003', _extract_version('1.005000_003'))

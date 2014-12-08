@@ -122,16 +122,20 @@ def _extract_version(line):
             line = line.replace(date_str.group('date'), u'')
 
         line = line.strip()
-        tokens = line.split()
-        # we ignore long lines because probably
-        # they are not headers we are looking for
-        if len(tokens) > 5:
-            return None
-
         for i in _version_regexes:
             match = re.search(i, line)
             if match is not None:
-                return match.group('ver')
+                version = match.group('ver')
+                tokens = line.replace(version, '').split()
+                tokens = [token for token in tokens
+                          if re.match(ur'[-:_]+', token) is None]
+
+                # we ignore long lines because probably
+                # they are not headers we are looking for
+                if len(tokens) > 6:
+                    return None
+
+                return version
 
 
 def _extract_date(line):
