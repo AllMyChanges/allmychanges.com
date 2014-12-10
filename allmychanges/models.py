@@ -568,8 +568,8 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         result = cache.get(key, self.processing_status)
         return result
 
-    def calc_next_update_interval(self):
-        """Returns number seconds to sleep before next update.
+    def calc_next_update(self):
+        """Returns date and time when next update should be scheduled.
         """
         hour = 60 * 60
         min_update_interval = hour
