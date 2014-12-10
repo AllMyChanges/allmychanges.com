@@ -185,7 +185,7 @@
 	                )
 	            );
 	        }
-	        return  (React.createElement("div", {className: "dropdown"}, React.createElement("button", {className: "button", onClick: this.handle_switcher_click}, React.createElement("i", {className: "fa fa-exclamation-circle fa-lg", style: {color: '#D9534F', marginRight: '5px'}}), "Report"), popup));
+	        return  (React.createElement("div", {className: "dropdown"}, React.createElement("button", {className: "button", onClick: this.handle_switcher_click, title: "If you found some issues with this changelog, please file this issue."}, React.createElement("i", {className: "fa fa-exclamation-circle fa-lg", style: {color: '#D9534F', marginRight: '5px'}}), "Report"), popup));
 	    }
 	});
 
@@ -355,9 +355,9 @@
 	    },
 	    render: function() {
 	        if (this.state.tracked) {
-	            return (React.createElement("button", {className: "package-select__track-button package-select__track-button_tracked"}, "Tracked"));
+	            return (React.createElement("button", {className: "package-select__track-button package-select__track-button_tracked", title: "Now you are tracking this package."}, "Tracked"));
 	        } else {
-	            return (React.createElement("button", {className: "package-select__track-button", onClick: this.handle_click}, "Track"));
+	            return (React.createElement("button", {className: "package-select__track-button", onClick: this.handle_click, title: "Press to receive notifications about new versions."}, "Track"));
 	        }
 	    }
 	});

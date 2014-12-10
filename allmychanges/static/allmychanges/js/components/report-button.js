@@ -82,6 +82,6 @@ module.exports = React.createClass({
                 </form>
             </div>;
         }
-        return  (<div className="dropdown"><button className="button" onClick={this.handle_switcher_click}><i className="fa fa-exclamation-circle fa-lg" style={{color: '#D9534F', marginRight: '5px'}}></i>Report</button>{popup}</div>);
+        return  (<div className="dropdown"><button className="button" onClick={this.handle_switcher_click} title="If you found some issues with this changelog, please file this issue."><i className="fa fa-exclamation-circle fa-lg" style={{color: '#D9534F', marginRight: '5px'}}></i>Report</button>{popup}</div>);
     }
 });

@@ -19,9 +19,9 @@ module.exports = React.createClass({
     },
     render: function() {
         if (this.state.tracked) {
-            return (<button className="package-select__track-button package-select__track-button_tracked">Tracked</button>);
+            return (<button className="package-select__track-button package-select__track-button_tracked" title="Now you are tracking this package.">Tracked</button>);
         } else {
-            return (<button className="package-select__track-button" onClick={this.handle_click}>Track</button>);
+            return (<button className="package-select__track-button" onClick={this.handle_click} title="Press to receive notifications about new versions.">Track</button>);
         }
     }
 });
