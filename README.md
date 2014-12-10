@@ -70,5 +70,3 @@ Interesting projects
 
 * Command-line utility, showing changelog of npm packages: https://github.com/dylang/changelog
 * A tool for updating project changelogs and package.json files for new releases: https://github.com/defunctzombie/changelog
-
-force push
