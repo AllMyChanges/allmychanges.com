@@ -2,6 +2,12 @@
 {% load md2 %}
 {% load allmychanges_tags %}
 
+{% block html-title %}{{package.namespace}}/{{package.name}}'s changelog at {{block.super}}{% endblock %}
+{% block extra_head %}
+{{ block.super }}
+<meta content="Package {{package.name}}'s changelog." name="description"></meta>
+<meta content="{{package.namespace}},{{package.name}},changelog,version,latest,release notes,release" name="keywords"></meta>
+{% endblock %}
 
 {% block content %}
   <h1 class="page-header">{{package.namespace}}/{{package.name}} <a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <track-button data-changelog="{{package.changelog.id}}" data-already-tracked="{{already_tracked|lower}}"/></h1>
