@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-import math
 import logging
-import datetime
-import time
 
-from django.db.models import Count
 from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
@@ -12,7 +8,6 @@ from django.conf import settings
 from allmychanges.utils import (
     count,
     count_time)
-from allmychanges.exceptions import UpdateError
 from allmychanges.changelog_updater import update_preview_or_changelog
 
 from twiggy_goodies.django_rq import job
@@ -241,7 +236,7 @@ def update_changelog_task(source):
     with log.fields(source=source):
         log.info('Starting task')
         processing_started_at = timezone.now()
-        error = False
+        error = True
 
         try:
             from .models import Changelog
@@ -251,9 +246,9 @@ def update_changelog_task(source):
             changelog.last_update_took = (timezone.now() - processing_started_at).seconds
             changelog.next_update_at = changelog.calc_next_update()
             changelog.save()
-        except Exception:
+            error = False
+        except (Exception, SystemExit):
             log.trace().error('Error during changelog update')
-            error = True
         finally:
             if error or changelog.status == 'error':
                 log.error('Scheduling next update because of error')
