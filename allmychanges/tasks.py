@@ -256,6 +256,7 @@ def update_changelog_task(source):
             error = True
         finally:
             if error or changelog.status == 'error':
+                log.error('Scheduling next update because of error')
                 changelog.next_update_at = changelog.calc_next_update_if_error()
                 changelog.save()
 
