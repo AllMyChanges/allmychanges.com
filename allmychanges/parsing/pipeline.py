@@ -635,6 +635,7 @@ def prerender_items(version):
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
                            u'p', # we allow paragraphs cause they are fine
                            u'h1', u'h2', u'h3', u'h4', # headers are ok too
+                           u'del', u'strike', u's',
                            u'tt', # monospace
                            u'div', # dont see why it should be prohibited
                            u'span', # and spans too
