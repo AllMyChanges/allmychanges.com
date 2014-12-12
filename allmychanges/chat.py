@@ -23,7 +23,6 @@ def send(text):
                                                   'from': 'bot'}))
 
     thread = threading.Thread(target=remote_send)
-    thread.daemon = True
     thread.start()
 
     if not settings.KATO_URL and not settings.SLACK_URL:
