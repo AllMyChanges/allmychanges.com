@@ -195,6 +195,7 @@ TEMP_DIR = '/tmp/allmychanges'
 EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 
 SLACK_URL = 'https://hooks.slack.com/services/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'
+KATO_URL = 'https://api.kato.im/rooms/1cade7d59009707e553d60bc9e0760f54dcb8d1f18544d5d2a4c4914998440c1/simple'
 
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
