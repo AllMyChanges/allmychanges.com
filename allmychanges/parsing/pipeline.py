@@ -2,7 +2,6 @@
 import re
 import codecs
 import copy
-import itertools
 import os
 import tempfile
 import shutil
@@ -12,6 +11,7 @@ import lxml.html
 from operator import itemgetter
 from collections import defaultdict
 from functools import wraps
+from itertools import islice, chain, takewhile
 from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
 
@@ -40,8 +40,8 @@ def compare_versions(left, right):
 def parse_changelog(raw_changelog):
     # TODO: похоже этот код нигде не используется
     chunks = raw_changelog.get_chunks()
-    versions = itertools.chain(*[chunk.get_versions()
-                                 for chunk in chunks])
+    versions = chain(*[chunk.get_versions()
+                       for chunk in chunks])
     versions = sorted(versions, compare_versions)
     return versions
 
@@ -441,7 +441,7 @@ def parse_html_file(obj):
 
 
     def process_header(parent, tag, text, all_children):
-        children = list(itertools.takewhile(
+        children = list(takewhile(
             is_header_tag,
             all_children))
         sections = list(create_notes(children))
@@ -527,8 +527,11 @@ def extract_metadata(version):
     """Tries to extract date and list items' type.
     """
     def _all_dates(iterable):
-        for item in iterable:
-            date = _extract_date(item)
+        # we don't need dates which are deep in the release notes
+        for item in islice(iterable, 0, 4):
+            # and we search only through first 200 symbols
+            # of each part
+            date = _extract_date(item[:200])
             if date:
                 yield date
 
@@ -557,8 +560,8 @@ def extract_metadata(version):
                 return True
         return False
 
-    all_dates = list(_all_dates(itertools.chain([version.title],
-                                                _all_list_items())))
+    all_dates = list(_all_dates(chain([version.title],
+                                      _all_list_items())))
 
     new_version = version.push(type='prerender_items')
 
