@@ -6,6 +6,7 @@ from django.db.models import Max
 from django import forms
 from django.contrib import messages
 from itertools import islice
+from twiggy_goodies.threading import log
 
 from rest_framework import viewsets, mixins, views, permissions
 from rest_framework.exceptions import ParseError
@@ -430,5 +431,13 @@ class IssueViewSet(HandleExceptionMixin,
         if issue.editable_by(user, self.request.light_user):
             issue.resolved_at = timezone.now()
             issue.save(update_fields=('resolved_at',))
+            if issue.type == 'auto-paused':
+                changelog = issue.changelog
+                with log.fields(changelog_id=changelog.id):
+                    log.info('Resuming changelog updates')
+                    changelog.paused_at = None
+                    changelog.next_update_at = timezone.now()
+                    changelog.save()
+
             return Response({'result': 'ok'})
         raise AccessDenied()
