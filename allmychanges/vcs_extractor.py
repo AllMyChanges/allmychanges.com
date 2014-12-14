@@ -56,7 +56,7 @@ def python_version_extractor(path):
 
             try:
                 from setup import setup
-            except Exception:
+            except:
                 pass
 
             return metadata.get('version')

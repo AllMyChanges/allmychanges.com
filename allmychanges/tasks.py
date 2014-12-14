@@ -247,7 +247,7 @@ def update_changelog_task(source):
             changelog.next_update_at = changelog.calc_next_update()
             changelog.save()
             error = False
-        except (Exception, SystemExit):
+        except Exception:
             log.trace().error('Error during changelog update')
         finally:
             if error or changelog.status == 'error':
