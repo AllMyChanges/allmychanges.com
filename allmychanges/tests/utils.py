@@ -1,4 +1,5 @@
 # coding: utf-8
+import datetime
 import anyjson
 
 from nose.tools import eq_
@@ -35,3 +36,17 @@ def put_json(cl, url, **data):
                       anyjson.serialize(data),
                       content_type='application/json')
     return response
+
+
+def dt_eq(left_date, right_date, threshold=3):
+    if not isinstance(left_date, datetime.datetime):
+        raise AssertionError('First argument should be an instance of `datetime` class, but it is `{0}`.'.format(
+            type(left_date).__name__))
+
+    if not isinstance(right_date, datetime.datetime):
+        raise AssertionError('Second argument should be an instance of `datetime` class, but it is `{0}`.'.format(
+            type(right_date).__name__))
+
+    diff = abs(left_date - right_date).total_seconds()
+    assert diff < threshold, '{0} differ from {1} more than in {2} seconds'.format(
+        left_date, right_date, threshold)

@@ -419,7 +419,13 @@ class Downloadable(object):
         return download(self.source)
 
 
+class ChangelogManager(models.Manager):
+    def only_active(self):
+        return self.all().filter(paused_at=None).exclude(name=None)
+
+
 class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
+    objects = ChangelogManager()
     source = models.URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     # TODO: remove
@@ -433,6 +439,7 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
                                blank=True, null=True)
     updated_at = models.DateTimeField(blank=True, null=True)
     next_update_at = models.DateTimeField(default=timezone.now)
+    paused_at = models.DateTimeField(blank=True, null=True)
     last_update_took = models.IntegerField(
         help_text=('Number of seconds required to '
                    'update this changelog last time'),
@@ -585,6 +592,7 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
         return timezone.now() + datetime.timedelta(0, time_to_next_update)
 
     def calc_next_update_if_error(self):
+        # TODO: check and remove
         return timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
 
     def schedule_update(self, async=True, full=False):

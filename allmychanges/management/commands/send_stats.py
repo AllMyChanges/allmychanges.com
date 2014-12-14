@@ -84,7 +84,7 @@ def get_stats():
     # because 10 minutes is job timeout and this is means that it will
     # never be updated
     stale_margin = timezone.now() - datetime.timedelta(0, 10 * 60)
-    stale = Changelog.objects.filter(next_update_at__lte=stale_margin)
+    stale = Changelog.objects.only_active().filter(next_update_at__lte=stale_margin)
     stats['crawler.stale.packages.count'] = stale.count()
 
     next_update_times = stale.values_list('next_update_at', flat=True)

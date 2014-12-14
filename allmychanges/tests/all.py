@@ -484,3 +484,14 @@ def test_digest_does_not_include_preview_versions():
                             code_version=code_version)
 
     eq_(0, len(digest))
+
+
+def test_active_changelogs_filtering():
+    ch1 = Changelog.objects.create(namespace='test', name='foo1', source='foo1')
+    Changelog.objects.create(namespace='test', name='foo2', source='foo2',
+                             paused_at=timezone.now())
+    Changelog.objects.create(namespace='test', name=None, source='foo3')
+
+    response = list(Changelog.objects.only_active())
+    eq_(1, len(response))
+    eq_(ch1.id, response[0].id)

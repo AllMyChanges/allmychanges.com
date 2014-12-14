@@ -114,7 +114,7 @@ def schedule_updates(reschedule=False, packages=[]):
     if packages:
         changelogs = Changelog.objects.filter(name__in=packages).distinct()
     else:
-        changelogs = Changelog.objects.all()
+        changelogs = Changelog.objects.only_active()
 
     if not reschedule:
         changelogs = changelogs.filter(next_update_at__lte=timezone.now())
@@ -237,6 +237,7 @@ def update_changelog_task(source):
         log.info('Starting task')
         processing_started_at = timezone.now()
         error = True
+        error_description = None
 
         try:
             from .models import Changelog
@@ -247,12 +248,15 @@ def update_changelog_task(source):
             changelog.next_update_at = changelog.calc_next_update()
             changelog.save()
             error = False
-        except Exception:
+        except Exception as e:
+            error_description = unicode(e)
             log.trace().error('Error during changelog update')
         finally:
             if error or changelog.status == 'error':
-                log.error('Scheduling next update because of error')
-                changelog.next_update_at = changelog.calc_next_update_if_error()
+                changelog.paused_at = timezone.now()
+                changelog.create_issue('auto-paused',
+                                       comment=u'Paused because of error: "{0}"'.format(
+                                           error_description or changelog.problem or 'unknown'))
                 changelog.save()
 
             log.info('Task done')
