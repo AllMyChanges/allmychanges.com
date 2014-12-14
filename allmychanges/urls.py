@@ -5,6 +5,7 @@ admin.autodiscover()
 
 from .views import (OldIndexView,
                     IssuesView,
+                    IssueDetailView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
@@ -60,6 +61,7 @@ urlpatterns = patterns(
     url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),
 
     url(r'^issues/$', IssuesView.as_view(), name='issues'),
+    url(r'^issues/(?P<pk>.*)/$', IssueDetailView.as_view(), name='issue-detail'),
 
     url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),

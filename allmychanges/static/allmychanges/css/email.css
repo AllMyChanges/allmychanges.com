@@ -409,13 +409,14 @@ a {
   padding-top: 1em;
 }
 .page-header {
-  font-size: 1.666666666666667em;
-  line-height: 1.2em;
-  margin-bottom: 1em;
+  font-size: 27px;
+  line-height: 30px;
+  margin-bottom: 27px;
   font-family: pragmatica-web-condensed, sans-serif;
 }
 .page-subheader {
-  margin-bottom: 1em;
+  margin-top: 25px;
+  margin-bottom: 16px;
   font-family: pragmatica-web-condensed, sans-serif;
 }
 .nowrap {

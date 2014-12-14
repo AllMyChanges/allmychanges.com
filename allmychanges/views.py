@@ -13,6 +13,7 @@ from django.views.generic import (TemplateView,
                                   RedirectView,
                                   FormView,
                                   UpdateView,
+                                  DetailView,
                                   View)
 from django.db.models import Q
 from django.conf import settings
@@ -951,3 +952,8 @@ class IssuesView(CommonContextMixin, TemplateView):
             url += '&'
         result['current_url'] = url
         return result
+
+
+class IssueDetailView(CommonContextMixin, DetailView):
+    template_name = 'allmychanges/issue.html'
+    model = Issue

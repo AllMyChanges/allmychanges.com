@@ -1,0 +1,63 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block content %}
+  <h1 class="page-header">Issue #{{ issue.id }}</h1>
+  <h2 class="page-subheader">{{ issue.changelog.namespace }}/{{ issue.changelog.name }}</h2>
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>№</th>
+          <td>#{{ issue.id }}</td>
+        </tr>
+        <tr>
+          <th>Date</th>
+          <td style="white-space: nowrap">{{ issue.created_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+        <tr>
+          <th>Type</th>
+          <td><a href="/issues/?type={{ issue.type }}">{{ issue.type }}</a></td>
+        </tr>
+        <tr>
+          <th>Package</th>
+          <td><a href="/issues/?namespace={{ issue.changelog.namespace }}&name={{ issue.changelog.name }}">{{ issue.changelog.namespace }}/{{ issue.changelog.name }}</a></td>
+        </tr>
+        <tr>
+          <th>Comment</th>
+          <td>{{ issue.comment }}</td>
+        </tr>
+        <tr>
+          <th>User</th>
+          <td>{% firstof issue.user "" %}</td>
+        </tr>
+        <tr>
+          <th>Action</th>
+          <td style="white-space: nowrap">{% if not issue.resolved_at %}<span class="resolve-button-container" data-issue-id="{{ issue.id }}"></span>{% endif %}<a class="button" href="{{ issue.changelog.get_absolute_url }}">View changelog</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    {% with issue.get_related_deployments as deployments %}
+      {% if deployments %}
+        <h2 class="page-subheader">Related deployments</h2>
+        <table class="table">
+          {% for d in deployments %}
+          <tr>
+            <th>Deployed at</th>
+            <td>{{ d.deployed_at }}</td>
+          </tr>
+          <tr>
+            <th>Hash</th>
+            <td>{{ d.hash }}</td>
+          </tr>
+          <tr>
+            <th>Changes</th>
+            <td>{{ d.description|linebreaks }}</td>
+          </tr>
+          <tr><td>&nbsp;</td><td></td></tr>
+          {% endfor %}
+        </table>
+      {% endif %}
+    {% endwith %}
+
+{% endblock content %}

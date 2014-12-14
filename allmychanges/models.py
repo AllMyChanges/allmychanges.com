@@ -657,6 +657,11 @@ Issue(changelog={self.changelog},
                     for version in self.related_versions.split(',')]
         return filter(None, response)
 
+    def get_related_deployments(self):
+        return DeploymentHistory.objects \
+            .filter(deployed_at__lte=self.created_at) \
+            .order_by('-id')[:3]
+
 
 class IssueComment(models.Model):
     issue = models.ForeignKey(Issue, related_name='comments')
@@ -970,3 +975,17 @@ class UserHistoryLog(models.Model):
                                       light_user=light_user,
                                       action=action,
                                       description=description)
+
+
+class DeploymentHistory(models.Model):
+    hash = models.CharField(max_length=32, default='')
+    description = models.TextField()
+    deployed_at = models.DateTimeField(auto_now_add=True)
+
+    def __repr__(self):
+        response =[u'<DeploymentHistory deployed_at={0.deployed_at} hash={0.hash}'.format(self)]
+        response.extend(
+                   u'                  ' + line
+            for line in self.description.split('\n'))
+        response.append(u'>')
+        return u'\n'.join(response).encode('utf-8')
