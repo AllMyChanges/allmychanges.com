@@ -1,3 +1,11 @@
+0.13.4 (2014-12-16)
+===================
+
+These changes fix the [amch][], command line client to AllMyChanges.
+
+* Now changelogs could be filtered by source in API like `/v1/changelogs/?source=...`.
+* Also, now API accepts urls starting with `git://...`.
+
 0.13.3 (2014-12-05)
 ===================
 
@@ -459,3 +467,4 @@ There are plenty directions for approvement. Stay tuned.
 [ansible-1.8]: http://allmychanges.com/p/python/ansible/#1.8
 [django-1.7]: http://allmychanges.com/p/python/django/#1.7
 [Go]: http://allmychanges.com/p/golang/go/
+[amch]: https://github.com/svetlyak40wt/allmychanges
