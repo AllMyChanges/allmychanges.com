@@ -15,6 +15,7 @@ from twiggy_goodies.threading import log
 from allmychanges.validators import URLValidator
 from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.crawler.git_crawler import aggregate_git_log
+from allmychanges.downloader import normalize_url
 from allmychanges.utils import (
     cd,
     split_filenames,
@@ -622,6 +623,9 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
             else:
                 update_changelog_task(self.source)
 
+    def clean(self):
+        super(Changelog, self).clean()
+        self.source, _, _ = normalize_url(self.source, for_checkout=False)
 
 
 class ChangelogTrack(models.Model):

@@ -14,6 +14,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
+from allmychanges.downloader import normalize_url
 from allmychanges.models import (Repo, Subscription, Package,
                                  Issue,
                                  Version,
@@ -270,7 +271,9 @@ class ChangelogViewSet(HandleExceptionMixin,
             if name is not None:
                 queryset = queryset.filter(name=name)
             if source is not None:
-                queryset = queryset.filter(source=source)
+                normalized_source, _, _ = normalize_url(source,
+                                                        for_checkout=False)
+                queryset = queryset.filter(source=normalized_source)
             return queryset
 
     def get_object(self, *args, **kwargs):

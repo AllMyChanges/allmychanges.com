@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 
 from allmychanges.models import Package, Changelog, Issue, UserHistoryLog
 from allmychanges import chat
-from .utils import check_status_code, create_user, put_json
+from .utils import check_status_code, create_user, put_json, post_json, json
 
 # схема урлов
 # / - список доступных урлов
@@ -320,4 +320,39 @@ def test_rename_changelog_using_put():
                         name='other',
                         source=changelog.source)
     check_status_code(200, response)
-    eq_(0, 1)
+
+
+def test_api_normalizes_source_url_on_create():
+    cl = Client()
+    create_user('bob')
+    cl.login(username='bob', password='bob')
+
+    url = 'git://github.com/tadam/Ubic-Service-Plack.git'
+    normalized_url = 'https://github.com/tadam/Ubic-Service-Plack'
+
+    response = post_json(cl,
+                         reverse('changelog-list'),
+                         namespace='test',
+                         name='package',
+                         source=url)
+    check_status_code(201, response)
+    ch = Changelog.objects.all()[0]
+    eq_(normalized_url, ch.source)
+
+
+def test_api_normalizes_source_url_on_search():
+    cl = Client()
+    create_user('bob')
+    cl.login(username='bob', password='bob')
+
+    url = 'git://github.com/tadam/Ubic-Service-Plack.git'
+    normalized_url = 'https://github.com/tadam/Ubic-Service-Plack'
+
+    Changelog.objects.create(namespace='test',
+                             name='package',
+                             source=normalized_url)
+
+    response = cl.get(reverse('changelog-list'),
+                      data=dict(source=url))
+    check_status_code(200, response)
+    eq_(1, len(json(response)))

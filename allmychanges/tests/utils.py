@@ -31,10 +31,21 @@ def create_user(username):
         return user
 
 
+def json(response):
+    return anyjson.deserialize(response.content)
+
+
 def put_json(cl, url, **data):
     response = cl.put(url,
                       anyjson.serialize(data),
                       content_type='application/json')
+    return response
+
+
+def post_json(cl, url, **data):
+    response = cl.post(url,
+                       anyjson.serialize(data),
+                       content_type='application/json')
     return response
 
 
