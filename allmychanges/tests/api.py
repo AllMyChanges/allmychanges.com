@@ -293,3 +293,31 @@ def test_nor_anonymous_nor_normal_user_are_unable_to_update_issue():
 
     eq_(0, UserHistoryLog.objects.filter(
         user=user).count())
+
+
+def test_url_field_validation_accepts_our_custom_urls():
+    from allmychanges.api.serializers import URLField
+    field = URLField()
+
+    url = 'http://github.com/tadam/Ubic-Service-Plack'
+    eq_(None, field.run_validators(url), 'Url {0} is not valid'.format(url))
+
+    url = 'git://github.com/tadam/Ubic-Service-Plack.git'
+    eq_(None, field.run_validators(url), 'Url {0} is not valid'.format(url))
+
+
+def test_rename_changelog_using_put():
+    cl = Client()
+    moderator_bob = create_user('bob')
+    changelog = Changelog.objects.create(name='thebot', namespace='python',
+                                      source='http://github.com/svetlyak40wt/thebot')
+    changelog.add_to_moderators(moderator_bob)
+
+    cl.login(username='bob', password='bob')
+    response = put_json(cl,
+                        reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
+                        namespace='other-namespace',
+                        name='other',
+                        source=changelog.source)
+    check_status_code(200, response)
+    eq_(0, 1)

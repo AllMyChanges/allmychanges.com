@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from rest_framework import serializers
+from rest_framework import serializers, fields
 from rest_framework_extensions.fields import ResourceUriField
 
 from allmychanges.models import (
@@ -11,9 +11,26 @@ from allmychanges.models import (
     Changelog,
     Issue,
     Package)
+from allmychanges.validators import URLValidator
 
 
-class RepoVersionItemChangeSerializer(serializers.ModelSerializer):
+class URLField(fields.URLField):
+    def __init__(self, **kwargs):
+        if 'validators' not in kwargs:
+            kwargs['validators'] = [URLValidator()]
+        super(URLField, self).__init__(**kwargs)
+
+
+class ModelSerializer(serializers.ModelSerializer):
+    """This serializer uses custom URL serializer instead of
+    standart one and should be used anywhere instead of
+    rest framework's serializer.
+    """
+    field_mapping = serializers.ModelSerializer.field_mapping.copy()
+    field_mapping[serializers.models.URLField] = URLField
+
+
+class RepoVersionItemChangeSerializer(ModelSerializer):
     class Meta:
         model = RepoVersionItemChange
         fields = (
@@ -22,7 +39,7 @@ class RepoVersionItemChangeSerializer(serializers.ModelSerializer):
         )
 
 
-class RepoVersionItemSerializer(serializers.ModelSerializer):
+class RepoVersionItemSerializer(ModelSerializer):
     changes = RepoVersionItemChangeSerializer(many=True)
     text_clean = serializers.CharField()
 
@@ -35,7 +52,7 @@ class RepoVersionItemSerializer(serializers.ModelSerializer):
         )
 
 
-class RepoVersionSerializer(serializers.ModelSerializer):
+class RepoVersionSerializer(ModelSerializer):
     items = RepoVersionItemSerializer(many=True)
 
     class Meta:
@@ -47,7 +64,7 @@ class RepoVersionSerializer(serializers.ModelSerializer):
         )
 
 
-class RepoSerializer(serializers.ModelSerializer):
+class RepoSerializer(ModelSerializer):
     resource_uri = ResourceUriField(view_name='repo-detail')
     versions = RepoVersionSerializer(many=True)
 
@@ -74,11 +91,12 @@ class RepoDetailSerializer(RepoSerializer):
         )
 
 
+# TODO: remove with Repo api views
 class CreateChangelogSerializer(serializers.Serializer):
     url = serializers.URLField()
 
 
-class SubscriptionSerializer(serializers.ModelSerializer):
+class SubscriptionSerializer(ModelSerializer):
     class Meta:
         model = Subscription
         fields = (
@@ -104,7 +122,7 @@ class AbsoluteUriField(serializers.Field):
 
 
 
-class PackageSerializer(serializers.ModelSerializer):
+class PackageSerializer(ModelSerializer):
     resource_uri = ResourceUriField(view_name='package-detail')
     absolute_uri = AbsoluteUriField()
     problem = serializers.Field(source='changelog.problem')
@@ -128,7 +146,7 @@ class PackageSerializer(serializers.ModelSerializer):
         )
 
 
-class ChangelogSerializer(serializers.ModelSerializer):
+class ChangelogSerializer(ModelSerializer):
     resource_uri = ResourceUriField(view_name='changelog-detail')
     absolute_uri = AbsoluteUriField()
     problem = serializers.Field(source='problem')
@@ -154,11 +172,11 @@ class ChangelogSerializer(serializers.ModelSerializer):
         )
 
 
-class VersionSerializer(serializers.ModelSerializer):
+class VersionSerializer(ModelSerializer):
     class Meta:
         model = Version
 
 
-class IssueSerializer(serializers.ModelSerializer):
+class IssueSerializer(ModelSerializer):
     class Meta:
         model = Issue

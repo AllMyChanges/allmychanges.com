@@ -12,6 +12,7 @@ from django.core.cache import cache
 
 from twiggy_goodies.threading import log
 
+from allmychanges.validators import URLValidator
 from allmychanges.crawler import search_changelog, parse_changelog
 from allmychanges.crawler.git_crawler import aggregate_git_log
 from allmychanges.utils import (
@@ -30,6 +31,7 @@ from allmychanges.downloader import (
 
 from allmychanges.tasks import update_repo, update_preview_task, update_changelog_task
 
+
 MARKUP_CHOICES = (
     ('markdown', 'markdown'),
     ('rest', 'rest'),
@@ -42,6 +44,10 @@ NAMESPACE_LENGTH = 80
 
 from pytz import common_timezones
 TIMEZONE_CHOICES = [(tz, tz) for tz in common_timezones]
+
+
+class URLField(models.URLField):
+    default_validators = [URLValidator()]
 
 
 class UserManager(BaseUserManager):
@@ -426,7 +432,7 @@ class ChangelogManager(models.Manager):
 
 class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
     objects = ChangelogManager()
-    source = models.URLField(unique=True)
+    source = URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     # TODO: remove
     processing_started_at = models.DateTimeField(blank=True, null=True)

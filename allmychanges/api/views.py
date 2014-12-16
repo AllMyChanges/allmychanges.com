@@ -263,10 +263,14 @@ class ChangelogViewSet(HandleExceptionMixin,
             queryset = super(ChangelogViewSet, self).get_queryset(*args, **kwargs)
             namespace = self.request.GET.get('namespace')
             name = self.request.GET.get('name')
+            source = self.request.GET.get('source')
+
             if namespace is not None:
                 queryset = queryset.filter(namespace=namespace)
             if name is not None:
                 queryset = queryset.filter(name=name)
+            if source is not None:
+                queryset = queryset.filter(source=source)
             return queryset
 
     def get_object(self, *args, **kwargs):
