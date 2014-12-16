@@ -1,8 +1,9 @@
-0.13.4 (2014-12-16)
+0.14.0 (2014-12-16)
 ===================
 
-These changes fix the [amch][], command line client to AllMyChanges.
+These changes should fix the [amch][], command line client to AllMyChanges.
 
+* Now all source urls are normalized by API handles before changelog creation, update or search.
 * Now changelogs could be filtered by source in API like `/v1/changelogs/?source=...`.
 * Also, now API accepts urls starting with `git://...`.
 
