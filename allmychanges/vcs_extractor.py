@@ -20,7 +20,8 @@ def git_history_extractor(path):
             _hash, date, msg = group.strip().split(ins)
 
             r = envoy.run('git checkout {revision}'.format(revision=_hash))
-            assert r.status_code == 0
+            assert r.status_code == 0, 'git checkout returned code {0} and here is it\'s stderr:{1}'.format(
+                r.status_code, r.std_err)
             yield _extract_date(date.strip()), msg.strip('\n -')
 
 
