@@ -392,7 +392,14 @@ def parse_html_file(obj):
     """
     Uses fields `content` and `filename` to generate new file_sections.
     """
-    parsed = lxml.html.document_fromstring(obj.content)
+    try:
+        parsed = lxml.html.document_fromstring(obj.content.encode('utf-8'))
+    except Exception as e:
+        # these errors are ignored
+        if str(e) == 'Document is empty':
+            return
+        raise
+
     headers = [tag for tag in parsed.iter()
                if tag.tag in ('h1', 'h2', 'h3', 'h4')]
 
