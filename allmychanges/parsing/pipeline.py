@@ -392,6 +392,10 @@ def parse_html_file(obj):
     """
     Uses fields `content` and `filename` to generate new file_sections.
     """
+    if not obj.content:
+        # Some files are empty, document_fromstring raises exception on them
+        return
+
     try:
         parsed = lxml.html.document_fromstring(obj.content.encode('utf-8'))
     except Exception as e:
