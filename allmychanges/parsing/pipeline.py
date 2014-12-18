@@ -477,9 +477,9 @@ def parse_html_file(obj):
         root = process_header(obj, 'h0', obj.filename, body.iterchildren())
         yield root
 
-    # and then process all other items
-    for tag, text, all_children in headers:
-        yield process_header(root, tag, text, all_children)
+        # and then process all other items
+        for tag, text, all_children in headers:
+            yield process_header(root, tag, text, all_children)
 
 
 def create_file(name, content):
