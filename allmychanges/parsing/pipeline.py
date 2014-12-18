@@ -460,9 +460,10 @@ def parse_html_file(obj):
                            full_content=full_content)
 
     # use whole document and filename as a section
-    root = process_header(obj, 'h0', obj.filename,
-                          parsed.find('body').iterchildren())
-    yield root
+    body = parsed.find('body')
+    if body is not None:
+        root = process_header(obj, 'h0', obj.filename, body.iterchildren())
+        yield root
 
     # and then process all other items
     for tag, text, all_children in headers:
