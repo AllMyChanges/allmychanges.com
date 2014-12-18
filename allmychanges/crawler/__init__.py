@@ -26,7 +26,7 @@ RE_DATE_STR = r"""(?P<date>(
 
               # 24 Apr 2014
               # 6th December 2013
-              \d{2}(rd|st|rd|th)?\ \month\ \d{4} |
+              \d{1,2}(rd|st|rd|th)?\ \month\ \d{4} |
 
 
               # May 23rd 2014
