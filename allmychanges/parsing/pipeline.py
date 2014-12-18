@@ -276,6 +276,16 @@ def search_conf_py(root_dir, doc_filename):
 
 
 def parse_rst_file(obj):
+    cfg_override = """
+html_theme = 'epub'
+html_theme_options = {
+    'relbar1': 'false',
+    'footer': 'false',
+}
+master_doc = 'index'
+source_suffix = '.rst'
+"""
+
     with log.fields(filename=obj.filename):
         dirname = os.path.dirname(obj.filename)
 
@@ -290,15 +300,7 @@ def parse_rst_file(obj):
             if os.path.exists(filename):
                 os.unlink(filename)
             with codecs.open(filename, 'a', 'utf-8') as f:
-                f.write("""
-html_theme = 'epub'
-html_theme_options = {
-    'relbar1': 'false',
-    'footer': 'false',
-}
-master_doc = 'index'
-source_suffix = '.rst'
-""")
+                f.write(cfg_override)
 
         def copy_conf_py():
             filename = os.path.join(path, 'conf.py')
@@ -324,8 +326,7 @@ source_suffix = '.rst'
                         shutil.copytree(fullname, destination)
 
             with codecs.open(os.path.join(path, 'conf.py'), 'a', 'utf-8') as f:
-                f.write("master_doc = 'index'\n")
-                f.write("source_suffix = '.rst'\n")
+                f.write(cfg_override)
 
 
         def generate_html():
