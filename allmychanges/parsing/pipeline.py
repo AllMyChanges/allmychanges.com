@@ -65,9 +65,16 @@ def strip_outer_tag(text):
 
     def rec(items):
         if len(items) == 1:
-            if isinstance(items[0], basestring):
-                return items[0]
-            return rec(get_children(items[0]))
+            item = items[0]
+            if isinstance(item, basestring):
+                return item
+
+            if isinstance(item, lxml.html.HtmlComment):
+                return item.tail or ''
+            else:
+                children = get_children(items[0])
+
+            return rec(children)
         else:
             return u''.join(
                 map(node_tostring,
@@ -620,6 +627,9 @@ def embedd_label(text, item):
         item))
     items = map(html_escape,
                 lxml.html.fragments_fromstring(text))
+
+    if not items:
+        return text
 
     if isinstance(items[0], basestring):
         items.insert(0, label)

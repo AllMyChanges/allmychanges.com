@@ -28,7 +28,7 @@ def test_update_package_using_full_pipeline():
 
 def test_html_parser():
     env = Environment(filename='Changelog',
-                      content="""
+                      content=u"""
 <div class="markdown-body">
 <h2>
 <a id="user-content-v021" class="anchor" href="#v021" aria-hidden="true"><span class="octicon octicon-link"></span></a><sub>v0.2.1</sub>

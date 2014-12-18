@@ -316,6 +316,10 @@ def test_strip_outer_tag():
     eq_('<p>Blah</p><p>minor</p>',
         strip_outer_tag('<p>Blah</p><p>minor</p>'))
 
+    # and shouldn't broke on comment lines
+    eq_('Blah',
+        strip_outer_tag('<!--Comment-->Blah'))
+
 
 def test_label_embedding():
     text = u'Version description\'s typography was significantly improved.\nNow you can read <a href="http://allmychanges.com/p/python/django/#1.7">Django\'s changelog</a> and it won\'t hurt your eyes.'
