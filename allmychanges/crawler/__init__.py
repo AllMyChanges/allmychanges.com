@@ -25,7 +25,9 @@ RE_DATE_STR = r"""(?P<date>(
               \d{1,2}(?P<delimiter2>[.-])\d{1,2}(?P=delimiter2)\d{4} |
 
               # 24 Apr 2014
-              \d{2}(rd|st|rd|th)?\ [A-Z][a-z]{2}\ \d{4} |
+              # 6th December 2013
+              \d{2}(rd|st|rd|th)?\ \month\ \d{4} |
+
 
               # May 23rd 2014
               # April 28, 2014

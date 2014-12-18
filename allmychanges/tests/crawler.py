@@ -202,6 +202,7 @@ def test_parse_item():
 
 
 def test_extract_date():
+    eq_(date(2013, 3, 13), _extract_date('13th March 2013'))
     eq_(None, _extract_date(''))
     eq_(None, _extract_date('ejwkjw kjjwk 20'))
     eq_(None, _extract_date('2009 thouth 15 fne 04'))
