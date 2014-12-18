@@ -438,6 +438,13 @@ class IssueViewSet(HandleExceptionMixin,
         if issue.editable_by(user, self.request.light_user):
             issue.resolved_at = timezone.now()
             issue.save(update_fields=('resolved_at',))
+            chat.send(('Issue <http://allmychanges.com/issues/{{issue_id}}/|#{{issue_id}}> '
+                       'for {{namespace}}/{{name}} was resolved by {{username}}.').format(
+                issue_id=issue.id,
+                namespace=issue.changelog.namespace,
+                name=issue.changelog.name,
+                username=user.username))
+
             if issue.type == 'auto-paused':
                 changelog = issue.changelog
                 with log.fields(changelog_id=changelog.id):
@@ -445,6 +452,10 @@ class IssueViewSet(HandleExceptionMixin,
                     changelog.paused_at = None
                     changelog.next_update_at = timezone.now()
                     changelog.save()
+                    chat.send('Autopaused package {{namespace}}/{{name}} was resumed {{username}}.'.format(
+                        namespace=changelog.namespace,
+                        name=changelog.name,
+                        username=user.username))
 
             return Response({'result': 'ok'})
         raise AccessDenied()
