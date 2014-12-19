@@ -9,6 +9,7 @@ from allmychanges.utils import (
     count,
     count_time)
 from allmychanges.changelog_updater import update_preview_or_changelog
+from allmychanges import chat
 
 from twiggy_goodies.django_rq import job
 from twiggy_goodies.threading import log
@@ -125,6 +126,8 @@ def schedule_updates(reschedule=False, packages=[]):
 
     for changelog in changelogs:
         changelog.schedule_update()
+
+    chat.send('Just a heartbeat')
 
 
 
