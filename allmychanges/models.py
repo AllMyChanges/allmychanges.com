@@ -623,6 +623,13 @@ class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
             else:
                 update_changelog_task(self.source)
 
+    def resume(self):
+        self.paused_at = None
+        self.next_update_at = timezone.now()
+        # we don't need to save here, because this will be done in schedule_update
+        self.schedule_update()
+
+
     def clean(self):
         super(Changelog, self).clean()
         self.source, _, _ = normalize_url(self.source, for_checkout=False)
