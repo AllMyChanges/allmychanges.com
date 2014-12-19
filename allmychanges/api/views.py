@@ -452,6 +452,8 @@ class IssueViewSet(HandleExceptionMixin,
                     changelog.paused_at = None
                     changelog.next_update_at = timezone.now()
                     changelog.save()
+                    changelog.schedule_update()
+
                     chat.send('Autopaused package {namespace}/{name} was resumed {username}.'.format(
                         namespace=changelog.namespace,
                         name=changelog.name,
