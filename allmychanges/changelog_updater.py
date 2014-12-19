@@ -270,9 +270,11 @@ def update_changelog_from_raw_data3(obj, raw_data):
             num_new_versions=len(new_versions))
 
     for raw_version in raw_data:
-        version, created = obj.versions.get_or_create(
-            number=raw_version.version,
-            code_version=code_version)
+        with log.fields(version_number=raw_version.version,
+                        code_version=code_version):
+            version, created = obj.versions.get_or_create(
+                number=raw_version.version,
+                code_version=code_version)
 
         version.unreleased = getattr(raw_version, 'unreleased', False)
         version.filename = getattr(raw_version, 'filename', None)
