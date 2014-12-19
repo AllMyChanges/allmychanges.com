@@ -108,6 +108,7 @@ def wait_chat_threads(func):
 @singletone()
 @job
 @transaction.atomic
+@wait_chat_threads
 def update_repo(repo_id):
     try:
         with count_time('task.update_repo.time'):
@@ -142,9 +143,6 @@ def schedule_updates(reschedule=False, packages=[]):
 
     for changelog in changelogs:
         changelog.schedule_update()
-
-    chat.send('Just a heartbeat')
-
 
 
 # @singletone()
@@ -237,6 +235,7 @@ def schedule_updates(reschedule=False, packages=[]):
 @singletone('preview')
 @job('preview', timeout=600)
 @transaction.atomic
+@wait_chat_threads
 def update_preview_task(preview_id):
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
@@ -251,6 +250,7 @@ def update_preview_task(preview_id):
 @singletone()
 @job('default', timeout=600)
 @transaction.atomic
+@wait_chat_threads
 def update_changelog_task(source):
     with log.fields(source=source):
         log.info('Starting task')
