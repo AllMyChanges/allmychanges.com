@@ -8,6 +8,8 @@ from django.conf import settings
 # these messages filled instead of sending
 # during unittests
 messages = []
+_threads = []
+_threads_lock = threading.Lock()
 
 def send(text):
     def remote_send():
@@ -24,9 +26,20 @@ def send(text):
 
     thread = threading.Thread(target=remote_send)
     thread.start()
+    with _threads_lock:
+        _threads.append(thread)
 
     if not settings.KATO_URL and not settings.SLACK_URL:
         messages.append(text)
+
+
+def wait_threads():
+    """In tasks we need to wait while all threads to be completed
+    because python-rq kill it's workers."""
+    with _threads_lock:
+        for thread in _threads:
+            thread.join()
+        _threads[:] = []
 
 
 def clear_messages():

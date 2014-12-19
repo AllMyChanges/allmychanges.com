@@ -90,6 +90,21 @@ def singletone(queue='default'):
     return decorator
 
 
+def wait_chat_threads(func):
+    """We need to wait all chat threads to exit
+    to ensure that all messages were sent before
+    task done.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        finally:
+            chat.wait_threads()
+
+    return wrapper
+
+
 @singletone()
 @job
 @transaction.atomic
@@ -109,6 +124,7 @@ def update_repo(repo_id):
 @singletone()
 @job
 @transaction.atomic
+@wait_chat_threads
 def schedule_updates(reschedule=False, packages=[]):
     from .models import Changelog
 
