@@ -8,6 +8,8 @@ import sys
 from allmychanges.utils import cd
 from allmychanges.crawler import _extract_date
 
+from twiggy_goodies.threading import log
+
 
 def git_history_extractor(path):
     splitter = '-----======!!!!!!======-----'
@@ -23,7 +25,7 @@ def git_history_extractor(path):
             r = envoy.run(command)
             assert r.status_code == 0, 'git checkout returned code {0} and here is it\'s stderr:{1}'.format(
                 r.status_code, r.std_err)
-            yield _extract_date(date.strip()), msg.strip('\n -')
+            yield _extract_date(date.strip()), msg.strip('\n -'), _hash
 
 
 def choose_history_extractor(path):
@@ -31,44 +33,62 @@ def choose_history_extractor(path):
         # this is a special case for tests
         def test_history_extractor(path):
             for version, date, message in path:
-                yield date, message
+                yield date, message, version
         return test_history_extractor
 
     return git_history_extractor
 
 
-def python_version_extractor(path):
-    if os.path.exists(os.path.join(path, 'setup.py')):
-        if os.path.exists(os.path.join(path, 'setup.pyc')):
-            os.unlink(os.path.join(path, 'setup.pyc'))
+def python_version_extractor(path, use_threads=True):
+    from multiprocessing import Process, Queue
 
-        try:
-            metadata = {}
+    if use_threads:
+        queue = Queue()
+        process = Process(target=python_version_extractor_worker,
+                          args=(path, queue))
+        process.start()
+        process.join()
+        return queue.get()
+    else:
+        class Queue(object):
+            def put(self, value):
+                self.value = value
+            def get(self):
+                return self.value
+        queue = Queue()
+        python_version_extractor_worker(path, queue)
+        return queue.get()
 
-            class FakeSetuptools(object):
-                def setup(self, *args, **kwargs):
-                    metadata.update(kwargs)
 
-                def __getattr__(self, name):
-                    return getattr(orig_setuptools, name)
-
-            sys.modules['distutils.core'] = FakeSetuptools()
-            sys.modules['setuptools'] = FakeSetuptools()
-            sys.path.insert(0, path)
+def python_version_extractor_worker(path, queue):
+    with cd(path):
+        if os.path.exists('setup.py'):
+            envoy.run("find . -name '*.pyc' -delete")
 
             try:
-                from setup import setup
-            except:
+                metadata = {}
+
+                class FakeSetuptools(object):
+                    def setup(self, *args, **kwargs):
+                        metadata.update(kwargs)
+
+                    def __getattr__(self, name):
+                        return getattr(orig_setuptools, name)
+
+                sys.modules['distutils.core'] = FakeSetuptools()
+                sys.modules['setuptools'] = FakeSetuptools()
+                sys.path.insert(0, path)
+
+                try:
+                    from setup import setup
+                except:
+                    pass
+
+                version = metadata.get('version')
+                queue.put(version)
+            finally:
                 pass
-
-            return metadata.get('version')
-        finally:
-            if sys.path[0] == path:
-                sys.path.pop(0)
-
-            for name in ('distutils.core', 'setuptools', 'setup'):
-                if name in sys.modules:
-                    del sys.modules[name]
+    queue.put(None)
 
 
 def npm_version_extractor(path):
@@ -121,7 +141,7 @@ def get_versions_from_vcs(env):
                         unreleased=unreleased,
                         content=[current_commits])
 
-    for date, message in walk_through_history(path):
+    for date, message, revision in walk_through_history(path):
         version = extract_version(path)
 
         if message:

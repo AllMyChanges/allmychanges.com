@@ -8,6 +8,7 @@ import logging
 import graphitesend
 import time
 import times
+import threading
 
 from lxml import html
 from contextlib import contextmanager
@@ -41,6 +42,11 @@ def first(iterable, default=None):
         return default
 
 
+# all parts of code which needs to change
+# current directory, should be serialized
+# to not interfere with each other
+_cd_lock = threading.RLock()
+
 @contextmanager
 def cd(path):
     """Usage:
@@ -48,12 +54,14 @@ def cd(path):
     with cd(to_some_dir):
         envoy.run('task do')
     """
+    _cd_lock.acquire()
     old_path = os.getcwd()
     os.chdir(path)
     try:
         yield
     finally:
         os.chdir(old_path)
+        _cd_lock.release()
 
 
 def get_package_metadata(path, field_name):
