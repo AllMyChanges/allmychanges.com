@@ -41,6 +41,7 @@ def choose_history_extractor(path):
 
 def python_version_extractor(path, use_threads=True):
     from multiprocessing import Process, Queue
+    from collections import deque
 
     if use_threads:
         queue = Queue()
@@ -50,11 +51,11 @@ def python_version_extractor(path, use_threads=True):
         process.join()
         return queue.get()
     else:
-        class Queue(object):
+        class Queue(deque):
             def put(self, value):
-                self.value = value
+                self.append(value)
             def get(self):
-                return self.value
+                return self.popleft()
         queue = Queue()
         python_version_extractor_worker(path, queue)
         return queue.get()
