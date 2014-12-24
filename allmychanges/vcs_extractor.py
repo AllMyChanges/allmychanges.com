@@ -15,25 +15,38 @@ def git_history_extractor(path):
     splitter = '-----======!!!!!!======-----'
     ins = '--!!==!!--'
 
+    def gen_checkouter(hash_):
+        def checkout():
+            command = 'git reset --hard {revision}'.format(revision=hash_)
+            with cd(path):
+                r = envoy.run(command)
+                assert r.status_code == 0, 'git checkout returned code {0} and here is it\'s stderr:{1}'.format(
+                    r.status_code, r.std_err)
+            return path
+        return checkout
+
     with cd(path):
-        r = envoy.run('git log --reverse --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{splitter}"'.format(ins=ins, splitter=splitter))
+        r = envoy.run('git log --simplify-merges --no-merges --reverse --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{splitter}"'.format(ins=ins, splitter=splitter))
 
-        for group in r.std_out.split(splitter)[:-1]:
-            _hash, date, msg = group.strip().split(ins)
+        # containse tuples (_hash, date, msg)
+        groups = (group.strip().split(ins)
+                  for group in r.std_out.split(splitter)[:-1])
+        return [[_extract_date(date.strip()),
+                 msg.strip('\n -'),
+                 gen_checkouter(_hash.strip())]
+                for _hash, date, msg in groups]
 
-            command = 'git reset --hard {revision}'.format(revision=_hash)
-            r = envoy.run(command)
-            assert r.status_code == 0, 'git checkout returned code {0} and here is it\'s stderr:{1}'.format(
-                r.status_code, r.std_err)
-            yield _extract_date(date.strip()), msg.strip('\n -'), _hash
+
 
 
 def choose_history_extractor(path):
     if isinstance(path, list):
         # this is a special case for tests
         def test_history_extractor(path):
-            for version, date, message in path:
-                yield date, message, version
+            return [[date,
+                     message,
+                     (lambda version :lambda: version)(version)]
+                    for version, date, message in path]
         return test_history_extractor
 
     return git_history_extractor
@@ -107,11 +120,8 @@ def npm_version_extractor(path):
 def choose_version_extractor(path):
     if isinstance(path, list):
         # this is a special case for tests
-        index = [0]
         def test_version_extractor(path):
-            version = path[index[0]][0]
-            index[0] += 1
-            return version
+            return path
         return test_version_extractor
 
     if os.path.exists(os.path.join(path, 'setup.py')):
@@ -128,7 +138,7 @@ def choose_version_extractor(path):
 def get_versions_from_vcs(env):
     path = env.dirname
 
-    walk_through_history = choose_history_extractor(path)
+    get_history = choose_history_extractor(path)
     extract_version = choose_version_extractor(path)
     current_version = None
     current_commits = []
@@ -142,20 +152,79 @@ def get_versions_from_vcs(env):
                         unreleased=unreleased,
                         content=[current_commits])
 
-    for date, message, revision in walk_through_history(path):
-        version = extract_version(path)
+    def add_version_number(commit):
+        if len(commit) == 3:
+            date, message, checkout = commit
+            checkout_path = checkout()
+            version = extract_version(checkout_path)
+            commit.append(version)
+        return commit[-1]
 
-        if message:
-            current_commits.append(message)
+    def rec(commits):
+        left_version = commits[0][-1]
+        right_version = add_version_number(commits[-1])
 
-        if version != current_version and version is not None:
-            current_version = version
-            yield create_version(date)
-            current_commits = []
+        if len(commits) == 2:
+            if right_version is None:
+                commits[-1][-1] = left_version
+        else:
+            if left_version == right_version:
+                for commit in commits[1:-1]:
+                    commit.append(left_version)
+            else:
+                threshold = len(commits) / 2
+                rec(commits[:threshold + 1])
+                rec(commits[threshold:])
 
-    if current_commits:
-        current_version = 'x.x.x'
-        yield create_version(date, unreleased=True)
+    commits = get_history(path)
+
+    if commits:
+#        ver = 'old'
+        ver = 'new' # use new fast algotithm of version searching
+
+        if ver == 'new':
+            # first, we'll skip heading commits without version number
+            idx = 0
+            number = add_version_number(commits[idx])
+
+            while number is None:
+                idx += 1
+                number = add_version_number(commits[idx])
+
+            rec(commits[idx:])
+
+        if ver == 'old':
+            for commit in commits:
+                number = add_version_number(commit)
+
+        from collections import defaultdict
+        already_seen = defaultdict(int)
+        previous_number = None
+
+        # We need this step to normalize version order
+        # because sometimes after the merge it is currupted
+        for commit in commits:
+            number = commit[-1]
+            if number is not None and previous_number is not None and number != previous_number and number in already_seen:
+                # fixing commit merged after the version
+                # was bumped
+                commit[-1] = previous_number
+            else:
+                already_seen[number] += 1
+                previous_number = number
+
+        for date, message, get_version, version in commits:
+            if message:
+                current_commits.append(message)
+
+            if version != current_version and version is not None:
+                current_version = version
+                yield create_version(date)
+                current_commits = []
+
+        if current_commits:
+            current_version = 'x.x.x'
+            yield create_version(date, unreleased=True)
 
 
 def extract_changelog_from_vcs(path):

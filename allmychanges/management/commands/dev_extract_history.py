@@ -1,7 +1,7 @@
 # coding: utf-8
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
-from allmychanges.utils import choose_history_extractor
+from allmychanges.vcs_extractor import choose_history_extractor
 
 
 class Command(LogMixin, BaseCommand):
@@ -9,9 +9,7 @@ class Command(LogMixin, BaseCommand):
 
     def handle(self, *args, **options):
         path = args[0] if args else '.'
-        walk_history = choose_history_extractor(path)
+        extract = choose_history_extractor(path)
 
-        for date, message in walk_history(path):
-            print date, message
-
-
+        for date, message, checkout in extract(path)[:10]:
+            print date, message, checkout()

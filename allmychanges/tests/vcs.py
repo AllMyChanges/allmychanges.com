@@ -22,11 +22,14 @@ def test_extract_from_vcs():
         (None,    date(2014, 1, 15), 'Initial commit'),
         (None,    date(2014, 1, 15), 'Feature was added'),
         ('0.1.0', date(2014, 1, 16), 'Tests were added'),
+
         (None,    date(2014, 2, 9),  'Repackaging'), # such gaps should be considered
         # as having previous version
         ('0.2.0', date(2014, 2, 10), 'Some new functions'),
+
         ('0.2.0', date(2014, 2, 11), 'Other feature'),
         ('0.3.0', date(2014, 2, 14), 'Version bump'),
+
         ('0.3.0', date(2014, 3, 20), 'First unreleased feature'),
         ('0.3.0', date(2014, 3, 21), 'Second unreleased feature')])
 
