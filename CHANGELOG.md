@@ -1,3 +1,15 @@
+0.15.0 (2014-12-24)
+===================
+
+This version contains many internal improvements and should
+improve parsing quality. VCS changelog extractor was
+significantly improved. Now it produces more correct results
+and also it became 5 times faster. Few error in python
+version extractor were fixed and now we should better group
+commit messages for python projects. For example, previously
+we did very poor job for [SleekXMPP][], but now are able
+to show all latest versions correctly.
+
 0.14.0 (2014-12-16)
 ===================
 
@@ -469,3 +481,4 @@ There are plenty directions for approvement. Stay tuned.
 [django-1.7]: http://allmychanges.com/p/python/django/#1.7
 [Go]: http://allmychanges.com/p/golang/go/
 [amch]: https://github.com/svetlyak40wt/allmychanges
+[SleekXMPP]: http://allmychanges.com/p/python/sleekxmpp/
