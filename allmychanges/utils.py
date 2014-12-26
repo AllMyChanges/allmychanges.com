@@ -12,6 +12,7 @@ import threading
 
 from lxml import html
 from contextlib import contextmanager
+from functools import wraps
 
 from django.conf import settings
 from django.utils.encoding import force_text
@@ -235,3 +236,23 @@ def strip_long_text(text, max_len, append=u'…'):
     if len(text) < max_len - 1:
         return text
     return text[:max_len - len(append)] + append
+
+
+def trace(func):
+    """Decorator which simple prints function calls and their results
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+        except Exception as e:
+            print 'CALL: {0}({1}, {2}) -> raise {3}'.format(
+                func.__name__, args, kwargs, e)
+            raise
+        else:
+            if 'cache' in kwargs:
+                del kwargs['cache']
+            print 'CALL: {0}({1}, {2}) -> returned {3}'.format(
+                func.__name__, args, kwargs, result)
+            return result
+    return wrapper
