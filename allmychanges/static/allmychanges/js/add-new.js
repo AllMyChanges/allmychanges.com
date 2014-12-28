@@ -174,7 +174,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
     };
 
     $scope.is_name_or_namespace_were_changed = function () {
-        return $scope.orig_name != $scope.name || $scope.orig_namespace != $scope.namespace;
+        return ($scope.orig_name && $scope.orig_name != $scope.name) || ($scope.orig_namespace && $scope.orig_namespace != $scope.namespace);
     }
 });
 
