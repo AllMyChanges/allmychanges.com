@@ -148,10 +148,11 @@ def read_files(root, filenames):
 def read_file(obj):
     with codecs.open(obj.filename, 'r', 'utf-8') as f:
         try:
+            content = f.read()
             yield obj.push(
                 type='file_content',
                 filename=os.path.relpath(obj.filename, obj.dirname),
-                content=f.read())
+                content=content)
         except Exception:
             pass
 
@@ -405,7 +406,9 @@ def parse_html_file(obj):
         return
 
     try:
-        parsed = lxml.html.document_fromstring(obj.content.encode('utf-8'))
+        parser = lxml.html.HTMLParser(encoding='utf-8')
+        parsed = lxml.html.document_fromstring(obj.content.encode('utf-8'),
+                                               parser=parser)
     except Exception as e:
         # these errors are ignored
         if str(e) == 'Document is empty':
