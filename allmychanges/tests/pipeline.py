@@ -68,12 +68,12 @@ def test_html_parser():
 
     eq_(['Changelog',
          'v0.2.1',
-         u'May 24, 2012 \xe2\x80\x94 Diff \xe2\x80\x94 Docs',
+         u'May 24, 2012 \u2014 Diff \u2014 Docs',
          'v0.1.0',
-         u'Apr. 23, 2012 \xe2\x80\x94 Docs'],
+         u'Apr. 23, 2012 \u2014 Docs'],
         [s.title for s in sections])
 
-    eq_(['<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#226;&#128;&#148; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>',
+    eq_(['<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#8212; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>',
          ['Initial release']],
         sections[3].content)
 
