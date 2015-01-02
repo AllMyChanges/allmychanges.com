@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
-from allmychanges.models import Changelog, ChangelogTrack, Version, User
+from allmychanges.models import Changelog, ChangelogTrack, Version, User, Issue
 from django.utils import timezone
 from django.db.models import Count
 
@@ -94,6 +94,20 @@ def get_stats():
     last_updates = Changelog.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(0, 60 * 60)).values_list('last_update_took', flat=True)
     stats['crawler.last_update_took.average'] = float(sum(last_updates)) / len(last_updates) if last_updates else 0
 
+    stats['crawler.paused.packages.count'] = Changelog.objects.exclude(paused_at=None).count()
+
+    opened_issues = Issue.objects.filter(resolved_at=None).count()
+    stats['crawler.issues.by-type.total.count'] = opened_issues.count()
+
+    for typ, cnt in opened_issues.values('type').annotate(cnt=Count('type')).values_list('type', 'cnt'):
+        stats['crawler.issues.by-type.{0}.count'.format(typ)] = cnt
+
+    stats['crawler.issues.by-status.total.count'] = Issue.objects.count()
+    stats['crawler.issues.by-status.opened.count'] = opened_issues.count()
+    stats['crawler.issues.by-status.resolved.count'] = Issue.objects.exclude(resolved_at=None).count()
+
+    stats['crawler.issues.from-robot.count'] = opened_issues.filter(user=None, light_user=None).count()
+    stats['crawler.issues.from-human.count'] = opened_issues.exclude(user=None, light_user=None).count()
 
     return stats
 
