@@ -10,7 +10,6 @@ from collections import defaultdict
 from orderedset import OrderedSet
 from allmychanges.utils import cd, trace
 from allmychanges.crawler import _extract_date
-from django.core.cache import cache
 
 from twiggy_goodies.threading import log
 
@@ -196,20 +195,11 @@ def stop_at_hash_if_needed(hash):
                 import pdb; pdb.set_trace()
 
 
-ver_num_calls = 0
 def _add_version_number(commit, extract_version):
-    global ver_num_calls
-
     if 'version' not in commit:
-        cache_key = 'version:' + commit['hash']
-        version = cache.get(cache_key)
-        if not version:
-            ver_num_calls += 1
-            stop_at_hash_if_needed(commit['hash'])
-            checkout_path = commit['checkout']()
-            version = extract_version(checkout_path)
-            cache.set(cache_key, version, 60 * 60 * 24)
-
+        stop_at_hash_if_needed(commit['hash'])
+        checkout_path = commit['checkout']()
+        version = extract_version(checkout_path)
         commit['version'] = version
     return commit['version']
 
@@ -297,11 +287,7 @@ def _normalize_version_numbers2(commits):
 import time
 
 def write_vcs_versions_slowly(commits, extract_version):
-    start = time.time()
     for idx, commit in enumerate(commits.values()):
-        delta = (time.time() - start)
-        if delta > 5:
-            print float(idx) / delta, 'per second'
         _add_version_number(commit, extract_version)
 
     _normalize_version_numbers2(commits)
@@ -354,8 +340,6 @@ def write_vcs_versions_bin_helper(commits, extract_version):
 def write_vcs_versions_fast(commits, extract_version):
     queue = deque()
     commit = commits['root']
-    print 'writing vcs versions'
-
     covered = set()
 
     def enque(hash):
@@ -365,14 +349,7 @@ def write_vcs_versions_fast(commits, extract_version):
                 queue.append(commit)
 
 
-    start = time.time()
-
     while commit:
-        delta = (time.time() - start)
-        if delta > 5:
-            print float(len(covered)) / delta, 'per second', 'queue:', len(queue), 'processed:', len(covered), 'ver_num_calls:', ver_num_calls
-
-        #version = _add_version_number(commit, extract_version)
         # fast forward
         commits_between = []
         # a hack to reuse version number from a previously calculated commit
@@ -408,7 +385,6 @@ def write_vcs_versions_fast(commits, extract_version):
         try:
             commit = queue.pop()
         except IndexError:
-            print 'Exit'
             commit = None
 
     _normalize_version_numbers2(commits)
