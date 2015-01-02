@@ -96,7 +96,7 @@ def get_stats():
 
     stats['crawler.paused.packages.count'] = Changelog.objects.exclude(paused_at=None).count()
 
-    opened_issues = Issue.objects.filter(resolved_at=None).count()
+    opened_issues = Issue.objects.filter(resolved_at=None)
     stats['crawler.issues.by-type.total.count'] = opened_issues.count()
 
     for typ, cnt in opened_issues.values('type').annotate(cnt=Count('type')).values_list('type', 'cnt'):
