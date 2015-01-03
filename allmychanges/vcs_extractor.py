@@ -79,7 +79,6 @@ def git_history_extractor(path, limit=None):
 
         result = dict((item['hash'], item) for item in result)
         result['root'] = result[root]
-        del result[root]
         return result
 
 
