@@ -417,7 +417,7 @@ def get_versions_from_vcs(env):
                         version=version['version'],
                         filename='VCS',
                         date=None if version.get('unreleased') else version['date'],
-                        unreleased=version.get('unreleased'),
+                        unreleased=version.get('unreleased', False),
                         content=[version['messages']])
 
     if False: # TODO: remove this old code
