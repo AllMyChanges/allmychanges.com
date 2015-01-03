@@ -484,6 +484,19 @@ def mark_version_bumps(tree):
     processed = set()
     commit = tree['root']
 
+    def add_bump(hash, version, date):
+        found = None
+        for idx, bump in enumerate(bumps):
+            if bump[1] == version:
+                found = idx
+                break
+        if found is not None:
+            if bumps[found][2] > date:
+                del bumps[idx]
+                bumps.append((hash, version, commit['date']))
+        else:
+            bumps.append((hash, version, commit['date']))
+
     while commit:
         hash = commit['hash']
         if hash not in processed:
@@ -496,7 +509,7 @@ def mark_version_bumps(tree):
                 parents = filter(None, parents)
                 if not any(map(lambda parent: parent['version'] == version,
                    parents)):
-                    bumps.append(hash)
+                    add_bump(hash, version, commit['date'])
 
                 queue.extend(parents)
             processed.add(hash)
@@ -504,7 +517,7 @@ def mark_version_bumps(tree):
             commit = queue.popleft()
         except IndexError:
             commit = None
-    return list(reversed(bumps))
+    return [bump[0] for bump in reversed(bumps)]
 
 
 def mark_version_bumps_rec(tree):

@@ -10,7 +10,8 @@ from allmychanges.utils import cd
 from allmychanges.vcs_extractor import (choose_history_extractor,
                                         choose_version_extractor,
                                         mark_version_bumps,
-                                        write_vcs_versions_slowly)
+                                        write_vcs_versions_slowly,
+                                        write_vcs_versions_fast)
 
 
 class Command(LogMixin, BaseCommand):
@@ -19,9 +20,9 @@ class Command(LogMixin, BaseCommand):
         # make_option('--limit',
         #             type='int',
         #             help='Limit history to N latest commits'),
-        make_option('--full',
+        make_option('--slow',
                     action='store_true',
-                    dest='full',
+                    dest='slow',
                     default=False,
                     help='Extract version for every commit'),
         make_option('--bumps',
@@ -45,70 +46,27 @@ class Command(LogMixin, BaseCommand):
             envoy.run('git pull')
 
         get_history = choose_history_extractor(path)
-        # extract_version = choose_version_extractor(path)
-        # write_vcs_versions_slowly(commits, extract_version)
         commits = get_history(path, limit=options.get('limit_history', 0))
 
         if options['bumps']:
             extract_version = choose_version_extractor(path)
-            write_vcs_versions_slowly(commits, extract_version)
+
+            num_extractions = [0]
+            def custom_extractor(path):
+                num_extractions[0] += 1
+                return extract_version(path)
+
+            if options['slow']:
+                write_vcs_versions_slowly(commits, custom_extractor)
+            else:
+                write_vcs_versions_fast(commits, custom_extractor)
+
             bumps = mark_version_bumps(commits)
             for bump in bumps:
                 print bump, commits[bump]['version']
+
+            print 'Num commits:', len(commits) - 1
+            print 'Num version extractions:', num_extractions[0]
         else:
             for commit in commits:
                 print commit
-        # bumps = mark_version_bumps(commits)
-        # grouped = group_versions(commits, bumps)
-
-        # fork_points = defaultdict(int)
-        # for commit in commits.values():
-        #     for parent in commit['parents']:
-        #         fork_points[parent] += 1
-
-        # fork_points = dict((hash, [num_childs, 0])
-        #                    for hash, num_childs in fork_points.items()
-        #                    if num_childs > 1)
-
-        # write_vcs_versions_slowly(commits, extract_version)
-
-        # def rec(commit, left_lines=0, right_lines=0):
-        #     hash = commit['hash']
-        #     if hash in fork_points:
-        #         pass
-        #     print '{0}*{1} "{2}"'.format(
-        #         '| ' * left_lines,
-        #         '| ' * right_lines,
-        #         commit['message'].split('\n', 1)[0])
-
-        #     num_parents = len(commit['parents'])
-        #     if num_parents > 1:
-        #         print '|' + '\\' * (num_parents - 1)
-
-        #     for idx, parent in enumerate(reversed(commit['parents'])):
-        #         try:
-        #             parent_commit = commits[parent]
-        #         except KeyError:
-        #             print 'History done'
-        #             break
-
-        #         rec(parent_commit,
-        #             left_lines + num_parents - idx - 1,
-        #             right_lines + idx - 1)
-
-        # rec(commits['root'])
-
-
-
-
-        # if options['limit']:
-        #     commits = commits[-options['limit']:]
-        # if options['full']:
-        #     write_vcs_versions_slowly(commits, extract_version)
-        # else:
-        #     write_vcs_versions_bin(commits, extract_version)
-
-        # for commit in commits:
-        #     print commit['date'], commit['hash'], commit['version']
-        #     for line in commit['message'].split('\n'):
-        #         print '\t>', line

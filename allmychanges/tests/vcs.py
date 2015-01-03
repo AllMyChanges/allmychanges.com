@@ -8,6 +8,7 @@ from allmychanges.env import Environment
 from allmychanges.parsing.pipeline import vcs_processing_pipe
 from allmychanges.vcs_extractor import (
     mark_version_bumps,
+    _normalize_version_numbers2,
     group_versions)
 
 
@@ -50,6 +51,13 @@ def _build_tree(tree=None, root=None):
     return tree
 
 
+def _add_dates(tree):
+    date = datetime.date
+    for key in tree:
+        if key != 'root':
+            tree[key]['date'] = date(2014, int(key), 1)
+
+
 def simplify(version):
     """Returns tuple of version-number, date, list-of-items."""
     return (version.version,
@@ -63,10 +71,7 @@ def test_extract_from_vcs():
     date = datetime.date
 
     tree = _build_tree()
-    for key in tree:
-        if key != 'root':
-            tree[key]['date'] = date(2014, int(key), 1)
-
+    _add_dates(tree)
     versions = vcs_processing_pipe(tree)
 
     sparse_check([
@@ -92,8 +97,36 @@ def test_extract_from_vcs():
 
 def test_mark_version_bumps():
     tree = _build_tree()
+    _add_dates(tree)
     bumps = mark_version_bumps(tree)
     eq_(['2', '4', '8'], bumps)
+
+
+def test_mark_version_bumps_when_there_are_gaps():
+    # in this case, oldest commit should be considered
+    # as a version bump
+    # Tree structure:
+    # * 5 (1)
+    # * 4 (1) # merge
+    # |\
+    # | * 3 (1)
+    # * | 2 (1)
+    # |/
+    # * 1 (None)
+
+    tree = _build_tree(
+        tree={
+            '5': {'version': '1',  'parents': ['4']},
+            '4': {'version': '1',  'parents': ['2', '3']},
+            '3': {'version': '1',  'parents': ['1']},
+            '2': {'version': '1',  'parents': ['1']},
+            '1': {'version': None, 'parents': []},
+        },
+        root='5')
+    _add_dates(tree)
+    _normalize_version_numbers2(tree)
+    bumps = mark_version_bumps(tree)
+    eq_(['2'], bumps)
 
 
 def test_group_versions():
