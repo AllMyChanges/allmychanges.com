@@ -32,35 +32,27 @@ def git_history_extractor(path, limit=None):
         return r
 
     with cd(path):
-        branch = do('git rev-parse --abbrev-ref HEAD').std_out.strip()
-
         def gen_checkouter(hash_):
             def checkout():
                 with cd(path):
-                    # do('git reset --hard {revision}'.format(revision=hash_))
-                    # if hash_.startswith('753cb358'):
-                    #     import pdb; pdb.set_trace()
+                    result = do('git status --porcelain')
+                    # if state is dirty, we just commit these changes
+                    # into a orphaned commit
+                    if result.std_out:
+                        if '??' in result.std_out:
+                            do('git clean -f')
 
-                    merge_point = do('git rev-list {hash}..{branch} --ancestry-path --merges --reverse'.format(
-                        hash=hash_,
-                        branch=branch)).std_out.split('\n', 1)[0]
+                        try:
+                            do('git add -u')
+                            do('git commit -m "Trash"')
+                        except:
+                            pass
 
-                    do('git reset --hard')
                     do('git checkout ' + hash_)
-    #                 if merge_point:
-    #                     do('git checkout ' + merge_point)
-    # #                    do('git branch -D vcs-checkout || true')
-    # #                    do('git checkout -b vcs-checkout')
-    #     #                do('git reset --hard {revision}'.format(revision=hash_))
-    # #                    do('git merge ' + hash_)
-    #                 else:
-    #                     do('git checkout ' + hash_)
                 return path
             return checkout
 
         r = envoy.run('git log --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
-#        r = envoy.run('git log --simplify-merges --no-merges --reverse --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
-#        r = envoy.run('git log --simplify-merges --reverse --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{splitter}"'.format(ins=ins, splitter=splitter))
 
         # containse tuples (_hash, date, msg, parents)
         groups = (group.strip().split(ins)
