@@ -554,18 +554,24 @@ def group_versions(tree, bumps):
 
     processed = set()
     def collect_messages(commit):
-        if commit['hash'] in processed:
-            return []
+        messages = []
+        queue = deque()
 
-        if len(commit['parents']) > 1:
-            messages = []
-        else:
-            messages = [commit['message']]
+        while commit is not None:
+            if commit['hash'] not in processed:
+                # we ignore merge commits where parents > 1
+                if len(commit['parents']) < 2:
+                    messages.append(commit['message'])
 
-        parents = map(tree.get, commit['parents'])
-        parent_messages = map(collect_messages, parents)
-        processed.add(commit['hash'])
-        return messages + list(chain(*parent_messages))
+                processed.add(commit['hash'])
+                queue.extend(filter(None, map(tree.get, commit['parents'])))
+
+            try:
+                commit = queue.popleft()
+            except IndexError:
+                commit = None
+
+        return messages
 
     result = []
 
