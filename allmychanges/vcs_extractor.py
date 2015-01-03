@@ -91,13 +91,13 @@ def choose_history_extractor(path):
                 new_item['checkout'] = lambda: item['version']
                 del new_item['version']
                 return new_item
-            return dict((key, create_version(item))
-                        for key, item in path.items())
-
-            # return [[date,
-            #          message,
-            #          (lambda version :lambda: version)(version)]
-            #         for version, date, message in path]
+            commits = dict((key, create_version(item))
+                           for key, item in path.items())
+            # make root to point to the tip of the
+            # commit history instead of pointing to a separate
+            # object
+            commits['root'] = commits[commits['root']['hash']]
+            return commits
         return test_history_extractor
 
     return git_history_extractor
@@ -261,9 +261,6 @@ def write_vcs_versions_bin(commits, extract_version):
 
 def _normalize_version_numbers2(commits):
     for commit in commits.values():
-        if 'version' not in commit:
-            import pdb; pdb.set_trace()
-
         if commit['version'] is None:
             to_update = deque()
             to_check = deque()
@@ -283,7 +280,6 @@ def _normalize_version_numbers2(commits):
                     except Exception:
                         current = None
 
-import time
 
 def write_vcs_versions_slowly(commits, extract_version):
     for idx, commit in enumerate(commits.values()):
@@ -544,7 +540,12 @@ def mark_version_bumps_rec(tree):
 from itertools import chain
 
 def group_versions(tree, bumps):
-    bumps = bumps + ['root']
+    root_hash = tree['root']['hash']
+    if root_hash not in bumps:
+        bumps.append(root_hash)
+        probably_has_unreleased_commits = True
+    else:
+        probably_has_unreleased_commits = False
 
     processed = set()
     def collect_messages(commit):
@@ -565,10 +566,15 @@ def group_versions(tree, bumps):
 
     for bump in bumps:
         commit = tree[bump].copy()
-        commit['messages'] = collect_messages(commit)
+        messages = collect_messages(commit)
+        if not messages:
+            continue
+
+        commit['messages'] = messages
         del commit['message']
         result.append(commit)
 
-    result[-1]['version'] = 'x.x.x'
-    result[-1]['unreleased'] = True
+    if probably_has_unreleased_commits and result and result[-1]['hash'] == root_hash:
+        result[-1]['version'] = 'x.x.x'
+        result[-1]['unreleased'] = True
     return result

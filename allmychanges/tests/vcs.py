@@ -11,7 +11,7 @@ from allmychanges.vcs_extractor import (
     group_versions)
 
 
-def _build_tree():
+def _build_tree(tree=None, root=None):
     """
     Tree structure:
     * root (3)
@@ -28,8 +28,8 @@ def _build_tree():
 
     Brackets contains discovered version number
     """
-    tree = {
-        'root': {'version': '3', 'parents': ['8']},
+    tree = tree or {
+        '9': {'version': '3', 'parents': ['8']},
         '8': {'version': '3', 'parents': ['7']},
         '7': {'version': '2', 'parents': ['6']},
         '6': {'version': '2', 'parents': ['4', '5']},
@@ -39,9 +39,13 @@ def _build_tree():
         '2': {'version': '1', 'parents': ['1']},
         '1': {'version': None, 'parents': []},
     }
+    root = root or '9'
+
     for key, item in tree.items():
         item['hash'] = key
         item['message'] = 'Commit ' + key
+
+    tree['root'] = tree[root]
 
     return tree
 
@@ -68,7 +72,7 @@ def test_extract_from_vcs():
     sparse_check([
         ('x.x.x',
          None,
-         ['Commit root']),
+         ['Commit 9']),
         ('1',
          date(2014, 2, 1), # version 1 was released with 2nd commit
          ['Commit 2',
@@ -109,8 +113,26 @@ def test_group_versions():
                       # 'Commit 6', this is a merge and it is excluded
                       'Commit 5']},
         {'version': 'x.x.x',
-         'messages': ['Commit root'],
+         'messages': ['Commit 9'],
          'unreleased': True}]
+    sparse_check(expected, versions)
+
+
+def test_group_versions_when_last_commit_is_a_version_bump():
+    # in this case there shouldnt be x.x.x version
+    tree = _build_tree(
+        tree={
+            '2': {'version': '1', 'parents': ['1']},
+            '1': {'version': None, 'parents': []},
+        },
+        root='2')
+
+    bumps = ['2']
+    versions = group_versions(tree, bumps)
+    expected = [
+        {'version': '1',
+         'messages': ['Commit 2',
+                      'Commit 1']}]
     sparse_check(expected, versions)
 
 
