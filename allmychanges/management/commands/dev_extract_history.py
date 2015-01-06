@@ -48,19 +48,20 @@ class Command(LogMixin, BaseCommand):
         get_history = choose_history_extractor(path)
         commits = get_history(path, limit=options.get('limit_history', 0))
 
+        extract_version = choose_version_extractor(path)
+
+        num_extractions = [0]
+        def custom_extractor(path):
+            num_extractions[0] += 1
+            return extract_version(path)
+
+        if options['slow']:
+            write_vcs_versions_slowly(commits, custom_extractor)
+        else:
+            write_vcs_versions_fast(commits, custom_extractor)
+
+
         if options['bumps']:
-            extract_version = choose_version_extractor(path)
-
-            num_extractions = [0]
-            def custom_extractor(path):
-                num_extractions[0] += 1
-                return extract_version(path)
-
-            if options['slow']:
-                write_vcs_versions_slowly(commits, custom_extractor)
-            else:
-                write_vcs_versions_fast(commits, custom_extractor)
-
             bumps = mark_version_bumps(commits)
             for bump in bumps:
                 print bump, commits[bump]['version']
@@ -68,5 +69,5 @@ class Command(LogMixin, BaseCommand):
             print 'Num commits:', len(commits) - 1
             print 'Num version extractions:', num_extractions[0]
         else:
-            for commit in commits:
-                print commit
+            for commit in commits.values():
+                print commit['hash'], commit['version']
