@@ -5,13 +5,44 @@ import os.path
 import setuptools as orig_setuptools
 import sys
 import itertools
+import string
 
 from collections import defaultdict
 from orderedset import OrderedSet
 from allmychanges.utils import cd, trace
-from allmychanges.crawler import _extract_date
+from allmychanges.crawler import _extract_date, _extract_version
 
 from twiggy_goodies.threading import log
+
+
+def do(command):
+#        print 'EXEC>', command
+    r = envoy.run(command)
+    assert r.status_code == 0, '"{0} returned code {1} and here is it\'s stderr:{2}'.format(
+        command, r.status_code, r.std_err)
+    return r
+
+
+def process_vcs_message(text):
+    return text
+
+def find_tagged_versions():
+    """Returns a map {hash -> version_number}
+    """
+    def tag_to_hash(tag):
+        r = do('git rev-parse ' + tag + '^{}')
+        return r.std_out.strip()
+
+    r = do('git tag')
+    tags = r.std_out.split('\n')
+    tags = ((tag, _extract_version(tag)) for tag in tags)
+    result = dict(
+        (tag_to_hash(tag), version)
+        for tag, version in tags
+        if version is not None)
+    return result
+
+
 
 
 def git_history_extractor(path, limit=None):
@@ -23,13 +54,6 @@ def git_history_extractor(path, limit=None):
     """
     splitter = '-----======!!!!!!======-----'
     ins = '--!!==!!--'
-
-    def do(command):
-#        print 'EXEC>', command
-        r = envoy.run(command)
-        assert r.status_code == 0, '"{0} returned code {1} and here is it\'s stderr:{2}'.format(
-            command, r.status_code, r.std_err)
-        return r
 
     with cd(path):
         def gen_checkouter(hash_):
@@ -52,17 +76,23 @@ def git_history_extractor(path, limit=None):
                 return path
             return checkout
 
+        tagged_versions = find_tagged_versions()
+
         r = envoy.run('git log --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
 
         # containse tuples (_hash, date, msg, parents)
-        groups = (group.strip().split(ins)
+        groups = (map(string.strip, group.strip().split(ins))
                   for group in r.std_out.split(splitter)[:-1])
-        result = (dict(date=_extract_date(date.strip()),
-                       message=msg.strip('\n -'),
-                       checkout=gen_checkouter(_hash.strip()),
-                       hash=_hash.strip(),
+
+        result = (dict(date=_extract_date(date),
+                       message=process_vcs_message(msg),
+                       checkout=gen_checkouter(_hash),
+                       hash=_hash,
+                       version=tagged_versions.get(_hash),
                        parents=parents.split())
                   for _hash, date, msg, parents in groups)
+        result = list(result)
+
         if limit:
             result = itertools.islice(result, 0, limit)
         result = list(result)
