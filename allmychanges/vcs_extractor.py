@@ -252,25 +252,32 @@ def write_vcs_versions_bin(commits, extract_version):
 
 
 def _normalize_version_numbers2(commits):
+    updated = set()
+    to_update = set()
+    to_check = deque()
+
     for commit in commits.values():
         if commit['version'] is None:
-            to_update = deque()
-            to_check = deque()
+            to_check.clear()
+            to_update.clear()
             current = commit
-            while current:
-                if current['version'] is not None:
-                    for commit in to_update:
-                        commit['version'] = current['version']
-                    break
-                else:
-                    to_update.append(current)
-                    to_check.extend(filter(None,
-                                           map(commits.get,
-                                               current['parents'])))
-                    try:
-                        current = to_check.popleft()
-                    except Exception:
-                        current = None
+
+            while current and current['version'] is None and current['hash'] not in updated:
+                to_update.add(current['hash'])
+                for hash_ in current['parents']:
+                    if hash_ not in to_update:
+                        to_check.append(hash_)
+
+                try:
+                    hash_ = to_check.popleft()
+                    current = commits.get(hash_)
+                except Exception:
+                    current = None
+
+            for hash_ in to_update:
+                commit = commits.get(hash_)
+                commit['version'] = current['version'] if current else None
+                updated.add(hash_)
 
 
 def write_vcs_versions_slowly(commits, extract_version):
