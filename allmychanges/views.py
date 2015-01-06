@@ -110,7 +110,12 @@ from django.core.cache import cache
 
 
 
-def get_package_data_for_template(package_or_changelog, filter_args, limit_versions, after_date, code_version='v1'):
+def get_package_data_for_template(package_or_changelog,
+                                  filter_args,
+                                  limit_versions,
+                                  after_date,
+                                  code_version='v1',
+                                  ordering=None):
     name = package_or_changelog.name
     namespace = package_or_changelog.namespace
 
@@ -123,11 +128,27 @@ def get_package_data_for_template(package_or_changelog, filter_args, limit_versi
 
     versions = []
     versions_queryset = changelog.versions.filter(**filter_args)
-
     # this allows to reduce number of queries in 5 times
     versions_queryset = versions_queryset.prefetch_related('sections__items')
 
-    for version in versions_queryset[:limit_versions]:
+    if ordering:
+        # if we are in this branch, then we probably
+        # rendering PackageView
+        versions_queryset = versions_queryset.order_by(*ordering)
+        versions_queryset = versions_queryset[:limit_versions]
+        # now we'll pop up any unreleased versions
+        normal_versions = []
+        unreleased_versions = []
+        for idx, version in enumerate(versions_queryset):
+            if version.unreleased:
+                unreleased_versions.append(version)
+            else:
+                normal_versions.append(version)
+        versions_queryset = unreleased_versions + normal_versions
+    else:
+        versions_queryset = versions_queryset[:limit_versions]
+
+    for version in versions_queryset:
         sections = []
         for section in version.sections.all():
             sections.append(dict(notes=section.notes,
@@ -373,7 +394,8 @@ class PackageView(CommonContextMixin, TemplateView):
             filter_args,
             100,
             None,
-            code_version=code_version)
+            code_version=code_version,
+            ordering=('-date', '-discovered_at'))
 
         result['package'] = package_data
         result['login_to_track'] = login_to_track
