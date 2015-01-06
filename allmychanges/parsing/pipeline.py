@@ -668,7 +668,7 @@ def prerender_items(version):
                            u'tt', # monospace
                            u'div', # dont see why it should be prohibited
                            u'span', # and spans too
-                           u'pre',
+                           u'pre', u'cite',
                        ],
                      attributes={u'a': [u'href', u'title'],
                                  u'acronym': [u'title'],
