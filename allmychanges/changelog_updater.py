@@ -216,6 +216,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
     code_version = 'v2'
+    now = timezone.now()
 
     current_versions = SortedSet(
         obj.versions.filter(
@@ -245,7 +246,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
             # we are closing issue if all mentioned versions
             # were discovered during this pass
             if discovered_versions.issuperset(issue.get_related_versions()):
-                issue.resolved_at = timezone.now()
+                issue.resolved_at = now
                 issue.save(update_fields=('resolved_at',))
                 issue.comments.create(message='Autoresolved')
                 chat.send(u'Issue of type "{issue.type}" was autoresolved: <http://allmychanges.com/issues/?namespace={issue.changelog.namespace}&name={issue.changelog.name}&resolved|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
@@ -281,7 +282,9 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.date = getattr(raw_version, 'date', None)
 
         if version.discovered_at is None:
-            version.discovered_at = getattr(raw_version, 'discovered_at', timezone.now())
+            version.discovered_at = getattr(raw_version, 'discovered_at', now)
+
+        version.last_seen_at = now
 
         version.save()
 

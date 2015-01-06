@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
 from django.core.cache import cache
+from south.modelsinspector import add_introspection_rules
 
 from twiggy_goodies.threading import log
 
@@ -49,6 +50,9 @@ TIMEZONE_CHOICES = [(tz, tz) for tz in common_timezones]
 
 class URLField(models.URLField):
     default_validators = [URLValidator()]
+
+add_introspection_rules([], ["^allmychanges\.models\.URLField"])
+
 
 
 class UserManager(BaseUserManager):
@@ -859,6 +863,7 @@ class Version(models.Model):
     number = models.CharField(max_length=255)
     unreleased = models.BooleanField(default=False)
     discovered_at = models.DateTimeField(blank=True, null=True)
+    last_seen_at = models.DateTimeField(blank=True, null=True)
     code_version = models.CharField(max_length=255, choices=CODE_VERSIONS)
     filename = models.CharField(max_length=1000,
                                 help_text=('Source file where this version was found'),
