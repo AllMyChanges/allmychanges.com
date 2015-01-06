@@ -12,20 +12,21 @@ from collections import defaultdict
 from orderedset import OrderedSet
 from allmychanges.utils import cd, trace
 from allmychanges.crawler import _extract_date, _extract_version, RE_BUMP_LINE
+from django.utils.encoding import force_str
 
 from twiggy_goodies.threading import log
 
 
 def do(command):
 #        print 'EXEC>', command
-    r = envoy.run(command)
+    r = envoy.run(force_str(command))
     assert r.status_code == 0, '"{0} returned code {1} and here is it\'s stderr:{2}'.format(
         command, r.status_code, r.std_err)
     return r
 
 
 def process_vcs_message(text):
-    lines = text.split('\n')
+    lines = text.split(u'\n')
     lines = (line for line in lines
              if RE_BUMP_LINE.match(line) is None)
     lines = itertools.dropwhile(operator.not_, lines)
@@ -84,17 +85,17 @@ def git_history_extractor(path, limit=None):
 
         tagged_versions = find_tagged_versions()
 
-        r = envoy.run('git log --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
+        r = do('git log --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
 
         # containse tuples (_hash, date, msg, parents)
+        response = r.std_out.decode('utf-8')
         groups = (map(string.strip, group.strip().split(ins))
-                  for group in r.std_out.split(splitter)[:-1])
+                  for group in response.split(splitter)[:-1])
 
         result = (dict(date=_extract_date(date),
                        message=process_vcs_message(msg),
                        checkout=gen_checkouter(_hash),
                        hash=_hash,
-                       version=tagged_versions.get(_hash),
                        parents=parents.split())
                   for _hash, date, msg, parents in groups)
         result = list(result)
@@ -105,7 +106,13 @@ def git_history_extractor(path, limit=None):
 
         root = result[0]['hash']
 
-        result = dict((item['hash'], item) for item in result)
+        def add_tagged_version(item):
+            if item['hash'] in tagged_versions:
+                item['version'] = tagged_versions[item['hash']]
+            return item
+
+        result = dict((item['hash'], add_tagged_version(item))
+                      for item in result)
         result['root'] = result[root]
         return result
 
