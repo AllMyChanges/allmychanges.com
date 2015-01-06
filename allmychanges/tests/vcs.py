@@ -198,6 +198,9 @@ def test_version_bumps_are_remove_from_commit_message():
     eq_('', process_vcs_message('Bump version in prep for 1.2.0'))
     eq_('', process_vcs_message('Bump version to 1.1.10'))
 
+    # http://allmychanges.com/p/javascript/react-intl/
+    eq_('', process_vcs_message('Build for 1.0.2'))
+
     #http://allmychanges.com/p/python/pip-autoremove/
     eq_('And some text<br/>\nto keep', process_vcs_message("""V0.8.0
 

@@ -121,7 +121,8 @@ _version_regexes = [item.format(ver=(r'v?(?P<ver>('
 RE_BUMP_LINE_STR = ur"""^
            [Bb]ump\ to.*                |
            [Bb]ump\ .*version           |
-           [Vv]\d+\.                   |
+           [Bb]uild\ for\ \d.*          |
+           [Vv]\d+\.                    |
            \d+\.\d+.*
 $"""
 
