@@ -10,6 +10,7 @@ from allmychanges.vcs_extractor import (
     mark_version_bumps,
     process_vcs_message,
     _normalize_version_numbers2,
+    write_vcs_versions_bin_helper,
     group_versions)
 
 
@@ -213,3 +214,18 @@ to keep"""))
 
     #http://allmychanges.com/p/CSS/normalize.css/
     eq_('', process_vcs_message('3.0.2'))
+
+
+def test_write_vcs_versions_bin_leaves_nulls_as_is():
+    commits = [{'hash': 0, 'checkout': lambda: 2},
+               {'hash': 1, 'checkout': lambda: None},
+               {'hash': 2, 'checkout': lambda: 1},
+               {'hash': 3, 'checkout': lambda: 1}]
+    extract_version = lambda path: path
+
+    write_vcs_versions_bin_helper(commits, extract_version)
+
+    eq_(2,    commits[0]['version'])
+    eq_(None, commits[1]['version'])
+    eq_(1,    commits[2]['version'])
+    eq_(1,    commits[3]['version'])

@@ -116,6 +116,14 @@ def git_history_extractor(path, limit=None):
         result = dict((item['hash'], add_tagged_version(item))
                       for item in result)
         result['root'] = result[root]
+
+        def show(hh):
+            # Function to view result item by partial hash
+            # used with set_trace ;)
+            for key, value in result.items():
+                if key.startswith(hh):
+                    return value
+
         return result
 
 
@@ -301,6 +309,13 @@ def _normalize_version_numbers2(commits):
     to_update = set()
     to_check = deque()
 
+    def show(hh):
+        # Function to view result item by partial hash
+        # used with set_trace ;)
+        for key, value in commits.items():
+            if key.startswith(hh):
+                return value
+
     for commit in commits.values():
         if commit['version'] is None:
             to_check.clear()
@@ -333,6 +348,10 @@ def write_vcs_versions_slowly(commits, extract_version):
 
 
 def write_vcs_versions_bin_helper(commits, extract_version):
+    """Recursively writes versions to continuous chain of commits.
+    Each commit should be decedant or ancestor of its nearest neiboughrs.
+    """
+
     # first, we'll skip commits from head and tail without version numbers
     number = _add_version_number(commits[0], extract_version)
     while number is None:
@@ -360,11 +379,8 @@ def write_vcs_versions_bin_helper(commits, extract_version):
         left_version = commits[0]['version']
         right_version = _add_version_number(commits[-1], extract_version)
 
-        if len(commits) == 2:
-            if right_version is None:
-                commits[-1]['version'] = left_version
-        else:
-            if left_version == right_version:
+        if len(commits) > 2:
+            if left_version and left_version == right_version:
                 for commit in commits[1:-1]:
                     commit['version'] = left_version
             else:
