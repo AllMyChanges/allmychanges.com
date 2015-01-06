@@ -6,11 +6,12 @@ import setuptools as orig_setuptools
 import sys
 import itertools
 import string
+import operator
 
 from collections import defaultdict
 from orderedset import OrderedSet
 from allmychanges.utils import cd, trace
-from allmychanges.crawler import _extract_date, _extract_version
+from allmychanges.crawler import _extract_date, _extract_version, RE_BUMP_LINE
 
 from twiggy_goodies.threading import log
 
@@ -24,7 +25,12 @@ def do(command):
 
 
 def process_vcs_message(text):
-    return text
+    lines = text.split('\n')
+    lines = (line for line in lines
+             if RE_BUMP_LINE.match(line) is None)
+    lines = itertools.dropwhile(operator.not_, lines)
+    return u'<br/>\n'.join(lines)
+
 
 def find_tagged_versions():
     """Returns a map {hash -> version_number}
@@ -597,7 +603,7 @@ def group_versions(tree, bumps):
         while commit is not None:
             if commit['hash'] not in processed:
                 # we ignore merge commits where parents > 1
-                if len(commit['parents']) < 2:
+                if len(commit['parents']) < 2 and commit['message']:
                     messages.append(commit['message'])
 
                 processed.add(commit['hash'])

@@ -8,6 +8,7 @@ from allmychanges.env import Environment
 from allmychanges.parsing.pipeline import vcs_processing_pipe
 from allmychanges.vcs_extractor import (
     mark_version_bumps,
+    process_vcs_message,
     _normalize_version_numbers2,
     group_versions)
 
@@ -176,3 +177,32 @@ def test_ignore_vcs_versions_if_there_is_only_one_unreleased_version():
          (None, date(2014, 1, 15), 'Feature was added'),
          (None, date(2014, 1, 16), 'Tests were added')])
     eq_([], versions)
+
+
+def test_in_vcs_messages_newlines_replaced_with_brs():
+    eq_("""Some new feature was implemented.<br/>
+<br/>
+And new bugs are<br/>
+introduced as well.""",
+        process_vcs_message("""Some new feature was implemented.
+
+And new bugs are
+introduced as well."""))
+
+
+def test_version_bumps_are_remove_from_commit_message():
+    #http://allmychanges.com/p/python/sleekxmpp/
+    eq_('', process_vcs_message('Bump to 1.3.1'))
+    eq_('', process_vcs_message('bump version'))
+    eq_('', process_vcs_message('Bump minor version'))
+    eq_('', process_vcs_message('Bump version in prep for 1.2.0'))
+    eq_('', process_vcs_message('Bump version to 1.1.10'))
+
+    #http://allmychanges.com/p/python/pip-autoremove/
+    eq_('And some text<br/>\nto keep', process_vcs_message("""V0.8.0
+
+And some text
+to keep"""))
+
+    #http://allmychanges.com/p/CSS/normalize.css/
+    eq_('', process_vcs_message('3.0.2'))

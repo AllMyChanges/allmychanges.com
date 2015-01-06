@@ -118,6 +118,15 @@ _version_regexes = [item.format(ver=(r'v?(?P<ver>('
                     for item in _version_regexes]
 
 
+RE_BUMP_LINE_STR = ur"""^
+           [Bb]ump\ to.*                |
+           [Bb]ump\ .*version           |
+           [Vv]\d+\.                   |
+           \d+\.\d+.*
+$"""
+
+RE_BUMP_LINE = re.compile(RE_BUMP_LINE_STR, re.VERBOSE)
+
 def _extract_version(line):
     if line:
         for date_str in RE_DATE.finditer(line):
