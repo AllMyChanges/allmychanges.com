@@ -316,6 +316,10 @@ select {
 .logo__link {
   text-decoration: none;
   color: #000;
+  transition: all ease 500ms;
+}
+.logo__link:hover {
+  color: #46f;
 }
 .login-plate {
   float: right;

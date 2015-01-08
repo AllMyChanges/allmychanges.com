@@ -11,15 +11,19 @@
 .logo {
     float: left;
     margin-left: 100px
-}
 
-.logo__text {
-    font-size: 2em
-    font-family: header-font
-}
-.logo__link {
-    text-decoration: none;
-    color: black;
+    &__text {
+        font-size: 2em
+        font-family: header-font
+    }
+    &__link {
+        text-decoration: none;
+        color: black;
+        transition: all ease 500ms;  
+    }
+    &__link:hover {
+        color: #4466FF;
+    }
 }
 
 .login-plate {
