@@ -8,6 +8,8 @@ import os
 import urllib
 import re
 
+from itertools import groupby
+from operator import itemgetter
 from braces.views import LoginRequiredMixin
 from django.views.generic import (TemplateView,
                                   RedirectView,
@@ -988,5 +990,20 @@ class CatalogueView(CommonContextMixin, TemplateView):
     def get_context_data(self, **kwargs):
         result = super(CatalogueView, self).get_context_data(**kwargs)
         namespaces = Changelog.objects.exclude(name=None).values_list('namespace', flat=True).distinct()
-        result['namespaces'] = sorted(namespaces)
+        namespaces = list(enumerate(sorted(namespaces)))
+        namespace_to_id = dict((namespace, key)
+                               for key, namespace in namespaces)
+        changelogs = Changelog.objects.exclude(name=None).values_list('namespace', 'name').distinct()
+        changelogs = [(namespace_to_id.get(namespace),
+                       name,
+                       reverse('package', kwargs=dict(
+                           namespace=namespace,
+                           name=name)))
+                      for namespace, name in changelogs]
+        changelogs.sort()
+        changelogs = groupby(changelogs, itemgetter(0))
+
+        result['namespaces'] = namespaces
+        result['changelogs'] = [(idx, list(items))
+                                for idx, items in changelogs]
         return result

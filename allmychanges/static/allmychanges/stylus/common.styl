@@ -590,11 +590,11 @@ level-4-header() {
   font-size: 20px
   line-height: 20px
   min-width: 200px
-  padding: 10px;
 
   transition: all ease 500ms;
   & a {
     display: block;
+    padding: 10px;
     transition: all ease 500ms;
   }
 
@@ -610,6 +610,12 @@ level-4-header() {
     & a {
       color: white
       text-decoration: none
+
+      &:before {
+          content: "+"
+          float: right
+          transform: rotate(45deg)
+      }
     }
   }
 }
