@@ -1004,6 +1004,7 @@ class CatalogueView(CommonContextMixin, TemplateView):
         changelogs = groupby(changelogs, itemgetter(0))
 
         result['namespaces'] = namespaces
-        result['changelogs'] = [(idx, list(items))
+        result['changelogs'] = [(idx, list(sorted(items, key=itemgetter(1))))
                                 for idx, items in changelogs]
+        result['title'] = 'Namespaces and Packages'
         return result

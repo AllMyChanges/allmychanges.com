@@ -1,21 +1,22 @@
 {% extends "allmychanges/new-base.html" %}
 
+{% block html-title %}{{ title }} – {{ block.super }}{% endblock %}
 
 {% block content %}
-  <h1 class="page-header">Namespaces</h1>
+  <h1 class="page-header">{{ title }}</h1>
 
   <ul class="catalogue-namespaces">
   {% for idx, namespace in namespaces %}
-    <li class="catalogue-namespace" data-idx="{{ idx }}"><a href="#test">{{ namespace }}</a></li>
+    <li class="catalogue-namespace" data-idx="{{ idx }}"><a href="#{{ namespace }}">{{ namespace }}</a></li>
   {% endfor %}
   </ul>
 
   {% for idx, items in changelogs %}
-    {% for idx2, name, url in items %}
-      <ul id="catalogue-packages-{{ idx }}" class="catalogue-packages">
+    <ul id="catalogue-packages-{{ idx }}" class="catalogue-packages">
+      {% for idx2, name, url in items %}
         <li><a href="{{ url }}">{{ name }}</a></li>
-      </ul>
-    {% endfor %}
+      {% endfor %}
+    </ul>
   {% endfor %}
 
   <script>
@@ -43,7 +44,7 @@
                namespaces.removeClass('catalogue-namespaces_transition');
                namespaces.addClass('catalogue-namespaces_selected');
                $('#catalogue-packages-' + namespace.data('idx')).addClass('catalogue-packages_visible');
-            }, 1000);
+            }, 500);
         }
       }
     });

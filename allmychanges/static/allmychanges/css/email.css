@@ -968,21 +968,21 @@ body.email {
 }
 .catalogue-namespaces {
   width: 100%;
-  transition: width 1s;
+  transition: width 500ms;
   background: #eee;
 }
 .catalogue-namespaces_transition {
-  width: 220px;
+  width: 200px;
 }
 .catalogue-namespaces_selected {
   display: table-cell;
-  width: 220px;
+  width: 200px;
 }
 .catalogue-namespace {
   display: inline-block;
   font-size: 20px;
   line-height: 20px;
-  min-width: 200px;
+  width: 200px;
   transition: all ease 500ms;
 }
 .catalogue-namespace a {
@@ -1011,9 +1011,14 @@ body.email {
 .catalogue-packages {
   display: none;
   list-style: outside none none;
-  width: 100%;
-  padding-left: 10px;
+  padding-left: 20px;
   border: 2px solid #eee;
+}
+.catalogue-packages li {
+  display: inline-block;
+  white-space: nowrap;
+  min-width: 200px;
+  line-height: 40px;
 }
 .catalogue-packages_visible {
   display: table-cell;
