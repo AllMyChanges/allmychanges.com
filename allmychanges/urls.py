@@ -16,6 +16,7 @@ from .views import (OldIndexView,
                     BadgeView,
                     AfterLoginView,
                     LoginView,
+                    CatalogueView,
                     SubscribedView,
                     StyleGuideView,
                     LandingView,
@@ -61,6 +62,7 @@ urlpatterns = patterns(
     url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),
 
     url(r'^issues/$', IssuesView.as_view(), name='issues'),
+    url(r'^catalogue/$', CatalogueView.as_view(), name='catalogue'),
     url(r'^issues/(?P<pk>.*)/$', IssueDetailView.as_view(), name='issue-detail'),
 
     url(r'^p/new/$', AddNewView.as_view(), name='add-new'),

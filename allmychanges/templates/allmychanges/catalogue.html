@@ -1,0 +1,43 @@
+{% extends "allmychanges/new-base.html" %}
+
+
+{% block content %}
+  <h1 class="page-header">Namespaces</h1>
+
+  <ul class="catalogue-namespaces">
+  {% for namespace in namespaces %}
+    <li class="catalogue-namespace"><a href="#test">{{ namespace }}</a></li>
+  {% endfor %}
+  </ul>
+
+  <ul id="catalogue-packages-1" class="catalogue-packages">
+   <li><a href="#2">blah</a></li>
+   <li><a href="#3">minor</a></li>
+  </ul>
+
+  <script>
+    $('.catalogue-namespace a').click(function(ev) {
+      ev.preventDefault();
+      var namespace = $(this).parent();
+      var has_class = namespace.hasClass('catalogue-namespace_selected');
+      console.log(has_class);
+      $('.catalogue-namespace_selected').removeClass('catalogue-namespace_selected');
+      $('.catalogue-packages_visible').removeClass('catalogue-packages_visible');
+
+      if (has_class) {
+        namespace.removeClass('catalogue-namespace_selected');
+        $('.catalogue-namespaces').removeClass('catalogue-namespaces_selected');
+      } else {
+        namespace.addClass('catalogue-namespace_selected');
+        $('.catalogue-namespaces').addClass('catalogue-namespaces_transition');
+        window.setTimeout(function() {
+           $('.catalogue-namespaces').removeClass('catalogue-namespaces_transition');
+           $('.catalogue-namespaces').addClass('catalogue-namespaces_selected');
+           $('#catalogue-packages-1').addClass('catalogue-packages_visible');
+    
+        }, 1000);
+      }
+    });
+  </script>
+
+{% endblock content %}

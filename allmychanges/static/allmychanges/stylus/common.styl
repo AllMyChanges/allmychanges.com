@@ -161,14 +161,14 @@ body.email {
         p:last-child {
            margin-bottom: 0px;
         }
-        // show code blocks nicely
+        /* show code blocks nicely */
         pre {
            font-size: 12px;
            background-color: #FAFAFA;
            border: 1px solid #DFDFDF;
            padding: 11px;
         }
-        // hide Django's permalinks
+        /* hide Django's permalinks */
         a[title="Permalink to this headline"] {
            display: none;
         }
@@ -569,3 +569,61 @@ level-4-header() {
   box-shadow: 0px 10px 20px -4px rgba(0, 0, 0, 0.4);
 }
 /* end dropdown */
+
+/* page of catalogue */
+
+.catalogue-namespaces {
+  width: 100%;
+  transition: width 1s;
+  background: #EEE;
+  &_transition {
+    width: 220px;
+  }
+  &_selected {
+    display: table-cell;
+    width: 220px;
+  }
+}
+
+.catalogue-namespace {
+  display: inline-block
+  font-size: 20px
+  line-height: 20px
+  min-width: 200px
+  padding: 10px;
+
+  transition: all ease 500ms;
+  & a {
+    display: block;
+    transition: all ease 500ms;
+  }
+
+  &:hover {
+    background: #4444FF
+    & a {
+      color: white
+    }
+  }
+
+  &_selected {
+    background: #4444FF
+    & a {
+      color: white
+      text-decoration: none
+    }
+  }
+}
+
+.catalogue-packages {
+    display: none
+    &_visible {
+        display: table-cell;
+    }
+
+    list-style: outside none none;
+    width: 100%;
+    padding-left: 10px;
+    border: 2px solid #eee;
+}
+
+/* page of catalogue */

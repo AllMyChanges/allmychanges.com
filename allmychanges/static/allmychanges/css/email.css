@@ -624,6 +624,8 @@ body.email {
   line-height: 22px;
   font-family: proxima-nova, sans-serif;
   font-weight: 300;
+/* show code blocks nicely */
+/* hide Django's permalinks */
 }
 .package-version__notes ul,
 .package-version__notes ol {
@@ -963,4 +965,51 @@ body.email {
   display: block;
   border: 1px solid #cbcbcb;
   box-shadow: 0px 10px 20px -4px rgba(0,0,0,0.4);
+}
+.catalogue-namespaces {
+  width: 100%;
+  transition: width 1s;
+  background: #eee;
+}
+.catalogue-namespaces_transition {
+  width: 220px;
+}
+.catalogue-namespaces_selected {
+  display: table-cell;
+  width: 220px;
+}
+.catalogue-namespace {
+  display: inline-block;
+  font-size: 20px;
+  line-height: 20px;
+  min-width: 200px;
+  padding: 10px;
+  transition: all ease 500ms;
+}
+.catalogue-namespace a {
+  display: block;
+  transition: all ease 500ms;
+}
+.catalogue-namespace:hover {
+  background: #44f;
+}
+.catalogue-namespace:hover a {
+  color: #fff;
+}
+.catalogue-namespace_selected {
+  background: #44f;
+}
+.catalogue-namespace_selected a {
+  color: #fff;
+  text-decoration: none;
+}
+.catalogue-packages {
+  display: none;
+  list-style: outside none none;
+  width: 100%;
+  padding-left: 10px;
+  border: 2px solid #eee;
+}
+.catalogue-packages_visible {
+  display: table-cell;
 }

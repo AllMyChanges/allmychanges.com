@@ -980,3 +980,13 @@ class IssuesView(CommonContextMixin, TemplateView):
 class IssueDetailView(CommonContextMixin, DetailView):
     template_name = 'allmychanges/issue.html'
     model = Issue
+
+
+class CatalogueView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/catalogue.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(CatalogueView, self).get_context_data(**kwargs)
+        namespaces = Changelog.objects.exclude(name=None).values_list('namespace', flat=True).distinct()
+        result['namespaces'] = sorted(namespaces)
+        return result
