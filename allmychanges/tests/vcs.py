@@ -192,12 +192,16 @@ introduced as well."""))
 
 
 def test_version_bumps_are_remove_from_commit_message():
-    #http://allmychanges.com/p/python/sleekxmpp/
+    # http://allmychanges.com/p/python/sleekxmpp/
     eq_('', process_vcs_message('Bump to 1.3.1'))
     eq_('', process_vcs_message('bump version'))
     eq_('', process_vcs_message('Bump minor version'))
     eq_('', process_vcs_message('Bump version in prep for 1.2.0'))
     eq_('', process_vcs_message('Bump version to 1.1.10'))
+
+    # http://allmychanges.com/p/python/pip/#6.0.6
+    eq_('', process_vcs_message('Bump release for 6.0.6'))
+    eq_('', process_vcs_message('Bump for release of 6.0.2'))
 
     # http://allmychanges.com/p/javascript/angucomplete-alt/
     eq_('', process_vcs_message('Update to v0.0.32'))

@@ -46,7 +46,7 @@
 (gulp.task "watch" (fn (do
                            (gulp.watch "allmychanges/static/allmychanges/jisp/*.jisp" `("jisp"))
                            (gulp.watch "allmychanges/static/allmychanges/js/**/*.js" `("webpack"))
-                           (gulp.watch "allmychanges/static/allmychanges/stylus/*.styl" `("css")))))
+                           (gulp.watch "allmychanges/static/allmychanges/stylus/**/*.styl" `("css")))))
 
 
 (task "default" `("jisp" "watch"))

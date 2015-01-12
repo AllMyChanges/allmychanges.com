@@ -1,0 +1,10 @@
+{% extends "allmychanges/new-base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <h1 class="page-header">Email Verification</h1>
+
+  <p>Thank you, now your email <code>{{ email }}</code>
+  is verified and we'll be able to delivery changelog digests.</p>
+  <p>Now just go and <a href="{% url 'second-step' %}">track libraries you use!</a></p>
+{% endblock content %}

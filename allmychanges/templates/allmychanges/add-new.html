@@ -1,6 +1,13 @@
 {% extends "allmychanges/new-base.html" %}
 
 {% block content %}
+
+{% if title %}
+  <h1 class="page-header {% if step3 %}first-step__header{% endif %}">{{ title }}</h1>
+{% endif %}
+
+{% if changelog %}
+
 {% if can_edit %}
 <div ng-controller="AddNewCtrl"
      data-preview-id="{{ preview.id }}"
@@ -20,7 +27,7 @@
   <input ng-model="changelog_source" name="changelog_source" type="text" placeholder="Changelog's source URL" class="text-input"/>
 {% else %}
   {% verbatim %}
-     <p class="new-package__greeting" ng-hide="tracked">There is no package with source url <a class="new-package__url" ng-bind="changelog_source" ng-href="{{changelog_source}}"></a> yet.<br/>Please, fill in a namespace and name to track it.</p>
+     <p class="new-package__greeting" ng-hide="tracked">There is no package with source url <a class="new-package__url" ng-bind="changelog_source" ng-href="{{changelog_source}}"></a> yet.<br/>Please, fill in a namespace and name to track it or return back and <a href="/p/new/">add another</a> package.</p>
      <p class="plate" ng-show="tracked" ng-cloak>Horay! The package was added and is available <a ng-href="/p/{{namespace}}/{{name}}/">on a separate page</a>.</p>
      <p class="plate plate_{{message.tags}}" ng-repeat="message in messages">{{message.message}}</p>
   {% endverbatim %}
@@ -100,4 +107,35 @@
   {% comment %}can_edit == False{% endcomment %}
   <p class="plate plate_warning">You are not a moderator of this package. There is no way to become a moderator automatically.<br/>If you feel you need it, write an email to <a href="mailto:help@allmychanges.com">help@allmychanges.com</a> and we'll help you.</p>
 {% endif %}
+
+{% else %}{% comment %} changelog is None {% endcomment %}
+
+  <div class="add-page__container">
+    <p class="add-page__text">Please enter an URL pointing to a repository or direct link to a changelog file.
+      This could be something like that:</p>
+
+    <ul class="add-page__examples">
+      <li class="add-page__example"><a href="https://github.com/rust-lang/rust">https://github.com/rust-lang/rust</a></li>
+      <li class="add-page__example"><a href="https://bitbucket.org/runeh/anyjson">https://bitbucket.org/runeh/anyjson</a></li>
+      <li class="add-page__example"><a href="http://git.haproxy.org/git/haproxy.git/">http://git.haproxy.org/git/haproxy.git/</a></li>
+      <li class="add-page__example"><a href="https://www.virtualbox.org/wiki/Changelog">https://www.virtualbox.org/wiki/Changelog</a></li>
+    </ul>
+
+    <form method="GET" action="." class="add-page__form">
+      <input type="text" placeholder="Repository's URL or direct link" name="url" class="add-page__input"/>
+      <input type="submit" value="Add" class="button _large _bad add-page__submit-button"/>
+      <div class="clear-both"></div>
+      {% csrf_token %}
+    </form>
+
+    <p class="add-page__text">You know, we are able to work with git and mercurial repositories and with direct links
+      to files, accessable via http. Just try it!</p>
+
+
+  </div>
+
+{% endif %}{% comment %} END changelog is None {% endcomment %}
 {% endblock content %}
+
+{% comment %} We dont need seach on this page {% endcomment %}
+{% block magic-prompt %}{% endblock %}

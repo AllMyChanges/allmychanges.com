@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.template.defaultfilters import linebreaksbr, urlize
+import time
 import math
 import os
 import datetime
+import md5
 
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
+from django.template.defaultfilters import linebreaksbr, urlize
 from django.core.cache import cache
 from south.modelsinspector import add_introspection_rules
 
@@ -104,6 +106,7 @@ class User(AbstractBaseUser):
     """
     username = models.CharField('user name', max_length=254, unique=True)
     email = models.EmailField('email address', max_length=254, blank=True)
+    email_is_valid = models.BooleanField(default=False)
     date_joined = models.DateTimeField('date joined', default=timezone.now)
     timezone = models.CharField(max_length=100,
                                 choices=TIMEZONE_CHOICES,
@@ -1034,3 +1037,26 @@ class DeploymentHistory(models.Model):
             for line in self.description.split('\n'))
         response.append(u'>')
         return u'\n'.join(response).encode('utf-8')
+
+
+class EmailVerificationCode(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                related_name='email_verification_code')
+    hash = models.CharField(max_length=32, default='')
+    deployed_at = models.DateTimeField(auto_now_add=True)
+
+
+    @staticmethod
+    def new_code_for(user):
+        hash = md5.md5(str(time.time()) + settings.SECRET_KEY).hexdigest()
+
+        if user.email_verification_code is None:
+            code = EmailVerificationCode.objects.create(
+                user=user,
+                hash=hash)
+        else:
+            code = user.email_verification_code
+            code.hash = hash
+            code.save()
+
+        return code

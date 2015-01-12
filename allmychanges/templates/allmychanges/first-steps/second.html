@@ -1,0 +1,34 @@
+{% extends "allmychanges/new-base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <h1 class="page-header first-step__header">Step 2 of 3</h1>
+
+  <p class="first-step__help">There are two ways to track package's changelog at AllMyChanges:</p>
+
+  <div class="first-step__container">
+  <ol class="first-step__list">
+    <li class="first-step__list-item">
+      <h2>Find and Track</h2>
+      <p>You can search and find it either using search input at the page's header ↑
+      or search through <a class="button _bad" href="{% url 'catalogue' %}?step3">full catalogue</a>, looking
+      up by namespace (language or environment) and by package's name.
+      </p>
+    </li>
+    <li class="first-step__list-item">
+      <h2>Add and Track</h2>
+      <p>Or you can <a class="button _bad" href="{% url 'add-new' %}?step3">add package</a> manually, giving us an address where sources
+      containing a changelog could be downloaded. This URL could point to a git or mercurial
+      repository or to a single file (markdown, restructured or html).
+      </p>
+    </li>
+  </ol>
+
+  <div class="first-step__submit-buttons">
+    <a class="button _large _bad" href="{% url 'catalogue' %}?step3">Search in Catalogue</a>
+    <a class="button _large _bad" href="{% url 'add-new' %}?step3">Add new Package</a>
+  </div>
+
+  <div class="clear-both"></div>
+  </div>
+{% endblock content %}

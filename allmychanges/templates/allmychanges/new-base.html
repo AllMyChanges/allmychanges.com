@@ -68,7 +68,9 @@
         {% endblock %}
         <div class="clear"></div>
 
+        {% block magic-prompt %}
         <magic-prompt data-query="{{q}}"/>
+        {% endblock %}
       </div>
       {% endblock header %}
 

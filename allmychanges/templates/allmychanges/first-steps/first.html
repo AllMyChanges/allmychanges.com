@@ -1,0 +1,33 @@
+{% extends "allmychanges/new-base.html" %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <h1 class="page-header first-step__header">Step 1 of 3</h1>
+
+  <form action="." method="post" class="first-step-form">
+    <p class="first-step__help">
+      Please, provide us an email and we'll send you a notification you when new changelog items will be discovered.<br/>
+    </p>
+    <p class="first-step__help">
+      These notification will be in a daily digest form and wi'll send them at 9:00 AM in a given timezone.
+    </p>
+
+    <div class="first-step__input">
+      <label class="first-step__label">Email:</label>
+      {{ form.email|add_class:"text-input first-step__email-field" }}
+      {{ form.errors.email }}
+    </div>
+
+    <div class="first-step__input">
+      <label class="first-step__label">Timezone:</label>
+      {{ form.timezone|add_class:"text-input first-step__timezone-field" }}
+      {{ form.errors.timezone }}
+    </div>
+
+    <input type="submit" value="Next →" class="button _large _bad first-step__submit-button"/>
+    <div class="clear-both"/>
+
+    {% csrf_token %}
+  </form>
+{% endblock content %}
+

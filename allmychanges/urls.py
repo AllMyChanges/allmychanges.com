@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
+from django.views.generic.base import RedirectView
+
 admin.autodiscover()
 
 from .views import (OldIndexView,
@@ -15,6 +17,9 @@ from .views import (OldIndexView,
                     LandingDigestView,
                     BadgeView,
                     AfterLoginView,
+                    FirstStepView,
+                    SecondStepView,
+                    VerifyEmail,
                     LoginView,
                     RetentionGraphsView,
                     CatalogueView,
@@ -54,6 +59,12 @@ urlpatterns = patterns(
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),
     url(r'^coming-soon/$', LandingView.as_view(landings=['coming-soon']), name='comint-soon'),
 
+    url(r'^after-login/', AfterLoginView.as_view(), name='after-login'),
+    url(r'^first-steps/$', RedirectView.as_view(url='/first-steps/1/'), name='first-steps'),
+    url(r'^first-steps/1/$', FirstStepView.as_view(), name='first-step'),
+    url(r'^first-steps/2/$', SecondStepView.as_view(), name='second-step'),
+    url(r'^verify-email/(?P<code>.*)/$', VerifyEmail.as_view(), name='verify-email'),
+
     url(r'^subscribed/$', SubscribedView.as_view(), name='subscribed'),
 
     url(r'^digest/$', DigestView.as_view(), name='digest'),
@@ -79,7 +90,6 @@ urlpatterns = patterns(
     url(r'^favicon.ico/$', lambda x: redirect('/static/favicon.ico')),
     url(r'^django-rq/', include('django_rq.urls')),
     url(r'^logout/', 'django.contrib.auth.views.logout', name='logout'),
-    url(r'^after-login/', AfterLoginView.as_view(), name='after-login'),
     url(r'^style-guide/', StyleGuideView.as_view(), name='style-guide'),
     url(r'^tools/', ToolsView.as_view(), name='tools'),
     url(r'^landing/ru/', LandingView.as_view(landings=['ru1-green', 'ru1-red']), name='landing-ru'),

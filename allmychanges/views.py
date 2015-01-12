@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import md5
 import datetime
 import anyjson
 import time
@@ -27,6 +28,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from twiggy_goodies.threading import log
 
 from allmychanges.models import (Package,
+                                 EmailVerificationCode,
                                  Issue,
                                  LightModerator,
                                  Subscription,
@@ -36,6 +38,7 @@ from allmychanges.models import (Package,
                                  Preview,
                                  Item)
 from allmychanges import chat
+from allmychanges.notifications import send_email
 from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import (HOUR,
@@ -744,40 +747,45 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
 
         url = self.request.GET.get('url')
         if url is None:
-            return Http404
-
-        normalized_url, _, _ = normalize_url(url, for_checkout=False)
-
-        try:
-            changelog = Changelog.objects.get(source=normalized_url)
-            if changelog.name is not None:
-                raise ImmediateResponse(
-                    HttpResponseRedirect(reverse('package', kwargs=dict(
-                        name=changelog.name,
-                        namespace=changelog.namespace))))
-        except Changelog.DoesNotExist:
-            changelog = Changelog.objects.create(source=normalized_url)
-            if user:
-                chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
-                    user.username, normalized_url))
+            if 'step3' in self.request.GET:
+                context['title'] = 'Step 3 of 3'
+                context['step3'] = True
             else:
-                chat.send('Wow, light user {0} added new changelog with url: <{1}>'.format(
-                    self.request.light_user, normalized_url))
+                context['title'] = 'Add new'
+        else:
+            normalized_url, _, _ = normalize_url(url, for_checkout=False)
 
-        changelog.problem = None
-        changelog.save()
+            try:
+                changelog = Changelog.objects.get(source=normalized_url)
+                if changelog.name is not None:
+                    raise ImmediateResponse(
+                        HttpResponseRedirect(reverse('package', kwargs=dict(
+                            name=changelog.name,
+                            namespace=changelog.namespace))))
+            except Changelog.DoesNotExist:
+                changelog = Changelog.objects.create(source=normalized_url)
+                if user:
+                    chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
+                        user.username, normalized_url))
+                else:
+                    chat.send('Wow, light user {0} added new changelog with url: <{1}>'.format(
+                        self.request.light_user, normalized_url))
+
+            changelog.problem = None
+            changelog.save()
 
 
-        preview = changelog.create_preview(
-            user=user,
-            light_user=self.request.light_user)
+            preview = changelog.create_preview(
+                user=user,
+                light_user=self.request.light_user)
 
-        preview.schedule_update()
+            preview.schedule_update()
 
-        context['changelog'] = changelog
-        context['preview'] = preview
+            context['changelog'] = changelog
+            context['preview'] = preview
+            context['can_edit'] = True
+
         context['mode'] = 'add-new'
-        context['can_edit'] = True
         return context
 
 
@@ -1006,12 +1014,12 @@ class CatalogueView(CommonContextMixin, TemplateView):
         result['namespaces'] = namespaces
         result['changelogs'] = [(idx, list(sorted(items, key=itemgetter(1))))
                                 for idx, items in changelogs]
-        result['title'] = 'Namespaces and Packages'
+
+        if 'step3' in self.request.GET:
+            result['title'] = 'Step 3 of 3'
+        else:
+            result['title'] = 'Namespaces and Packages'
         return result
-
-
-
-
 
 
 import arrow
@@ -1076,3 +1084,59 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
                         label=dt.humanize()) for dt in cohort_dates]
         result['markers'] = anyjson.serialize(markers)
         return result
+
+
+class FirstStepView(LoginRequiredMixin, CommonContextMixin, UpdateView):
+    model = User
+    template_name = 'allmychanges/first-steps/first.html'
+    success_url = '/first-steps/2/'
+
+    def get_form_class(self):
+        from django.forms.models import modelform_factory
+        return modelform_factory(User, fields=('email', 'timezone'))
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'first-step-view',
+                             'User opened first step of the wizard')
+        return super(FirstStepView, self).get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        UserHistoryLog.write(self.request.user,
+                             self.request.light_user,
+                             'first-step-post',
+                             'User pressed Next button on the first step page')
+        response = super(FirstStepView, self).post(*args, **kwargs)
+
+        user = self.request.user
+        code = EmailVerificationCode.new_code_for(user)
+        send_email(recipient='unittest@svetlyak.ru',
+                   subject='Please, confirm your email',
+                   template='verify-email.html',
+                   context=dict(
+                       hash=code.hash))
+        return response
+
+
+class VerifyEmail(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/verify-email.html'
+
+    def get_context_data(self, *args, **kwargs):
+        result = super(VerifyEmail, self).get_context_data(**kwargs)
+        code = EmailVerificationCode.objects.get(hash=kwargs['code'])
+        user = code.user
+        user.email_is_valid = True
+        user.save(update_fields=('email_is_valid',))
+
+        UserHistoryLog.write(user,
+                             self.request.light_user,
+                             'verify-email',
+                             'User has verified his email')
+        return result
+
+class SecondStepView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/first-steps/second.html'
