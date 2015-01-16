@@ -114,6 +114,8 @@ def get_stats():
     stats['crawler.issues.from-robot.count'] = opened_issues.filter(user=None, light_user=None).count()
     stats['crawler.issues.from-human.count'] = opened_issues.exclude(user=None, light_user=None).count()
 
+    stats['test.count'] = 42
+
     return stats
 
 
