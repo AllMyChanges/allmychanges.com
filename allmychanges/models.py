@@ -85,6 +85,15 @@ class UserManager(BaseUserManager):
         return self._create_user(username, email, password,
                                  **extra_fields)
 
+    def active_users(self, interval):
+        """Outputs only users who was active in last `interval` days.
+        """
+        after = timezone.now() - datetime.timedelta(interval)
+        queryset = self.all()
+        queryset = queryset.filter(history_log__action__in=ACTIVE_USER_ACTIONS,
+                                   history_log__created_at__gte=after).distinct()
+        return queryset
+
 
 class User(AbstractBaseUser):
     """
@@ -974,6 +983,12 @@ class Package(models.Model):
         else:
             print 'ChangeLog wasn\'t found.'
 
+
+ACTIVE_USER_ACTIONS = (
+    u'landing-digest-view', u'landing-track', u'landing-ignore',
+    u'login', u'package-view', u'profile-update', u'digest-view',
+    u'index-view', u'track', u'untrack',
+    u'untrack-allmychanges', u'create-issue')
 
 
 class UserHistoryLog(models.Model):

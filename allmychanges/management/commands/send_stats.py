@@ -59,7 +59,12 @@ def get_stats():
 
     stats['db.tracks.count'] = ChangelogTrack.objects.count()
     stats['db.changelogs'] = Changelog.objects.count()
+
     stats['db.users'] = User.objects.count()
+    stats['db.active-users.day'] = User.objects.active_users(1)
+    stats['db.active-users.week'] = User.objects.active_users(7)
+    stats['db.active-users.month'] = User.objects.active_users(30)
+    stats['db.active-users.year'] = User.objects.active_users(365)
 
     stats['db.versions.v1-vcs'] = Version.objects.filter(code_version='v1', changelog__filename=None).count()
     stats['db.versions.v1'] = Version.objects.filter(code_version='v1').exclude(changelog__filename=None).count()

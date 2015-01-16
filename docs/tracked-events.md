@@ -14,7 +14,6 @@ Here is a list of event which are tracked:
   Used in `AfterLoginView` if it was called after 60 second interval
   from `date_joined`.
 * digest-view: 'User viewed the digest'
-* edit-digest-view: 'User opened the track list editing page'
 * package-view: 'User opened package /u/allmychanges/web/allmychanges/'
 * profile-view: 'User opened his profile settings'
 * profile-update: 'User saved his profile settings'

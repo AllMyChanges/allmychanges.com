@@ -1,12 +1,7 @@
 import arrow
 import tablib
 
-from allmychanges.models import User
-
-active_actions = [u'landing-digest-view', u'landing-track', u'landing-ignore',
-                  u'login', u'package-view', u'profile-update', u'digest-view',
-                  u'edit-digest-view', u'index-view', u'track', u'untrack',
-                  u'untrack-allmychanges', u'create-issue']
+from allmychanges.models import User, ACTIVE_USER_ACTIONS
 
 
 def get_cohort_for(date):
@@ -20,7 +15,7 @@ def get_cohort_stats(cohort, date):
     total = float(cohort.count())
 
     while date < today:
-        stats.append(cohort.filter(history_log__action__in=active_actions,
+        stats.append(cohort.filter(history_log__action__in=ACTIVE_USER_ACTIONS,
                                    history_log__created_at__range=(
                                        date.date(), date.replace(months=+1).date())) \
                      .distinct().count())
