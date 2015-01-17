@@ -1050,37 +1050,29 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
         now = arrow.utcnow()
         start_date = arrow.get(2014, 1, 1)
         span_months = 3
-        dates = arrow.Arrow.range('month', start_date, now)[::span_months]
+        all_dates = arrow.Arrow.range('month', start_date, now)
+        cohort_dates = all_dates[::span_months]
         cohorts = [get_cohort_for(date, span_months)
-                   for date in dates]
+                   for date in cohort_dates]
 
-        stats = map(get_cohort_stats, cohorts, dates)
-
-#        human_dates = [dt.humanize().split()[0] for dt in dates]
-
-        def zip_dates(values, start_from):
-            result = []
-            num_cohorts = len(dates)
-            for date, value in zip(range(start_from, num_cohorts + 1), values):
-                result.append(dict(date=num_cohorts - date, value=value))
-            return result
-
+        stats = map(get_cohort_stats, cohorts, cohort_dates)
         new_stats = []
+
         for idx, cohort in enumerate(stats):
+            idx = idx * span_months
             new_cohort = [dict(date=date.format('YYYY-MM-DD'),
                                value=0)
-                          for date in dates[:idx]]
-            for value, date in zip(cohort, dates[idx:]):
+                          for date in all_dates[:idx]]
+            for value, date in zip(cohort, all_dates[idx:]):
                 new_data = dict(value=value, date=date.format('YYYY-MM-DD'))
                 new_cohort.append(new_data)
             new_stats.append(new_cohort)
 
-
         limit = 8
         result['data'] = anyjson.serialize(new_stats[-limit:])
-        data_legend = [dt.humanize() for dt in dates]
+        data_legend = [dt.humanize() for dt in cohort_dates]
         result['data_legend'] = anyjson.serialize(data_legend[-limit:])
         markers = [dict(date=dt.format('YYYY-MM-DD'),
-                        label=dt.humanize()) for dt in dates]
+                        label=dt.humanize()) for dt in cohort_dates]
         result['markers'] = anyjson.serialize(markers)
         return result
