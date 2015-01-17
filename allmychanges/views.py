@@ -1020,9 +1020,9 @@ import arrow
 from allmychanges.models import User, ACTIVE_USER_ACTIONS
 
 
-def get_cohort_for(date):
+def get_cohort_for(date, span_months):
     return User.objects.filter(date_joined__range=
-                               (date.date(), date.replace(months=+1).date()))
+                               (date.date(), date.replace(months=span_months).date()))
 
 
 def get_cohort_stats(cohort, date):
@@ -1049,14 +1049,14 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
 
         now = arrow.utcnow()
         start_date = arrow.get(2014, 1, 1)
-        dates = arrow.Arrow.range('month', start_date, now)
-        cohorts = map(get_cohort_for, dates)
+        span_months = 3
+        dates = arrow.Arrow.range('month', start_date, now)[::span_months]
+        cohorts = [get_cohort_for(date, span_months)
+                   for date in dates]
 
         stats = map(get_cohort_stats, cohorts, dates)
 
 #        human_dates = [dt.humanize().split()[0] for dt in dates]
-        data_legend = [dt.humanize() for dt in dates]
-
 
         def zip_dates(values, start_from):
             result = []
@@ -1078,5 +1078,9 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
 
         limit = 8
         result['data'] = anyjson.serialize(new_stats[-limit:])
+        data_legend = [dt.humanize() for dt in dates]
         result['data_legend'] = anyjson.serialize(data_legend[-limit:])
+        markers = [dict(date=dt.format('YYYY-MM-DD'),
+                        label=dt.humanize()) for dt in dates]
+        result['markers'] = anyjson.serialize(markers)
         return result

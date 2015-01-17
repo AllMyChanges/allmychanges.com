@@ -17,20 +17,30 @@
   <script>
 var data = {{ data|safe }};
 var data_legend = {{ data_legend|safe }};
+var markers = {{ markers|safe }};
 
 for(var i=0;i<data.length;i++) {
     data[i] = MG.convert.date(data[i], 'date');
 }
+markers = MG.convert.date(markers, 'date');
 
-//modify away!
+<!-- var dt_format = d3.time.format("%Y-%m-%d"); -->
+<!-- for(var i=0; i < markers.length; i++) { -->
+<!--     markers[i][0] = dt_format.parse(markers[i][0]); -->
+<!-- } -->
+
+
 MG.data_graphic({
   title: "Retention",
   description: "Retention by monthly cohorts.",
   data: data,
   legend: data_legend,
   legend_target: ".legend",
+  markers: markers,
   width: 800,
   height: 400,
+  <!-- xax_count: 12, -->
+  xax_format: d3.time.format('%b'),
   target: ".graphs",
   x_accessor: "date",
   y_accessor: "value",
