@@ -1008,3 +1008,70 @@ class CatalogueView(CommonContextMixin, TemplateView):
                                 for idx, items in changelogs]
         result['title'] = 'Namespaces and Packages'
         return result
+
+
+
+
+
+
+import arrow
+#import tablib
+
+from allmychanges.models import User, ACTIVE_USER_ACTIONS
+
+
+def get_cohort_for(date):
+    return User.objects.filter(date_joined__range=
+                               (date.date(), date.replace(months=+1).date()))
+
+
+def get_cohort_stats(cohort, date):
+    stats = []
+    today = arrow.utcnow()
+    total = float(cohort.count())
+
+    while date < today:
+        stats.append(cohort.filter(history_log__action__in=ACTIVE_USER_ACTIONS,
+                                   history_log__created_at__range=(
+                                       date.date(), date.replace(months=+1).date())) \
+                     .distinct().count())
+        date = date.replace(months=+1)
+    return [item / total if total else 0 for item in stats]
+
+
+
+class RetentionGraphsView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/retention.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(RetentionGraphsView, self).get_context_data(**kwargs)
+        result['title'] = 'Retention Graphs'
+
+        now = arrow.utcnow()
+        start_date = arrow.get(2014, 1, 1)
+        dates = arrow.Arrow.range('month', start_date, now)
+        cohorts = map(get_cohort_for, dates)
+
+        stats = map(get_cohort_stats, cohorts, dates)
+
+#        human_dates = [dt.humanize().split()[0] for dt in dates]
+
+
+        def zip_dates(values, start_from):
+            result = []
+            num_cohorts = len(dates)
+            for date, value in zip(range(start_from, num_cohorts + 1), values):
+                result.append(dict(date=num_cohorts - date, value=value))
+            return result
+
+        new_stats = []
+        for idx, cohort in enumerate(stats):
+            new_cohort = []
+            for value, date in zip(cohort, dates[idx:]):
+                new_data = dict(value=value, date=date.format('YYYY-MM-DD'))
+                new_cohort.append(new_data)
+            new_stats.append(new_cohort)
+
+
+        result['data'] = anyjson.serialize(new_stats)
+        return result

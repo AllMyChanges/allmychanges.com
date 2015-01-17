@@ -1,0 +1,36 @@
+{% extends "allmychanges/new-base.html" %}
+{% load staticfiles %}
+
+
+{% block html-title %}{{ title }} – {{ block.super }}{% endblock %}
+
+{% block content %}
+  <link href="{% static 'metricsgraphics/metricsgraphics.css' %}" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js" charset="utf-8"></script>
+  <script src="{% static 'metricsgraphics/metricsgraphics.js' %}" type="text/javascript" charset="utf-8"></script>
+
+  <h1 class="page-header">{{ title }}</h1>
+
+  <div class="graphs"></div>
+  <script>
+var data = {{ data|safe }};
+
+for(var i=0;i<data.length;i++) {
+    data[i] = MG.convert.date(data[i], 'date');
+}
+
+//modify away!
+MG.data_graphic({
+  title: "Retention",
+  description: "Retention by monthly cohorts.",
+  data: data,
+  width: 800,
+  height: 400,
+  target: ".graphs",
+  x_accessor: "date",
+  y_accessor: "value",
+  interpolate: "basic"
+});
+  </script>
+
+{% endblock content %}

@@ -987,7 +987,7 @@ class Package(models.Model):
 ACTIVE_USER_ACTIONS = (
     u'landing-digest-view', u'landing-track', u'landing-ignore',
     u'login', u'package-view', u'profile-update', u'digest-view',
-    u'index-view', u'track', u'untrack',
+    u'edit-digest-view', u'index-view', u'track', u'untrack',
     u'untrack-allmychanges', u'create-issue')
 
 
