@@ -1055,6 +1055,7 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
         stats = map(get_cohort_stats, cohorts, dates)
 
 #        human_dates = [dt.humanize().split()[0] for dt in dates]
+        data_legend = [dt.humanize() for dt in dates]
 
 
         def zip_dates(values, start_from):
@@ -1066,12 +1067,16 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
 
         new_stats = []
         for idx, cohort in enumerate(stats):
-            new_cohort = []
+            new_cohort = [dict(date=date.format('YYYY-MM-DD'),
+                               value=0)
+                          for date in dates[:idx]]
             for value, date in zip(cohort, dates[idx:]):
                 new_data = dict(value=value, date=date.format('YYYY-MM-DD'))
                 new_cohort.append(new_data)
             new_stats.append(new_cohort)
 
 
-        result['data'] = anyjson.serialize(new_stats)
+        limit = 8
+        result['data'] = anyjson.serialize(new_stats[-limit:])
+        result['data_legend'] = anyjson.serialize(data_legend[-limit:])
         return result
