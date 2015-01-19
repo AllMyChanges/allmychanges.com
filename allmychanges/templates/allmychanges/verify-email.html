@@ -4,7 +4,12 @@
 {% block content %}
   <h1 class="page-header">Email Verification</h1>
 
-  <p>Thank you, now your email <code>{{ email }}</code>
-  is verified and we'll be able to delivery changelog digests.</p>
-  <p>Now just go and <a href="{% url 'second-step' %}">track libraries you use!</a></p>
+  <div class="first-step__container">
+    <p class="first-step__help">Thank you! Your email <code>{{ email }}</code>
+      was verified and we'll be able to delivery changelog digests.</p>
+    <p class="first-step__help">Now, proceed to the <a href="{% url 'second-step' %}">second step</a> and learn
+      how to track packages!</p>
+    
+    <a href="{% url 'second-step' %}" class="button _good _large">Second step</a>
+  </div>
 {% endblock content %}

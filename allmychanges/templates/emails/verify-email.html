@@ -8,11 +8,18 @@ To deliver changelogs digest we need to verify that this is
 email belongs to you.</p>
 
 <p>Please, click here:<br/>
-<a href="http://allmychanges.com/account/confirm/{{ hash }}">
-http://allmychanges.com/account/confirm/{{ hash }}</a><br/>
+<a href="http://allmychanges.com{% url 'verify-email' code=hash %}">
+http://allmychanges.com{% url 'verify-email' code=hash %}</a><br/>
 to confirm your desire to receive email digests with latest
 changelogs' items.</p>
 
 <p>If you did not request that an AllMyChanges account be created,
 please disregard this notice. No email will be sent without your confirmation.</p>
+
+<div class="email-note">
+  <hr/>
+  <p>Sincerely yours, change-tracking robot.</p>
+</div>
+
+
 {% endblock %}

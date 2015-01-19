@@ -298,9 +298,6 @@ select {
 .nowrap {
   white-space: nowrap;
 }
-.clear-both {
-  clear: both;
-}
 .header {
   padding-bottom: 1.5em;
   padding-top: 1.5em;
@@ -424,114 +421,6 @@ select {
   z-index: 100;
   border-bottom: 1px solid #fff;
   color: #333;
-}
-.add-page__container {
-  max-width: 800px;
-}
-.add-page__text {
-  font-size: 20px;
-  line-height: 30px;
-}
-.add-page__examples {
-  list-style-position: inside;
-  font-size: 20px;
-  line-height: 30px;
-  margin: 20px;
-}
-.add-page__example a {
-  color: #000;
-  text-decoration: none;
-  transition: color 0.2s;
-  font-family: courier new;
-}
-.add-page__example a:hover {
-  color: #00f;
-  text-decoration: none;
-}
-.add-page__form {
-  position: relative;
-  padding-right: 110px;
-  margin: 30px 0;
-}
-.add-page__input {
-  width: 100%;
-  margin-right: -40px;
-  font-size: 25px;
-  height: 35px;
-}
-.add-page__submit-button {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  width: 80px;
-}
-.first-step__container {
-  max-width: 800px;
-}
-.first-step__help {
-  font-size: 20px;
-  line-height: 30px;
-  margin-bottom: 30px;
-}
-.first-step__label {
-  font-size: 20px;
-  font-weight: bold;
-  margin-top: 30px;
-  margin-bottom: 20px;
-  display: block;
-}
-.first-step__header {
-  border-bottom: 4px solid #5cb85c;
-  display: inline-block;
-}
-.first-step__submit-buttons {
-  float: right;
-}
-.first-step__submit-buttons a {
-  margin-left: 20px;
-}
-.first-step__input {
-  position: relative;
-}
-.first-step__input .errorlist {
-  position: absolute;
-  list-style: none;
-  margin-top: -15px;
-  color: #f00;
-}
-.first-step__list {
-  list-style-position: inside;
-  font-size: 20px;
-  line-height: 30px;
-}
-.first-step__list-item {
-  background: #f2f0f0;
-  padding: 10px;
-  border: 1px solid #e3e1e1;
-  border-radius: 5px;
-  list-style-type: none;
-  padding-left: 60px;
-  position: relative;
-  margin-bottom: 30px;
-}
-.first-step__list-item h2 {
-  margin-top: -25px;
-  margin-bottom: 20px;
-  font-size: 30px;
-  color: #555;
-}
-.first-step__list-item:before {
-  font-size: 40px;
-  position: relative;
-  left: -40px;
-  top: 10px;
-  margin-right: -20px;
-}
-.first-step__list-item:nth-child(1):before {
-  content: "1";
-}
-.first-step__list-item:nth-child(2):before {
-  content: "2";
 }
 .subscribed-text {
   font-size: 1.5em;
