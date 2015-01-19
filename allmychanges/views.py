@@ -263,6 +263,7 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
 
     def get_context_data(self, **kwargs):
         result = super(DigestView, self).get_context_data(**kwargs)
+        result['menu_digest'] = True
 
         now = timezone.now()
         one_day = datetime.timedelta(1)
@@ -743,6 +744,7 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AddNewView, self).get_context_data(**kwargs)
+        context['menu_add_new'] = True
         user = self.request.user if self.request.user.is_authenticated() else None
 
         url = self.request.GET.get('url')
@@ -997,6 +999,8 @@ class CatalogueView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(CatalogueView, self).get_context_data(**kwargs)
+        result['menu_catalogue'] = True
+
         namespaces = Changelog.objects.exclude(name=None).values_list('namespace', flat=True).distinct()
         namespaces = list(enumerate(sorted(namespaces)))
         namespace_to_id = dict((namespace, key)
@@ -1114,10 +1118,11 @@ class FirstStepView(LoginRequiredMixin, CommonContextMixin, UpdateView):
 
         user = self.request.user
         code = EmailVerificationCode.new_code_for(user)
-        send_email(recipient='unittest@svetlyak.ru',
+        send_email(recipient=user.email,
                    subject='Please, confirm your email',
                    template='verify-email.html',
                    context=dict(
+                       user=user,
                        hash=code.hash))
         return response
 

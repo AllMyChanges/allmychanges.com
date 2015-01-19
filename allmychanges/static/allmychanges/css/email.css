@@ -426,15 +426,14 @@ a {
   clear: both;
 }
 .header {
-  padding-bottom: 1.5em;
   padding-top: 1.5em;
-  background-color: #fff;
-  margin-bottom: 1em;
-  border-bottom: 1px solid #dedede;
+  background-color: #eee;
+  margin-bottom: 30px;
 }
 .logo {
-  float: left;
-  margin-left: 100px;
+  margin-left: 20px;
+  position: absolute;
+  top: 25px;
 }
 .logo__text {
   font-size: 2em;
@@ -449,9 +448,9 @@ a {
   color: #46f;
 }
 .login-plate {
-  float: right;
-  margin-right: 100px;
-  line-height: 2em;
+  position: absolute;
+  right: 20px;
+  top: 20px;
 }
 .login-plate__profile-link {
   color: #000;
@@ -459,6 +458,64 @@ a {
 }
 .login-plate__profile-link:hover {
   text-decoration: underline;
+}
+.site-menu {
+  display: block;
+  margin: 0;
+  padding: 10px 100px;
+  border-bottom: 1px solid #808080;
+}
+.site-menu__item {
+  display: inline-block;
+}
+.site-menu__item a {
+  display: block;
+  font-size: 20px;
+  margin-right: 30px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 5px solid #555;
+  transition: 0.2s;
+}
+.site-menu__item a:hover {
+  color: #46f;
+  border-bottom: 5px solid #46f;
+}
+.site-menu__selected-item a {
+  border-bottom: 5px solid #f00;
+}
+.site-menu__selected-item a:hover {
+  color: #333;
+  border-bottom: 5px solid #f00;
+  cursor: default;
+}
+.magic-prompt {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 290px;
+  padding-right: 220px;
+  line-height: 50px;
+}
+.magic-prompt__text {
+  font-size: 24px;
+  line-height: 24px;
+  margin-top: -8px;
+  padding: 10px;
+}
+.magic-prompt__autocomplete {
+  width: 80%;
+  display: inline-block;
+}
+.magic-prompt__submit {
+  font-size: 24px;
+  line-height: 32px;
+  margin-top: -25px;
+  margin-left: 20px;
+}
+.magic-prompt__apply {
+  font-size: 24px;
+  line-height: 32px;
+  margin-top: 10px;
 }
 .form_subscription {
   font-size: 2em;
@@ -962,32 +1019,6 @@ body.email {
 .large-login-button:hover {
   color: #fefefe;
   background: #0c82c5;
-}
-.magic-prompt {
-  margin-top: 24px;
-  margin-left: 100px;
-  margin-right: 200px;
-}
-.magic-prompt__text {
-  font-size: 24px;
-  line-height: 24px;
-  margin-top: -8px;
-  padding: 10px;
-}
-.magic-prompt__autocomplete {
-  width: 80%;
-  display: inline-block;
-}
-.magic-prompt__submit {
-  font-size: 24px;
-  line-height: 32px;
-  margin-top: -25px;
-  margin-left: 20px;
-}
-.magic-prompt__apply {
-  font-size: 24px;
-  line-height: 32px;
-  margin-top: 10px;
 }
 .new-package__greeting {
   font-size: 24px;

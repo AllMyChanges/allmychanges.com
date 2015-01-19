@@ -1,16 +1,15 @@
 @require "utils"
 
 .header {
-    padding-bottom: 1.5em;
     padding-top: 1.5em;
-    background-color: white;
-    margin-bottom: 1em;
-    border-bottom: 1px solid #dedede;
+    background-color: #EEE;
+    margin-bottom: 30px;
 }
 
 .logo {
-    float: left;
-    margin-left: 100px
+    margin-left: 20px
+    position: absolute
+    top: 25px
 
     &__text {
         font-size: 2em
@@ -27,11 +26,76 @@
 }
 
 .login-plate {
-    float: right;
-    margin-right: 100px;
-    line-height: 2em;
+    position: absolute
+    right: 20px
+    top: 20px
 
     &__profile-link {
         black-link();
     }
 }
+
+/* Navigation */
+.site-menu {
+  display: block;
+  margin: 0;
+  padding: 10px 100px;
+  border-bottom: 1px solid gray;
+}
+.site-menu__item {
+  display: inline-block;
+}
+.site-menu__item a {
+  display: block;
+  font-size: 20px;
+  margin-right: 30px;
+  color: text-color;
+  text-decoration: none;
+  border-bottom: 5px solid #555;
+  transition: 0.2s;
+  &:hover {
+      color: link-color;
+      border-bottom: 5px solid link-color;
+  }
+}
+.site-menu__selected-item a {
+  border-bottom: 5px solid red;
+  &:hover {
+      color: text-color;
+      border-bottom: 5px solid red;
+      cursor: default;
+  }
+}
+/* END Navigation */
+
+
+.magic-prompt {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 290px
+    padding-right: 220px
+    line-height: 50px
+
+    &__text {
+        font-size: 24px;
+        line-height: 24px;
+        margin-top: -8px;
+        padding: 10px;
+    }
+    &__autocomplete {
+        width: 80%;
+        display: inline-block;
+    }
+    &__submit {
+        font-size: 24px;
+        line-height: 32px;
+        margin-top: -25px;
+        margin-left: 20px;
+    }
+    &__apply {
+        font-size: 24px;
+        line-height: 32px;
+        margin-top: 10px;
+    }
+}
+
