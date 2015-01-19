@@ -1050,13 +1050,13 @@ class EmailVerificationCode(models.Model):
     def new_code_for(user):
         hash = md5.md5(str(time.time()) + settings.SECRET_KEY).hexdigest()
 
-        if user.email_verification_code is None:
-            code = EmailVerificationCode.objects.create(
-                user=user,
-                hash=hash)
-        else:
+        try:
             code = user.email_verification_code
             code.hash = hash
             code.save()
+        except EmailVerificationCode.DoesNotExist:
+            code = EmailVerificationCode.objects.create(
+                user=user,
+                hash=hash)
 
         return code
