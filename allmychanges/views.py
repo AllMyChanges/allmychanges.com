@@ -1090,14 +1090,21 @@ class RetentionGraphsView(CommonContextMixin, TemplateView):
         return result
 
 
+class FirstStepForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ['email', 'timezone']
+
+
 class FirstStepView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     model = User
     template_name = 'allmychanges/first-steps/first.html'
     success_url = '/first-steps/2/'
 
     def get_form_class(self):
-        from django.forms.models import modelform_factory
-        return modelform_factory(User, fields=('email', 'timezone'))
+        return FirstStepForm
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -1109,12 +1116,12 @@ class FirstStepView(LoginRequiredMixin, CommonContextMixin, UpdateView):
                              'User opened first step of the wizard')
         return super(FirstStepView, self).get(*args, **kwargs)
 
-    def post(self, *args, **kwargs):
+    def form_valid(self, *args, **kwargs):
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
                              'first-step-post',
                              'User pressed Next button on the first step page')
-        response = super(FirstStepView, self).post(*args, **kwargs)
+        response = super(FirstStepView, self).form_valid(*args, **kwargs)
 
         user = self.request.user
         code = EmailVerificationCode.new_code_for(user)

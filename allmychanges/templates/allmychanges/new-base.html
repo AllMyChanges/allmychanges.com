@@ -81,9 +81,12 @@
       {% endblock header %}
 
       <div class="content">
-        {% if user.is_authenticated and not user.email %}
-          <div class="plate plate_warning">Please, <a href="{% url "account-settings" %}#notifications">setup email</a> and we will notify you when new versions will be discovered.</div>
-        {% endif %}
+        {% block no-email-warning %}
+          {% if user.is_authenticated and not user.email %}
+            <div class="plate plate_warning">Please, <a href="{% url "account-settings" %}#notifications">setup email</a> and we will notify you when new versions will be discovered.</div>
+          {% endif %}
+        {% endblock %}
+
         {% block content %}{% endblock content %}
       </div>
 

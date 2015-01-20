@@ -4,6 +4,7 @@
 {% block content %}
   <h1 class="page-header first-step__header">Step 1 of 3</h1>
 
+  <div class="first-step__container">
   <form action="." method="post" class="first-step-form">
     <p class="first-step__help">
       Please, provide us an email and we'll send you a notification you when new changelog items will be discovered.<br/>
@@ -24,10 +25,14 @@
       {{ form.errors.timezone }}
     </div>
 
-    <input type="submit" value="Next →" class="button _large _bad first-step__submit-button"/>
+    <div class="first-step__submit-buttons">
+      <input type="submit" value="Next →" class="button _large _bad"/>
+    </div>
     <div class="clear-both"/>
 
     {% csrf_token %}
   </form>
+  </div>
 {% endblock content %}
 
+{% block no-email-warning %}{% endblock %}
