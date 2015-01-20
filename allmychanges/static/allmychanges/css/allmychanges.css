@@ -328,6 +328,15 @@ select {
   right: 20px;
   top: 20px;
 }
+.login-plate__greeting {
+  display: inline-block;
+  width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+  top: 6px;
+  text-align: right;
+}
 .login-plate__profile-link {
   color: #000;
   text-decoration: none;
