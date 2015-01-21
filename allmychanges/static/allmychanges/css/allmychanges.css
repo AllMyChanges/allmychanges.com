@@ -303,11 +303,11 @@ select {
 }
 .header {
   padding-top: 1.5em;
+  padding-left: 100px;
   background-color: #eee;
   margin-bottom: 30px;
 }
 .logo {
-  margin-left: 20px;
   position: absolute;
   top: 25px;
 }
@@ -347,7 +347,7 @@ select {
 .site-menu {
   display: block;
   margin: 0;
-  padding: 10px 100px;
+  padding: 10px 0;
   border-bottom: 1px solid #808080;
 }
 .site-menu__item {
@@ -377,8 +377,8 @@ select {
 .magic-prompt {
   width: 100%;
   box-sizing: border-box;
-  padding-left: 290px;
-  padding-right: 220px;
+  padding-left: 270px;
+  padding-right: 250px;
   line-height: 50px;
 }
 .magic-prompt__text {
