@@ -469,7 +469,7 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
                 UserHistoryLog.write(user, self.request.light_user,
                                      action='login',
                                      description='User logged in')
-                response = reverse('digest')
+                response = reverse('index')
 
             tracked_changelogs = parse_ints(self.request.COOKIES.get('tracked-changelogs', ''))
             log.info('Cookie tracked-changelogs={0}'.format(tracked_changelogs))
