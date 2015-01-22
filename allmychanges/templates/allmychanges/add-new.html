@@ -43,7 +43,7 @@
               <td class="namespace-name-cell__namespace-cell">
                 <div class="input">
                   <label class="input__label">Namespace:</label><span class="input__error" ng-if="namespace_error" ng-bind="namespace_error"></span><br/>
-                  <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (e.g. python, node)" pause="100" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="namespace" minlength="1" override-suggestions="true" selected-object="selected_namespace_unused" input-class="text-input"  input-changed="namespace_changed" {% if changelog.namespace %}initial-value="{{changelog.namespace}}"{% endif %}/></div>
+                  <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (e.g. python, node)" pause="100" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" selected-object="selected_namespace_unused" input-class="text-input"  input-changed="namespace_changed" {% if changelog.namespace %}initial-value="{{changelog.namespace}}"{% endif %}/></div>
                 </div>
               </td>
               <td class="namespace-name-cell__name-cell">
