@@ -309,7 +309,7 @@ select {
 }
 .logo {
   position: absolute;
-  top: 25px;
+  top: 32px;
 }
 .logo__text {
   font-size: 2em;
@@ -326,7 +326,7 @@ select {
 .login-plate {
   position: absolute;
   right: 20px;
-  top: 20px;
+  top: 5px;
 }
 .login-plate__greeting {
   display: inline-block;
@@ -347,7 +347,7 @@ select {
 .site-menu {
   display: block;
   margin: 0;
-  padding: 10px 0;
+  padding: 20px 0px 10px 0px;
   border-bottom: 1px solid #808080;
 }
 .site-menu__item {
@@ -373,6 +373,51 @@ select {
   color: #333;
   border-bottom: 5px solid #f00;
   cursor: default;
+}
+.magic-prompt2 {
+  width: 100%;
+  box-sizing: border-box;
+  padding-left: 270px;
+  padding-right: 400px;
+  position: relative;
+}
+.magic-prompt2__input {
+  font-size: 24px;
+  line-height: 40px;
+  border: 1px solid #808080;
+  padding: 0 5px;
+  width: 100%;
+}
+.magic-prompt2__submit {
+  font-size: 24px;
+  line-height: 32px;
+  position: absolute;
+  right: 250px;
+}
+.magic-prompt2__no-matches {
+  padding: 10px;
+}
+.magic-prompt2 .twitter-typeahead {
+  width: 100%;
+}
+.magic-prompt2 .tt-dropdown-menu {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #808080;
+  box-shadow: 0 0 3px #111;
+  margin-top: 10px;
+}
+.magic-prompt2 .tt-suggestion {
+  border-bottom: 1px solid #808080;
+  font-size: 15px;
+  line-height: 20px;
+  padding: 10px;
+}
+.magic-prompt2 .tt-cursor {
+  background: #88f;
+}
+.magic-prompt2 .tt-suggestion:last-of-type {
+  border-bottom: none;
 }
 .magic-prompt {
   width: 100%;

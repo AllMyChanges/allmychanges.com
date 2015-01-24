@@ -31,8 +31,11 @@
 
     {% compress js %}
       <script src="/static/bower_components/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
-      <script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/bower_components/jquery.cookie/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/bower_components/typehead.js/dist/typeahead.jquery.js" type="text/javascript" charset="utf-8"></script>
+      <!-- используется для UserStory -->
+      <script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script>
 
       <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
@@ -46,6 +49,16 @@
 
       <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
       <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+      <script type="text/javascript">
+        UserStory.configure({
+          on: ['*'],
+          off: ['foo.bar'],
+          logger: function (message, section){
+            console.log('My custom log', message, section);
+          }
+        });
+      </script>
 
     {% block extra_head %}{% endblock extra_head %}
 </head>
@@ -69,7 +82,7 @@
         <div class="clear"></div>
 
         {% block magic-prompt %}
-        <magic-prompt data-query="{{q}}"></magic-prompt>
+        <div class="typeahead">SEARCH</div>
         {% endblock %}
 
         <ul class="site-menu">

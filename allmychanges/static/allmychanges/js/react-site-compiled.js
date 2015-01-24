@@ -52,7 +52,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(6)
+	var PackageSelector = __webpack_require__(7)
 
 	module.exports = {
 	    render: function () {
@@ -74,6 +74,7 @@
 	var ReportButton = __webpack_require__(3)
 	var ResolveButton = __webpack_require__(4)
 	var DeleteButton = __webpack_require__(5)
+	var Typeahead = __webpack_require__(6)
 
 	module.exports = {
 	    render: function () {
@@ -91,6 +92,11 @@
 	        $('.delete-button-container').each(function (idx, element) {
 	            React.render(
 	                React.createElement(DeleteButton, {version_id: element.dataset['versionId']}),
+	                element);
+	        });
+	        $('.typeahead').each(function (idx, element) {
+	            React.render(
+	                React.createElement(Typeahead, null),
 	                element);
 	        });
 	    }
@@ -260,7 +266,88 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(7)
+	module.exports = React.createClass({displayName: 'exports',
+	    componentDidMount: function(){
+	        var element = this.getDOMNode();
+	        var fetch_suggestions = function(query, cb) {
+	            $.get('/v1/search-autocomplete/', {q: query}, function(data) {
+	                var results = data['results'];
+	                _.each(results, function(item) {
+	                    if (item.type == 'package') {
+	                        item.value = item.namespace + '/' + item.name;
+	                    }
+	                    if (item.type == 'namespace') {
+	                        item.value = item.namespace;
+	                    }
+	                    if (item.type == 'add-new') {
+	                        item.value = item.source;
+	                    }
+	                });
+
+	                cb(results);
+	            });
+	        };
+
+	        var show_by_type = {
+	            'package': _.template('<div class="magic-prompt2__suggest-item"><%- namespace %>/<%- name %></div>'),
+	            'namespace': _.template('<div class="magic-prompt2__suggest-item"><%- namespace %></div>'),
+	            'add-new': _.template('<div class="magic-prompt2__suggest-item"><%- source %> <span class="button _good">add new</span></div>')
+	        }
+
+	        var show_suggestion = function (obj) {
+	            return show_by_type[obj.type](obj);
+	        }
+
+	        $(element).find('.magic-prompt2__input').typeahead(
+	            {
+	                minLength: 1,
+	                highlight: true
+	            },
+	            {
+	                name: 'magic-prompt',
+	                displayKey: 'value',
+	                
+	                // Just a little object that implements the necessary 
+	                // signature to plug into typeahead.js
+	                source: fetch_suggestions,
+	                templates: {
+	                    empty: '<div class="magic-prompt2__no-matches">No matches found</div>',
+	                    suggestion: show_suggestion
+	                }
+	            });
+	        
+	        // Behind the scenes, this is just delegating to Backbone's router
+	        // to 'navigate' the main pane of the page to a different view
+	        $(element).on('typeahead:selected', function(jquery, option){
+	            window.location = option.url;
+	        });
+	    },
+	    
+	    componentWillUnmount: function(){
+	        var element = this.getDOMNode();
+	        $(element).find('.magic-prompt2__input').typeahead('destroy');
+	    },
+
+	    render: function(){
+	        return (
+	            React.createElement("div", {className: "magic-prompt2"}, 
+	                React.createElement("form", {action: "/search/", method: "GET"}, 
+	                  React.createElement("input", {type: "search", name: "q", ref: "input", 
+	                         className: "magic-prompt2__input", 
+	                         placeholder: "Search packages and namespaces"}), 
+	                  React.createElement("input", {type: "submit", className: "button _good _large magic-prompt2__submit", value: "Search"})
+	                )
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Package = __webpack_require__(8)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -298,10 +385,10 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	TrackButton = __webpack_require__(8)
+	TrackButton = __webpack_require__(9)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -331,7 +418,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',

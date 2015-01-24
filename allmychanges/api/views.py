@@ -7,6 +7,7 @@ from django import forms
 from django.contrib import messages
 from itertools import islice
 from twiggy_goodies.threading import log
+from urllib import urlencode
 
 from rest_framework import viewsets, mixins, views, permissions
 from rest_framework.exceptions import ParseError
@@ -162,19 +163,34 @@ class SearchAutocompleteView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         q = request.GET.get('q', '')
         splitted = re.split(r'[ /]', q, 1)
+        results = []
+        sources = set()
+
+        def add_changelogs(changelogs):
+            for changelog in changelogs:
+                sources.add(changelog.source)
+                results.append(dict(type='package',
+                                    namespace=changelog.namespace,
+                                    name=changelog.name,
+                                    source=changelog.source,
+                                    url=changelog.get_absolute_url()))
+
+
         if len(splitted) == 2:
             namespace, name = splitted
-            urls = list(Changelog.objects.filter(namespace=namespace,
-                                                 name__startswith=name)
-                        .values_list('source', flat=True)
-                        .distinct())
+            add_changelogs(Changelog.objects.filter(namespace=namespace,
+                                                    name__icontains=name).distinct())
         else:
+            namespaces = Changelog.objects.exclude(namespace=None).exclude(name=None).values_list('namespace', flat=True).distinct()
+            for namespace in namespaces:
+                if q in namespace:
+                    results.append(dict(type='namespace',
+                                         namespace=namespace,
+                                         url='/catalogue/#' + namespace))
+
+
             namespace, name = None, q
-            urls = list(Changelog.objects.filter(namespace__startswith=q)
-                        .values_list('namespace', flat=True)
-                        .distinct())
-            urls += list(Changelog.objects.filter(name__startswith=q)
-                        .values_list('source', flat=True)
+            add_changelogs(Changelog.objects.filter(name__icontains=q)
                         .distinct())
 
         guessed_urls = guess_source(namespace, name)
@@ -183,11 +199,13 @@ class SearchAutocompleteView(viewsets.ViewSet):
         # to ensure, that urls from database
         # will retain their order
         for url in guessed_urls:
-            if url not in urls:
-                urls.append(url)
+            if url not in sources:
+                results.append(dict(type='add-new',
+                                    source=url,
+                                    url='/p/new/?' + urlencode(dict(url=url))))
 
-        return Response({'results': [{'name': url}
-                                     for url in urls]})
+        return Response({'results': results})
+
 
 
 class LandingPackageSuggestView(viewsets.ViewSet):

@@ -16,5 +16,8 @@
     "UserStory": "~0.0.8",
     "jquery": "~2.1.1",
     "jquery.cookie": "~1.4.1"
+  },
+  "devDependencies": {
+    "typehead.js": "~0.10.5"
   }
 }
