@@ -22,11 +22,12 @@
   <script>
     $('.catalogue-namespace a').click(function(ev) {
       ev.preventDefault();
+      window.location.hash = $(this).attr('href');
+
       var namespace = $(this).parent();
       var namespaces = $('.catalogue-namespaces');
 
       var has_class = namespace.hasClass('catalogue-namespace_selected');
-      console.log(namespace.data('idx'));
 
       $('.catalogue-namespace_selected').removeClass('catalogue-namespace_selected');
       $('.catalogue-packages_visible').removeClass('catalogue-packages_visible');
@@ -48,6 +49,12 @@
         }
       }
     });
+
+    /* we need this to open tab if a namespace was specified in URL's fragment */
+    /* # sign is removed because I heard that some browsers include it
+       as part for the window.location.hash, but others don't */
+    var hash = window.location.hash.replace('#', '');
+    $(document).find(".catalogue-namespace a[href=#" + hash + "]").click();
   </script>
 
 {% endblock content %}
