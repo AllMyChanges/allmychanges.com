@@ -21,9 +21,9 @@ module.exports = React.createClass({
         };
 
         var show_by_type = {
-            'package': _.template('<div class="magic-prompt__suggest-item"><%- namespace %>/<%- name %></div>'),
-            'namespace': _.template('<div class="magic-prompt__suggest-item"><%- namespace %></div>'),
-            'add-new': _.template('<div class="magic-prompt__suggest-item"><%- source %> <span class="button _good">add new</span></div>')
+            'package': _.template('<div class="magic-prompt__suggest-item"><%- namespace %>/<%- name %> <span class="magic-prompt__suggest-item-info">package</span></div>'),
+            'namespace': _.template('<div class="magic-prompt__suggest-item"><%- namespace %> <span class="magic-prompt__suggest-item-info">namespace</span></div>'),
+            'add-new': _.template('<div class="magic-prompt__suggest-item"><%- source %> <span class="magic-prompt__suggest-item-info button _good">add new</span></div>')
         }
 
         var show_suggestion = function (obj) {

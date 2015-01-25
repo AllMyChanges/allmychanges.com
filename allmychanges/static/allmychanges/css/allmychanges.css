@@ -397,6 +397,10 @@ select {
 .magic-prompt__no-matches {
   padding: 10px;
 }
+.magic-prompt__suggest-item-info {
+  color: #808080;
+  float: right;
+}
 .magic-prompt .twitter-typeahead {
   width: 100%;
 }
