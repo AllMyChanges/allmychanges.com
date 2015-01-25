@@ -1,3 +1,53 @@
+0.16.0 (2015-01-25)
+===================
+
+This version includes many bugfixes and improvements. The
+most significant are: header's redesign, packages catalogue
+and step by step guide after the first login.
+
+Site header's redesign
+----------------------
+
+Now header includes a tree links to the main services functions.
+Using these links, you could "add a new package", "navigate through
+existing packages" and "view your digest".
+
+Also, search input was completely rewrote in react.js and now should
+work on every page even on the [angular's](http://allmychanges.com/p/javascript/angular.js/).
+Now search results can contain three types of results: namespaces,
+packages and urls found for given namespace and package's name on pypi.
+In latter case, you could select this url to add it as a new package.
+
+In other words, search become much more convinient now. Just go and
+[try it yorself](http://allmychanges.com/)!
+
+Packages catalogue
+------------------
+
+[Packages catalogue](http://allmychanges.com/catalogue/) is a browsable
+directory of namespaces and packages known to the service.
+This way you could discover interesting packages and track their changelogs.
+
+Step by step guide
+------------------
+
+This is very important change because previously allmychanges was
+too odd for a newcomer. It didn't tell him what to do after the registration.
+
+Now service [tries to guide](http://allmychanges.com/first-steps/) user through setup and describes how to search
+changelogs on the site and how to add new packages.
+
+Other changes and fixes
+-----------------------
+
+* Now VCS parser is able to extract version information from git tags!
+* Parser removes 'version bumps' from version descriptions extracted from VCS.
+* When extracting changelog items from VCS history, newlines are replaced with html `<br>` tag.
+* Version ordering at package's page was changed to more natural however sometimes still wrong.
+* Now we use HTMLParser with 'utf-8' encoding when parsing html, this fixes processing unicode symbols in markdown changelogs.
+* Now git history extractor processes branches properly.
+* Fixed an error in VCS parser when last commit is a version bump.
+
 0.15.0 (2014-12-24)
 ===================
 
