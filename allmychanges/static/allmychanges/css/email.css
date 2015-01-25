@@ -498,78 +498,50 @@ a {
   border-bottom: 5px solid #f00;
   cursor: default;
 }
-.magic-prompt2 {
+.magic-prompt {
   width: 100%;
   box-sizing: border-box;
   padding-left: 270px;
   padding-right: 400px;
   position: relative;
 }
-.magic-prompt2__input {
+.magic-prompt__input {
   font-size: 24px;
   line-height: 40px;
   border: 1px solid #808080;
   padding: 0 5px;
   width: 100%;
 }
-.magic-prompt2__submit {
+.magic-prompt__submit {
   font-size: 24px;
   line-height: 32px;
   position: absolute;
   right: 250px;
 }
-.magic-prompt2__no-matches {
+.magic-prompt__no-matches {
   padding: 10px;
 }
-.magic-prompt2 .twitter-typeahead {
+.magic-prompt .twitter-typeahead {
   width: 100%;
 }
-.magic-prompt2 .tt-dropdown-menu {
+.magic-prompt .tt-dropdown-menu {
   width: 100%;
   background: #fff;
   border: 1px solid #808080;
   box-shadow: 0 0 3px #111;
   margin-top: 10px;
 }
-.magic-prompt2 .tt-suggestion {
+.magic-prompt .tt-suggestion {
   border-bottom: 1px solid #808080;
   font-size: 15px;
   line-height: 20px;
   padding: 10px;
 }
-.magic-prompt2 .tt-cursor {
+.magic-prompt .tt-cursor {
   background: #88f;
 }
-.magic-prompt2 .tt-suggestion:last-of-type {
+.magic-prompt .tt-suggestion:last-of-type {
   border-bottom: none;
-}
-.magic-prompt {
-  width: 100%;
-  box-sizing: border-box;
-  padding-left: 270px;
-  padding-right: 250px;
-  line-height: 50px;
-}
-.magic-prompt__text {
-  font-size: 24px;
-  line-height: 24px;
-  margin-top: -8px;
-  padding: 10px;
-}
-.magic-prompt__autocomplete {
-  width: 80%;
-  display: inline-block;
-}
-.magic-prompt__submit {
-  font-size: 24px;
-  line-height: 32px;
-  margin-top: -25px;
-  margin-left: 20px;
-}
-.magic-prompt__apply {
-  font-size: 24px;
-  line-height: 32px;
-  margin-top: 10px;
 }
 .form_subscription {
   font-size: 2em;

@@ -289,16 +289,16 @@
 	        };
 
 	        var show_by_type = {
-	            'package': _.template('<div class="magic-prompt2__suggest-item"><%- namespace %>/<%- name %></div>'),
-	            'namespace': _.template('<div class="magic-prompt2__suggest-item"><%- namespace %></div>'),
-	            'add-new': _.template('<div class="magic-prompt2__suggest-item"><%- source %> <span class="button _good">add new</span></div>')
+	            'package': _.template('<div class="magic-prompt__suggest-item"><%- namespace %>/<%- name %></div>'),
+	            'namespace': _.template('<div class="magic-prompt__suggest-item"><%- namespace %></div>'),
+	            'add-new': _.template('<div class="magic-prompt__suggest-item"><%- source %> <span class="button _good">add new</span></div>')
 	        }
 
 	        var show_suggestion = function (obj) {
 	            return show_by_type[obj.type](obj);
 	        }
 
-	        $(element).find('.magic-prompt2__input').typeahead(
+	        $(element).find('.magic-prompt__input').typeahead(
 	            {
 	                minLength: 1,
 	                highlight: true
@@ -311,7 +311,7 @@
 	                // signature to plug into typeahead.js
 	                source: fetch_suggestions,
 	                templates: {
-	                    empty: '<div class="magic-prompt2__no-matches">No matches found</div>',
+	                    empty: '<div class="magic-prompt__no-matches">No matches found</div>',
 	                    suggestion: show_suggestion
 	                }
 	            });
@@ -325,17 +325,17 @@
 	    
 	    componentWillUnmount: function(){
 	        var element = this.getDOMNode();
-	        $(element).find('.magic-prompt2__input').typeahead('destroy');
+	        $(element).find('.magic-prompt__input').typeahead('destroy');
 	    },
 
 	    render: function(){
 	        return (
-	            React.createElement("div", {className: "magic-prompt2"}, 
+	            React.createElement("div", {className: "magic-prompt"}, 
 	                React.createElement("form", {action: "/search/", method: "GET"}, 
 	                  React.createElement("input", {type: "search", name: "q", ref: "input", 
-	                         className: "magic-prompt2__input", 
+	                         className: "magic-prompt__input", 
 	                         placeholder: "Search packages and namespaces"}), 
-	                  React.createElement("input", {type: "submit", className: "button _good _large magic-prompt2__submit", value: "Search"})
+	                  React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__submit", value: "Search"})
 	                )
 	            )
 	        );
