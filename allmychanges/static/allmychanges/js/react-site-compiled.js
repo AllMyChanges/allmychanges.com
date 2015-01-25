@@ -74,7 +74,7 @@
 	var ReportButton = __webpack_require__(3)
 	var ResolveButton = __webpack_require__(4)
 	var DeleteButton = __webpack_require__(5)
-	var Typeahead = __webpack_require__(6)
+	var MagicPrompt = __webpack_require__(6)
 
 	module.exports = {
 	    render: function () {
@@ -94,9 +94,9 @@
 	                React.createElement(DeleteButton, {version_id: element.dataset['versionId']}),
 	                element);
 	        });
-	        $('.typeahead').each(function (idx, element) {
+	        $('.magic-prompt-container').each(function (idx, element) {
 	            React.render(
-	                React.createElement(Typeahead, null),
+	                React.createElement(MagicPrompt, null),
 	                element);
 	        });
 	    }

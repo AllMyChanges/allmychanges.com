@@ -1,7 +1,7 @@
 var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
-var Typeahead = require('../components/typeahead.js')
+var MagicPrompt = require('../components/magic-prompt.js')
 
 module.exports = {
     render: function () {
@@ -21,9 +21,9 @@ module.exports = {
                 <DeleteButton version_id={element.dataset['versionId']}/>,
                 element);
         });
-        $('.typeahead').each(function (idx, element) {
+        $('.magic-prompt-container').each(function (idx, element) {
             React.render(
-                <Typeahead />,
+                <MagicPrompt />,
                 element);
         });
     }
