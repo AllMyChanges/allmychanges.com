@@ -21,6 +21,9 @@ RE_DATE_STR = r"""(?P<date>(
               # 2009-05-23, 2009.05.23, 2009/05/23 but not 2009.05-23
               \d{4}(?P<delimiter1>[./-])\d{1,2}(?P=delimiter1)\d{1,2} |
 
+              # 05/23/2009
+              \d{1,2}(?P<delimiter3>[./-])\d{1,2}(?P=delimiter3)\d{4} |
+
               # 05-23-2009 or 05.23.2009 but not 05.23-2009
               \d{1,2}(?P<delimiter2>[.-])\d{1,2}(?P=delimiter2)\d{4} |
 
