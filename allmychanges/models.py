@@ -880,6 +880,9 @@ class Version(models.Model):
     filename = models.CharField(max_length=1000,
                                 help_text=('Source file where this version was found'),
                                 blank=True, null=True)
+    raw_text = models.TextField(blank=True, null=True)
+    processed_text = models.TextField(blank=True, null=True)
+
     objects = VersionManager()
 
     class Meta:

@@ -6,7 +6,6 @@ from allmychanges.utils import first
 from allmychanges.parsing.pipeline import (
     create_section,
     parse_changelog,
-    filter_versions,
     get_markup,
     extract_metadata,
     group_by_path,
@@ -124,13 +123,11 @@ Final word.
 
     sc = v3.content
 
-    eq_(3, len(sc))
-    eq_("<h1>Minor changes</h1>\n\n<p>This release has small importance.</p>",
-        sc[0])
-    eq_(["Test case was introduced"],
-        sc[1])
-    eq_("<p>Final word.</p>",
-        sc[2])
+    eq_("""<h1>Minor changes</h1>\n\n<p>This release has small importance.</p>
+
+<ul><li>Test case was introduced</li>
+</ul><p>Final word.</p>""",
+        sc)
 
 
 def test_markup_guesser_from_extension():
@@ -193,28 +190,17 @@ def test_markup_guesser_from_content():
      >"""))
 
 
-def test_filter_versions():
-    input_data = [
-        create_section('0.1.0'),
-        create_section('Just a header'),
-        create_section('Version 3.1.5')]
-    eq_([create_section('0.1.0', [], version='0.1.0'),
-         create_section('Version 3.1.5', version='3.1.5')],
-        list(filter_versions(input_data)))
-
-
 def test_extract_metadata():
     env = Environment()
     env.type = 'almost_version'
     v = lambda **kwargs: env.push(**kwargs)
 
     input_data = v(title='1.0 (2014-06-24)',
-                   content=[['Fixed issue']])
+                   content='Fixed issue')
 
     eq_([v(type='prerender_items',
            title='1.0 (2014-06-24)',
-           content=[[{'type': 'fix',
-                      'text': 'Fixed issue'}]],
+           content='Fixed issue',
            date=datetime.date(2014, 6, 24))],
         extract_metadata(input_data))
 
@@ -226,11 +212,10 @@ def test_prerender_inserts_labels_into_content_items():
 
     input_data = v(type='prerender_items',
                    title='1.0 (2014-06-24)',
-                   content=[[{'type': 'fix',
-                              'text': '<p>Some bug was <em>fixed</em> issue</p>'}]],
+                   content='<p>Some bug was <em>fixed</em> issue</p>',
                    date=datetime.date(2014, 6, 24))
     expected = '<p><span class="changelog-item-type changelog-item-type_fix">fix</span>Some bug was <em>fixed</em> issue</p>'
-    eq_(expected, first(prerender_items(input_data)).content[0][0]['text'])
+    eq_(expected, first(prerender_items(input_data)).processed_content)
 
     input_data = v(type='prerender_items',
                    title='1.0 (2014-06-24)',
@@ -238,7 +223,7 @@ def test_prerender_inserts_labels_into_content_items():
                               'text': 'Fixed issue'}]],
                    date=datetime.date(2014, 6, 24))
     expected = '<span class="changelog-item-type changelog-item-type_fix">fix</span>Fixed issue'
-    eq_(expected, first(prerender_items(input_data)).content[0][0]['text'])
+    eq_(expected, first(prerender_items(input_data)).processed_content)
 
 
 def test_extract_metadata_is_able_to_detect_unreleased_version():
@@ -249,18 +234,18 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
     eq_([v(type='prerender_items',
            title='1.0 (unreleased)',
            unreleased=True,
-           content=[])],
+           content='')],
         extract_metadata(
             v(title='1.0 (unreleased)',
-              content=[])))
+              content='')))
 
     eq_([v(type='prerender_items',
            title='1.45 (not yet released)',
            unreleased=True,
-           content=[])],
+           content='')],
         extract_metadata(
             v(title='1.45 (not yet released)',
-              content=[])))
+              content='')))
 
 
 

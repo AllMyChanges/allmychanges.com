@@ -32,6 +32,12 @@ def test_preview():
     response = cl.get(preview_url)
     eq_(200, response.status_code)
 
+    print 'HUETA ' * 5
+    print ''
+    print response.content
+    import pdb; pdb.set_trace()
+    print 'HUETA ' * 5
+
     assert 'Some bugfix.' in response.content
     assert 'Initial release.' in response.content
 
@@ -76,23 +82,18 @@ def test_update_package_preview_versions():
 
     eq_(0, changelog.versions.filter(preview=None).count())
 
-    def first_item(version):
-        first_section = version.sections.all()[0]
-        result = first_section.notes or ''
+    def first_line(version):
+        return version.processed_text.split('\n', 1)[0]
 
-        items = list(first_section.items.all())
-        if items:
-            result += items[0].text
-        return result
-
-    def first_items(versions):
-        return map(first_item, versions)
+    def first_lines(versions):
+        return map(first_line, versions)
 
     versions = preview.versions.filter(code_version='v2')
 
-    eq_(['<span class="changelog-item-type changelog-item-type_new">new</span>Some crap',
+    eq_([
+        '<ul><li>Some crap</li>',
          u'<h1>0.1.1</h1>', u'<h1>0.1.0</h1>'],
-        first_items(versions))
+        first_lines(versions))
 
     # now we'll check if ignore list works
     preview.set_ignore_list(['docs/unrelated-crap.md'])
@@ -101,7 +102,7 @@ def test_update_package_preview_versions():
 
     versions = preview.versions.filter(code_version='v2')
     eq_([u'<h1>0.1.1</h1>', u'<h1>0.1.0</h1>'],
-        first_items(versions))
+        first_lines(versions))
 
 
 def test_when_preview_saved_versions_are_copied_to_changelog():

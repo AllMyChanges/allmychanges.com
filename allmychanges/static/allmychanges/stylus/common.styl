@@ -89,12 +89,14 @@ body.email {
         color: gray;
         font-family: header-font
     }
+    /* Remove this after migration to one blob versions */
     &__items {
         margin-left: 1em;
         margin-top: 0.5em;
         font-family: generic-font;
         font-weight: 300;
     }
+    /* Remove this after migration to one blob versions */
     &__section-item {
         list-style: none;
         line-height: 1.667em;
@@ -114,6 +116,83 @@ body.email {
         }
     }
 
+    &__description {
+        margin-left: 1em;
+        margin-top: 0.5em;
+        font-size: 16px;
+        line-height: 22px;
+        font-family: generic-font;
+        font-weight: 300;
+
+        & ul {
+            list-style-position: inside;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        & li > ul {
+            margin-left: 20px;
+            margin-top: 0px;
+        }
+
+        h1 {
+           font-size: 26px;
+           font-family: header-font;
+           line-height: 40px;
+           margin-top: 16px;
+           margin-bottom: 6px;
+        }
+
+        h2 {
+           font-size: 22px;
+           font-family: header-font;
+           line-height: 22px;
+           margin-top: 16px;
+           margin-bottom: 6px;
+        }
+        h3 {
+           font-size: 16px;
+           font-family: header-font;
+           line-height: 22px;
+           font-variant: small-caps;
+           margin-top: 16px;
+           margin-bottom: 6px;
+        }
+        h4 {
+           font-size: 16px;
+           font-family: header-font;
+           line-height: 22px;
+           font-variant: small-caps;
+           margin-top: 16px;
+           margin-bottom: 6px;
+           color: gray;
+        }
+        h1 tt, h2 tt, h3 tt, h4 tt {
+           font-weight: normal;
+        }
+        p {
+           font-size: 16px;
+           line-height: 22px;
+           margin-bottom: 11px;
+        }
+        p:last-child {
+           margin-bottom: 0px;
+        }
+        /* show code blocks nicely */
+        pre {
+           font-size: 12px;
+           background-color: #FAFAFA;
+           border: 1px solid #DFDFDF;
+           padding: 11px;
+        }
+        /* hide Django's permalinks */
+        a[title="Permalink to this headline"] {
+           display: none;
+        }
+
+    }
+
+    /* Remove this after migration to one blob versions */
     &__notes {
         margin-left: 1em;
         margin-top: 0.5em;
