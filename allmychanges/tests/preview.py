@@ -32,12 +32,6 @@ def test_preview():
     response = cl.get(preview_url)
     eq_(200, response.status_code)
 
-    print 'HUETA ' * 5
-    print ''
-    print response.content
-    import pdb; pdb.set_trace()
-    print 'HUETA ' * 5
-
     assert 'Some bugfix.' in response.content
     assert 'Initial release.' in response.content
 

@@ -566,36 +566,19 @@ def extract_metadata(version):
     yield new_version
 
 
-def embedd_label(text, item):
-    """Embedds a span to show item type as a label."""
-    if not item:
-        return text
+def highlight_keywords(text):
+    checks = [
+        (ur'([Ff]ix(ed|es|ing)?)', ur'<span class="changelog-highlight-fix">\1</span>'),
+        (ur'([Bb]ug)', ur'<span class="changelog-highlight-fix">\1</span>'),
+        (ur'([Bb]ackward incompatible)', ur'<span class="changelog-highlight-inc">\1</span>'),
+        (ur'([Dd]eprecated)', ur'<span class="changelog-highlight-dep">\1</span>'),
+    ]
+    checks = [(re.compile(pattern), replacement)
+              for pattern, replacement in checks]
 
-    def html_escape(text):
-        if isinstance(text, basestring):
-            return text.replace('<', '&lt;').replace('>', '&gt;')
-        return text
-
-    label = lxml.html.fragment_fromstring('<span class="changelog-item-type changelog-item-type_{0[type]}">{0[type]}</span>'.format(
-        item))
-    items = map(html_escape,
-                lxml.html.fragments_fromstring(text))
-
-    if not items:
-        return text
-
-    if isinstance(items[0], basestring):
-        items.insert(0, label)
-        # here with_tail needed to not eat text after html elements
-        # see `test_label_embedding` test for details
-        return u''.join(node_tostring(node, with_tail=True)
-                        for node in items)
-    else:
-        element = items[0]
-        label.tail = element.text
-        element.text = ''
-        items[0].insert(0, label)
-        return u''.join(map(lxml.html.tostring, items))
+    for pattern, replacement in checks:
+        text = pattern.sub(replacement, text)
+    return text
 
 
 def prerender_items(version):
@@ -631,10 +614,10 @@ def prerender_items(version):
         """Accepts whole item and returns another item with processed text.
         Item could be a dictionary or plain text."""
         for flt in [remove_html_markup,
-                    lambda text, *args, **kwargs: process_cve(text),
-                    lambda text, *args, **kwargs: capfirst(text),
-                    embedd_label]:
-            text = flt(text, None)
+                    process_cve,
+                    capfirst,
+                    highlight_keywords]:
+            text = flt(text)
 
         return text
 

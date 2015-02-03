@@ -11,7 +11,7 @@ from allmychanges.parsing.pipeline import (
     group_by_path,
     strip_outer_tag,
     prerender_items,
-    embedd_label,
+    highlight_keywords,
     parse_file)
 from allmychanges.parsing.raw import RawChangelog
 from allmychanges.env import Environment
@@ -214,16 +214,28 @@ def test_prerender_inserts_labels_into_content_items():
                    title='1.0 (2014-06-24)',
                    content='<p>Some bug was <em>fixed</em> issue</p>',
                    date=datetime.date(2014, 6, 24))
-    expected = '<p><span class="changelog-item-type changelog-item-type_fix">fix</span>Some bug was <em>fixed</em> issue</p>'
+    expected = '<p>Some bug was <em><span class="changelog-highlight-fix">fixed</span></em> issue</p>'
     eq_(expected, first(prerender_items(input_data)).processed_content)
 
     input_data = v(type='prerender_items',
                    title='1.0 (2014-06-24)',
-                   content=[[{'type': 'fix',
-                              'text': 'Fixed issue'}]],
+                   content='Fixed issue',
                    date=datetime.date(2014, 6, 24))
-    expected = '<span class="changelog-item-type changelog-item-type_fix">fix</span>Fixed issue'
+    expected = '<span class="changelog-highlight-fix">Fixed</span> issue'
     eq_(expected, first(prerender_items(input_data)).processed_content)
+
+
+def test_keywords_highlighting():
+    eq_('Some <span class="changelog-highlight-fix">bug</span> was <span class="changelog-highlight-fix">fixed</span>.',
+        highlight_keywords('Some bug was fixed.'))
+    eq_('<span class="changelog-highlight-fix">Fix</span> an issue.',
+        highlight_keywords('Fix an issue.'))
+    eq_('<span class="changelog-highlight-fix">Fixes</span> an issue.',
+        highlight_keywords('Fixes an issue.'))
+    eq_('This change is <span class="changelog-highlight-inc">backward incompatible</span>.',
+        highlight_keywords('This change is backward incompatible.'))
+    eq_('This function is <span class="changelog-highlight-dep">deprecated</span>.',
+        highlight_keywords('This function is deprecated.'))
 
 
 def test_extract_metadata_is_able_to_detect_unreleased_version():
@@ -305,11 +317,6 @@ def test_strip_outer_tag():
     eq_('Blah',
         strip_outer_tag('<!--Comment-->Blah'))
 
-
-def test_label_embedding():
-    text = u'Version description\'s typography was significantly improved.\nNow you can read <a href="http://allmychanges.com/p/python/django/#1.7">Django\'s changelog</a> and it won\'t hurt your eyes.'
-    expected = u'<span class="changelog-item-type changelog-item-type_new">new</span>' + text
-    eq_(expected, embedd_label(text, {'type': 'new'}))
 
 
 def test_parse_plain_text():
