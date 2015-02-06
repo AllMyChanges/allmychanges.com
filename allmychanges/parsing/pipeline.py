@@ -877,10 +877,14 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     inclusions = defaultdict(list)
 
     for i in versions:
+        if i.filename == 'VCS':
+            continue
+
         for j in versions:
             if i != j:
                 i_content = i.content
                 j_content = j.content
+
                 i_file_section = i.find_parent_of_type('file_section')
 
                 if i_content and j_content \
