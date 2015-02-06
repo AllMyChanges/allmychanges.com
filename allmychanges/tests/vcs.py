@@ -61,39 +61,42 @@ def _add_dates(tree):
 
 
 def simplify(version):
-    """Returns tuple of version-number, date, list-of-items."""
+    """Returns tuple of version-number, date, content."""
     return (version.version,
             version.date,
-            [re.sub(ur'<span class="changelog-item-type.*?</span>',
-                    u'',
-                    item['text'])
-             for item in version.content[0]])
+            version.content)
+            # [re.sub(ur'<span class="changelog-item-type.*?</span>',
+            #         u'',
+            #         item['text'])
+            #  for item in version.content[0]])
 
 def test_extract_from_vcs():
     date = datetime.date
 
     tree = _build_tree()
     _add_dates(tree)
+
     versions = vcs_processing_pipe(tree)
+
 
     sparse_check([
         ('x.x.x',
          None,
-         ['Commit 9']),
+         '<ul><li>Commit 9</li></ul>'),
         ('1',
          date(2014, 2, 1), # version 1 was released with 2nd commit
-         ['Commit 2',
-          'Commit 1']),
+         '<ul><li>Commit 2</li>'
+         '<li>Commit 1</li></ul>'),
         ('2',
           date(2014, 4, 1), # version 2 was released with 4th commit
-          ['Commit 4',
-           'Commit 3']),
+          '<ul><li>Commit 4</li>'
+          '<li>Commit 3</li></ul>'),
         ('3',
          date(2014, 8, 1), # version 3 was released with 8th commit
-         ['Commit 8',
-          'Commit 7',
-          # 'Commit 6', this is a merge and it is excluded
-          'Commit 5']),
+         '<ul><li>Commit 8</li>'
+         '<li>Commit 7</li>'
+         # 'Commit 6', this is a merge and it is excluded
+         '<li>Commit 5</li></ul>'),
     ], map(simplify, versions))
 
 

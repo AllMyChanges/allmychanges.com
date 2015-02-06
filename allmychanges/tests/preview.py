@@ -32,7 +32,7 @@ def test_preview():
     response = cl.get(preview_url)
     eq_(200, response.status_code)
 
-    assert 'Some bugfix.' in response.content
+    assert 'Some <span class="changelog-highlight-fix">bugfix</span>.' in response.content
     assert 'Initial release.' in response.content
 
     # при этом, у объекта preview должны быть версии, а у changelog нет

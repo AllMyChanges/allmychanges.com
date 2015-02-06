@@ -125,7 +125,11 @@ body.email {
         font-weight: 300;
 
         & ul {
-            list-style-position: inside;
+            // we need outside and left-margin here because this way
+            // multiline items looks better
+            list-style-position: outside;
+            margin-left: 16px;
+
             margin-top: 10px;
             margin-bottom: 10px;
         }
@@ -288,6 +292,7 @@ body.email {
   }
 }
 
+// TODO remove after migration to a single blob versions
 .changelog-item-type {
       background-color: purple;
       content: text;
@@ -319,6 +324,22 @@ body.email {
 
 .changelog-item-type_inc {
       background-color: #ff3b16;
+}
+
+// leave only this after migration to a single blob versions
+.changelog-highlight {
+    &-fix {
+        border-bottom: 4px solid #ee883d;
+    }
+    &-inc {
+        border-bottom: 4px solid #ff3b16;
+    }
+    &-dep {
+        border-bottom: 4px solid #ff3b16;
+    }
+    &-sec {
+        border-bottom: 4px solid #ff3b16;
+    }
 }
 
 

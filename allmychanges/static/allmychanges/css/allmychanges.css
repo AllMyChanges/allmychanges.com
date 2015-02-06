@@ -746,7 +746,8 @@ body.email {
 /* hide Django's permalinks */
 }
 .package-version__description ul {
-  list-style-position: inside;
+  list-style-position: outside;
+  margin-left: 16px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -921,6 +922,18 @@ body.email {
 }
 .changelog-item-type_inc {
   background-color: #ff3b16;
+}
+.changelog-highlight-fix {
+  border-bottom: 4px solid #ee883d;
+}
+.changelog-highlight-inc {
+  border-bottom: 4px solid #ff3b16;
+}
+.changelog-highlight-dep {
+  border-bottom: 4px solid #ff3b16;
+}
+.changelog-highlight-sec {
+  border-bottom: 4px solid #ff3b16;
 }
 .autocomplete-input {
   display: inline-block;

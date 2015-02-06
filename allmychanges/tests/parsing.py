@@ -214,7 +214,7 @@ def test_prerender_inserts_labels_into_content_items():
                    title='1.0 (2014-06-24)',
                    content='<p>Some bug was <em>fixed</em> issue</p>',
                    date=datetime.date(2014, 6, 24))
-    expected = '<p>Some bug was <em><span class="changelog-highlight-fix">fixed</span></em> issue</p>'
+    expected = '<p>Some <span class="changelog-highlight-fix">bug</span> was <em><span class="changelog-highlight-fix">fixed</span></em> issue</p>'
     eq_(expected, first(prerender_items(input_data)).processed_content)
 
     input_data = v(type='prerender_items',
@@ -226,16 +226,32 @@ def test_prerender_inserts_labels_into_content_items():
 
 
 def test_keywords_highlighting():
+    eq_('<span class="changelog-highlight-fix">Fixed a bug</span> where blah minor',
+        highlight_keywords('Fixed a bug where blah minor'))
+    eq_('<span class="changelog-highlight-fix">Bug Fixes</span>',
+        highlight_keywords('Bug Fixes'))
     eq_('Some <span class="changelog-highlight-fix">bug</span> was <span class="changelog-highlight-fix">fixed</span>.',
         highlight_keywords('Some bug was fixed.'))
     eq_('<span class="changelog-highlight-fix">Fix</span> an issue.',
         highlight_keywords('Fix an issue.'))
     eq_('<span class="changelog-highlight-fix">Fixes</span> an issue.',
         highlight_keywords('Fixes an issue.'))
-    eq_('This change is <span class="changelog-highlight-inc">backward incompatible</span>.',
-        highlight_keywords('This change is backward incompatible.'))
     eq_('This function is <span class="changelog-highlight-dep">deprecated</span>.',
         highlight_keywords('This function is deprecated.'))
+    eq_('This is a <span class="changelog-highlight-fix">bugfix</span> release.',
+        highlight_keywords('This is a bugfix release.'))
+
+    # Backward
+    eq_('This feature was <span class="changelog-highlight-inc">removed</span>.',
+        highlight_keywords('This feature was removed.'))
+    eq_('This change is <span class="changelog-highlight-inc">backward incompatible</span>.',
+        highlight_keywords('This change is backward incompatible.'))
+
+    # security
+    eq_('Improved <span class="changelog-highlight-sec">XSS</span> filtering',
+        highlight_keywords('Improved XSS filtering'))
+    eq_('Improved <span class="changelog-highlight-sec">security</span> in SQL',
+        highlight_keywords('Improved security in SQL'))
 
 
 def test_extract_metadata_is_able_to_detect_unreleased_version():

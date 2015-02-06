@@ -567,17 +567,32 @@ def extract_metadata(version):
 
 
 def highlight_keywords(text):
+    check = lambda pattern, label: (ur'(?P<before>^|\s|>)(?P<word>{0}?)(?P<after>$|\s|\.|,|:|!|<)'.format(pattern),
+                                    ur'\g<before>BEG-highlight-{0}-BEG\g<word>END-highlight-END\g<after>'.format(label))
+
     checks = [
-        (ur'([Ff]ix(ed|es|ing)?)', ur'<span class="changelog-highlight-fix">\1</span>'),
-        (ur'([Bb]ug)', ur'<span class="changelog-highlight-fix">\1</span>'),
-        (ur'([Bb]ackward incompatible)', ur'<span class="changelog-highlight-inc">\1</span>'),
-        (ur'([Dd]eprecated)', ur'<span class="changelog-highlight-dep">\1</span>'),
+        check(ur'fix(ed|es|ing)? a bug', u'fix'),
+        check(ur'bug fix(ed|es|ing)?', u'fix'),
+        check(ur'fix(ed|es|ing)?', u'fix'),
+        check(ur'bug(fix)?', u'fix'),
+
+        check(ur'deprecated', u'dep'),
+
+        check(ur'security', u'sec'),
+        check(ur'xss', u'sec'),
+
+        check(ur'backward incompatible', u'inc'),
+        check(ur'removed', u'inc'),
     ]
-    checks = [(re.compile(pattern), replacement)
+    checks = [(re.compile(pattern, re.IGNORECASE), replacement)
               for pattern, replacement in checks]
 
     for pattern, replacement in checks:
         text = pattern.sub(replacement, text)
+
+    text = re.sub(ur'BEG-highlight-(?P<label>.*?)-BEG(?P<text>.*?)END-highlight-END',
+                  ur'<span class="changelog-highlight-\g<label>">\g<text></span>',
+                  text)
     return text
 
 
