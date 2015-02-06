@@ -581,7 +581,7 @@ def highlight_keywords(text):
         check(ur'fix(ed|es|ing)? a bug', u'fix'),
         check(ur'bug fix(ed|es|ing)?', u'fix'),
         check(ur'fix(ed|es|ing)?', u'fix'),
-        check(ur'bug(fix)?', u'fix'),
+        check(ur'bug(fix(es)?)?', u'fix'),
 
         check(ur'deprecated', u'dep'),
 

@@ -226,6 +226,8 @@ def test_prerender_inserts_labels_into_content_items():
 
 
 def test_keywords_highlighting():
+    eq_('Various <span class="changelog-highlight-fix">bugfixes</span>',
+        highlight_keywords('Various bugfixes'))
     eq_('<span class="changelog-highlight-fix">Fixed a bug</span> where blah minor',
         highlight_keywords('Fixed a bug where blah minor'))
     eq_('<span class="changelog-highlight-fix">Bug Fixes</span>',
@@ -252,6 +254,10 @@ def test_keywords_highlighting():
         highlight_keywords('Improved XSS filtering'))
     eq_('Improved <span class="changelog-highlight-sec">security</span> in SQL',
         highlight_keywords('Improved security in SQL'))
+
+    # multiple
+    eq_('attention to <span class="changelog-highlight-fix">bugfixes</span> and <span class="changelog-highlight-sec">security</span> issues',
+        highlight_keywords('attention to bugfixes and security issues'))
 
 
 def test_extract_metadata_is_able_to_detect_unreleased_version():
@@ -359,11 +365,11 @@ def test_parse_plain_text():
     eq_('0.1:', v1.title)
     eq_('0.1.1', v2.title)
 
-    eq_([["Initial release"]],
+    eq_('<ul><li>Initial release</li></ul>',
         v1.content)
 
-    eq_([["Added benchmarking script",
-          "Added support for more\nserializer modules"]],
+    eq_('<ul><li>Added benchmarking script</li>'
+        '<li>Added support for more\nserializer modules</li></ul>',
         v2.content)
 
 
@@ -390,9 +396,9 @@ def test_parse_redispy_style_plain_text():
     eq_('* 2.10.2', v1.title)
     eq_('* 2.10.1', v2.title)
 
-    eq_([['Added support for Hiredis\'s new bytearray support. Thanks\nhttps://github.com/tzickel',
-          'Fixed a bug when attempting to send large values to Redis in a Pipeline.']],
+    eq_('<ul><li>Added support for Hiredis\'s new bytearray support. Thanks\nhttps://github.com/tzickel</li>'
+        '<li>Fixed a bug when attempting to send large values to Redis in a Pipeline.</li></ul>',
         v1.content)
 
-    eq_([['Fixed a bug where Sentinel connections to a server that\'s no longer a\nmaster and receives a READONLY error will disconnect and reconnect to\nthe master.']],
+    eq_('<ul><li>Fixed a bug where Sentinel connections to a server that\'s no longer a\nmaster and receives a READONLY error will disconnect and reconnect to\nthe master.</li></ul>',
         v2.content)
