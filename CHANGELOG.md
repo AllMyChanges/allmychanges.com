@@ -1,3 +1,30 @@
+0.17.0 (2015-02-05)
+===================
+
+This release introduces significant changes in a way
+how AllMyChanges stores and shows information about package's versions.
+
+Previously, it tried to figure out where a list items in version
+description, and store them separately on database level.
+Also, our algorithm tagged these items with labels like "fix", "new"
+"sec" and "dep". This approach produced nice results in very simple
+cases and awful in relatively complex. For example it was unable
+to handle nested lists and somitimes didn't work with complex html
+changelogs.
+
+Today we changed our processing pipeline, and will store
+information about each version as whole text. Then it is processed
+and some keywords are underlined to attract you attention to
+bugfixes and security issues. We hope this algorithm will work
+better with complex changelogs and will provide better user experience.
+
+Right now not all packages have migrated to this new scheme, but all of them
+will be converted sooner or later.
+
+As usual, if you have any ideas how to improve the service, feel free to
+drop a line via our [support email](mailto:support@allmychanges.com) or through
+a feedback form available via click by "Report" button on package's page.
+
 0.16.0 (2015-01-25)
 ===================
 
