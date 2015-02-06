@@ -203,6 +203,15 @@ def parse_plain_file(obj):
     current_section = None
     current_ident = None
 
+    def format_section(section):
+        if isinstance(section, list):
+            return messages_to_html(section)
+        return u'<p>{0}</p>'.format(section)
+
+    def format_content(sections):
+        return u'\n'.join(map(format_section, sections))
+
+
     for line in obj.content.split('\n'):
         # skip lines like
         # ===================
@@ -234,7 +243,7 @@ def parse_plain_file(obj):
                 if current_title and current_sections:
                     yield obj.push(type='file_section',
                                    title=current_title,
-                                   content=current_sections)
+                                   content=format_content(current_sections))
 
                 current_title = line
                 current_section = None
@@ -265,11 +274,9 @@ def parse_plain_file(obj):
         current_sections.append(current_section)
 
     if current_title and current_sections:
-        # if current_section:
-        #     current_sections.append(current_section)
         yield obj.push(type='file_section',
                        title=current_title,
-                       content=current_sections)
+                       content=format_content(current_sections))
 
 
 
@@ -695,7 +702,8 @@ def processing_pipe(*args, **kwargs):
 
 
 from allmychanges.vcs_extractor import (
-    get_versions_from_vcs
+    get_versions_from_vcs,
+    messages_to_html
 )
 
 def vcs_processing_pipe(*args, **kwargs):
