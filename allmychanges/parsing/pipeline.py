@@ -524,27 +524,12 @@ def filter_version(section):
 def extract_metadata(version):
     """Tries to extract date and list items' type.
     """
-    def _all_dates(iterable):
-        # we don't need dates which are deep in the release notes
-        for item in islice(iterable, 0, 4):
-            # and we search only through first 200 symbols
-            # of each part
-            date = _extract_date(item[:200])
-            if date:
-                yield date
-
-    def _all_lines():
-        for line in version.content.split(u'\n'):
-            yield line
-
     def mention_unreleased(text):
         # here we limit our scoupe of searching
         # unreleased keywords
         # because if keyword is somewhere far from
         # the beginning, than probably it is unrelated
         # to the version itself
-        text = text[:300]
-
         keywords = ('unreleased', 'under development',
                     'not yet released',
                     'release date to be decided')
@@ -554,22 +539,18 @@ def extract_metadata(version):
                 return True
         return False
 
-    all_dates = list(_all_dates(chain([version.title],
-                                      _all_lines())))
+    first_lines = version.content.split(u'\n', 3)[:3]
+    first_lines.insert(0, version.title)
 
     new_version = version.push(type='prerender_items')
-
-    if all_dates:
-        new_version.date = first(all_dates)
-
-    if mention_unreleased(version.title):
-        new_version.unreleased = True
-
-    lines = version.content.split(u'\n', 3)
-    for line in lines:
-        if mention_unreleased(line):
+    for line in first_lines:
+        date = _extract_date(line[:200])
+        if date:
+            new_version.date = date
+            break
+        if mention_unreleased(line[:200]):
             new_version.unreleased = True
-
+            break
     yield new_version
 
 

@@ -282,6 +282,52 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
               content='')))
 
 
+def test_extract_metadata_ignores_unreleased_keywords_if_date_was_found_ealier():
+    env = Environment()
+    env.type = 'almost_version'
+    v = lambda **kwargs: env.push(**kwargs)
+
+    eq_([v(type='prerender_items',
+           title='1.0 (2015-02-06)',
+           date=datetime.date(2015, 2, 6),
+           content='unreleased')],
+        extract_metadata(
+            v(title='1.0 (2015-02-06)',
+              content='unreleased')))
+
+
+
+def test_extract_date_only_from_first_three_lines():
+    env = Environment()
+    env.type = 'almost_version'
+    v = lambda **kwargs: env.push(**kwargs)
+
+    eq_(datetime.date(2015, 12, 14),
+        first(extract_metadata(
+            v(title='1.0',
+              content='one\ntwo\n2015-12-14'))).date)
+
+    eq_(None,
+        getattr(first(extract_metadata(
+            v(title='1.0',
+              content='one\ntwo\nthree\n2015-12-14'))), 'date', None))
+
+
+def test_extract_unreleased_keywords_only_from_first_three_lines():
+    env = Environment()
+    env.type = 'almost_version'
+    v = lambda **kwargs: env.push(**kwargs)
+
+    eq_(True,
+        first(extract_metadata(
+            v(title='1.0',
+              content='one\ntwo\nunreleased'))).unreleased)
+
+    eq_(None,
+        getattr(first(extract_metadata(
+            v(title='1.0',
+              content='one\ntwo\nthree\nunreleased'))), 'unreleased', None))
+
 
 def test_grouping_by_path():
     env = Environment()

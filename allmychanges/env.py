@@ -20,8 +20,9 @@ class Environment(object):
 
     def __eq__(self, other):
         undefined = object()
-        return all(getattr(self, key) == getattr(other, key, undefined)
-                   for key in self.keys())
+        return len(self.keys()) == len(other.keys()) \
+            and all(getattr(self, key) == getattr(other, key, undefined)
+                    for key in self.keys())
 
     def __repr__(self, only=None):
         attrs = [(key, getattr(self, key))
