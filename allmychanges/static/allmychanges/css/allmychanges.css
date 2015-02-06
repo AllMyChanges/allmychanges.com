@@ -691,6 +691,9 @@ body.email {
 }
 .package-version {
   list-style: none;
+/* Remove this after migration to one blob versions */
+/* Remove this after migration to one blob versions */
+/* Remove this after migration to one blob versions */
 }
 .package-version__number {
   display: inline-block;
@@ -731,6 +734,80 @@ body.email {
 .package-version__section-item ul,
 .package-version__section-item ol {
   margin-left: 16px;
+}
+.package-version__description {
+  margin-left: 1em;
+  margin-top: 0.5em;
+  font-size: 16px;
+  line-height: 22px;
+  font-family: proxima-nova, sans-serif;
+  font-weight: 300;
+/* show code blocks nicely */
+/* hide Django's permalinks */
+}
+.package-version__description ul {
+  list-style-position: outside;
+  margin-left: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.package-version__description li > ul {
+  margin-left: 20px;
+  margin-top: 0px;
+}
+.package-version__description h1 {
+  font-size: 26px;
+  font-family: pragmatica-web-condensed, sans-serif;
+  line-height: 40px;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+.package-version__description h2 {
+  font-size: 22px;
+  font-family: pragmatica-web-condensed, sans-serif;
+  line-height: 22px;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+.package-version__description h3 {
+  font-size: 16px;
+  font-family: pragmatica-web-condensed, sans-serif;
+  line-height: 22px;
+  font-variant: small-caps;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+.package-version__description h4 {
+  font-size: 16px;
+  font-family: pragmatica-web-condensed, sans-serif;
+  line-height: 22px;
+  font-variant: small-caps;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  color: #808080;
+}
+.package-version__description h1 tt,
+.package-version__description h2 tt,
+.package-version__description h3 tt,
+.package-version__description h4 tt {
+  font-weight: normal;
+}
+.package-version__description p {
+  font-size: 16px;
+  line-height: 22px;
+  margin-bottom: 11px;
+}
+.package-version__description p:last-child {
+  margin-bottom: 0px;
+}
+.package-version__description pre {
+  font-size: 12px;
+  background-color: #fafafa;
+  border: 1px solid #dfdfdf;
+  padding: 11px;
+}
+.package-version__description a[title="Permalink to this headline"] {
+  display: none;
 }
 .package-version__notes {
   margin-left: 1em;
@@ -845,6 +922,18 @@ body.email {
 }
 .changelog-item-type_inc {
   background-color: #ff3b16;
+}
+.changelog-highlight-fix {
+  border-bottom: 4px solid #ee883d;
+}
+.changelog-highlight-inc {
+  border-bottom: 4px solid #ff3b16;
+}
+.changelog-highlight-dep {
+  border-bottom: 4px solid #ff3b16;
+}
+.changelog-highlight-sec {
+  border-bottom: 4px solid #ff3b16;
 }
 .autocomplete-input {
   display: inline-block;
@@ -1111,6 +1200,16 @@ body.email {
 }
 .catalogue-packages_visible {
   display: table-cell;
+}
+.test-fix1:before {
+  content: "BLAH:";
+  display: inline-block;
+  width: 50px;
+  height: 20px;
+  border-bottom: 4px solid #f00;
+}
+.test-fix2 {
+  background-color: #f77;
 }
 .table > thead {
   color: #808080;

@@ -203,6 +203,15 @@ def parse_plain_file(obj):
     current_section = None
     current_ident = None
 
+    def format_section(section):
+        if isinstance(section, list):
+            return messages_to_html(section)
+        return u'<p>{0}</p>'.format(section)
+
+    def format_content(sections):
+        return u'\n'.join(map(format_section, sections))
+
+
     for line in obj.content.split('\n'):
         # skip lines like
         # ===================
@@ -234,7 +243,7 @@ def parse_plain_file(obj):
                 if current_title and current_sections:
                     yield obj.push(type='file_section',
                                    title=current_title,
-                                   content=current_sections)
+                                   content=format_content(current_sections))
 
                 current_title = line
                 current_section = None
@@ -265,11 +274,9 @@ def parse_plain_file(obj):
         current_sections.append(current_section)
 
     if current_title and current_sections:
-        # if current_section:
-        #     current_sections.append(current_section)
         yield obj.push(type='file_section',
                        title=current_title,
-                       content=current_sections)
+                       content=format_content(current_sections))
 
 
 
@@ -419,34 +426,6 @@ def parse_html_file(obj):
                if tag.tag in ('h1', 'h2', 'h3', 'h4')]
 
 
-    def create_list(el):
-        def inner_html(el):
-            text = lxml.html.tostring(el).strip()
-            text = strip_outer_tag(text)
-            return text
-
-        return map(inner_html, el.getchildren())
-
-    def create_notes(children):
-        """ This function returns content of the current
-        version. It is a list where each item either a HTML
-        fragment or a list of html fragments.
-        If it is a list of html fragments, then each item
-        SHOULD NOT be wrapped into a node like <li> or <p>.
-        """
-        current_text = ''
-        for el in children:
-            if el.tag == 'ul':
-                if current_text:
-                    yield current_text.strip()
-                    current_text = ''
-                yield create_list(el)
-            else:
-                current_text += lxml.html.tostring(el)
-
-        if current_text:
-            yield current_text.strip()
-
     def create_full_content(children):
         """Just serialize all childrens and join result."""
         strings = map(lxml.html.tostring, children)
@@ -456,23 +435,19 @@ def parse_html_file(obj):
     headers = [(header.tag, header.text_content(), header.itersiblings())
                for header in headers]
 
-
     def is_header_tag(ch):
         if isinstance(ch.tag, basestring):
             return not ch.tag.startswith('h') or ch.tag > tag
-
 
     def process_header(parent, tag, text, all_children):
         children = list(takewhile(
             is_header_tag,
             all_children))
-        sections = list(create_notes(children))
 
         full_content = create_full_content(children)
         return parent.push(type='file_section',
                            title=text.strip(),
-                           content=sections,
-                           full_content=full_content)
+                           content=full_content)
 
     # use whole document and filename as a section
     body = parsed.find('body')
@@ -523,17 +498,17 @@ def get_markup(filename, content):
     return 'plain'
 
 
-def filter_versions(sections):
-    """Searches parts of the files which looks like
-    changelog pieces.
-    """
-    for section in sections:
-        version = _extract_version(get_section_title(section))
+# def filter_versions(sections):
+#     """Searches parts of the files which looks like
+#     changelog pieces.
+#     """
+#     for section in sections:
+#         version = _extract_version(get_section_title(section))
 
-        if version:
-            new_section = copy.deepcopy(section)
-            new_section['version'] = version
-            yield new_section
+#         if version:
+#             new_section = copy.deepcopy(section)
+#             new_section['version'] = version
+#             yield new_section
 
 
 def filter_version(section):
@@ -558,13 +533,9 @@ def extract_metadata(version):
             if date:
                 yield date
 
-    def _all_list_items():
-        for content_part in version.content:
-            if isinstance(content_part, list):
-                for item in content_part:
-                    yield item
-            elif isinstance(content_part, basestring):
-                yield content_part
+    def _all_lines():
+        for line in version.content.split(u'\n'):
+            yield line
 
     def mention_unreleased(text):
         # here we limit our scoupe of searching
@@ -584,7 +555,7 @@ def extract_metadata(version):
         return False
 
     all_dates = list(_all_dates(chain([version.title],
-                                      _all_list_items())))
+                                      _all_lines())))
 
     new_version = version.push(type='prerender_items')
 
@@ -594,58 +565,42 @@ def extract_metadata(version):
     if mention_unreleased(version.title):
         new_version.unreleased = True
 
-    def process_content(idx, content_part):
-        if isinstance(content_part, basestring):
-            # here we limit our scoupe of searching
-            # unreleased keywords
-            # because if keyword is somewhere far from
-            # the beginning, than probably it is unrelated
-            # to the version itself
-            if idx < 3 and mention_unreleased(content_part):
-                new_version.unreleased = True
+    lines = version.content.split(u'\n', 3)
+    for line in lines:
+        if mention_unreleased(line):
+            new_version.unreleased = True
 
-            return content_part
-        else:
-            # here we process list items
-            return [{'type': get_change_type(item),
-                     'text': item}
-                    for item in content_part]
-    new_version.content = [process_content(idx, content)
-                           for idx, content
-                           in enumerate(version.content)]
     yield new_version
 
 
-def embedd_label(text, item):
-    """Embedds a span to show item type as a label."""
-    if not item:
-        return text
+def highlight_keywords(text):
+    check = lambda pattern, label: (ur'(?P<before>^|\s|>)(?P<word>{0}?)(?P<after>$|\s|\.|,|:|!|<)'.format(pattern),
+                                    ur'\g<before>BEG-highlight-{0}-BEG\g<word>END-highlight-END\g<after>'.format(label))
 
-    def html_escape(text):
-        if isinstance(text, basestring):
-            return text.replace('<', '&lt;').replace('>', '&gt;')
-        return text
+    checks = [
+        check(ur'fix(ed|es|ing)? a bug', u'fix'),
+        check(ur'bug fix(ed|es|ing)?', u'fix'),
+        check(ur'fix(ed|es|ing)?', u'fix'),
+        check(ur'bug(fix)?', u'fix'),
 
-    label = lxml.html.fragment_fromstring('<span class="changelog-item-type changelog-item-type_{0[type]}">{0[type]}</span>'.format(
-        item))
-    items = map(html_escape,
-                lxml.html.fragments_fromstring(text))
+        check(ur'deprecated', u'dep'),
 
-    if not items:
-        return text
+        check(ur'security', u'sec'),
+        check(ur'xss', u'sec'),
 
-    if isinstance(items[0], basestring):
-        items.insert(0, label)
-        # here with_tail needed to not eat text after html elements
-        # see `test_label_embedding` test for details
-        return u''.join(node_tostring(node, with_tail=True)
-                        for node in items)
-    else:
-        element = items[0]
-        label.tail = element.text
-        element.text = ''
-        items[0].insert(0, label)
-        return u''.join(map(lxml.html.tostring, items))
+        check(ur'backward incompatible', u'inc'),
+        check(ur'removed', u'inc'),
+    ]
+    checks = [(re.compile(pattern, re.IGNORECASE), replacement)
+              for pattern, replacement in checks]
+
+    for pattern, replacement in checks:
+        text = pattern.sub(replacement, text)
+
+    text = re.sub(ur'BEG-highlight-(?P<label>.*?)-BEG(?P<text>.*?)END-highlight-END',
+                  ur'<span class="changelog-highlight-\g<label>">\g<text></span>',
+                  text)
+    return text
 
 
 def prerender_items(version):
@@ -677,32 +632,22 @@ def prerender_items(version):
                      styles=[])
         return text
 
-    def apply_filters(item):
+    def apply_filters(text):
         """Accepts whole item and returns another item with processed text.
         Item could be a dictionary or plain text."""
-        if isinstance(item, basestring):
-            text = item
-            item = None
-        else:
-            text = item['text']
-
         for flt in [remove_html_markup,
-                    lambda text, *args, **kwargs: process_cve(text),
-                    lambda text, *args, **kwargs: capfirst(text),
-                    embedd_label]:
-            text = flt(text, item)
+                    process_cve,
+                    capfirst,
+                    highlight_keywords]:
+            text = flt(text)
 
-        if item is None:
-            return text
-        return dict(item, text=text)
+        return text
 
-    def process_content(content):
-        if isinstance(content, basestring):
-            return apply_filters(content)
-        else:
-            return map(apply_filters, content)
+    # def prerender_content(html):
+    #     # TODO insert markup using get_change_type(item)
+    #     return html
 
-    new_version.content = map(process_content, version.content)
+    new_version.processed_content = apply_filters(version.content)
     yield new_version
 
 def group_by_path(versions):
@@ -757,7 +702,8 @@ def processing_pipe(*args, **kwargs):
 
 
 from allmychanges.vcs_extractor import (
-    get_versions_from_vcs
+    get_versions_from_vcs,
+    messages_to_html
 )
 
 def vcs_processing_pipe(*args, **kwargs):
@@ -948,16 +894,18 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     #print_tree(root_env)
 
     inclusions = defaultdict(list)
+
     for i in versions:
         for j in versions:
-            i_full_content = getattr(i, 'full_content', '')
-            j_full_content = getattr(j, 'full_content', '')
-            i_file_section = i.find_parent_of_type('file_section')
+            if i != j:
+                i_content = i.content
+                j_content = j.content
+                i_file_section = i.find_parent_of_type('file_section')
 
-            if i != j and i_full_content and j_full_content \
-               and j_full_content in i_full_content \
-               and i_file_section.is_parent_for(j):
-                inclusions[i.id].append(j.id)
+                if i_content and j_content \
+                   and j_content in i_content \
+                   and i_file_section.is_parent_for(j):
+                    inclusions[i.id].append(j.id)
 
     to_filter_out = set()
 

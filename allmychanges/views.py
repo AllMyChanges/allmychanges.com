@@ -175,6 +175,7 @@ def get_package_data_for_template(package_or_changelog,
                              show_discovered_as_well=show_discovered_as_well,
                              filename=version.filename,
                              sections=sections,
+                             processed_text=version.processed_text,
                              unreleased=version.unreleased))
 
     return dict(namespace=namespace,

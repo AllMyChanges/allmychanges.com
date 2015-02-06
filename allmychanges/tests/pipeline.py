@@ -20,10 +20,16 @@ def test_update_package_using_full_pipeline():
 
     versions = list(changelog.versions.filter(code_version='v2'))
     eq_(2, len(versions))
-    eq_('<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
-        versions[0].sections.all()[0].items.all()[0].text)
-    eq_('<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.',
-        versions[1].sections.all()[0].items.all()[0].text)
+    eq_('<ul><li>Some bugfix.</li>\n</ul>',
+        versions[0].raw_text)
+    eq_('<ul><li>Initial release.</li>\n</ul>',
+        versions[1].raw_text)
+
+    # TODO: uncomment when I add text processing
+    # eq_('<span class="changelog-item-type changelog-item-type_fix">fix</span>Some bugfix.',
+    #     versions[0].raw_text)
+    # eq_('<span class="changelog-item-type changelog-item-type_new">new</span>Initial release.',
+    #     versions[1].raw_text)
 
 
 def test_html_parser():
@@ -73,8 +79,7 @@ def test_html_parser():
          u'Apr. 23, 2012 \u2014 Docs'],
         [s.title for s in sections])
 
-    eq_(['<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#8212; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>',
-         ['Initial release']],
+    eq_('<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#8212; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>\n\n<ul class="task-list"><li>Initial release</li>\n</ul>',
         sections[3].content)
 
 
@@ -106,7 +111,7 @@ def test_exclude_version_if_it_included_in_the_version_with_same_number_and_bigg
     version = changelog.versions.all()[0]
     eq_(u'<h1>3.1<a href="#id1" title="Permalink to this headline">\xb6</a></h1><p>Version description.</p>',
         re.sub(ur' +', u' ',
-               re.sub(ur'[\n ]+\n *|\n|<div>|</div>', u'', version.sections.all()[0].notes)).strip())
+               re.sub(ur'[\n ]+\n *|\n|<div>|</div>', u'', version.processed_text)).strip())
 
 
 def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_number():
@@ -123,7 +128,7 @@ def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_numbe
     eq_(1, changelog.versions.all().count())
 
     version = changelog.versions.all()[0]
-    eq_(u'<p>Version description.</p>', version.sections.all()[0].notes)
+    eq_(u'<p>Version description.</p>\n', version.raw_text)
 
 
 def test_not_exclude_two_versions_with_same_content():

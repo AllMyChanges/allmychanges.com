@@ -6,13 +6,12 @@ from allmychanges.utils import first
 from allmychanges.parsing.pipeline import (
     create_section,
     parse_changelog,
-    filter_versions,
     get_markup,
     extract_metadata,
     group_by_path,
     strip_outer_tag,
     prerender_items,
-    embedd_label,
+    highlight_keywords,
     parse_file)
 from allmychanges.parsing.raw import RawChangelog
 from allmychanges.env import Environment
@@ -124,13 +123,11 @@ Final word.
 
     sc = v3.content
 
-    eq_(3, len(sc))
-    eq_("<h1>Minor changes</h1>\n\n<p>This release has small importance.</p>",
-        sc[0])
-    eq_(["Test case was introduced"],
-        sc[1])
-    eq_("<p>Final word.</p>",
-        sc[2])
+    eq_("""<h1>Minor changes</h1>\n\n<p>This release has small importance.</p>
+
+<ul><li>Test case was introduced</li>
+</ul><p>Final word.</p>""",
+        sc)
 
 
 def test_markup_guesser_from_extension():
@@ -193,28 +190,17 @@ def test_markup_guesser_from_content():
      >"""))
 
 
-def test_filter_versions():
-    input_data = [
-        create_section('0.1.0'),
-        create_section('Just a header'),
-        create_section('Version 3.1.5')]
-    eq_([create_section('0.1.0', [], version='0.1.0'),
-         create_section('Version 3.1.5', version='3.1.5')],
-        list(filter_versions(input_data)))
-
-
 def test_extract_metadata():
     env = Environment()
     env.type = 'almost_version'
     v = lambda **kwargs: env.push(**kwargs)
 
     input_data = v(title='1.0 (2014-06-24)',
-                   content=[['Fixed issue']])
+                   content='Fixed issue')
 
     eq_([v(type='prerender_items',
            title='1.0 (2014-06-24)',
-           content=[[{'type': 'fix',
-                      'text': 'Fixed issue'}]],
+           content='Fixed issue',
            date=datetime.date(2014, 6, 24))],
         extract_metadata(input_data))
 
@@ -226,19 +212,46 @@ def test_prerender_inserts_labels_into_content_items():
 
     input_data = v(type='prerender_items',
                    title='1.0 (2014-06-24)',
-                   content=[[{'type': 'fix',
-                              'text': '<p>Some bug was <em>fixed</em> issue</p>'}]],
+                   content='<p>Some bug was <em>fixed</em> issue</p>',
                    date=datetime.date(2014, 6, 24))
-    expected = '<p><span class="changelog-item-type changelog-item-type_fix">fix</span>Some bug was <em>fixed</em> issue</p>'
-    eq_(expected, first(prerender_items(input_data)).content[0][0]['text'])
+    expected = '<p>Some <span class="changelog-highlight-fix">bug</span> was <em><span class="changelog-highlight-fix">fixed</span></em> issue</p>'
+    eq_(expected, first(prerender_items(input_data)).processed_content)
 
     input_data = v(type='prerender_items',
                    title='1.0 (2014-06-24)',
-                   content=[[{'type': 'fix',
-                              'text': 'Fixed issue'}]],
+                   content='Fixed issue',
                    date=datetime.date(2014, 6, 24))
-    expected = '<span class="changelog-item-type changelog-item-type_fix">fix</span>Fixed issue'
-    eq_(expected, first(prerender_items(input_data)).content[0][0]['text'])
+    expected = '<span class="changelog-highlight-fix">Fixed</span> issue'
+    eq_(expected, first(prerender_items(input_data)).processed_content)
+
+
+def test_keywords_highlighting():
+    eq_('<span class="changelog-highlight-fix">Fixed a bug</span> where blah minor',
+        highlight_keywords('Fixed a bug where blah minor'))
+    eq_('<span class="changelog-highlight-fix">Bug Fixes</span>',
+        highlight_keywords('Bug Fixes'))
+    eq_('Some <span class="changelog-highlight-fix">bug</span> was <span class="changelog-highlight-fix">fixed</span>.',
+        highlight_keywords('Some bug was fixed.'))
+    eq_('<span class="changelog-highlight-fix">Fix</span> an issue.',
+        highlight_keywords('Fix an issue.'))
+    eq_('<span class="changelog-highlight-fix">Fixes</span> an issue.',
+        highlight_keywords('Fixes an issue.'))
+    eq_('This function is <span class="changelog-highlight-dep">deprecated</span>.',
+        highlight_keywords('This function is deprecated.'))
+    eq_('This is a <span class="changelog-highlight-fix">bugfix</span> release.',
+        highlight_keywords('This is a bugfix release.'))
+
+    # Backward
+    eq_('This feature was <span class="changelog-highlight-inc">removed</span>.',
+        highlight_keywords('This feature was removed.'))
+    eq_('This change is <span class="changelog-highlight-inc">backward incompatible</span>.',
+        highlight_keywords('This change is backward incompatible.'))
+
+    # security
+    eq_('Improved <span class="changelog-highlight-sec">XSS</span> filtering',
+        highlight_keywords('Improved XSS filtering'))
+    eq_('Improved <span class="changelog-highlight-sec">security</span> in SQL',
+        highlight_keywords('Improved security in SQL'))
 
 
 def test_extract_metadata_is_able_to_detect_unreleased_version():
@@ -249,18 +262,18 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
     eq_([v(type='prerender_items',
            title='1.0 (unreleased)',
            unreleased=True,
-           content=[])],
+           content='')],
         extract_metadata(
             v(title='1.0 (unreleased)',
-              content=[])))
+              content='')))
 
     eq_([v(type='prerender_items',
            title='1.45 (not yet released)',
            unreleased=True,
-           content=[])],
+           content='')],
         extract_metadata(
             v(title='1.45 (not yet released)',
-              content=[])))
+              content='')))
 
 
 
@@ -320,11 +333,6 @@ def test_strip_outer_tag():
     eq_('Blah',
         strip_outer_tag('<!--Comment-->Blah'))
 
-
-def test_label_embedding():
-    text = u'Version description\'s typography was significantly improved.\nNow you can read <a href="http://allmychanges.com/p/python/django/#1.7">Django\'s changelog</a> and it won\'t hurt your eyes.'
-    expected = u'<span class="changelog-item-type changelog-item-type_new">new</span>' + text
-    eq_(expected, embedd_label(text, {'type': 'new'}))
 
 
 def test_parse_plain_text():

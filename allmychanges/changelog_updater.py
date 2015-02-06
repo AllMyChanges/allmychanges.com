@@ -280,6 +280,8 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.unreleased = getattr(raw_version, 'unreleased', False)
         version.filename = getattr(raw_version, 'filename', None)
         version.date = getattr(raw_version, 'date', None)
+        version.raw_text = raw_version.content
+        version.processed_text = raw_version.processed_content
 
         if version.discovered_at is None:
             version.discovered_at = getattr(raw_version, 'discovered_at', now)
@@ -287,17 +289,9 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.last_seen_at = now
 
         version.save()
-
+        # TODO: remove this completely some day
         version.sections.all().delete()
-        for raw_section in raw_version.content:
-            if isinstance(raw_section, list):
-                section = version.sections.create(code_version=code_version)
-                for raw_item in raw_section:
-                    section.items.create(text=raw_item['text'],
-                                         type=raw_item['type'])
-            else:
-                section = version.sections.create(notes=raw_section,
-                                                  code_version=code_version)
+
 
 
 # TODO: remove when new update_changelog_from_raw_data3 will be ready

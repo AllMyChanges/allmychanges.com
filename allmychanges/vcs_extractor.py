@@ -90,6 +90,7 @@ def git_history_extractor(path, limit=None):
         r = do('git log --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
 
         # containse tuples (_hash, date, msg, parents)
+
         response = r.std_out.decode('utf-8')
         groups = (map(string.strip, group.strip().split(ins))
                   for group in response.split(splitter)[:-1])
@@ -445,6 +446,13 @@ def write_vcs_versions_fast(commits, extract_version):
     _normalize_version_numbers2(commits)
 
 
+def messages_to_html(messages):
+    items = [u'<ul>']
+    items.extend(map(u'<li>{0}</li>'.format, messages))
+    items.append(u'</ul>')
+    return u''.join(items)
+
+
 def get_versions_from_vcs(env):
     path = env.dirname
 
@@ -474,7 +482,7 @@ def get_versions_from_vcs(env):
                         filename='VCS',
                         date=None if version.get('unreleased') else version['date'],
                         unreleased=version.get('unreleased', False),
-                        content=[version['messages']])
+                        content=messages_to_html(version['messages']))
 
     if False: # TODO: remove this old code
         ver = 'old'
