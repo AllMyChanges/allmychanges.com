@@ -20,7 +20,7 @@ from allmychanges.utils import (
     discard_seconds)
 from allmychanges.downloader import fake_downloader
 from allmychanges.changelog_updater import (
-    update_changelog_from_raw_data,
+    update_changelog_from_raw_data3,
     fill_missing_dates2)
 from allmychanges.parsing.pipeline import get_files
 from allmychanges.env  import Environment
@@ -32,16 +32,14 @@ from allmychanges.views import get_digest_for
 from .utils import refresh, check_status_code, create_user
 
 def test_update_package_from_basic_structure():
+    root = Environment()
     structure = [
-        {'version': '0.1.0',
-         'sections': [
-             {'notes': 'Initial release'}]},
-        {'version': '0.2.0',
-         'sections': [
-             {'notes': 'Fixes:',
-              'items': ['boo fixed', 'baz fixed too']},
-             {'notes': 'Features:',
-              'items': ['cool feature was added']}]}
+        root.push(version='0.1.0',
+                  content='v1 content',
+                  processed_content='v1 processed content'),
+        root.push(version='0.2.0',
+                  content='v2 content',
+                  processed_content='v2 processed content')
     ]
 
     art = create_user('art')
@@ -49,29 +47,27 @@ def test_update_package_from_basic_structure():
         namespace='python', name='pip', source='test')
     art.track(changelog)
 
-    update_changelog_from_raw_data(changelog, structure)
+    update_changelog_from_raw_data3(changelog, structure)
 
     eq_(2, changelog.versions.count())
     v = changelog.versions.all()[0]
     eq_('0.2.0', v.number)
-    eq_(['boo fixed', 'baz fixed too'],
-        [item.text
-         for item in v.sections.all()[0].items.all()])
+    eq_('v2 processed content', v.processed_text)
 
 
 def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw_data():
+    root = Environment()
     structure = [
-        {'version': '0.1.0',
-         'sections': [
-             {'notes': 'Initial release'}]}
-    ]
+        root.push(version='0.1.0',
+                  content='content',
+                  processed_content='processed content')]
 
     art = create_user('art')
     changelog = Changelog.objects.create(
         namespace='python', name='pip', source='test')
     art.track(changelog)
 
-    update_changelog_from_raw_data(changelog, structure)
+    update_changelog_from_raw_data3(changelog, structure)
 
     v = changelog.versions.all()[0]
     discovered_at = v.discovered_at
@@ -80,7 +76,7 @@ def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw
 
     with mock.patch('allmychanges.changelog_updater.timezone') as timezone:
         timezone.now.return_value = datetime.datetime.now() + datetime.timedelta(10)
-        update_changelog_from_raw_data(changelog, structure)
+        update_changelog_from_raw_data3(changelog, structure)
 
     v = changelog.versions.all()[0]
     # neither date not discovered_at were changed
@@ -89,18 +85,18 @@ def test_update_package_leaves_version_dates_as_is_if_there_isnt_new_date_in_raw
 
 
 def test_update_package_changes_date_if_it_was_changed_in_the_raw_data():
+    root = Environment()
     structure = [
-        {'version': '0.1.0',
-         'sections': [
-             {'notes': 'Initial release'}]}
-    ]
+        root.push(version='0.1.0',
+                  content='content',
+                  processed_content='processed content')]
 
     art = create_user('art')
     changelog = Changelog.objects.create(
         namespace='python', name='pip', source='test')
     art.track(changelog)
 
-    update_changelog_from_raw_data(changelog, structure)
+    update_changelog_from_raw_data3(changelog, structure)
 
     v = changelog.versions.all()[0]
     discovered_at = v.discovered_at
@@ -108,8 +104,8 @@ def test_update_package_changes_date_if_it_was_changed_in_the_raw_data():
     assert discovered_at is not None
 
     new_date = datetime.date(2013, 3, 27)
-    structure[0]['date'] = new_date
-    update_changelog_from_raw_data(changelog, structure)
+    structure[0].date = new_date
+    update_changelog_from_raw_data3(changelog, structure)
     v = changelog.versions.all()[0]
 
     # package's date has changed
@@ -311,11 +307,11 @@ def test_new_user_have_allmychanges_in_digest():
 def test_old_user_can_have_zero_packages():
     """We wont add a default package to old users."""
     user = create_user('art')
-    eq_(0, user.packages.count())
+    eq_(0, user.changelogs.count())
 
     add_default_package(None, is_new=False, user=user)
 
-    eq_(0, user.packages.count())
+    eq_(0, user.changelogs.count())
 
 
 def test_digest_for_today_includes_changes_from_last_9am():
@@ -357,29 +353,29 @@ def test_namespace_name_validator():
                              name='bar')
 
     eq_({'result': 'ok'},
-        api_get('validate-changelog-name',
+        api_get('validate-changelog-name-list',
                  namespace='foo',
                  name='blah'))
 
     eq_({'result': 'ok'},
-        api_get('validate-changelog-name',
+        api_get('validate-changelog-name-list',
                  namespace='blah',
                  name='bar'))
 
     eq_({'errors': {'name': ['These namespace/name pair already taken.']}},
-        api_get('validate-changelog-name',
+        api_get('validate-changelog-name-list',
                  namespace='foo',
                  name='bar'))
 
     eq_({'errors': {'namespace': ['Please, fill this field'],
                     'name': ['Please, fill this field']}},
-        api_get('validate-changelog-name',
+        api_get('validate-changelog-name-list',
                  namespace='',
                  name=''))
 
     eq_({'errors': {'namespace': ['Field should not contain backslashes'],
                     'name': ['Field should not contain backslashes']}},
-        api_get('validate-changelog-name',
+        api_get('validate-changelog-name-list',
                  namespace='fo/o',
                  name='ba/r'))
 

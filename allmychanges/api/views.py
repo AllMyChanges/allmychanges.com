@@ -16,15 +16,12 @@ from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
 from allmychanges.downloader import normalize_url
-from allmychanges.models import (Repo, Subscription, Package,
+from allmychanges.models import (Subscription,
                                  Issue,
                                  Version,
                                  Changelog, UserHistoryLog)
 from allmychanges import chat
 from allmychanges.api.serializers import (
-    RepoSerializer,
-    RepoDetailSerializer,
-    CreateChangelogSerializer,
     SubscriptionSerializer,
     ChangelogSerializer,
     IssueSerializer,
@@ -67,28 +64,6 @@ class HandleExceptionMixin(object):
         return super(HandleExceptionMixin, self).handle_exception(exc=exc)
 
 
-class RepoViewSet(HandleExceptionMixin,
-                  DetailSerializerMixin,
-                  viewsets.ReadOnlyModelViewSet):
-    queryset = Repo.objects.all()
-    serializer_class = RepoSerializer
-    serializer_detail_class = RepoDetailSerializer
-    queryset_detail = queryset.prefetch_related('versions__items__changes')
-
-    @action(is_for_list=True, endpoint='create-changelog')
-    def create_changelog(self, request, *args, **kwargs):
-
-        serializer = CreateChangelogSerializer(data=request.DATA)
-        if serializer.is_valid():
-            count('api.create.changelog')
-            repo = Repo.start_changelog_processing_for_url(
-                url=serializer.data['url'])
-
-            return Response(data={'id': repo.id})
-        else:
-            raise ParseError(detail=serializer.errors)
-
-
 class SubscriptionViewSet(HandleExceptionMixin,
                           mixins.CreateModelMixin,
                           viewsets.GenericViewSet):
@@ -102,45 +77,9 @@ class SubscriptionViewSet(HandleExceptionMixin,
             .create(request, *args, **kwargs)
 
 
-# class PackageViewSet(HandleExceptionMixin,
-#                      DetailSerializerMixin,
-#                      viewsets.ModelViewSet):
-#     serializer_class = PackageSerializer
-#     serializer_detail_class = PackageSerializer
-#     paginate_by = None
-
-
-#     def get_queryset(self, *args, **kwargs):
-#         return self.request.user.packages.all()
-
-#     def pre_save(self, obj):
-#         obj.user = self.request.user
-#         now = timezone.now()
-
-#         if self.request.method == 'POST' and \
-#            self.request.user.packages.filter(
-#                namespace=obj.namespace,
-#                name=obj.name).count() > 0:
-#             raise AlreadyExists('Package {0}/{1} already exists'.format(
-#                 obj.namespace, obj.name))
-
-#         obj.next_update_at = now
-#         if obj.created_at is None:
-#             obj.created_at = now
-
-#         obj.source, _, _ = normalize_url(obj.source, for_checkout=False)
-#         return super(PackageViewSet, self).pre_save(obj)
-
-#     def post_save(self, obj, *args, **kwargs):
-#         response = super(PackageViewSet, self).post_save(obj, *args, **kwargs)
-#         if self.action in ('create', 'update'):
-#             update_changelog_task.delay(obj.changelog.source)
-#         return response
-
-
 class AutocompleteNamespaceView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
-        queryset = Package.objects.filter(namespace__startswith=request.GET.get('q'))
+        queryset = Changelog.objects.filter(namespace__startswith=request.GET.get('q'))
         namespaces = list(queryset.values_list('namespace', flat=True).distinct())
         namespaces.sort()
         return Response({'results': [{'name': namespace}
@@ -150,7 +89,7 @@ class AutocompleteNamespaceView(viewsets.ViewSet):
 class AutocompletePackageNameView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         filter_args = dict(name__startswith=request.GET.get('q'))
-        queryset = Package.objects.filter(**filter_args)
+        queryset = Changelog.objects.filter(**filter_args)
         this_users_packages = request.user.changelogs.filter(**filter_args).values_list('name', flat=True)
         queryset = queryset.exclude(name__in=this_users_packages)
         names = list(queryset.values_list('name', flat=True).distinct())
@@ -401,8 +340,8 @@ class NamespaceAndNameForm(forms.Form):
 
 
 class ValidateChangelogName(HandleExceptionMixin,
-                            views.APIView):
-    def get(self, *args, **kwargs):
+                            viewsets.ViewSet):
+    def list(self, *args, **kwargs):
         form = NamespaceAndNameForm(self.request.GET)
         if form.is_valid():
             return Response({'result': 'ok'},

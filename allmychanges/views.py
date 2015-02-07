@@ -26,8 +26,7 @@ from django import forms
 from django.http import HttpResponseRedirect, HttpResponse
 from twiggy_goodies.threading import log
 
-from allmychanges.models import (Package,
-                                 Version,
+from allmychanges.models import (Version,
                                  EmailVerificationCode,
                                  Issue,
                                  LightModerator,
@@ -114,21 +113,14 @@ from django.core.cache import cache
 
 
 
-def get_package_data_for_template(package_or_changelog,
+def get_package_data_for_template(changelog,
                                   filter_args,
                                   limit_versions,
                                   after_date,
                                   code_version='v1',
                                   ordering=None):
-    name = package_or_changelog.name
-    namespace = package_or_changelog.namespace
-
-    if isinstance(package_or_changelog, Package):
-        changelog = package_or_changelog.changelog
-        user = package_or_changelog.user
-    else:
-        changelog = package_or_changelog
-        user = None
+    name = changelog.name
+    namespace = changelog.namespace
 
     versions = []
     versions_queryset = changelog.versions.filter(**filter_args)
@@ -171,9 +163,6 @@ def get_package_data_for_template(package_or_changelog,
     return dict(namespace=namespace,
                 name=name,
                 source=changelog.source,
-                user=dict(
-                    username=user.username if user else None,
-                ),
                 changelog=dict(
                     id=changelog.id,
                     updated_at=changelog.updated_at,

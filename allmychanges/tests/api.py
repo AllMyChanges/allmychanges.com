@@ -8,7 +8,7 @@ from django.test import Client, TestCase
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 
-from allmychanges.models import Package, Changelog, Issue, UserHistoryLog
+from allmychanges.models import Changelog, Issue, UserHistoryLog
 from allmychanges import chat
 from .utils import check_status_code, create_user, put_json, post_json, json
 
@@ -20,7 +20,7 @@ from .utils import check_status_code, create_user, put_json, post_json, json
 
 
 def setup():
-    Package.objects.all().delete()
+    Changelog.objects.all().delete()
 
 
 def test_show_packages():
@@ -131,20 +131,19 @@ class TransactionTests(TestCase):
 
         create_user('art')
         cl.login(username='art', password='art')
-        eq_(0, Package.objects.count())
+        eq_(0, Changelog.objects.count())
 
 
-        with mock.patch.object(Changelog.objects, 'get_or_create') as get_or_create:
-            get_or_create.side_effect = RuntimeError
+        with mock.patch.object(Changelog.objects, 'get_queryset') as get_queryset:
+            get_queryset.side_effect = RuntimeError
             try:
-                cl.post('/v1/packages/',
+                cl.post('/v1/changelogs/',
                         dict(namespace='python',
                              name='pip',
                              source='https://github.com/pipa/pip'))
             except RuntimeError:
                 pass
 
-        eq_(0, Package.objects.count())
         eq_(0, Changelog.objects.count())
 
 
