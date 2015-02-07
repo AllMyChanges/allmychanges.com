@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import md5
 import datetime
 import anyjson
 import time
@@ -24,10 +23,11 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django import forms
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse
 from twiggy_goodies.threading import log
 
 from allmychanges.models import (Package,
+                                 Version,
                                  EmailVerificationCode,
                                  Issue,
                                  LightModerator,
@@ -35,8 +35,7 @@ from allmychanges.models import (Package,
                                  Changelog,
                                  User,
                                  UserHistoryLog,
-                                 Preview,
-                                 Item)
+                                 Preview)
 from allmychanges import chat
 from allmychanges.notifications import send_email
 from oauth2_provider.models import Application, AccessToken
@@ -134,7 +133,6 @@ def get_package_data_for_template(package_or_changelog,
     versions = []
     versions_queryset = changelog.versions.filter(**filter_args)
     # this allows to reduce number of queries in 5 times
-    versions_queryset = versions_queryset.prefetch_related('sections__items')
 
     if ordering:
         # if we are in this branch, then we probably
@@ -154,13 +152,6 @@ def get_package_data_for_template(package_or_changelog,
         versions_queryset = versions_queryset[:limit_versions]
 
     for version in versions_queryset:
-        sections = []
-        for section in version.sections.all():
-            sections.append(dict(notes=section.notes,
-                                 items=[
-                                     dict(text=item.text,
-                                          type=item.type)
-                                     for item in section.items.all()]))
         if after_date is not None and version.date is not None \
            and version.date < after_date.date():
             show_discovered_as_well = True
@@ -174,7 +165,6 @@ def get_package_data_for_template(package_or_changelog,
                              last_seen_at=version.last_seen_at,
                              show_discovered_as_well=show_discovered_as_well,
                              filename=version.filename,
-                             sections=sections,
                              processed_text=version.processed_text,
                              unreleased=version.unreleased))
 
@@ -253,7 +243,7 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         cache_key = 'digest-{username}-{packages}-{changes}-{code_version}'.format(
             username=user.username,
             packages=user.changelogs.count(),
-            changes=Item.objects.filter(section__version__changelog__trackers=user).count(),
+            changes=Version.objects.filter(changelog__trackers=user).count(),
             code_version=code_version)
 
         if self.request.GET:
@@ -385,7 +375,7 @@ class PackageView(CommonContextMixin, TemplateView):
         changelog = None
 
         changelog = get_object_or_404(
-            Changelog.objects.prefetch_related('versions__sections__items'),
+            Changelog.objects.prefetch_related('versions'),
             namespace=kwargs['namespace'],
             name=kwargs['name'])
 
@@ -421,7 +411,7 @@ class PackageView(CommonContextMixin, TemplateView):
 class BadgeView(View):
     def get(self, *args, **kwargs):
         changelog = get_object_or_404(
-            Changelog.objects.prefetch_related('versions__sections__items'),
+            Changelog.objects.prefetch_related('versions'),
             namespace=kwargs['namespace'],
             name=kwargs['name'])
 
