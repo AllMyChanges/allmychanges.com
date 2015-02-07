@@ -569,8 +569,9 @@ def highlight_keywords(text):
     return text
 
 
-def prerender_items(version):
-    new_version = version.push(type='version')
+def process_version_description(html):
+    """Processes html, sanitizing and adding additional markup.
+    """
     from ..templatetags.allmychanges_tags import process_cve
     from django.template.defaultfilters import capfirst
     from bleach import clean
@@ -609,12 +610,36 @@ def prerender_items(version):
 
         return text
 
-    # def prerender_content(html):
-    #     # TODO insert markup using get_change_type(item)
-    #     return html
+    return apply_filters(html)
 
-    new_version.processed_content = apply_filters(version.content)
+
+def update_version_content(version):
+    # TODO: remove after all versions will be converted
+    if version.processed_text:
+        return False
+
+    content = []
+    for section in version.sections.all():
+        if section.notes:
+            content.append(section.notes)
+        else:
+            messages = [item.text for item in section.items.all()]
+            messages = [re.sub(ur'<span class="changelog-item.*?</span>', '', text)
+                        for text in messages]
+            content.append(messages_to_html(messages))
+    content = u'\n'.join(content)
+    version.raw_text = content
+    version.processed_text = process_version_description(content)
+    version.save(update_fields=('raw_text', 'processed_text'))
+    return True
+
+def prerender_items(version):
+    processed_content = process_version_description(version.content)
+    new_version = version.push(
+        type='version',
+        processed_content=processed_content)
     yield new_version
+
 
 def group_by_path(versions):
     """ Returns a dictionary, where keys are a strings
