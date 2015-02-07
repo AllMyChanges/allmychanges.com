@@ -412,7 +412,7 @@ class BadgeView(View):
 
         # replacing to dash because repl.ca uses minus as a separator
         version = version.replace(u'-', u'–')
-        url = u'http://b.repl.ca/v1/changelog-{0}-brightgreen.png'.format(
+        url = u'https://img.shields.io/badge/changelog-{0}-brightgreen.svg'.format(
             version)
 
         content = cache.get(url)
@@ -422,7 +422,7 @@ class BadgeView(View):
             content = r.content
             cache.set(url, content, HOUR)
 
-        response = HttpResponse(content, content_type='image/png')
+        response = HttpResponse(content, content_type='image/svg+xml;charset=utf-8')
         response['Content-Length'] = len(content)
         response['Cache-Control'] = 'no-cache'
         return response
