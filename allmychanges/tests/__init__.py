@@ -10,3 +10,4 @@ from .preview import *
 from .vcs import *
 from .registration import *
 from .tasks import *
+from .version import *

@@ -882,6 +882,10 @@ class Version(models.Model):
                                 blank=True, null=True)
     raw_text = models.TextField(blank=True, null=True)
     processed_text = models.TextField(blank=True, null=True)
+    order_idx = models.IntegerField(blank=True, null=True,
+                                    help_text=('This field is used to reorder versions '
+                                               'according their version numbers and to '
+                                               'fetch them from database efficiently.'))
 
     objects = VersionManager()
 

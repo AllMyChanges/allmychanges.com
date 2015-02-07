@@ -5,7 +5,6 @@ from nose.tools import eq_ as orig_eq_
 from allmychanges.utils import first
 from allmychanges.parsing.pipeline import (
     create_section,
-    parse_changelog,
     get_markup,
     extract_metadata,
     group_by_path,
@@ -35,58 +34,6 @@ class TestRawChangelog(RawChangelog):
             yield self.create_chunk(title=item['filename'],
                                     content=item['content'])
 
-
-def test_simple():
-    fixture = [
-        dict(filename='CHANGELOG.md',
-             content=
-"""The lib
-=======
-
-0.3.1
------
-
-Small fixes.
-
-0.3.0
------
-
-* Feature 1.
-* Bugfix 2.
-
-0.2.1
------
-
-* Unittests were added.
-""")]
-    raw_changelog = TestRawChangelog(fixture)
-    parsed = parse_changelog(raw_changelog)
-    eq_(3, len(parsed))
-
-
-def test_release_notes():
-    fixture = [
-        dict(filename='release-notes/0.1.0.md',
-             content=
-"""
-Initial release
-===============
-
-I wrote this library as a proof of the concept.
-"""),
-        dict(filename='release-notes/0.1.1.md',
-             content=
-"""
-Minor changes
-===============
-
-This release has small importance.
-
-* Test case was introduced
-""")]
-    raw_changelog = TestRawChangelog(fixture)
-    parsed = parse_changelog(raw_changelog)
-    eq_(2, len(parsed))
 
 
 def test_parsing_files():

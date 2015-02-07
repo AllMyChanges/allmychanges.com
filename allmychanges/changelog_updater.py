@@ -11,6 +11,7 @@ from allmychanges.exceptions import (
 from allmychanges.crawler import search_changelog
 from allmychanges.crawler import parse_changelog
 from allmychanges import chat
+from allmychanges.version import reorder_versions
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
 
@@ -291,6 +292,8 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.save()
         # TODO: remove this completely some day
         version.sections.all().delete()
+
+    reorder_versions(list(obj.versions.all()))
 
 
 

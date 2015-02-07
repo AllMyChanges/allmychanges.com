@@ -1,7 +1,6 @@
 # coding: utf-8
 import re
 import codecs
-import copy
 import os
 import tempfile
 import shutil
@@ -11,12 +10,12 @@ import lxml.html
 from operator import itemgetter
 from collections import defaultdict
 from functools import wraps
-from itertools import islice, chain, takewhile
+from itertools import takewhile
 from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
 
 from allmychanges.crawler import _extract_version, _extract_date
-from allmychanges.utils import get_change_type, strip_long_text, first
+from allmychanges.utils import strip_long_text
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -30,20 +29,6 @@ def filename_looks_like_a_changelog(filename):
     filename = filename.lower()
     return any((item in filename)
                for item in CHANGELOG_LIKE_FILENAMES)
-
-
-def compare_versions(left, right):
-    return left.date < right.date \
-        and left.version < right.version
-
-
-def parse_changelog(raw_changelog):
-    # TODO: похоже этот код нигде не используется
-    chunks = raw_changelog.get_chunks()
-    versions = chain(*[chunk.get_versions()
-                       for chunk in chunks])
-    versions = sorted(versions, compare_versions)
-    return versions
 
 
 ##############################

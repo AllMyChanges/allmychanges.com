@@ -403,7 +403,7 @@ class PackageView(CommonContextMixin, TemplateView):
             100,
             None,
             code_version=code_version,
-            ordering=('-date', '-discovered_at'))
+            ordering=('-order_idx',))
 
         result['package'] = package_data
         result['login_to_track'] = login_to_track
