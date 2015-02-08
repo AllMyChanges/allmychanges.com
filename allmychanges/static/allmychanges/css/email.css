@@ -1273,15 +1273,30 @@ body.email {
 .catalogue-packages_visible {
   display: table-cell;
 }
-.test-fix1:before {
-  content: "BLAH:";
-  display: inline-block;
-  width: 50px;
-  height: 20px;
-  border-bottom: 4px solid #f00;
+.version-links {
+  list-style: none;
+  margin-bottom: 20px;
+  clear: both;
 }
-.test-fix2 {
-  background-color: #f77;
+.version-links__wrapper {
+  height: auto !important;
+}
+.version-links__sticky .version-links {
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 5px;
+  margin-right: 100px;
+  left: 100px;
+}
+.version-links__item {
+  display: inline-block;
+  margin-right: 10px;
+  min-width: 50px;
+}
+.version-links__selected-item a {
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: default;
 }
 /* override link style from email-reset */
 a {

@@ -18,6 +18,8 @@
     "jquery.cookie": "~1.4.1"
   },
   "devDependencies": {
-    "typehead.js": "~0.10.5"
+    "typehead.js": "~0.10.5",
+    "sticky": "~1.0.1",
+    "waypoints": "~3.1.1"
   }
 }

@@ -11,7 +11,7 @@ register = template.Library()
 def json(value):
     return anyjson.serialize(value)
 
-    
+
 @register.filter
 def order_by(value, arg):
     return value.order_by(arg)
@@ -28,6 +28,9 @@ def process_cve(value):
                   r'<a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=\1">\1</a>',
                   value)
 
+@register.filter
+def replace_dots(value):
+    return value.replace('.', '-')
 
 @register.filter
 def debug(value):
