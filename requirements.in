@@ -7,7 +7,7 @@ django-debug-toolbar
 requests
 envoy
 graphitesend
-rq
+rq<0.5.0
 django-rq
 docutils
 markdown
