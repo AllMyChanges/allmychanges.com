@@ -83,30 +83,32 @@ a {color: orange;}
 @require "common"
 
 
+/* override link style from email-reset */
 a {
     color: #15C;
     text-decoration: underline;
 }
 
+/* override blank links from common */
+.package-changes {
+    &__package-title {
+        > a {
+            color: #15C;
+            text-decoration: underline;
+        }
+    }
+}
 
-/* .package-changes { */
-/*     &__package-title { */
-/*         > a { */
-/*             color: #15C; */
-/*             text-decoration: underline; */
-/*         } */
-/*     } */
-/* } */
+.package-version {
+    &__number {
+        > a {
+            color: #15C;
+            text-decoration: underline;
+        }
+    }
+}
 
-/* .package-version { */
-/*     &__number { */
-/*         > a { */
-/*             color: #15C; */
-/*             text-decoration: underline; */
-/*         } */
-/*     } */
-/* } */
-
+/* other email styles */
 .email-note {
     margin-top: 2em;
     font-size: 1.2em;

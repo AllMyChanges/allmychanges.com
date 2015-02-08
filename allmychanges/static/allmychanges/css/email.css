@@ -1283,26 +1283,21 @@ body.email {
 .test-fix2 {
   background-color: #f77;
 }
+/* override link style from email-reset */
 a {
   color: #15c;
   text-decoration: underline;
 }
-/* .package-changes { */
-/*     &__package-title { */
-/*         > a { */
-/*             color: #15C; */
-/*             text-decoration: underline; */
-/*         } */
-/*     } */
-/* } */
-/* .package-version { */
-/*     &__number { */
-/*         > a { */
-/*             color: #15C; */
-/*             text-decoration: underline; */
-/*         } */
-/*     } */
-/* } */
+/* override blank links from common */
+.package-changes__package-title > a {
+  color: #15c;
+  text-decoration: underline;
+}
+.package-version__number > a {
+  color: #15c;
+  text-decoration: underline;
+}
+/* other email styles */
 .email-note {
   margin-top: 2em;
   font-size: 1.2em;
