@@ -310,6 +310,7 @@ select {
 .logo {
   position: absolute;
   top: 32px;
+  z-index: 1000;
 }
 .logo__text {
   font-size: 2em;
