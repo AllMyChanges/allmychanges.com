@@ -1,6 +1,6 @@
 django>=1.6,<1.6.6
 South
-djangorestframework
+djangorestframework<3.0.0
 drf-extensions
 django-extensions
 django-debug-toolbar
@@ -32,8 +32,8 @@ ndg-httpsclient
 pyOpenSSL
 orderedset
 
--e git+https://github.com/svetlyak40wt/django-oauth-toolkit
+-e git+git://github.com/svetlyak40wt/django-oauth-toolkit
 -e git+git://github.com/svetlyak40wt/logster.git@allmychanges
--e git+https://github.com/svetlyak40wt/django-sendmail-backend
--e git+https://github.com/svetlyak40wt/django-markdown2
--e git+https://github.com/trentm/python-markdown2
+-e git+git://github.com/svetlyak40wt/django-sendmail-backend
+-e git+git://github.com/svetlyak40wt/django-markdown2
+-e git+git://github.com/trentm/python-markdown2

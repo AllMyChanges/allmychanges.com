@@ -16,3 +16,4 @@ rq-dashboard
 -e git+git://github.com/svetlyak40wt/nose-notify-tmux.git
 -e git+git://github.com/svetlyak40wt/tdaemon.git@develop
 -e git+git://github.com/nosedjango/nosedjango.git
+-e git+git://github.com/svetlyak40wt/unittest-asserts.git
