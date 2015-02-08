@@ -44,14 +44,14 @@ def get_stats():
         stats['queue.{0}.jobs'.format(queue.name)] = queue.count
 
 
-    package_counts = list(User.objects.annotate(Count('packages')))
+    changelogs_counts = list(User.objects.annotate(Count('changelogs')))
 
     zero_packages = [user
-                     for user in package_counts
-                     if user.packages__count == 0]
-    others = [user.packages__count
-              for user in package_counts
-              if user.packages__count > 0]
+                     for user in changelogs_counts
+                     if user.changelogs__count == 0]
+    others = [user.changelogs__count
+              for user in changelogs_counts
+              if user.changelogs__count > 0]
     stats['db.peruser-package-count.zero'] = len(zero_packages)
     stats['db.peruser-package-count.min'] = min(others)
     stats['db.peruser-package-count.max'] = max(others)
