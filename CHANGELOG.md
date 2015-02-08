@@ -1,3 +1,31 @@
+0.18.0 (2015-02-08)
+===================
+
+The main feature of this release is a sticky navigation
+bar for package's version.
+
+Previously it was very hard to navigate through long
+changelogs because large number of versions or because
+their description was very long. Now this problem is solved
+by special navigation bar which sticks to the top of the screen
+and shows you a version number you are looking at and also
+all other versions. And you can click on any version to
+open it's description.
+
+Other changes:
+
+* Now service generated SVG badges instead of PNG.
+  And they should look nice on retina displays.
+* Keyword 'bugfixes' now highlighted.
+* Now links to packages and their versions are blue in emailed
+  digests.
+
+And bugfixes (any software has bugs, right? :)):
+
+* Fixed issue when version has a date but considered "unreleased"
+  because a keyword in description.
+* Fixed link from logo text to index page.
+
 0.17.0 (2015-02-05)
 ===================
 
