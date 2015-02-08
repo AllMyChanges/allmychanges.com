@@ -28,21 +28,20 @@ html5lib==0.999  # requirements.in:27 ~> bleach==1.4.1
 lxml==3.4.2  # requirements.in:14
 markdown==2.5.2  # requirements.in:13
 ndg-httpsclient==0.3.3  # requirements.in:31
-oauthlib==0.7.2  # requirements.in:16 ~> python-social-auth==0.2.1
+oauthlib==0.7.2  # requirements.in:16 ~> python-social-auth==0.1.26
 orderedset==1.1.2  # requirements.in:33
 plumbum==1.4.2  # requirements.in:30
 premailer==2.8.1  # requirements.in:19
 pyasn1==0.1.7  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32 ~> pyopenssl==0.14 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2
 pycparser==2.10  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32 ~> pyopenssl==0.14 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 ~> cffi==0.8.6 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 ~> cffi==0.8.6
-pyjwt==0.4.1  # requirements.in:16 ~> python-social-auth==0.2.1
 pyopenssl==0.14  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32
 python-dateutil==2.4.0  # requirements.in:18 ~> times==0.7 ~> arrow==0.5.0
 python-memcached==1.53  # requirements.in:21
-python-openid==2.2.5  # requirements.in:16 ~> python-social-auth==0.2.1
-python-social-auth==0.2.1  # requirements.in:16
+python-openid==2.2.5  # requirements.in:16 ~> python-social-auth==0.1.26
+python-social-auth==0.1.26  # requirements.in:16
 pytz==2014.10  # requirements.in:20 ~> twiggy-goodies==0.5.0
-requests-oauthlib==0.4.2  # requirements.in:16 ~> python-social-auth==0.2.1
-requests==2.5.1  # requirements.in:16 ~> python-social-auth==0.2.1
+requests-oauthlib==0.4.2  # requirements.in:16 ~> python-social-auth==0.1.26
+requests==2.5.1  # requirements.in:16 ~> python-social-auth==0.1.26
 rq==0.5.0  # requirements.in:11 ~> django-rq==0.7.0
 setuptools==12.0.5  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32 ~> pyopenssl==0.14 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2
 six==1.9.0  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32 ~> pyopenssl==0.14 and requirements.in:32 ~> pyopenssl==0.14

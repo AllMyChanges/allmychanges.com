@@ -45,7 +45,7 @@ markupsafe==0.23  # requirements-dev.in:12 ~> rq-dashboard==0.3.4 ~> flask==0.10
 mock==1.0.1  # requirements-dev.in:7
 ndg-httpsclient==0.3.3  # requirements-dev.in:1 -> requirements.in:31
 nose==1.2.1  # requirements-dev.in:4
-oauthlib==0.7.2  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.2.1
+oauthlib==0.7.2  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.1.26
 orderedset==1.1.2  # requirements-dev.in:1 -> requirements.in:33
 paramiko==1.15.2  # requirements-dev.in:11 ~> fabric==1.10.1
 pdbpp==0.7.2  # requirements-dev.in:3
@@ -55,18 +55,17 @@ pyasn1==0.1.7  # requirements-dev.in:1 -> requirements.in:31 ~> ndg-httpsclient=
 pycparser==2.10  # requirements-dev.in:1 -> requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 ~> cffi==0.8.6 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 ~> cffi==0.8.6
 pyflakes==0.8.1  # requirements-dev.in:6
 pygments==2.0.2  # requirements-dev.in:3 ~> pdbpp==0.7.2
-pyjwt==0.4.1  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.2.1
 pyopenssl==0.14  # requirements-dev.in:1 -> requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements-dev.in:1 -> requirements.in:32
 pyrepl==0.8.4  # requirements-dev.in:3 ~> pdbpp==0.7.2 ~> fancycompleter==0.4
 python-dateutil==2.4.0  # requirements-dev.in:1 -> requirements.in:18 and requirements-dev.in:12 ~> rq-dashboard==0.3.4 ~> times==0.7 and requirements-dev.in:1 -> requirements.in:18 ~> times==0.7 ~> arrow==0.5.0 and requirements-dev.in:1 -> requirements.in:18 ~> times==0.7 ~> arrow==0.5.0
 python-memcached==1.53  # requirements-dev.in:1 -> requirements.in:21
-python-openid==2.2.5  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.2.1
-python-social-auth==0.2.1  # requirements-dev.in:1 -> requirements.in:16
+python-openid==2.2.5  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.1.26
+python-social-auth==0.1.26  # requirements-dev.in:1 -> requirements.in:16
 pytz==2014.10  # requirements-dev.in:1 -> requirements.in:20 ~> twiggy-goodies==0.5.0
 pyyaml==3.11  # requirements-dev.in:5 ~> tmuxp==0.1.12 ~> kaptan==0.5.8
 redis==2.10.3  # requirements-dev.in:12 ~> rq-dashboard==0.3.4
-requests-oauthlib==0.4.2  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.2.1
-requests==2.5.1  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.2.1
+requests-oauthlib==0.4.2  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.1.26
+requests==2.5.1  # requirements-dev.in:1 -> requirements.in:16 ~> python-social-auth==0.1.26
 rq-dashboard==0.3.4  # requirements-dev.in:12
 rq==0.5.0  # requirements-dev.in:12 ~> rq-dashboard==0.3.4
 setuptools==12.0.5  # requirements-dev.in:1 -> requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 and requirements-dev.in:1 -> requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2
