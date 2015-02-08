@@ -10,14 +10,15 @@ import re
 
 from itertools import groupby
 from operator import itemgetter
-from braces.views import LoginRequiredMixin
+from braces.views import (LoginRequiredMixin,
+                          UserPassesTestMixin)
 from django.views.generic import (TemplateView,
                                   RedirectView,
                                   FormView,
                                   UpdateView,
                                   DetailView,
                                   View)
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -43,6 +44,13 @@ from allmychanges.utils import (HOUR,
                                 parse_ints,
                                 join_ints)
 from allmychanges.downloader import normalize_url
+
+
+
+class SuperuserRequiredMixin(UserPassesTestMixin):
+    raise_exception = True
+    def get_test_func(self):
+        return lambda user: user.username == 'svetlyak40wt'
 
 
 class CommonContextMixin(object):
@@ -635,21 +643,18 @@ class TokenView(CommonContextMixin, FormView):
         return super(TokenView, self).form_valid(form)
 
 
-class UserHistoryView(CommonContextMixin, TemplateView):
+class UserHistoryView(SuperuserRequiredMixin,
+                      CommonContextMixin,
+                      TemplateView):
     template_name = 'allmychanges/user-history.html'
 
     def get_context_data(self, **kwargs):
         result = super(UserHistoryView, self).get_context_data(**kwargs)
-
-        if 'username' in kwargs:
-            user = User.objects.get(username=kwargs['username'])
-            result['log'] = UserHistoryLog.objects.filter(user=user)
-        else:
-            user = self.request.user
-            user = user if user.is_authenticated() else None
-
-            result['log'] = UserHistoryLog.objects.filter(
-                Q(user=user) | Q(light_user=self.request.light_user))
+        user = User.objects.get(username=kwargs['username'])
+        result['log'] = UserHistoryLog.objects \
+                                      .filter(user=user) \
+                                      .prefetch_related('user') \
+                                      .order_by('-id')
         return result
 
 
@@ -1032,13 +1037,23 @@ def get_cohort_stats(cohort, date):
 
 
 
-class RetentionGraphsView(CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/retention.html'
+class AdminDashboardView(SuperuserRequiredMixin,
+                         CommonContextMixin,
+                         TemplateView):
+    template_name = 'allmychanges/admin-dashboard.html'
 
     def get_context_data(self, **kwargs):
-        result = super(RetentionGraphsView, self).get_context_data(**kwargs)
-        result['title'] = 'Retention Graphs'
+        result = super(AdminDashboardView, self).get_context_data(**kwargs)
+        result['title'] = 'Admin Dashboard'
 
+        two_weeks = timezone.now() - datetime.timedelta(14)
+        users = User.objects \
+                    .filter(date_joined__gte=two_weeks) \
+                    .order_by('-date_joined') \
+                    .annotate(num_changelogs=Count('changelogs'))
+        result['users'] = users
+
+        # calculating cohorts for retention graphs
         now = arrow.utcnow()
         start_date = arrow.get(2014, 1, 1)
         span_months = 3

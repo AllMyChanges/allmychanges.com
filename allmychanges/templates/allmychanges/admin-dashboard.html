@@ -11,6 +11,31 @@
 
   <h1 class="page-header">{{ title }}</h1>
 
+  <h2 class="page-subheader">Users, joined in last two weeks</h2>
+
+  {% if users %}
+  <table class="table">
+    <tr>
+      <th>Date Joined</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Track Changelogs</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+      <td>{{user.date_joined|timesince}}</td>
+      <td><a href="{% url 'user-history' username=user.username %}">{{user.username}}</a></td>
+      <td>{{user.email}}</td>
+      <td>{{user.num_changelogs}}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>Nobody joined in last two weeks :(<br/>
+    We need to work on Marketing!</p>
+  {% endif %}
+
+  <h2 class="page-subheader">Retention</h2>
   <div class="graphs"></div>
 
   <div class="legend"></div>

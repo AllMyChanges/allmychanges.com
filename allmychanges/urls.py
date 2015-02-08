@@ -21,7 +21,7 @@ from .views import (OldIndexView,
                     SecondStepView,
                     VerifyEmail,
                     LoginView,
-                    RetentionGraphsView,
+                    AdminDashboardView,
                     CatalogueView,
                     SubscribedView,
                     StyleGuideView,
@@ -75,7 +75,6 @@ urlpatterns = patterns(
 
     url(r'^issues/$', IssuesView.as_view(), name='issues'),
     url(r'^catalogue/$', CatalogueView.as_view(), name='catalogue'),
-    url(r'^retention/$', RetentionGraphsView.as_view(), name='retention'),
     url(r'^issues/(?P<pk>.*)/$', IssueDetailView.as_view(), name='issue-detail'),
 
     url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
@@ -86,6 +85,7 @@ urlpatterns = patterns(
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
     url(r'^v1/', include('allmychanges.api.urls')),
+    url(r'^admin/dashboard/$', AdminDashboardView.as_view(), name='admin-dashboard'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^favicon.ico/$', lambda x: redirect('/static/favicon.ico')),
     url(r'^django-rq/', include('django_rq.urls')),

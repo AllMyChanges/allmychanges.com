@@ -5,7 +5,7 @@
 {% block content %}
   <div class="box box_coming-soon">
     <h1 class="page-header page-header_coming-soon">User history</h1>
-    <table class="user-history">
+    <table class="user-history table">
       <thead>
       <tr>
         <th>Created at</th>
@@ -19,7 +19,7 @@
       <tbody>
       {% for item in log %}
       <tr class="table user-history__raw">
-        <td>{{ item.created_at }}</td>
+        <td>{{ item.created_at|timesince }}</td>
         <td>{{ item.action }}</td>
         <td>{{ item.user }}</td>
         <td>{{ item.light_user }}</td>
