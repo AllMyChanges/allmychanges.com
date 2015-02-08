@@ -958,18 +958,6 @@ body.email {
   margin-top: 1em;
   display: inline-block;
 }
-.email-note {
-  margin-top: 2em;
-  font-size: 1.2em;
-}
-.email-signature {
-  margin-top: 2em;
-  font-size: 1.2em;
-}
-.email-unsubscribe {
-  font-size: 0.75em;
-  margin-top: 2em;
-}
 .package-metadata > dt {
   float: left;
   clear: left;
@@ -1294,4 +1282,36 @@ body.email {
 }
 .test-fix2 {
   background-color: #f77;
+}
+a {
+  color: #15c;
+  text-decoration: underline;
+}
+/* .package-changes { */
+/*     &__package-title { */
+/*         > a { */
+/*             color: #15C; */
+/*             text-decoration: underline; */
+/*         } */
+/*     } */
+/* } */
+/* .package-version { */
+/*     &__number { */
+/*         > a { */
+/*             color: #15C; */
+/*             text-decoration: underline; */
+/*         } */
+/*     } */
+/* } */
+.email-note {
+  margin-top: 2em;
+  font-size: 1.2em;
+}
+.email-signature {
+  margin-top: 2em;
+  font-size: 1.2em;
+}
+.email-unsubscribe {
+  font-size: 0.75em;
+  margin-top: 2em;
 }
