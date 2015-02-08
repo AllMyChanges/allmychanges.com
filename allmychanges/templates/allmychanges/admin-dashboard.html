@@ -56,8 +56,6 @@ markers = MG.convert.date(markers, 'date');
 
 
 MG.data_graphic({
-  title: "Retention",
-  description: "Retention by monthly cohorts.",
   data: data,
   legend: data_legend,
   legend_target: ".legend",
@@ -69,7 +67,8 @@ MG.data_graphic({
   target: ".graphs",
   x_accessor: "date",
   y_accessor: "value",
-  interpolate: "linear"
+  interpolate: "linear",
+  full_width: true
 });
   </script>
 
