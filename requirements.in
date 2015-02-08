@@ -1,4 +1,4 @@
-django>=1.6,<1.6.6
+django>=1.6,<1.7
 South
 djangorestframework<3.0.0
 drf-extensions
