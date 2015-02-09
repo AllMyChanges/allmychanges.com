@@ -50,7 +50,7 @@
       $(".package-version__number a").waypoint({
         handler: function (direction) {
           $(".version-links__item").removeClass("version-links__selected-item");
-          $(".version-links__item-" + this.element.text.replace(".", "-", "g")).addClass("version-links__selected-item");
+          $(".version-links__item-" + this.element.text.replace(/\./g, "-")).addClass("version-links__selected-item");
         },
         offset: "30%"
       });
