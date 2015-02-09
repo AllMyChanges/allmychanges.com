@@ -1201,8 +1201,9 @@ body.email {
 .version-links__sticky .version-links {
   background: rgba(255,255,255,0.8);
   box-shadow: 0 0 5px;
-  margin-right: 100px;
-  left: 100px;
+  margin-right: 95px;
+  left: 95px;
+  padding: 0 5px 5px 5px;
 }
 .version-links__item {
   display: inline-block;
