@@ -18,7 +18,7 @@ from django.views.generic import (TemplateView,
                                   UpdateView,
                                   DetailView,
                                   View)
-from django.db.models import Q, Count
+from django.db.models import Count
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -1046,9 +1046,12 @@ class AdminDashboardView(SuperuserRequiredMixin,
         result = super(AdminDashboardView, self).get_context_data(**kwargs)
         result['title'] = 'Admin Dashboard'
 
-        two_weeks = timezone.now() - datetime.timedelta(14)
+        # default period is two weeks
+        period = int(self.request.GET.get('period', 14))
+        period = timezone.now() - datetime.timedelta(period)
+
         users = User.objects \
-                    .filter(date_joined__gte=two_weeks) \
+                    .filter(date_joined__gte=period) \
                     .order_by('-date_joined') \
                     .annotate(num_changelogs=Count('changelogs'))
         result['users'] = users
