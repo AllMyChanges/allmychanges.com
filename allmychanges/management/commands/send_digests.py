@@ -1,6 +1,5 @@
 # coding: utf-8
 import datetime
-import os
 import times
 import logging
 
@@ -8,15 +7,12 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 
 from django.contrib.auth import get_user_model
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 from django.utils import timezone
-from django.conf import settings
 
 from allmychanges.models import UserHistoryLog
 from allmychanges.views import get_digest_for
 from allmychanges.utils import dt_in_window
-from premailer import Premailer
+from allmychanges.notification import send_email
 
 
 def send_digest_to(user, code_version='v2'):
@@ -35,10 +31,9 @@ def send_digest_to(user, code_version='v2'):
                              and today_changes[0]['name'] == 'allmychanges')
 
         print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
-        if code_version == 'v2':
-            UserHistoryLog.write(user, '',
-                                 'digest-sent',
-                                 'We send user an email with digest')
+        UserHistoryLog.write(user, '',
+                             'digest-sent',
+                             'We send user an email with digest')
 
         for package in today_changes:
             print '\t{namespace}/{name}'.format(**package)
@@ -50,25 +45,6 @@ def send_digest_to(user, code_version='v2'):
                                       before_date=day_ago,
                                       after_date=week_ago,
                                       code_version=code_version)
-        body = render_to_string(
-            'emails/digest.html',
-            dict(current_user=user,
-                 today_changes=today_changes,
-                 week_changes_count=len(week_changes)))
-
-        external_styles = [
-            os.path.join(settings.STATIC_ROOT,
-                         'allmychanges/css',
-                         name)
-            for name in ('email.css',)]
-        premailer = Premailer(body,
-                              base_url='http://allmychanges.com/',
-                              external_styles=external_styles,
-                              disable_validation=True)
-
-        body = premailer.transform()
-        subject = 'Changelogs digest on {0:%d %B %Y}'.format(now)
-
         def send_to(email):
             if user.username != 'svetlyak40wt' \
                and not email.startswith('svetlyak.40wt') \
@@ -76,23 +52,22 @@ def send_digest_to(user, code_version='v2'):
                 # все чужие дайжесты дублируем ко мне на email
                 send_to('svetlyak.40wt+changes@gmail.com')
 
-            # в копиях мне — указываем username и версию
+            subject = 'Changelogs digest on {0:%d %B %Y}'.format(now)
+            # в копиях мне — указываем username
             if email.startswith('svetlyak.40wt'):
-                actual_subject = subject + ' ({username}, {code_version})'.format(
-                    username=user.username, code_version=code_version)
+                actual_subject = subject + ' ({username})'.format(
+                    username=user.username)
             else:
                 actual_subject = subject
 
-            # обычным пользователям отправляем только v2 дайжесты
-            # мне — все остальные
-            if code_version == 'v2' or email.startswith('svetlyak.40wt'):
-                message = EmailMultiAlternatives(actual_subject,
-                          None,
-                          'AllMyChanges.com <noreply@allmychanges.com>',
-                          [email])
-
-                message.attach_alternative(body.encode('utf-8'), 'text/html')
-                message.send()
+            send_email(email,
+                       actual_subject,
+                       'digest.html',
+                       context=dict(current_user=user,
+                                    today_changes=today_changes,
+                                    week_changes_count=len(
+                                        week_changes)),
+                       tags=['allmychanges', 'digest'])
 
         send_to(user.email)
 
@@ -122,5 +97,4 @@ class Command(LogMixin, BaseCommand):
             users = users.filter(timezone__in=send_for_timezones)
 
         for user in users:
-#            send_digest_to(user, code_version='v1')
             send_digest_to(user, code_version='v2')

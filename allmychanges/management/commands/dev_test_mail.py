@@ -9,6 +9,8 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from premailer import Premailer
 
+from allmychanges.notifications import send_email
+
 
 def send_email_using_template(address, subject, template, **context):
     if not isinstance(address, (list, tuple)):
@@ -49,4 +51,8 @@ class Command(LogMixin, BaseCommand):
         cssutils_logger = logging.getLogger('CSSUTILS')
         cssutils_logger.level = logging.ERROR
 
-        send_email_using_template(to_email, u'Тестовый email', template)
+        send_email(
+            to_email,
+            u'Тестовый email',
+            template + '.html',
+            tags=('allmychanges', 'test'))
