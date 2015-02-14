@@ -1,3 +1,6 @@
+// uses jquery typeahead plugin:
+// http://twitter.github.io/typeahead.js/
+
 module.exports = React.createClass({
     componentDidMount: function(){
         var element = this.getDOMNode();
@@ -46,7 +49,7 @@ module.exports = React.createClass({
                     empty: '<div class="magic-prompt__no-matches">No matches found</div>',
                     suggestion: show_suggestion
                 }
-            });
+        }).focus();
         
         // Behind the scenes, this is just delegating to Backbone's router
         // to 'navigate' the main pane of the page to a different view
@@ -66,7 +69,7 @@ module.exports = React.createClass({
                 <form action="/search/" method="GET">
                   <input type="search" name="q" ref="input" 
                          className="magic-prompt__input" 
-                         placeholder="Search packages and namespaces" />
+                         placeholder="Search packages and namespaces"/>
                   <input type="submit" className="button _good _large magic-prompt__submit" value="Search"/>
                 </form>
             </div>

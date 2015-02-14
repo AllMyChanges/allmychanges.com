@@ -266,6 +266,9 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// uses jquery typeahead plugin:
+	// http://twitter.github.io/typeahead.js/
+
 	module.exports = React.createClass({displayName: 'exports',
 	    componentDidMount: function(){
 	        var element = this.getDOMNode();
@@ -314,7 +317,7 @@
 	                    empty: '<div class="magic-prompt__no-matches">No matches found</div>',
 	                    suggestion: show_suggestion
 	                }
-	            });
+	        }).focus();
 	        
 	        // Behind the scenes, this is just delegating to Backbone's router
 	        // to 'navigate' the main pane of the page to a different view
