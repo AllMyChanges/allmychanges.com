@@ -1,6 +1,7 @@
 var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
+var TrackButton = require('../components/track-button.js')
 var MagicPrompt = require('../components/magic-prompt.js')
 
 module.exports = {
@@ -8,6 +9,13 @@ module.exports = {
         $('.report-button').each(function (idx, element) {
             React.render(
                 <ReportButton changelog_id={element.dataset['changelogId']}/>,
+                element);
+        });
+
+        $('.track-button-container').each(function (idx, element) {
+            React.render(
+                <TrackButton changelog_id={element.dataset['changelogId']}
+                             tracked={element.dataset['tracked']}/>,
                 element);
         });
 

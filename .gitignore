@@ -26,6 +26,7 @@ nosetests.xml
 .pydevproject
 *.tar.gz
 /env
+/env2
 /secure_settings.py
 /static
 /data

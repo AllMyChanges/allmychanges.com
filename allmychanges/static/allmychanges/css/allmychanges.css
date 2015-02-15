@@ -1216,6 +1216,9 @@ body.email {
   font-weight: bold;
   cursor: default;
 }
+.track-button-container {
+  display: inline-block;
+}
 .table > thead {
   color: #808080;
 }

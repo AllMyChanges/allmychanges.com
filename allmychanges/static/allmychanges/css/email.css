@@ -1299,6 +1299,9 @@ body.email {
   font-weight: bold;
   cursor: default;
 }
+.track-button-container {
+  display: inline-block;
+}
 /* override link style from email-reset */
 a {
   color: #15c;

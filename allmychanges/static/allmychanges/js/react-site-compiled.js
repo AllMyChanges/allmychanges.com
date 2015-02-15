@@ -52,7 +52,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(7)
+	var PackageSelector = __webpack_require__(8)
 
 	module.exports = {
 	    render: function () {
@@ -74,13 +74,21 @@
 	var ReportButton = __webpack_require__(3)
 	var ResolveButton = __webpack_require__(4)
 	var DeleteButton = __webpack_require__(5)
-	var MagicPrompt = __webpack_require__(6)
+	var TrackButton = __webpack_require__(6)
+	var MagicPrompt = __webpack_require__(7)
 
 	module.exports = {
 	    render: function () {
 	        $('.report-button').each(function (idx, element) {
 	            React.render(
 	                React.createElement(ReportButton, {changelog_id: element.dataset['changelogId']}),
+	                element);
+	        });
+
+	        $('.track-button-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(TrackButton, {changelog_id: element.dataset['changelogId'], 
+	                             tracked: element.dataset['tracked']}),
 	                element);
 	        });
 
@@ -266,6 +274,52 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        console.log('this.props=', this.props);
+	        return {tracked: (this.props.tracked == 'true')};
+	    },
+	    perform_action: function(action, state_after) {
+	        $.ajax({
+	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
+	            method: 'POST',
+	            dataType: 'json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            success: function(data) {
+	                console.log('Setting state to ', state_after);
+	                this.setState({tracked: state_after});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    track: function (e) {
+	        e.preventDefault();
+	        this.perform_action('track', true);
+	    },
+	    untrack: function (e) {
+	        e.preventDefault();
+	        this.perform_action('untrack', false);
+	    },
+	    render: function() {
+	        if (this.state.tracked) {
+	            return (React.createElement("button", {className: "button _bad", 
+	                            onClick: this.untrack, 
+	                            title: "Click to unsubscribe from this package."}, "Untrack"));
+	        } else {
+	            return (React.createElement("button", {className: "button _good", 
+	                            onClick: this.track, 
+	                            title: "Click to receive notifications about new versions."}, "Track it!"));
+	        }
+	    }
+	});
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
 
@@ -347,10 +401,10 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(8)
+	var Package = __webpack_require__(9)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -388,10 +442,10 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	TrackButton = __webpack_require__(9)
+	TrackButton = __webpack_require__(6)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -419,39 +473,6 @@
 	    )
 	    );
 	  }
-	});
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {tracked: false};
-	    },
-	    handle_click: function (e) {
-	        e.preventDefault();
-	        $.ajax({
-	            url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
-	            method: 'POST',
-	            dataType: 'json',
-	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
-	            success: function(data) {
-	                this.setState({tracked: true});
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error('Unable to track changelog', status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    render: function() {
-	        if (this.state.tracked) {
-	            return (React.createElement("button", {className: "package-select__track-button package-select__track-button_tracked", title: "Now you are tracking this package."}, "Tracked"));
-	        } else {
-	            return (React.createElement("button", {className: "package-select__track-button", onClick: this.handle_click, title: "Press to receive notifications about new versions."}, "Track"));
-	        }
-	    }
 	});
 
 
