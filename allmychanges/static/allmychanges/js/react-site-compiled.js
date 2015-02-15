@@ -395,9 +395,11 @@
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
+	      var changelog_id = this.props.changelog_id;
+
 	      var versions = this.props.versions.map(function(version) {
 	          return  (
-	                  React.createElement("li", {className: "package-selector__version", key: version.number}, 
+	                  React.createElement("li", {className: "package-selector__version", key: version.id}, 
 	                    React.createElement("span", {className: "package-selector__number"}, version.number), 
 	                    React.createElement("span", {className: "package-selector__date"}, "Released at ", version.date)
 	                  )

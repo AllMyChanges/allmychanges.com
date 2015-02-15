@@ -150,7 +150,8 @@ class SearchAutocompleteView(viewsets.ViewSet):
 class LandingPackageSuggestView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         def process_versions(versions):
-            return [{'number': v.number,
+            return [{'id': v.id,
+                     'number': v.number,
                      'date': v.date or v.discovered_at.date()}
                     for v in versions]
 

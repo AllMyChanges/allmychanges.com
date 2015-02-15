@@ -2,9 +2,11 @@ TrackButton = require('../track-button.js')
 
 module.exports = React.createClass({
   render: function() {
+      var changelog_id = this.props.changelog_id;
+
       var versions = this.props.versions.map(function(version) {
           return  (
-                  <li className="package-selector__version" key={version.number}>
+                  <li className="package-selector__version" key={version.id}>
                     <span className="package-selector__number">{version.number}</span>
                     <span className="package-selector__date">Released at {version.date}</span>
                   </li>
