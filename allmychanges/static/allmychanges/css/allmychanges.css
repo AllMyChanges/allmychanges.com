@@ -487,6 +487,7 @@ select {
 }
 .share-badge__text {
   width: 400px;
+  white-space: pre;
 }
 .share-badge__tabs {
   font-size: 8px;

@@ -46,13 +46,14 @@
 
 	__webpack_require__(1).render()
 	__webpack_require__(2).render()
+	__webpack_require__(3).render()
 
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(8)
+	var PackageSelector = __webpack_require__(10)
 
 	module.exports = {
 	    render: function () {
@@ -71,11 +72,12 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ReportButton = __webpack_require__(3)
-	var ResolveButton = __webpack_require__(4)
-	var DeleteButton = __webpack_require__(5)
-	var TrackButton = __webpack_require__(6)
-	var MagicPrompt = __webpack_require__(7)
+	var ReportButton = __webpack_require__(4)
+	var ResolveButton = __webpack_require__(5)
+	var DeleteButton = __webpack_require__(6)
+	var TrackButton = __webpack_require__(7)
+	var MagicPrompt = __webpack_require__(8)
+	var Share = __webpack_require__(9)
 
 	module.exports = {
 	    render: function () {
@@ -113,6 +115,24 @@
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Share = __webpack_require__(9)
+
+	module.exports = {
+	    render: function () {
+	        $('.share-badge-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(Share, {namespace: element.dataset['namespace'], 
+	                       name: element.dataset['name']}),
+	                element);
+	        });
+	    }
+	}
+
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
@@ -205,7 +225,7 @@
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
@@ -238,7 +258,7 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
@@ -271,12 +291,11 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
-	        console.log('this.props=', this.props);
 	        return {tracked: (this.props.tracked == 'true')};
 	    },
 	    perform_action: function(action, state_after) {
@@ -286,7 +305,7 @@
 	            dataType: 'json',
 	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
 	            success: function(data) {
-	                console.log('Setting state to ', state_after);
+	                // console.log('Setting state to ', state_after);
 	                this.setState({tracked: state_after});
 	            }.bind(this),
 	            error: function(xhr, status, err) {
@@ -317,7 +336,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// uses jquery typeahead plugin:
@@ -401,10 +420,71 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(9)
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {active_tab: 'markdown'};
+	    },
+	    show: function (tab) {
+	        return function () {
+	            this.setState({active_tab: tab});
+	        }.bind(this);
+	    },
+	    render: function() {
+	        var base_url = window.location.origin + '/p/' + this.props.namespace + '/' + this.props.name + '/';
+	        var package_url = base_url + '?utm_source=badge';
+	        var image_url = base_url + 'badge/';
+	        var tab_classes = {}
+	        tab_classes[this.state.active_tab] = 'tab_active';
+
+	        var get_content = function (tab) {
+	            var snippets = {
+	                markdown: '[![changelog](' + image_url + ')](' + package_url + ')',
+	                rst: '.. image:: ' + image_url + '\n   :target: ' + package_url,
+	                html: '<a href="' + package_url + '"><img title="changelog" src="' + image_url + '"/></a>'};
+	            var num_rows = {markdown: 1, rst: 2, html: 1};
+	            return (React.createElement("textarea", {readOnly: "1", 
+	                              wrap: "off", 
+	                              rows: num_rows[tab], 
+	                              className: "text-input share-badge__text", 
+	                              value: snippets[tab]}));
+	        }
+
+	        return (
+	React.createElement("table", {className: "share-badge"}, 
+	  React.createElement("tbody", null, 
+	    React.createElement("tr", null, 
+	      React.createElement("td", null), 
+	      React.createElement("td", null, 
+	        React.createElement("ul", {className: "share-badge__tabs"}, 
+	          React.createElement("li", {className: "tab " + tab_classes.markdown, onClick: this.show('markdown')}, "markdown"), 
+	          React.createElement("li", {className: "tab " + tab_classes.rst, onClick: this.show('rst')}, "reST"), 
+	          React.createElement("li", {className: "tab " + tab_classes.html, onClick: this.show('html')}, "html")
+	        )
+	      )
+	    ), 
+
+	    React.createElement("tr", null, 
+	      React.createElement("td", null, 
+	        React.createElement("img", {className: "share-badge__example", src: image_url})
+	      ), 
+	      React.createElement("td", null, 
+	        get_content(this.state.active_tab)
+	      )
+	    )
+	  )
+	));
+	    }
+	});
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Package = __webpack_require__(11)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -442,10 +522,10 @@
 
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	TrackButton = __webpack_require__(6)
+	TrackButton = __webpack_require__(7)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {

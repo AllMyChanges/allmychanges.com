@@ -1,6 +1,5 @@
 module.exports = React.createClass({
     getInitialState: function () {
-        console.log('this.props=', this.props);
         return {tracked: (this.props.tracked == 'true')};
     },
     perform_action: function(action, state_after) {
@@ -10,7 +9,7 @@ module.exports = React.createClass({
             dataType: 'json',
             headers: {'X-CSRFToken': $.cookie('csrftoken')},
             success: function(data) {
-                console.log('Setting state to ', state_after);
+                // console.log('Setting state to ', state_after);
                 this.setState({tracked: state_after});
             }.bind(this),
             error: function(xhr, status, err) {

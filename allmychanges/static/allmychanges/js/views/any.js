@@ -3,6 +3,7 @@ var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
 var TrackButton = require('../components/track-button.js')
 var MagicPrompt = require('../components/magic-prompt.js')
+var Share = require('../components/share.js')
 
 module.exports = {
     render: function () {
