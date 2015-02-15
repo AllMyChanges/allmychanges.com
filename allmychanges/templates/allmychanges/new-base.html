@@ -1,6 +1,6 @@
 {% load staticfiles allmychanges_tags compress %}
 <!DOCTYPE html>
-<html ng-app="allMyChangesApp">
+<html{% block ng-app %}{% endblock %}>
 <head>
     <title>{% block html-title %}AllMyChanges.com{% endblock %}</title>
 
@@ -40,7 +40,6 @@
 
       <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
-      <script src="/static/allmychanges/js/share.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/landing-page.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/add-new.js" type="text/javascript" charset="utf-8"></script>
     {% endcompress %}
