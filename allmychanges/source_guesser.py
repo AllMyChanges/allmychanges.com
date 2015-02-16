@@ -28,15 +28,32 @@ def _append_url(results, url):
 
 
 def _python_guesser(name):
-    results = []
-    response = requests.get('https://pypi.python.org/pypi/' + name)
+    def check_page(url):
+        results = []
+        response = requests.get(url)
 
-    urls = re.findall(r'"(https?://.*?)"', response.content)
-    for url in urls:
-        if ('git' in url or 'bitbucket' in url) and \
-           not ('issues' in url or 'gist' in url):
-            _append_url(results, url)
-    return results
+        if 'Index of Packages' in response.content:
+            other_pages = re.findall(
+                r'href="(/pypi/{0}/.*?)"'.format(name),
+                response.content)
+
+            while other_pages:
+                page = other_pages.pop(0)
+                other_results = check_page(u'https://pypi.python.org' + page)
+                if other_results:
+                    for url in other_results:
+                        _append_url(results, url)
+                    break
+
+        else:
+            urls = re.findall(r'"(https?://.*?)"', response.content)
+            for url in urls:
+                if ('git' in url or 'bitbucket' in url) and \
+                   not ('issues' in url or 'gist' in url):
+                    _append_url(results, url)
+        return results
+
+    return check_page('https://pypi.python.org/pypi/' + name)
 
 
 def _perl_guesser(name):

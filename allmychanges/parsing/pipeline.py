@@ -410,7 +410,6 @@ def parse_html_file(obj):
     headers = [tag for tag in parsed.iter()
                if tag.tag in ('h1', 'h2', 'h3', 'h4')]
 
-
     def create_full_content(children):
         """Just serialize all childrens and join result."""
         strings = map(lxml.html.tostring, children)
