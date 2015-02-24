@@ -57,12 +57,19 @@ Installing Stylus for developement
 
    npm install
 
+
 Clearing RQ queue
 -----------------
 
 1. Start `rq-dashboard`
 2. Go to http://art.dev.allmychanges.com:9181/default
 3. Press `Empty`
+
+
+Using amch to import requirements.txt
+-------------------------------------
+
+    cat requirements.txt| grep -v '^-e' | sed -e 's/\([^=]\+\).*/python,\1/' -e '1 i\namespace,name' | head | amch import
 
 
 Interesting projects

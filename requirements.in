@@ -32,8 +32,8 @@ ndg-httpsclient
 pyOpenSSL
 orderedset
 
--e git+git://github.com/svetlyak40wt/django-oauth-toolkit
--e git+git://github.com/svetlyak40wt/logster.git@allmychanges
--e git+git://github.com/svetlyak40wt/django-sendmail-backend
--e git+git://github.com/svetlyak40wt/django-markdown2
--e git+git://github.com/trentm/python-markdown2
+git+git://github.com/svetlyak40wt/django-oauth-toolkit
+git+git://github.com/svetlyak40wt/logster.git@allmychanges
+git+git://github.com/svetlyak40wt/django-sendmail-backend
+git+git://github.com/svetlyak40wt/django-markdown2
+git+git://github.com/trentm/python-markdown2

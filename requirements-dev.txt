@@ -1,7 +1,7 @@
--e git+git://github.com/nosedjango/nosedjango.git@05d280a98085d05182119ce6b5eac2dcf59553b6#egg=nosedjango  # requirements-dev.in:18
--e git+git://github.com/svetlyak40wt/django-markdown2@5c68d8965a132993ac54ed9b359764a22a7c60e4#egg=django-markdown2  # requirements-dev.in:1 -> requirements.in:38
--e git+git://github.com/svetlyak40wt/django-oauth-toolkit@c590afc1350d43b1cf4e8da37bb0b9402ea82543#egg=django-oauth-toolkit  # requirements-dev.in:1 -> requirements.in:35
--e git+git://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend  # requirements-dev.in:1 -> requirements.in:37
+git+git://github.com/nosedjango/nosedjango.git@05d280a98085d05182119ce6b5eac2dcf59553b6#egg=nosedjango  # requirements-dev.in:18
+git+git://github.com/svetlyak40wt/django-markdown2@5c68d8965a132993ac54ed9b359764a22a7c60e4#egg=django-markdown2  # requirements-dev.in:1 -> requirements.in:38
+git+git://github.com/svetlyak40wt/django-oauth-toolkit@c590afc1350d43b1cf4e8da37bb0b9402ea82543#egg=django-oauth-toolkit  # requirements-dev.in:1 -> requirements.in:35
+git+git://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend  # requirements-dev.in:1 -> requirements.in:37
 -e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster  # requirements-dev.in:1 -> requirements.in:36
 -e git+git://github.com/svetlyak40wt/nose-notify-tmux.git@e715df3ea6e1c41da8e964a04be759a7a364d284#egg=nose-notify-tmux  # requirements-dev.in:16
 -e git+git://github.com/svetlyak40wt/pip-1.git@2a44a3b0287a8ef05c216a93bb4a0a7a40d0e73f#egg=pip  # requirements-dev.in:14

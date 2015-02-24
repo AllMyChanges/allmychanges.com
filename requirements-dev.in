@@ -11,9 +11,9 @@ docopt
 fabric
 rq-dashboard
 
--e git+git://github.com/svetlyak40wt/pip-1.git@ask-before-hard-reset#egg=pip
--e git+git://github.com/svetlyak40wt/pip-tools.git@my-future
--e git+git://github.com/svetlyak40wt/nose-notify-tmux.git
--e git+git://github.com/svetlyak40wt/tdaemon.git@develop
--e git+git://github.com/nosedjango/nosedjango.git
--e git+git://github.com/svetlyak40wt/unittest-asserts.git
+#-e git+git://github.com/svetlyak40wt/pip-1.git@ask-before-hard-reset#egg=pip
+git+git://github.com/svetlyak40wt/pip-tools.git@my-future
+git+git://github.com/svetlyak40wt/nose-notify-tmux.git
+git+git://github.com/svetlyak40wt/tdaemon.git@develop
+git+git://github.com/nosedjango/nosedjango.git
+git+git://github.com/svetlyak40wt/unittest-asserts.git
