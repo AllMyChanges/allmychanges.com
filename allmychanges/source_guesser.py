@@ -46,14 +46,18 @@ def _python_guesser(name):
                     break
 
         else:
-            urls = re.findall(r'"(https?://.*?)"', response.content)
+            urls = re.findall(r'["()\[\]](https?://.*?)(?:["()\[\]]|/blob/|&gt;)', response.content)
             for url in urls:
                 if ('git' in url or 'bitbucket' in url) and \
                    not ('issues' in url or 'gist' in url):
                     _append_url(results, url)
         return results
 
-    return check_page('https://pypi.python.org/pypi/' + name)
+    results = check_page('https://pypi.python.org/pypi/' + name)
+    # sort results so that urls which include package's name come first
+    results.sort(key=lambda item: name in item,
+                 reverse=True)
+    return results
 
 
 def _perl_guesser(name):
