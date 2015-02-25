@@ -227,10 +227,6 @@ def choose_version_extractor(path):
     if os.path.exists(os.path.join(path, 'package.json')):
         return npm_version_extractor
 
-    # TODO: raise exception because we unable to extract versions
-    null_extractor = lambda path: None
-    return null_extractor
-
 
 def stop_at_hash_if_needed(hash):
     if os.environ.get('STOP_AT_HASH'):
@@ -458,57 +454,22 @@ def get_versions_from_vcs(env):
 
     get_history = choose_history_extractor(path)
     extract_version = choose_version_extractor(path)
-    # current_version = None
-    # current_commits = []
 
-    # def create_version(date, unreleased=False):
-    #     return env.push(type='almost_version',
-    #                     title=current_version,
-    #                     version=current_version,
-    #                     filename='VCS',
-    #                     date=None if unreleased else date,
-    #                     unreleased=unreleased,
-    #                     content=[current_commits])
+    if extract_version is not None:
+        commits = get_history(path)
 
-    commits = get_history(path)
+        write_vcs_versions_fast(commits, extract_version)
+        bumps = mark_version_bumps(commits)
+        grouped = group_versions(commits, bumps)
+        for version in grouped:
+            yield env.push(type='almost_version',
+                            title=version['version'],
+                            version=version['version'],
+                            filename='VCS',
+                            date=None if version.get('unreleased') else version['date'],
+                            unreleased=version.get('unreleased', False),
+                            content=messages_to_html(version['messages']))
 
-    write_vcs_versions_fast(commits, extract_version)
-    bumps = mark_version_bumps(commits)
-    grouped = group_versions(commits, bumps)
-    for version in grouped:
-        yield env.push(type='almost_version',
-                        title=version['version'],
-                        version=version['version'],
-                        filename='VCS',
-                        date=None if version.get('unreleased') else version['date'],
-                        unreleased=version.get('unreleased', False),
-                        content=messages_to_html(version['messages']))
-
-    if False: # TODO: remove this old code
-        ver = 'old'
-#        ver = 'new' # use new fast algotithm of version searching
-
-        if ver == 'new':
-            write_vcs_versions_bin(commits, extract_version)
-        else:
-            write_vcs_versions_slowly(commits, extract_version)
-
-        for commit in commits:
-            message = commit['message']
-            version = commit['version']
-            date = commit['date']
-
-            if message:
-                current_commits.append(message)
-
-            if version != current_version and version is not None:
-                current_version = version
-                yield create_version(date)
-                current_commits = []
-
-        if current_commits:
-            current_version = 'x.x.x'
-            yield create_version(date, unreleased=True)
 
 
 def extract_changelog_from_vcs(path):
