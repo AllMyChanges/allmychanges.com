@@ -453,12 +453,20 @@ def get_versions_from_vcs(env):
     path = env.dirname
 
     get_history = choose_history_extractor(path)
+    commits = get_history(path)
+
+    # we only go through the history
+    # if version extractor is available for this repository
     extract_version = choose_version_extractor(path)
-
     if extract_version is not None:
-        commits = get_history(path)
-
         write_vcs_versions_fast(commits, extract_version)
+
+    # now we'll check if some version information was
+    # extracted
+    has_versions = sum(1 for commit in commits.values()
+                       if 'version' in commit)
+
+    if has_versions:
         bumps = mark_version_bumps(commits)
         grouped = group_versions(commits, bumps)
         for version in grouped:
