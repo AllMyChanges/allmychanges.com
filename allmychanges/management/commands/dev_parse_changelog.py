@@ -6,8 +6,6 @@ from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
 from allmychanges.utils import split_filenames
 
 
-
-
 def print_version(version, full=False):
     print ''
     print u'{version} ({filename}, {date}, unreleased={unreleased})'.format(
