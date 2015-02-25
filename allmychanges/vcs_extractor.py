@@ -302,6 +302,7 @@ def write_vcs_versions_bin(commits, extract_version):
 
 
 def _normalize_version_numbers2(commits):
+    # fills commits in gaps with 'version' attribute
     updated = set()
     to_update = set()
     to_check = deque()
@@ -314,12 +315,12 @@ def _normalize_version_numbers2(commits):
                 return value
 
     for commit in commits.values():
-        if commit['version'] is None:
+        if commit.get('version') is None:
             to_check.clear()
             to_update.clear()
             current = commit
 
-            while current and current['version'] is None and current['hash'] not in updated:
+            while current and current.get('version') is None and current['hash'] not in updated:
                 to_update.add(current['hash'])
                 for hash_ in current['parents']:
                     if hash_ not in to_update:
@@ -458,8 +459,13 @@ def get_versions_from_vcs(env):
     # we only go through the history
     # if version extractor is available for this repository
     extract_version = choose_version_extractor(path)
+
     if extract_version is not None:
         write_vcs_versions_fast(commits, extract_version)
+    else:
+        # if we only use information from tags,
+        # we need to fill gaps between tags
+        _normalize_version_numbers2(commits)
 
     # now we'll check if some version information was
     # extracted
