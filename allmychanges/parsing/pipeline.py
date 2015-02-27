@@ -13,6 +13,7 @@ from functools import wraps
 from itertools import takewhile
 from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
+from django.utils.encoding import force_text
 
 from allmychanges.crawler import _extract_version, _extract_date
 from allmychanges.utils import strip_long_text
@@ -90,7 +91,9 @@ def get_files(env, walk=os.walk):
         return False, None
 
     for root, dirs, files in walk(env.dirname):
+        root = force_text(root)
         for filename in files:
+            filename = force_text(filename)
             full_filename = os.path.join(root, filename)
             rel_filename = os.path.relpath(full_filename, env.dirname)
 
