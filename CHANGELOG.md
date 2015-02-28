@@ -1,3 +1,17 @@
+0.18.1 (2015-02-28)
+===================
+
+* Source guesser was optimized to extract urls not only from
+  html attributes but also from many other weird places.
+  And, now it sorts results so that better matching come first.
+* Also, guesser for python was slightly improved and now is
+  able to find right repository urls for packages like django-extensions.
+* Fixed issue with Django's 1.7.6 version which
+  was parsed as released, but actually is "under development".
+* Fixed error with unicode filenames in repository.
+* URL validator was fixed to accept urls like `git@github...`
+  and `hg+http://bitbucket...`.
+
 0.18.0 (2015-02-08)
 ===================
 
