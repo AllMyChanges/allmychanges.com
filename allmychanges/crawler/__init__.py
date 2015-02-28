@@ -176,130 +176,143 @@ def _parse_item(line):
     *) Damn you, Nginx!
 
     returns tuple (True, 3, 'Blah minor')
+
+    For item like:
+
+        Blah minor
+
+    returns  tuple (False, 4, 'Blah minor')
     for others - (False, 0, None)
     """
+    # for items
     match = re.search(r'^[ ]*[*-]\)?[ ]+', line)
     if match is not None:
         ident = len(match.group(0))
         return (True, ident, line[ident:])
+
+    # for idented lines
+    match = re.search(r'^[ \t]+', line)
+    if match is not None:
+        ident = len(match.group(0))
+        return (False, ident, line[ident:])
     return (False, 0, None)
 
 
-def _starts_with_ident(line, ident):
-    """Returns true, if line starts with given number of spaces."""
-    if ident <= 0:
-        return False
-    match = re.search(r'^[ ]{%s}[^ ]' % ident, line)
-    return match is not None
+# def _starts_with_ident(line, ident):
+#     """Returns true, if line starts with given number of spaces."""
+#     if ident <= 0:
+#         return False
+#     match = re.search(r'^[ ]{%s}[^ ]' % ident, line)
+#     return match is not None
 
 
-def parse_changelog(text):
-    changelog = []
-    current_version = None
-    # here we'll track each line distance from corresponding
-    # line with version number
-    line_in_current_version = None
-    current_section = None
-    current_item = None
-    current_ident = None
+# def parse_changelog(text):
+#     changelog = []
+#     current_version = None
+#     # here we'll track each line distance from corresponding
+#     # line with version number
+#     line_in_current_version = None
+#     current_section = None
+#     current_item = None
+#     current_ident = None
 
-    if '<html' in text and \
-       '<body' in text:
-        text = html2text(text)
+#     if '<html' in text and \
+#        '<body' in text:
+#         text = html2text(text)
 
-    lines = text.split('\n')
+#     lines = text.split('\n')
 
-    for line in lines:
-        # skip lines like
-        # ===================
-        if line and line == line[0] * len(line):
-            continue
+#     for line in lines:
+#         # skip lines like
+#         # ===================
+#         if line and line == line[0] * len(line):
+#             continue
 
-        if line_in_current_version is not None:
-            line_in_current_version += 1
+#         if line_in_current_version is not None:
+#             line_in_current_version += 1
 
-        is_item, ident, text = _parse_item(line)
-        if is_item and current_section:
-            # wow, a new changelog item was found!
-            current_item = [text]
-            current_ident = ident
-            current_section['items'].append(current_item)
-        else:
-            version = _extract_version(line)
-            v_date = _extract_date(line.replace(version, '') if version else line)
-            if version is not None:
-                # we found a possible version number, lets
-                # start collecting the changes!
-                current_version = dict(version=version, sections=[])
-                line_in_current_version = 1
-                current_section = None
-                current_item = None
-                current_ident = None
+#         is_item, ident, text = _parse_item(line)
+#         if is_item and current_section:
+#             # wow, a new changelog item was found!
+#             current_item = [text]
+#             current_ident = ident
+#             current_section['items'].append(current_item)
+#         else:
+#             version = _extract_version(line)
+#             v_date = _extract_date(line.replace(version, '') if version else line)
+#             if version is not None:
+#                 # we found a possible version number, lets
+#                 # start collecting the changes!
+#                 current_version = dict(version=version, sections=[])
+#                 line_in_current_version = 1
+#                 current_section = None
+#                 current_item = None
+#                 current_ident = None
 
-                changelog.append(current_version)
+#                 changelog.append(current_version)
 
-            elif _starts_with_ident(line, current_ident) and current_item:
-                # previous changelog item has continuation on the
-                # next line
-                current_item.append(line[current_ident:])
-            else:
-                # if this is not item, then this is a note
-                if current_version is not None:
+#             elif _starts_with_ident(line, current_ident) and current_item:
+#                 # previous changelog item has continuation on the
+#                 # next line
+#                 current_item.append(line[current_ident:])
+#             else:
+#                 # if this is not item, then this is a note
+#                 if current_version is not None:
 
-                    if not current_section or current_section['items']:
-                        # if there is items in the current section
-                        # and we found another plaintext part,
-                        # then start another section
-                        current_section = dict(notes=[line], items=[])
-                        current_version['sections'].append(current_section)
-                    else:
-                        # otherwise, continue note of the curent
-                        # section
-                        current_section['notes'].append(line)
+#                     if not current_section or current_section['items']:
+#                         # if there is items in the current section
+#                         # and we found another plaintext part,
+#                         # then start another section
+#                         current_section = dict(notes=[line], items=[])
+#                         current_version['sections'].append(current_section)
+#                     else:
+#                         # otherwise, continue note of the curent
+#                         # section
+#                         current_section['notes'].append(line)
 
-            if current_version:
-                if line_in_current_version < 3 and 'unreleased' in line.lower():
-                    current_version['unreleased'] = True
+#             if current_version:
+#                 if line_in_current_version < 3 and 'unreleased' in line.lower():
+#                     current_version['unreleased'] = True
 
-                if v_date and current_version.get('date') is None:
-                    current_version['date'] = v_date
+#                 if v_date and current_version.get('date') is None:
+#                     current_version['date'] = v_date
 
-    # usually versions go from most recent to
-    # older, but we should return them in chronological
-    # order
-    changelog.reverse()
-    return _finalize_changelog(changelog)
+#     # usually versions go from most recent to
+#     # older, but we should return them in chronological
+#     # order
+#     changelog.reverse()
+#     return _finalize_changelog(changelog)
 
 
-def _finalize_changelog(changelog):
-    """A helper to squash notes and items."""
-    dct_versions = dict()
-    result = list()
+# def _finalize_changelog(changelog):
+#     """A helper to squash notes and items."""
+#     dct_versions = dict()
+#     result = list()
 
-    # either add a space at the end, nor replace with
-    # \n if empty
-    process_note_line = lambda text: text + ' ' if text else '\n'
+#     # either add a space at the end, nor replace with
+#     # \n if empty
+#     process_note_line = lambda text: text + ' ' if text else '\n'
 
-    for version in changelog:
-        # squash texts
-        for section in version['sections']:
-            section['items'] = [
-                ' '.join(item).strip()
-                for item in section['items']]
-            section['notes'] = ''.join(
-                process_note_line(note)
-                for note in section['notes']).strip()
+#     for version in changelog:
+#         # squash texts
+#         for section in version['sections']:
+#             section['items'] = [
+#                 ' '.join(item).strip()
+#                 for item in section['items']]
+#             section['notes'] = ''.join(
+#                 process_note_line(note)
+#                 for note in section['notes']).strip()
 
-        # remove empty sections
-        version['sections'] = [section for section in version['sections']
-                               if section['notes'] or section['items']]
+#         # remove empty sections
+#         version['sections'] = [section for section in version['sections']
+#                                if section['notes'] or section['items']]
 
-        version_data = dct_versions.get(version['version'])
-        if version_data:
-            # add current params to already existed
-            version_data['sections'].extend(version['sections'])
-        else:
-            dct_versions[version['version']] = version
-            result.append(version)
+#         version_data = dct_versions.get(version['version'])
+#         if version_data:
+#             # add current params to already existed
+#             version_data['sections'].extend(version['sections'])
+#         else:
+#             dct_versions[version['version']] = version
+#             result.append(version)
 
-    return result
+#     return result

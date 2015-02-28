@@ -183,8 +183,9 @@ def parse_markdown_file(obj):
 
 
 def parse_plain_file(obj):
-    from allmychanges.crawler import _parse_item, _starts_with_ident
+    from allmychanges.crawler import _parse_item
     current_title = None
+    current_title_ident = 0
     # here we'll track each line distance from corresponding
     # line with version number
     current_sections = []
@@ -207,7 +208,17 @@ def parse_plain_file(obj):
             continue
 
         is_item, ident, text = _parse_item(line)
+
+        # ищем версию только
+        # если строка не элемент списка и сам
+        # список внутри потенциальной версии
+        # (is_item или ident) указывают на то,
+        # что строка является либо началом, либо следующей
+        # строкой элемента списка, как в nodejs 0.1.4
         version = _extract_version(line)
+        if current_title:
+            if ident and ident > current_title_ident:
+                version = None
 
         # we have to check if item is not version
         # because of python-redis changelog format
@@ -234,14 +245,15 @@ def parse_plain_file(obj):
                                    content=format_content(current_sections))
 
                 current_title = line
+                current_title_ident = ident
                 current_section = None
                 current_sections = []
                 current_ident = None
 
-            elif _starts_with_ident(line, current_ident) and isinstance(current_section, list):
+            elif ident >= current_ident and isinstance(current_section, list):
                 # previous changelog item has continuation on the
                 # next line
-                current_section[-1] += '\n' + line[current_ident:]
+                current_section[-1] += '<br/>' + line[current_ident:]
             else:
                 # if this is not item, then this is a note
                 if current_title:

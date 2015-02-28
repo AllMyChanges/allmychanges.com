@@ -193,7 +193,7 @@ def test_extract_version():
 
 def test_parse_item():
     eq_((False, 0, None), _parse_item('Blah minor'))
-    eq_((False, 0, None), _parse_item('  Blah minor'))
+    eq_((False, 2, 'Blah minor'), _parse_item('  Blah minor'))
     eq_((True, 2, 'Blah minor'), _parse_item('- Blah minor'))
     eq_((True, 3, 'Blah minor'), _parse_item(' - Blah minor'))
     eq_((True, 5, 'Blah minor'), _parse_item('  -  Blah minor'))

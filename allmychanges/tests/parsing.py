@@ -4,15 +4,15 @@ import datetime
 from nose.tools import eq_ as orig_eq_
 from allmychanges.utils import first
 from allmychanges.parsing.pipeline import (
-    create_section,
     get_markup,
     extract_metadata,
     group_by_path,
     strip_outer_tag,
     prerender_items,
     highlight_keywords,
+    parse_plain_file,
+    parse_markdown_file,
     parse_file)
-from allmychanges.parsing.raw import RawChangelog
 from allmychanges.env import Environment
 
 
@@ -22,25 +22,16 @@ def eq_(left, right):
 
     if isinstance(right, types.GeneratorType):
         right = list(right)
-    orig_eq_(left, right)
+    orig_eq_(left, right, '\n{0}\n!=\n{1}'.format(repr(left), repr(right)))
 
 
-class TestRawChangelog(RawChangelog):
-    def __init__(self, fixture):
-        self.fixture = fixture
-
-    def get_chunks(self):
-        for item in self.fixture:
-            yield self.create_chunk(title=item['filename'],
-                                    content=item['content'])
-
+env = Environment()
+create_file = lambda filename, content: env.push(type='file_content',
+                                                 filename=filename,
+                                                 content=content)
 
 
 def test_parsing_files():
-    env = Environment()
-    create_file = lambda filename, content: env.push(type='file_content',
-                                                     filename=filename,
-                                                     content=content)
     files = [
         create_file('release-notes/0.1.0.md',
 """
@@ -349,14 +340,8 @@ def test_strip_outer_tag():
         strip_outer_tag('<!--Comment-->Blah'))
 
 
-
 def test_parse_plain_text():
-    env = Environment()
-    create_file = lambda filename, content: env.push(type='file_content',
-                                                     filename=filename,
-                                                     content=content)
-    file = create_file('Changes',
-"""
+    _test_plain_parser(u"""
 0.1:
 
  * Initial release
@@ -365,49 +350,74 @@ def test_parse_plain_text():
 
  * Added benchmarking script
  * Added support for more
-   serializer modules""")
-
-    versions = list(parse_file(file))
-    eq_(2, len(versions))
-    v1, v2 = versions
-
-    eq_('0.1:', v1.title)
-    eq_('0.1.1', v2.title)
-
-    eq_('<ul><li>Initial release</li></ul>',
-        v1.content)
-
-    eq_('<ul><li>Added benchmarking script</li>'
-        '<li>Added support for more\nserializer modules</li></ul>',
-        v2.content)
+   serializer modules""", [
+       u'<ul><li>Initial release</li></ul>',
+       (u'<ul><li>Added benchmarking script</li>'
+        u'<li>Added support for more<br/>serializer modules</li></ul>')
+    ])
 
 
 def test_parse_redispy_style_plain_text():
-    env = Environment()
-    create_file = lambda filename, content: env.push(type='file_content',
-                                                     filename=filename,
-                                                     content=content)
-    file = create_file('Changes',
-"""* 2.10.2
+    _test_plain_parser(u"""
+* 2.10.2
     * Added support for Hiredis's new bytearray support. Thanks
       https://github.com/tzickel
     * Fixed a bug when attempting to send large values to Redis in a Pipeline.
 * 2.10.1
     * Fixed a bug where Sentinel connections to a server that's no longer a
       master and receives a READONLY error will disconnect and reconnect to
-      the master.""")
+      the master.""", [
+          (u'<ul><li>Added support for Hiredis\'s new bytearray support. Thanks<br/>https://github.com/tzickel</li>'
+           '<li>Fixed a bug when attempting to send large values to Redis in a Pipeline.</li></ul>'),
+          (u'<ul><li>Fixed a bug where Sentinel connections to a server that\'s no longer a<br/>master and receives a READONLY error will disconnect and reconnect to<br/>the master.</li></ul>')])
 
-    versions = list(parse_file(file))
 
-    eq_(2, len(versions))
-    v1, v2 = versions
+def test_plaintext_parser_ignores_nested_versions():
+    # this is a snippet from Node's changelog
+    # https://raw.githubusercontent.com/joyent/node/master/ChangeLog
+    file = create_file('Changes',
+"""
+2015.02.06, Version 0.12.0 (Stable)
 
-    eq_('* 2.10.2', v1.title)
-    eq_('* 2.10.1', v2.title)
+* npm: Upgrade to 2.5.1
 
-    eq_('<ul><li>Added support for Hiredis\'s new bytearray support. Thanks\nhttps://github.com/tzickel</li>'
-        '<li>Fixed a bug when attempting to send large values to Redis in a Pipeline.</li></ul>',
-        v1.content)
+* mdb_v8: update for v0.12 (Dave Pacheco)
+""")
 
-    eq_('<ul><li>Fixed a bug where Sentinel connections to a server that\'s no longer a\nmaster and receives a READONLY error will disconnect and reconnect to\nthe master.</li></ul>',
-        v2.content)
+    versions = list(parse_plain_file(file))
+    eq_(1, len(versions))
+    v = versions[0]
+
+    eq_('2015.02.06, Version 0.12.0 (Stable)', v.title)
+    eq_('<ul><li>npm: Upgrade to 2.5.1</li></ul>\n<ul><li>mdb_v8: update for v0.12 (Dave Pacheco)</li></ul>',
+        v.content)
+
+
+def _test_parser(parser, given, expected):
+    file = create_file('Changes', given)
+
+    versions = list(parser(file))
+    expected = [expected] if isinstance(expected, basestring) else expected
+    assert len(versions) >= len(expected)
+
+    for v, ex_v in zip(versions, expected):
+        eq_(ex_v.strip(), v.content.strip())
+    eq_(len(versions), len(expected))
+
+_test_plain_parser = lambda *args: _test_parser(parse_plain_file, *args)
+_test_md_parser = lambda *args: _test_parser(parse_markdown_file, *args)
+
+
+def test_nodejs_parsing():
+    _test_plain_parser(u"""
+2009.08.13, Version 0.1.4, 0f888ed6de153f68c17005211d7e0f960a5e34f3
+
+      * Major refactor to evcom.
+
+      * Upgrade v8 to 1.3.4
+        Upgrade libev to 3.8
+        Upgrade http_parser to v0.2
+""", u"""
+<ul><li>Major refactor to evcom.</li></ul>
+<ul><li>Upgrade v8 to 1.3.4<br/>Upgrade libev to 3.8<br/>Upgrade http_parser to v0.2</li></ul>
+""")
