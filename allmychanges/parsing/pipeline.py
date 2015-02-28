@@ -10,7 +10,7 @@ import lxml.html
 from operator import itemgetter
 from collections import defaultdict
 from functools import wraps
-from itertools import takewhile
+from itertools import takewhile, islice
 from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
 from django.utils.encoding import force_text
@@ -524,18 +524,24 @@ def extract_metadata(version):
         for keyword in keywords:
             if keyword in lowered:
                 return True
+
         return False
 
-    first_lines = version.content.split(u'\n', 3)[:3]
+    first_lines = (line for line in version.content.split(u'\n', 10))
+    first_lines = (line[:200] for line in first_lines)
+    first_lines = (line.strip() for line in first_lines)
+    first_lines = (line for line in first_lines if line)
+    first_lines = list(islice(first_lines, 0, 3))
+
     first_lines.insert(0, version.title)
 
     new_version = version.push(type='prerender_items')
     for line in first_lines:
-        date = _extract_date(line[:200])
+        date = _extract_date(line)
         if date:
             new_version.date = date
             break
-        if mention_unreleased(line[:200]):
+        if mention_unreleased(line):
             new_version.unreleased = True
             break
     yield new_version

@@ -11,7 +11,7 @@ def print_version(version, full=False):
     print u'{version} ({filename}, {date}, unreleased={unreleased})'.format(
         version=version.version,
         filename=version.filename,
-        unreleased=getattr(version, 'unreleased', False),
+        unreleased=getattr(version, 'unreleased', 'not known'),
         date=getattr(version, 'date', None)).encode('utf-8')
 
     if full:
