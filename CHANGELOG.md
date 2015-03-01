@@ -1,3 +1,12 @@
+0.18.2 (2015-03-01)
+===================
+
+* Plain text parser was fixed that way so now
+  it is able to parse [nodejs][]'s changelog correctly.
+  By the way, if you are interested in server-side
+  javascript, then you could also track [io.js][]'s
+  changelog too.
+
 0.18.1 (2015-02-28)
 ===================
 
@@ -601,3 +610,5 @@ There are plenty directions for approvement. Stay tuned.
 [Go]: http://allmychanges.com/p/golang/go/
 [amch]: https://github.com/svetlyak40wt/allmychanges
 [SleekXMPP]: http://allmychanges.com/p/python/sleekxmpp/
+[nodejs]: http://allmychanges.com/p/node/nodejs/
+[iojs]: http://allmychanges.com/p/javascript/iojs/
