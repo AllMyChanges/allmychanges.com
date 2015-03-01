@@ -2,8 +2,8 @@ from datetime import date
 from nose.tools import eq_
 
 from allmychanges.crawler import (
-    _filter_changelog_files, parse_changelog,
-    _extract_version, _starts_with_ident, _parse_item,
+    _filter_changelog_files,
+    _extract_version, _parse_item,
     _extract_date)
 from allmychanges.utils import get_markup_type, get_change_type
 from allmychanges.downloader import normalize_url
@@ -42,125 +42,6 @@ def test_changelog_finder():
           './README.rst',
     ]
     eq_(out, list(_filter_changelog_files(in_)))
-
-
-def test_flask_parser():
-    input = """
-Flask Changelog
-===============
-
-Here you can see the full list of changes between each Flask release.
-
-Version 1.0 (23-12-2013)
------------
-
-(release date to be announced, codename to be selected)
-
-- Added ``SESSION_REFRESH_EACH_REQUEST`` config key that controls the
-  set-cookie behavior.  If set to `True` a permanent session will be
-  refreshed each request and get their lifetime extended, if set to
-  `False` it will only be modified if the session actually modifies.
-  Non permanent sessions are not affected by this and will always
-  expire if the browser window closes.
-
-Version 0.10.2
---------------
-
-(bugfix release, release date to be announced)
-
-- Fixed broken `test_appcontext_signals()` test case.
-- Raise an :exc:`AttributeError` in :func:`flask.helpers.find_package` with a
-  useful message explaining why it is raised when a PEP 302 import hook is used
-  without an `is_package()` method.
-
-Version 0.7.1
--------------
-
-Bugfix release, released on June 29th 2011
-
-- Added missing future import that broke 2.5 compatibility.
-- Fixed an infinite redirect issue with blueprints.
-"""
-    parsed = parse_changelog(input)
-    eq_(3, len(parsed))
-    eq_('1.0', parsed[2]['version'])
-    eq_(date(2013, 12, 23), parsed[2]['date'])
-    eq_('0.10.2', parsed[1]['version'])
-    eq_('0.7.1', parsed[0]['version'])
-
-    eq_(1, len(parsed[2]['sections']))
-    eq_('(release date to be announced, codename to be selected)',
-        parsed[2]['sections'][0]['notes'])
-
-    eq_(1, len(parsed[2]['sections'][0]['items']))
-    eq_(('Added ``SESSION_REFRESH_EACH_REQUEST`` config key that controls the '
-         'set-cookie behavior.  If set to `True` a permanent session will be '
-         'refreshed each request and get their lifetime extended, if set to '
-         '`False` it will only be modified if the session actually modifies. '
-         'Non permanent sessions are not affected by this and will always '
-         'expire if the browser window closes.'),
-        parsed[2]['sections'][0]['items'][0])
-
-
-def test_preserve_newlines_in_long_notes():
-    input = """
-1.0
------------
-
-Some note with few paragraphs.
-Each paragraph should be separated with empty line.
-
-Like that.
-"""
-    parsed = parse_changelog(input)
-    eq_("""Some note with few paragraphs. Each paragraph should be separated with empty line. \nLike that.""", parsed[0]['sections'][0]['notes'])
-
-
-def test_use_date_even_from_next_string():
-    input = """
-Version 1.1
------------
-
-(bugfix release, released on May 23rd 2014)
-
-- fixed a bug that caused text files on Python 2 to not accept
-  native strings.
-
-Version 1.0
------------
-
-(no codename, released on May 21st 2014)
-
-- Initial release.
-"""
-    parsed = parse_changelog(input)
-    eq_(2, len(parsed))
-    eq_('1.0', parsed[0]['version'])
-    eq_(date(2014, 5, 21), parsed[0]['date'])
-
-    eq_('1.1', parsed[1]['version'])
-    eq_(date(2014, 5, 23), parsed[1]['date'])
-
-
-def test_detect_unreleased_version_in_version_line():
-    parsed = parse_changelog("""
-1.0 (unreleased)
------------
-
-Some note.
-""")
-    eq_(True, parsed[0].get('unreleased'))
-
-
-def test_detect_unreleased_version_but_not_in_notes():
-    parsed = parse_changelog("""
-Version 1.0
------------
-
-Change in a way how unreleased notes are parsed.
-""")
-    eq_(None, parsed[0].get('unreleased'))
-
 
 
 def test_extract_version():
@@ -262,15 +143,6 @@ def test_extract_date():
 
     # from https://github.com/alex/django-taggit/blob/develop/CHANGELOG.txt
     eq_(date(2014, 8, 10), _extract_date('10.08.2014'))
-
-
-def test_starts_with_ident():
-    eq_(False, _starts_with_ident('Blah', 0))
-    eq_(False, _starts_with_ident('Blah', 1))
-    eq_(False, _starts_with_ident(' Blah', 2))
-    eq_(False, _starts_with_ident('  Blah', 1))
-    eq_(True,  _starts_with_ident('  Blah', 2))
-    eq_(True,  _starts_with_ident(' Blah', 1))
 
 
 def test_url_normalization():
