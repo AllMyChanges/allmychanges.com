@@ -199,15 +199,17 @@ def itunes_downloader(source):
             data = requests.get(url).json()
             results = data.get('results', [])
             if results:
-                text = u"""
-{0[version]}
-==============
+                results = results[0]
+                if 'releaseNotes' in results:
+                    text = u"""
+    {0[version]}
+    ==============
 
-{0[releaseNotes]}
-                """.strip().format(results[0])
-                with cd(path):
-                    with open('ChangeLog', 'w') as f:
-                        f.write(text.encode('utf-8'))
+    {0[releaseNotes]}
+                    """.strip().format(results)
+                    with cd(path):
+                        with open('ChangeLog', 'w') as f:
+                            f.write(text.encode('utf-8'))
 
         except Exception, e:
             if os.path.exists(path):
