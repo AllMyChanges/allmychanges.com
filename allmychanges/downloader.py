@@ -10,6 +10,15 @@ from urlparse import urlsplit
 from .utils import cd
 
 
+def get_itunes_lookup_url(url):
+    """Returns itunes lookup url if applicable, or None.
+    """
+    match = re.search(ur'id(?P<id>\d+)', url)
+    if match is not None:
+        app_id = match.group('id')
+        return 'https://itunes.apple.com/lookup?id={0}&lang=en_us'.format(app_id)
+
+
 def normalize_url(url, for_checkout=True):
     """Normalize url either for browser or for checkout.
     Usually, difference is in the schema.
@@ -44,6 +53,10 @@ def normalize_url(url, for_checkout=True):
         return (bitbucket_template.format(**locals()),
                 username,
                 repo)
+    elif 'itunes' in url:
+        url = get_itunes_lookup_url(url)
+        data = requests.get(url).json()
+        return (data['results'][0]['trackViewUrl'], None, None)
 
     return (url, None, url.rsplit('/')[-1])
 
@@ -173,8 +186,41 @@ def http_downloader(source):
     return path
 
 
+def itunes_downloader(source):
+    """Processes iOS app's changelog from urls like these
+    https://itunes.apple.com/in/app/temple-run/id420009108?mt=8
+    https://itunes.apple.com/en/app/slack-team-communication/id618783545?l=en&mt=8
+    """
+    url = get_itunes_lookup_url(source)
+    if url is not None:
+        path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+
+        try:
+            data = requests.get(url).json()
+            results = data.get('results', [])
+            if results:
+                text = u"""
+{0[version]}
+==============
+
+{0[releaseNotes]}
+                """.strip().format(results[0])
+                with cd(path):
+                    with open('ChangeLog', 'w') as f:
+                        f.write(text.encode('utf-8'))
+
+        except Exception, e:
+            if os.path.exists(path):
+                shutil.rmtree(path)
+            raise RuntimeError('Unexpected exception "{0}" when fetching: {1}'.format(
+                repr(e), url))
+        return path
+
 def guess_downloader(url):
     parts = urlsplit(url)
+
+    if parts.hostname == 'itunes.apple.com':
+        return 'itunes'
 
     if parts.hostname == 'github.com':
         url, username, repo = normalize_url(url)
