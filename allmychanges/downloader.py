@@ -202,10 +202,10 @@ def itunes_downloader(source):
                 results = results[0]
                 if 'releaseNotes' in results:
                     text = u"""
-    {0[version]}
-    ==============
+{0[version]}
+==============
 
-    {0[releaseNotes]}
+{0[releaseNotes]}
                     """.strip().format(results)
                     with cd(path):
                         with open('ChangeLog', 'w') as f:
