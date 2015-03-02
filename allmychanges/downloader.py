@@ -202,7 +202,7 @@ def itunes_downloader(source):
                 results = results[0]
                 version = results['version']
                 notes = results.get('releaseNotes', 'No notes')
-                notes = notes.replace('•', '*') # because of vk.com mothefuckers
+                notes = notes.replace(u'•', u'*') # because of vk.com mothefuckers
                 text = u"""
 {version}
 ==============
