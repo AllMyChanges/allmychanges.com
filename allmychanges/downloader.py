@@ -200,16 +200,19 @@ def itunes_downloader(source):
             results = data.get('results', [])
             if results:
                 results = results[0]
-                if 'releaseNotes' in results:
-                    text = u"""
-{0[version]}
+                version = results['version']
+                notes = results.get('releaseNotes', 'No notes')
+                notes = notes.replace('•', '*') # because of vk.com mothefuckers
+                text = u"""
+{version}
 ==============
 
-{0[releaseNotes]}
-                    """.strip().format(results)
-                    with cd(path):
-                        with open('ChangeLog', 'w') as f:
-                            f.write(text.encode('utf-8'))
+{notes}
+                """.strip().format(version=version,
+                                   notes=notes)
+                with cd(path):
+                    with open('ChangeLog', 'w') as f:
+                        f.write(text.encode('utf-8'))
 
         except Exception, e:
             if os.path.exists(path):
