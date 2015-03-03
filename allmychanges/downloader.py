@@ -237,7 +237,8 @@ def normalize_url(url, for_checkout=True):
         app_id = get_itunes_app_id(url)
         data = get_itunes_app_data(app_id)
         if data:
-            return (data['trackViewUrl'], None, None)
+            # here we add iTunes Affilate token
+            return (data['trackViewUrl'] + '&at=1l3vwNn', None, None)
 
     return (url, None, url.rsplit('/')[-1])
 
