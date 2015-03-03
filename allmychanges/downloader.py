@@ -6,6 +6,7 @@ import os.path
 import shutil
 import envoy
 import requests
+import plistlib
 
 from django.conf import settings
 from urlparse import urlsplit
@@ -183,13 +184,19 @@ def get_itunes_release_notes(app_id, fronts=_try_fronts):
         if response.status_code == 400:
             return get_itunes_release_notes(app_id, fronts=fronts[1:])
 
-        page = response.text
-        data = re.sub(ur'.*its.serverData=(?P<data>.*?)</.*',
-                      ur'\g<data>',
-                      page,
-                      flags=re.DOTALL)
-        data = anyjson.deserialize(data)
-        return data
+        ctype = response.headers.get('content-type', '').split(';')[0].strip()
+        if ctype == 'text/xml':
+            data = plistlib.readPlistFromString(response.text)
+            if data.get('m-allowed') is False:
+                return get_itunes_release_notes(app_id, fronts=fronts[1:])
+        else:
+            page = response.text
+            data = re.sub(ur'.*its.serverData=(?P<data>.*?)</.*',
+                          ur'\g<data>',
+                          page,
+                          flags=re.DOTALL)
+            data = anyjson.deserialize(data)
+            return data
 
 
 def normalize_url(url, for_checkout=True):
