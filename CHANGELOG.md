@@ -1,10 +1,41 @@
+0.19.0 (2015-03-03)
+===================
+
+This release brings an amazing feature.
+Now you can track a changelog of any iOS application!
+
+How to track iOS app's release notes?
+-------------------------------------
+
+It is very very easy. If you didn't find the app
+in our [catalogue][] under `ios` namespace, then
+search it in the AppStore and right click on app's
+icon to open context menu. It could look like that:
+
+![](https://img-fotki.yandex.ru/get/15567/13558447.f/0_b2c7f_9910ce74_M.png)
+
+Or you could open drop down menu inder the apps icon:
+
+![](https://img-fotki.yandex.ru/get/5110/13558447.f/0_b2c7e_55b034ce_L.png)
+
+Select "Copy Link" menu item. Open [AllMyChanges.com](http://allmychanges.com)
+and paste app's url into the search input at the top of the page.
+
+After hitting the "Search" button you will see as service will process release notes
+and show it as usual. And good news are -- it is trackable, and you even don't
+have to install the app on your device!
+
+P.S. -- if you are wondering if only latest Slack's release note was so verbose and nice,
+go and discover their [previous release notes](http://allmychanges.com/p/ios/slack/).
+I wish all app developers were like slack's developers not [like facebook's](http://allmychanges.com/p/ios/facebook/) :)))
+
 0.18.2 (2015-03-01)
 ===================
 
 * Plain text parser was fixed that way so now
   it is able to parse [nodejs][]'s changelog correctly.
   By the way, if you are interested in server-side
-  javascript, then you could also track [io.js][]'s
+  javascript, then you could also track [iojs][]'s
   changelog too.
 
 0.18.1 (2015-02-28)
