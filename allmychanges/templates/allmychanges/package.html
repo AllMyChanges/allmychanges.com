@@ -19,6 +19,12 @@
            data-namespace="{{package.namespace}}"
            data-name="{{package.name}}">Share Badge Should be Here</div>
     </dd>
+    {% if package.show_itunes_badge %}
+    <dt>Install application:</dt>
+    <dd>
+      <a href="{{ package.source }}" target="itunes_store" style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/htmlResources/assets/en_us//images/web/linkmaker/badge_appstore-lrg.png) no-repeat;width:135px;height:40px;@media only screen{background-image:url(https://linkmaker.itunes.apple.com/htmlResources/assets/en_us//images/web/linkmaker/badge_appstore-lrg.svg);}"></a>
+    </dd>
+    {% endif %}
     <dt>Last update was:</dt>
     <dd>{{package.changelog.updated_at|timesince}} ago</dd>
     <dt>Time to next update:</dt>

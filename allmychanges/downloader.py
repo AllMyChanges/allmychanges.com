@@ -233,7 +233,7 @@ def normalize_url(url, for_checkout=True):
         return (bitbucket_template.format(**locals()),
                 username,
                 repo)
-    elif 'itunes' in url:
+    elif 'itunes.apple.com' in url:
         app_id = get_itunes_app_id(url)
         data = get_itunes_app_data(app_id)
         if data:

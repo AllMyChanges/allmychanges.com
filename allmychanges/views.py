@@ -168,16 +168,19 @@ def get_package_data_for_template(changelog,
                              processed_text=version.processed_text,
                              unreleased=version.unreleased))
 
-    return dict(namespace=namespace,
-                name=name,
-                source=changelog.source,
-                changelog=dict(
-                    id=changelog.id,
-                    updated_at=changelog.updated_at,
-                    next_update_at=getattr(changelog, 'next_update_at', None),
-                    problem=changelog.problem,
-                ),
-                versions=versions)
+    result = dict(namespace=namespace,
+                  name=name,
+                  source=changelog.source,
+                  show_itunes_badge='itunes.apple.com' in changelog.source,
+                  changelog=dict(
+                      id=changelog.id,
+                      updated_at=changelog.updated_at,
+                      next_update_at=getattr(changelog, 'next_update_at', None),
+                      problem=changelog.problem,
+
+                  ),
+                  versions=versions)
+    return result
 
 
 def get_digest_for(changelogs,
