@@ -191,6 +191,13 @@ def _parse_item(line):
         Blah minor
 
     returns  tuple (False, 4, 'Blah minor')
+
+    For items like:
+
+        Feature #1155: Log packet payloads in eve alerts
+
+    returns tuple (True, 0, 'Feature #1155: Log packet payloads in eve alerts')
+
     for others - (False, 0, None)
     """
     # for items
@@ -198,6 +205,10 @@ def _parse_item(line):
     if match is not None:
         ident = len(match.group(0))
         return (True, ident, line[ident:])
+
+    match = re.search(r'^\S+(\s\S+){1,2}: .*', line)
+    if match is not None:
+        return (True, 0, line)
 
     # for idented lines
     match = re.search(r'^[ \t]+', line)

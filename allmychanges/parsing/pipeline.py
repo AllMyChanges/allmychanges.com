@@ -15,7 +15,9 @@ from pkg_resources import parse_version
 from rq.timeouts import JobTimeoutException
 from django.utils.encoding import force_text
 
-from allmychanges.crawler import _extract_version, _extract_date
+from allmychanges.crawler import (
+    _extract_version, _extract_date,
+    _parse_item)
 from allmychanges.utils import strip_long_text
 from allmychanges.env import Environment
 from django.conf import settings
@@ -183,7 +185,6 @@ def parse_markdown_file(obj):
 
 
 def parse_plain_file(obj):
-    from allmychanges.crawler import _parse_item
     current_title = None
     current_title_ident = 0
     # here we'll track each line distance from corresponding
@@ -268,7 +269,7 @@ def parse_plain_file(obj):
                         if line:
                             current_section = line
                     else:
-                        current_section += u'\n' + line
+                        current_section += u'<br/>' + line
 
     if current_section:
         current_sections.append(current_section)

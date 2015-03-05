@@ -100,6 +100,12 @@ def test_extract_version():
 
 
 def test_parse_item():
+    eq_((True, 0, 'Feature #1155: Log packet payloads in eve alerts'),
+        _parse_item('Feature #1155: Log packet payloads in eve alerts'))
+
+    eq_((False, 0, None),
+        _parse_item('Some very long feature: doing blah'))
+
     eq_((False, 0, None), _parse_item('Blah minor'))
     eq_((False, 2, 'Blah minor'), _parse_item('  Blah minor'))
     eq_((True, 2, 'Blah minor'), _parse_item('- Blah minor'))
