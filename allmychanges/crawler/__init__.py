@@ -120,7 +120,7 @@ _version_regexes = [
 ]
 
 _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded by brackets
-                                     r'v?(?P<ver>('
+                                     r'(?:v|v\.)?(?P<ver>('
                                      r'\d+(?:\.\d+)+(-[a-z0-9.]+[a-z0-9])?'
                                      r'|\d+\.\d+'
                                      r')'
@@ -159,6 +159,10 @@ def _extract_version(line):
                 # we ignore long lines because probably
                 # they are not headers we are looking for
                 if len(tokens) > 6:
+                    return None
+
+                # also, we ignore versions ending with .x
+                if version.endswith('.x'):
                     return None
 
                 return version

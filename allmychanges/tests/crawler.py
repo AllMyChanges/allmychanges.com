@@ -62,6 +62,13 @@ def test_extract_version():
             eq_(v, _extract_version('2015-03-12 ({0})'.format(v)))
             eq_(v, _extract_version('2015-03-12 (v{0})'.format(v)))
 
+    # dont consider this a version
+    # from https://bitbucket.org/cthedot/cssutils/src/d572ac8df6bd18cad203dea1bbf58867ff0d0ebe/docs/html/_sources/CHANGELOG.txt
+    check(None, '0.3.x')
+
+    # from https://github.com/meteor/meteor/blob/devel/History.md#v1032-2015-feb-25
+    check('1.0.3.2', 'v.1.0.3.2, 2015-Feb-25')
+
     # from https://itunes.apple.com/ru/app/chrome-web-browser-by-google/id535886823?l=en&mt=8
     check('40.0.2214.73')
     check('05.10.2014.73')
