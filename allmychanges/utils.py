@@ -256,3 +256,18 @@ def trace(func):
                 func.__name__, args, kwargs, result)
             return result
     return wrapper
+
+
+def get_text_from_response(response):
+    """Returns text from response, replacing
+    default encoding with utf-8.
+    we need this because when `requests` library
+    unable to discover response encoding from headers,
+    it pretends it is a latin-1, but many text
+    on the internet now is utf-8, like
+    Code's changelog for example:
+    http://panic.com/jp/coda/releasenotes.html
+    """
+    if response.encoding == 'ISO-8859-1':
+        response.encoding = 'utf-8'
+    return response.text

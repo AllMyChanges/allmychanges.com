@@ -10,7 +10,7 @@ import plistlib
 
 from django.conf import settings
 from urlparse import urlsplit
-from .utils import cd
+from .utils import cd, get_text_from_response
 from twiggy_goodies.threading import log
 
 
@@ -186,11 +186,11 @@ def get_itunes_release_notes(app_id, fronts=_try_fronts):
 
         ctype = response.headers.get('content-type', '').split(';')[0].strip()
         if ctype == 'text/xml':
-            data = plistlib.readPlistFromString(response.text)
+            data = plistlib.readPlistFromString(get_text_from_response(response))
             if data.get('m-allowed') is False:
                 return get_itunes_release_notes(app_id, fronts=fronts[1:])
         else:
-            page = response.text
+            page = get_text_from_response(response)
             data = re.sub(ur'.*its.serverData=(?P<data>.*?)</.*',
                           ur'\g<data>',
                           page,
@@ -358,7 +358,7 @@ def http_downloader(source):
         with cd(path):
             response = requests.get(url)
             with open('ChangeLog', 'w') as f:
-                f.write(response.text.encode('utf-8'))
+                f.write(get_text_from_response(response).encode('utf-8'))
 
     except Exception, e:
         if os.path.exists(path):
