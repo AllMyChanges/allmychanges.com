@@ -45,31 +45,58 @@ def test_changelog_finder():
 
 
 def test_extract_version():
-    # from https://github.com/ansible/ansible/blob/devel/CHANGELOG.md
-    eq_('1.6.8', _extract_version('1.6.8 "And the Cradle Will Rock" - Jul 22, 2014'))
+    def check(v, text=None):
+        if text:
+            eq_(v, _extract_version(text))
+        else:
+            eq_(v, _extract_version(v))
+            eq_(v, _extract_version('v' + v))
+            check(v, '{0} (2013-09-24)'.format(v))
+            check(v, '{0} (2013.09.24)'.format(v))
+            check(v, '**{0} (2014-05-16)**'.format(v))
+            check(v, '**{0} (2014.05.16)**'.format(v))
+            eq_(v, _extract_version('New version {0}'.format(v)))
+            eq_(v, _extract_version('New version v{0}'.format(v)))
+            eq_(v, _extract_version('2015-03-12 {0}'.format(v)))
+            eq_(v, _extract_version('2015-03-12 v{0}'.format(v)))
+            eq_(v, _extract_version('2015-03-12 ({0})'.format(v)))
+            eq_(v, _extract_version('2015-03-12 (v{0})'.format(v)))
 
-    eq_('0.2.1', _extract_version('2014-09-11 v0.2.1'))
+    # from https://itunes.apple.com/ru/app/chrome-web-browser-by-google/id535886823?l=en&mt=8
+    check('40.0.2214.73')
+    check('05.10.2014.73')
+    check('3.05.10.2014')
+    # # from https://github.com/inliniac/suricata/blob/master/ChangeLog
+    check('2.0.1rc1')
+    check('2.0beta2')
+
+    # from https://github.com/textmate/textmate/blob/master/Applications/TextMate/about/Changes.md
+    check('2.0-beta.6.7', '2015-01-19 (v2.0-beta.6.7)')
+
+    # # from https://github.com/ansible/ansible/blob/devel/CHANGELOG.md
+    check('1.6.8', '1.6.8 "And the Cradle Will Rock" - Jul 22, 2014')
+
+    check('0.2.1')
     # this horror is from the https://github.com/Test-More/TB2/blob/master/Changes
-    eq_('1.005000_003', _extract_version('1.005000_003'))
-    eq_('1.005000_003', _extract_version('1.005000_003 Thu Mar 22 17:48:08 GMT 2012'))
+    check('1.005000_003')
+    check('1.005000_003', '1.005000_003 Thu Mar 22 17:48:08 GMT 2012')
 
-    eq_('3.0.0-pre', _extract_version('v3.0.0-pre (wip)'))
-    eq_('1.0.12', _extract_version('v1.0.12'))
-    eq_('2.0.0-beta.1', _extract_version('2.0.0-beta.1'))
-    eq_('2.0.0-beta.1', _extract_version('v2.0.0-beta.1'))
+    check('3.0.0-pre', 'v3.0.0-pre (wip)')
+    check('1.0.12')
+    check('2.0.0-beta.1')
 
-    eq_(None, _extract_version('Just a text with some 1 33 nubers'))
-    eq_('1.0', _extract_version('Version 1.0'))
-    eq_('0.10.2', _extract_version('Version 0.10.2'))
-    eq_('2.0.0', _extract_version('2.0.0 (2013-09-24)'))
-    eq_('1.5.6', _extract_version('**1.5.6 (2014-05-16)**'))
-    eq_('0.1.1', _extract_version('release-notes/0.1.1.md'))
-    eq_('1.3', _extract_version('doc/go1.3.html'))
-    eq_(None, _extract_version('  some number in the item\'s text 0.1'))
-    eq_(None, _extract_version('This is the first version compatible with Django 1.7.'))
-    eq_(None, _extract_version('SWIG 3.0 required for programs that use SWIG'))
-    eq_(None, _extract_version('HTTP/1.1 302 Found'))
-    eq_(None, _extract_version('<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>'))
+    check(None, 'Just a text with some 1 33 nubers')
+    check('1.0')
+    check('0.10.2')
+    check('2.0.0')
+    check('1.5.6')
+    check('0.1.1', 'release-notes/0.1.1.md')
+    check('1.3', 'doc/go1.3.html')
+    check(None, '  some number in the item\'s text 0.1')
+    check(None, 'This is the first version compatible with Django 1.7.')
+    check(None, 'SWIG 3.0 required for programs that use SWIG')
+    check(None, 'HTTP/1.1 302 Found')
+    check(None, '<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>')
 
 
 def test_parse_item():

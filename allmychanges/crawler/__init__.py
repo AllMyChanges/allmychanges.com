@@ -1,3 +1,4 @@
+# coding: utf-8
 import os
 import re
 from dateutil.parser import parse as date_parser
@@ -17,30 +18,37 @@ _months = _months \
           + tuple(name[:3] for name in _months) \
           + tuple(abbr_month(name) for name in _months)
 
-RE_DATE_STR = r"""(?P<date>(
+# вот эти штуки (?:[^.0-9]|$) в начале и конце,
+# нужны, чтобы мы не пытались искать даты в составе номеров версий
+RE_DATE_STR = r"""(?:[^.0-9]|^)(?P<date>(
               # 2009-05-23, 2009.05.23, 2009/05/23 but not 2009.05-23
-              \d{4}(?P<delimiter1>[./-])\d{1,2}(?P=delimiter1)\d{1,2} |
+              \num_year(?P<delimiter1>[./-])\d{1,2}(?P=delimiter1)\d{1,2} |
 
               # 05/23/2009
-              \d{1,2}(?P<delimiter3>[./-])\d{1,2}(?P=delimiter3)\d{4} |
+              \d{1,2}(?P<delimiter3>[./-])\d{1,2}(?P=delimiter3)\num_year |
 
               # 05-23-2009 or 05.23.2009 but not 05.23-2009
-              \d{1,2}(?P<delimiter2>[.-])\d{1,2}(?P=delimiter2)\d{4} |
+              \d{1,2}(?P<delimiter2>[.-])\d{1,2}(?P=delimiter2)\num_year |
 
               # 24 Apr 2014
               # 6th December 2013
-              \d{1,2}(rd|st|rd|th|nd)?\ \month\ \d{4} |
+              \d{1,2}(rd|st|rd|th|nd)?\ \month\ \num_year |
 
 
               # May 23rd 2014
               # April 28, 2014
               # Apr 01, 2013
               # Aug. 17, 2012
-              \month[ ]+\d{1,2}(rd|st|rd|th)?,?\ \d{4} |
+              \month[ ]+\d{1,2}(rd|st|rd|th)?,?\ \num_year |
 
               # Fri Aug  8 19:12:51 PDT 2014
-              [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \d{4}
-              ))""".replace('\month', '({0})'.format('|'.join(_months)))
+              [A-Z][a-z]{2}\ [A-Z][a-z]{2}\ +\d{1,2}\ \d{2}:\d{2}:\d{2}\ [A-Z]{3}\ \num_year
+              ))(?:[^.0-9]|$)""".replace(
+                  r'\month',
+                  r'({0})'.format('|'.join(_months))) \
+                  .replace(
+                      r'\num_year',
+                      r'(?:(?:19|20)\d{2})')
 
 RE_DATE = re.compile(RE_DATE_STR, re.VERBOSE)
 
@@ -111,11 +119,12 @@ _version_regexes = [
     r'[/a-zA-Z-]{ver}\.[^\d]',
 ]
 
-_version_regexes = [item.format(ver=(r'v?(?P<ver>('
-                                     r'\d+\.\d+\.\d+(-[a-z0-9.]+[a-z0-9])?'
+_version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded by brackets
+                                     r'v?(?P<ver>('
+                                     r'\d+(?:\.\d+)+(-[a-z0-9.]+[a-z0-9])?'
                                      r'|\d+\.\d+'
                                      r')'
-                                     r'(-[a-z0-9.]+[a-z0-9])?' # possbile -something123 like suffix
+                                     r'(-?[a-z0-9.]+[a-z0-9])?' # rc1, beta2 or maybe -something123 like suffix
                                      r'(_\d+)?'                # or _12343 suffix like in the damn https://github.com/Test-More/TB2/blob/master/Changes
                                      r')'))
                     for item in _version_regexes]
