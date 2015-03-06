@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='allmychanges',
-    version='0.19.0',
+    version='0.19.1',
     description='A djangodash project.',
     author='Alexander Artemenko',
     author_email='svetlyak.40wt@gmail.com',

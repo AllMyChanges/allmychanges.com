@@ -1,3 +1,19 @@
+0.19.1 (2015-03-05)
+===================
+
+* Fix version parsing so that versions like `2.0-beta.6.7`,
+`40.0.2214.73`, `v.1.0.3.2` and `2.0.1rc1` now parsed correctly. This made
+possible to add new release notes of [Textmate](http://allmychanges.com/p/soft/textmate/),
+[Chrome for iOS](http://allmychanges.com/p/ios/chrome/) and [suricata](http://allmychanges.com/p/security/suricata/).
+* Nicer formatting for lines like:
+
+        Bug #1184: pfring: cppcheck warnings
+        Feature #1309: Lua support for Stats output
+
+  parsed by plaintext parser.
+* Also, plaintext parser now used `<br>` for textwrapping within paragraphs.
+* Now we use `utf-8` as default encoding for files downloaded using `requests`. This fixes issues with unicode when server don't return encoding in the http headers.
+
 0.19.0 (2015-03-03)
 ===================
 
