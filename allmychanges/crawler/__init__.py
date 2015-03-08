@@ -168,7 +168,8 @@ def _extract_version(line):
                     return None
 
                 # also, we ignore versions ending with .x
-                if version.endswith('.x'):
+                if version.endswith('.x') \
+                   or 'since' in line.lower():
                     return None
 
                 return version

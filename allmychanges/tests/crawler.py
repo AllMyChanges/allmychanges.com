@@ -62,6 +62,9 @@ def test_extract_version():
             eq_(v, _extract_version('2015-03-12 ({0})'.format(v)))
             eq_(v, _extract_version('2015-03-12 (v{0})'.format(v)))
 
+    # https://github.com/git/git/blob/master/Documentation/RelNotes/2.3.2.txt
+    check(None, u'Fixes since v2.3.1')
+
     # this should work because we'll remove stop-words
     # like "release notes" and "for"
     check('3.0', u'Release Notes for MongoDB 3.0')
