@@ -175,9 +175,6 @@ def parse_file(env):
         versions = parser(env)
         for version in versions:
             yield version
-
-
-
 def parse_markdown_file(obj):
     import markdown2
     html = markdown2.markdown(obj.content)
@@ -429,35 +426,70 @@ def parse_html_file(obj):
     def create_full_content(children):
         """Just serialize all childrens and join result."""
         strings = map(lxml.html.tostring, children)
-        return u''.join(strings)
+        return u''.join(strings).strip()
 
 
-    headers = [(header.tag, header.text_content(), header.itersiblings())
-               for header in headers]
+    def header_level(element):
+        depth = 0
+        el = element
+        while el is not None:
+            el = el.getparent()
+            depth += 1
 
-    def is_header_tag(ch):
-        if isinstance(ch.tag, basestring):
-            return not ch.tag.startswith('h') or ch.tag > tag
+        default_h_level = 1000
+        h_levels = {
+            'body': 0,
+            'h1': 1, 'h2': 2,
+            'h3': 3, 'h4': 4,
+            'h5': 5, 'h6': 6}
+        h_level = h_levels.get(
+            element.tag,
+            default_h_level)
 
-    def process_header(parent, tag, text, all_children):
+        return depth, h_level
+
+    headers = [(header_level(el),
+                el,
+                el.text_content().strip(),
+                el.itersiblings())
+               for el in headers]
+    body = parsed.find('body')
+    headers.insert(0, (header_level(body),
+                       body,
+                       obj.filename,
+                       body.iterchildren()))
+
+    def process_header(parent, level, elem, title, all_children):
+        def not_same_level_H(ch):
+            if isinstance(ch.tag, basestring):
+                return not ch.tag.lower().startswith('h') \
+                    or header_level(ch) > level
+
         children = list(takewhile(
-            is_header_tag,
+            not_same_level_H,
             all_children))
 
         full_content = create_full_content(children)
         return parent.push(type='file_section',
-                           title=text.strip(),
+                           title=title,
                            content=full_content)
 
-    # use whole document and filename as a section
-    body = parsed.find('body')
-    if body is not None:
-        root = process_header(obj, 'h0', obj.filename, body.iterchildren())
-        yield root
+    stack = [((-1, 1), obj)]
 
-        # and then process all other items
-        for tag, text, all_children in headers:
-            yield process_header(root, tag, text, all_children)
+    for h_level, h_elem, h_title, h_children in headers:
+        # now,remove deeper headers fromtop of the stack
+        while stack[-1][0] >= h_level:
+            stack.pop()
+
+        # if 'Level 2.1' == h_title:
+        #     import pudb; pudb.set_trace()  # DEBUG
+        result_item = process_header(stack[-1][1],
+                                     h_level,
+                                     h_elem,
+                                     h_title,
+                                     h_children)
+        stack.append((h_level, result_item))
+        yield result_item
 
 
 def create_file(name, content):

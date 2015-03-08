@@ -83,6 +83,37 @@ def test_html_parser():
         sections[3].content)
 
 
+def test_html_parser_makes_hierarchy():
+    env = Environment(filename='Changelog',
+                      content=u"""
+<h1>Level 1.1</h1>
+  <h2>Level 2.1</h2>
+    <h3>Level 3.1</h3>
+    <p>Bottom level description</p>
+  <h2>Level 2.2</h2>
+<h1>Level 1.2</h1>
+""")
+
+    sections = list(parse_html_file(env))
+
+    eq_(6, len(sections))
+    s0, s1, s2, s3, s4, s5 = sections
+
+    eq_('Level 2.1', s2.title)
+    assert 'Level 3.1' in s2.content
+    assert 'Level 2.2' not in s2.content
+
+    assert s0.is_parent_for(s1)
+    assert s1.is_parent_for(s2)
+    assert s0.is_parent_for(s2)
+
+    eq_('Level 3.1', s3.title)
+    eq_('<p>Bottom level description</p>', s3.content)
+    assert s2.is_parent_for(s3)
+    assert s1.is_parent_for(s2)
+    assert s0.is_parent_for(s2)
+
+
 def test_exclude_version_if_it_includes_few_other_versions():
     art = create_user('art')
     changelog = Changelog.objects.create(
@@ -93,6 +124,7 @@ def test_exclude_version_if_it_includes_few_other_versions():
 
     # there shouldn't be 3.1 version because it is just number from a filename
     eq_(0, changelog.versions.filter(number='3.1').count())
+
 
 
 def test_exclude_version_if_it_included_in_the_version_with_same_number_and_bigger_content():
@@ -128,7 +160,7 @@ def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_numbe
     eq_(1, changelog.versions.all().count())
 
     version = changelog.versions.all()[0]
-    eq_(u'<p>Version description.</p>\n', version.raw_text)
+    eq_(u'<p>Version description.</p>', version.raw_text)
 
 
 def test_not_exclude_two_versions_with_same_content():

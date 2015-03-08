@@ -147,6 +147,12 @@ def _extract_version(line):
         for date_str in RE_DATE.finditer(line):
             line = line.replace(date_str.group('date'), u'')
 
+        # now remove frequent words
+        line = re.sub(ur'version|release notes|for',
+                      u'', line, flags=re.IGNORECASE)
+        # remove duplicate spaces
+        line = re.sub(ur'\s{2,}', u' ', line)
+
         line = line.strip()
         for i in _version_regexes:
             match = re.search(i, line)

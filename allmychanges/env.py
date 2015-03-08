@@ -39,7 +39,8 @@ class Environment(object):
 
         attrs = map(u'{0[0]}={0[1]}'.format, attrs)
         return u'<{0} {1}>'.format(
-            getattr(self, 'type', 'unknown'), ', '.join(attrs))
+            getattr(self, 'type', 'unknown'), u', '.join(attrs)) \
+            .encode('utf-8')
 
     def push(self, **kwargs):
         new_env = Environment(_parent=self, **kwargs)

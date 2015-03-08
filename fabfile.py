@@ -8,12 +8,12 @@ def shell():
     local('./manage.py shell_plus')
 
 
-def test():
-    local('nosetests')
+def test(args=''):
+    local('nosetests --with-progressive ' + args)
 
 
-def test_failed():
-    local('nosetests --failed')
+def test_failed(args=''):
+    local('nosetests --with-progressive --failed ' + args)
 
 
 def coverage():

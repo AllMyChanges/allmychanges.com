@@ -62,7 +62,11 @@ def test_extract_version():
             eq_(v, _extract_version('2015-03-12 ({0})'.format(v)))
             eq_(v, _extract_version('2015-03-12 (v{0})'.format(v)))
 
-    # dont consider this a version
+    # this should work because we'll remove stop-words
+    # like "release notes" and "for"
+    check('3.0', u'Release Notes for MongoDB 3.0')
+
+    # don't consider this a version
     # from https://bitbucket.org/cthedot/cssutils/src/d572ac8df6bd18cad203dea1bbf58867ff0d0ebe/docs/html/_sources/CHANGELOG.txt
     check(None, '0.3.x')
 
@@ -101,7 +105,8 @@ def test_extract_version():
     check('1.3', 'doc/go1.3.html')
     check(None, '  some number in the item\'s text 0.1')
     check(None, 'This is the first version compatible with Django 1.7.')
-    check(None, 'SWIG 3.0 required for programs that use SWIG')
+    # this text is too long
+    check(None, 'SWIG 3.0 required for programs that use SWIG library')
     check(None, 'HTTP/1.1 302 Found')
     check(None, '<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>')
 
