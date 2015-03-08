@@ -432,8 +432,10 @@ def parse_html_file(obj):
     def header_level(element):
         depth = 0
         el = element
+        path = []
         while el is not None:
             el = el.getparent()
+            path.insert(0, getattr(el, 'tag', None))
             depth += 1
 
         default_h_level = 1000
@@ -962,7 +964,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     for key, values in inclusions.items():
         if len(values) > 2:
             # if filename has 3.1 in it, but there are versions like 3.1, 3.1.1 and 3.1.2,
-            # then version bigger 3.1 should be filtered out.
+            # then version 3.1 should be filtered out.
             to_filter_out.add(key)
 
         else:
@@ -974,7 +976,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
                 # if filename has 3.1 in it, and it's content is another (single) version with number 3.1
                 # then latter should be excluded as it could miss some information.
                 to_filter_out.add(inner_id)
-            else:
+            elif inner_number.startswith(outer_number):
                 # if filename has 3.1 in it and it's content includes a single 3.1.1 version in it
                 # then 3.1 should be filtered out.
                 to_filter_out.add(outer_id)

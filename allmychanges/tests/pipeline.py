@@ -146,7 +146,8 @@ def test_exclude_version_if_it_included_in_the_version_with_same_number_and_bigg
                re.sub(ur'[\n ]+\n *|\n|<div>|</div>', u'', version.processed_text)).strip())
 
 
-def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_number():
+def test_exclude_outer_version_if_it_includes_a_single_version_which_is_subversion():
+    # this is the case when 3.1 version includes one 3.1.0 version
     art = create_user('art')
     changelog = Changelog.objects.create(
         namespace='python', name='pip', source='test+samples/celery/3')
@@ -161,6 +162,21 @@ def test_exclude_outer_version_if_it_includes_a_single_version_with_differ_numbe
 
     version = changelog.versions.all()[0]
     eq_(u'<p>Version description.</p>', version.raw_text)
+
+
+def test_dont_exclude_outer_version_if_it_includes_a_single_version_with_differ_number():
+    art = create_user('art')
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/celery/4')
+    art.track(changelog)
+
+    update_preview_or_changelog(changelog)
+
+    # there should be 3.1.0 and 3.1.1 versions
+    # with a header because there aren't any versions there yet
+    eq_(2, changelog.versions.all().count())
+    eq_(1, changelog.versions.filter(number='3.1.0').count())
+    eq_(1, changelog.versions.filter(number='3.1.1').count())
 
 
 def test_not_exclude_two_versions_with_same_content():
