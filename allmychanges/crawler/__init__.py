@@ -168,7 +168,10 @@ def _extract_version(line):
                     return None
 
                 # also, we ignore versions ending with .x
+                # or with suffix -notes which sometimes used
+                # in filenames: https://github.com/numpy/numpy/tree/master/doc/release
                 if version.endswith('.x') \
+                   or version.endswith('-notes') \
                    or 'since' in line.lower():
                     return None
 

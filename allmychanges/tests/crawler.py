@@ -62,6 +62,9 @@ def test_extract_version():
             eq_(v, _extract_version('2015-03-12 ({0})'.format(v)))
             eq_(v, _extract_version('2015-03-12 (v{0})'.format(v)))
 
+    # https://github.com/numpy/numpy/tree/master/doc/release
+    check(None, u'doc/release/1.3.0-notes.rst')
+
     # https://github.com/git/git/blob/master/Documentation/RelNotes/2.3.2.txt
     check(None, u'Fixes since v2.3.1')
 
