@@ -173,10 +173,23 @@ def test_dont_exclude_outer_version_if_it_includes_a_single_version_with_differ_
     update_preview_or_changelog(changelog)
 
     # there should be 3.1.0 and 3.1.1 versions
-    # with a header because there aren't any versions there yet
     eq_(2, changelog.versions.all().count())
     eq_(1, changelog.versions.filter(number='3.1.0').count())
     eq_(1, changelog.versions.filter(number='3.1.1').count())
+
+
+# def test_exclude_inner_version_if_it_is_greater_than_outer():
+#     art = create_user('art')
+#     changelog = Changelog.objects.create(
+#         namespace='python', name='pip', source='test+samples/celery/5')
+#     art.track(changelog)
+
+#     update_preview_or_changelog(changelog)
+
+#     # there should be 1.3.0
+#     # with a header because there aren't any versions there yet
+#     eq_(1, changelog.versions.all().count())
+#     eq_(1, changelog.versions.filter(number='1.3.0').count())
 
 
 def test_not_exclude_two_versions_with_same_content():

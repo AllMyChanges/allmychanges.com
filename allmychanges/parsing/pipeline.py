@@ -34,6 +34,18 @@ def filename_looks_like_a_changelog(filename):
                for item in CHANGELOG_LIKE_FILENAMES)
 
 
+def compare_version_numbers(left, right):
+    try:
+        # it is fair to compare version numbers
+        # as tuples of integers
+        left = parse_version(left)
+        right = parse_version(right)
+    except Exception:
+        # but some versions can't be represented with integers only
+        # in this case we'll fall back to lexicographical comparison
+        pass
+    return cmp(left, right)
+
 ##############################
 ## NEW
 ##############################
@@ -175,6 +187,8 @@ def parse_file(env):
         versions = parser(env)
         for version in versions:
             yield version
+
+
 def parse_markdown_file(obj):
     import markdown2
     html = markdown2.markdown(obj.content)
@@ -871,19 +885,6 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     if not versions:
         return []
 
-    def compare_version_numbers(left, right):
-        try:
-            # it is fair to compare version numbers
-            # as tuples of integers
-            left = parse_version(left)
-            right = parse_version(right)
-        except Exception:
-            # but some versions can't be represented with integers only
-            # in this case we'll fall back to lexicographical comparison
-            pass
-
-        return cmp(left, right)
-
     def compare_version_metadata(left, right):
         result = compare_version_numbers(left.version, right.version)
         if result != 0:
@@ -980,6 +981,10 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
                 # if filename has 3.1 in it and it's content includes a single 3.1.1 version in it
                 # then 3.1 should be filtered out.
                 to_filter_out.add(outer_id)
+            # elif compare_version_numbers(outer_number, inner_number) < 0:
+            #     # but if for some reason we have greater version inside lesser,
+            #     # for example 2.6 inside of 1.3.0
+            #     to_filter_out.add(inner_id)
 
 
     # and filter them out
