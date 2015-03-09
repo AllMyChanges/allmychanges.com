@@ -12,7 +12,8 @@ class Command(LogMixin, BaseCommand):
     def handle(self, *args, **options):
         source = args[0]
         if len(args) > 1:
-            search_list = args[1].split(',')
+            search_list = [(item, None)
+                           for item in args[1].split(',')]
         else:
             search_list = []
         downloader_name = guess_downloader(source)
