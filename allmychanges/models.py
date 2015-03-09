@@ -158,9 +158,26 @@ class Subscription(models.Model):
         return self.email
 
 
-class IgnoreCheckSetters(object):
-    """A mixin to get/set ignore and check lists on a model.
+class Downloadable(object):
+    """Adds method download, which uses attribute `source`
+    to update attribute `downloader` if needed and then to
+    download repository into a temporary directory.
     """
+    def download(self):
+        """This method fetches repository into a temporary directory
+        and returns path to this directory.
+        """
+        if self.downloader is None:
+            self.downloader = guess_downloader(self.source)
+            self.save(update_fields=('downloader',))
+
+        download = get_downloader(self.downloader)
+        return download(self.source,
+                        search_list=self.get_search_list(),
+                        ignore_list=self.get_ignore_list())
+
+
+    # A mixin to get/set ignore and check lists on a model.
     def get_ignore_list(self):
         """Returns a list with all filenames and directories to ignore
         when searching a changelog."""
@@ -190,29 +207,12 @@ class IgnoreCheckSetters(object):
         self.search_list = u'\n'.join(map(process, items))
 
 
-class Downloadable(object):
-    """Adds method download, which uses attribute `source`
-    to update attribute `downloader` if needed and then to
-    download repository into a temporary directory.
-    """
-    def download(self):
-        """This method fetches repository into a temporary directory
-        and returns path to this directory.
-        """
-        if self.downloader is None:
-            self.downloader = guess_downloader(self.source)
-            self.save(update_fields=('downloader',))
-
-        download = get_downloader(self.downloader)
-        return download(self.source)
-
-
 class ChangelogManager(models.Manager):
     def only_active(self):
         return self.all().filter(paused_at=None).exclude(name=None)
 
 
-class Changelog(Downloadable, IgnoreCheckSetters, models.Model):
+class Changelog(Downloadable, models.Model):
     objects = ChangelogManager()
     source = URLField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -531,7 +531,7 @@ class Moderator(models.Model):
     from_light_user = models.CharField(max_length=40, blank=True, null=True)
 
 
-class Preview(Downloadable, IgnoreCheckSetters, models.Model):
+class Preview(Downloadable, models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              related_name='previews',
                              blank=True,

@@ -1,4 +1,5 @@
 # coding: utf-8
+import urlparse
 import anyjson
 import tempfile
 import re
@@ -7,6 +8,7 @@ import shutil
 import envoy
 import requests
 import plistlib
+import lxml
 
 from django.conf import settings
 from urlparse import urlsplit
@@ -283,7 +285,9 @@ def download_repo(url, pull_if_exists=True):
     return path
 
 
-def fake_downloader(source):
+def fake_downloader(source,
+                    search_list=[],
+                    ignore_list=[]):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
 
     source = source.replace('test+', '')
@@ -305,7 +309,9 @@ def split_branch(url):
     return url, None
 
 
-def git_downloader(source):
+def git_downloader(source,
+                   search_list=[],
+                   ignore_list=[]):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url, username, repo_name = normalize_url(source)
 
@@ -333,7 +339,9 @@ def git_downloader(source):
 
     return path
 
-def hg_downloader(source):
+def hg_downloader(source,
+                  search_list=[],
+                  ignore_list=[]):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url = source.replace('hg+', '')
 
@@ -350,7 +358,9 @@ def hg_downloader(source):
     return path
 
 
-def http_downloader(source):
+def http_downloader(source,
+                    search_list=[],
+                    ignore_list=[]):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url = source.replace('http+', '')
 
@@ -368,7 +378,9 @@ def http_downloader(source):
     return path
 
 
-def itunes_downloader(source):
+def itunes_downloader(source,
+                      search_list=[],
+                      ignore_list=[]):
     """Processes iOS app's changelog from urls like these
     https://itunes.apple.com/in/app/temple-run/id420009108?mt=8
     https://itunes.apple.com/en/app/slack-team-communication/id618783545?l=en&mt=8
@@ -408,6 +420,92 @@ def itunes_downloader(source):
                 repr(e), app_id))
         return path
 
+
+def rechttp_downloader(source,
+                       search_list=[],
+                       ignore_list=[]):
+    base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    base_url = source.replace('rechttp+', '')
+    queue = [base_url]
+    already_seen = set()
+
+    search_list = [item
+                   for item in search_list
+                   if re.match('^https?://.*$', item) is not None]
+    if search_list:
+        search_patterns = [('^' + item + '$')
+                           for item in search_list]
+    else:
+        if base_url.endswith('/'):
+            search_patterns = ['^' + base_url + '.*$']
+        else:
+            search_patterns = ['^' + base_url.rsplit('/', 1)[0] + '/.*$']
+
+    search_patterns = map(re.compile, search_patterns)
+
+    def pass_filters(link):
+        for patt in search_patterns:
+            if patt.match(link) is not None:
+                return True
+        return False
+
+    def ensure_dir(path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    def filename_from(response):
+        splitted = urlparse.urlsplit(response.url)
+        path = splitted.path
+        if path.endswith('/'):
+            path += 'index.html'
+        return path.lstrip('/')
+
+    def make_absolute(url):
+        return urlparse.urljoin(base_url, url)
+
+    def remove_fragment(url):
+        return url.split('#', 1)[0]
+
+    def enqueue(url):
+        if url not in already_seen and url not in queue:
+            queue.append(url)
+
+    def fetch_page(url):
+        response = requests.get(url)
+        filename = filename_from(response)
+        fs_path = os.path.join(base_path, filename)
+        ensure_dir(os.path.dirname(fs_path))
+
+        text = get_text_from_response(response)
+        with open(fs_path, 'w') as f:
+            f.write(text.encode('utf-8'))
+
+        if response.headers['content-type'].startswith(
+            'text/html'):
+            tree = lxml.html.document_fromstring(text)
+            get_links = lxml.html.etree.XPath("//a/@href")
+            links = map(make_absolute, get_links(tree))
+            links = map(remove_fragment, links)
+            links = filter(pass_filters, links)
+            map(enqueue, links)
+
+
+
+    try:
+        while queue:
+            url = queue.pop()
+            already_seen.add(url)
+            fetch_page(url)
+
+    except Exception, e:
+        if os.path.exists(base_path):
+            shutil.rmtree(base_path)
+        raise RuntimeError('Unexpected exception "{0}" when fetching: {1}'.format(
+            e, url))
+    return base_path
+
+
+
 def guess_downloader(url):
     parts = urlsplit(url)
 
@@ -423,6 +521,9 @@ def guess_downloader(url):
 
     if url.startswith('test+'):
         return 'fake'
+
+    if url.startswith('rechttp+'):
+        return 'rechttp'
 
     downloaders = [('git', git_downloader),
                    ('hg', hg_downloader),
