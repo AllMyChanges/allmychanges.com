@@ -11,10 +11,16 @@ def shell():
 def test(args=''):
     local('nosetests --with-progressive ' + args)
 
+def test2(args=''):
+    local('nosetests ' + args)
+
 
 def test_failed(args=''):
     local('nosetests --with-progressive --failed ' + args)
 
+
+def test_failed2(args=''):
+    local('nosetests --failed ' + args)
 
 def coverage():
     local('nosetests --with-coverage --cover-package=allmychanges --cover-html --cover-erase --cover-inclusive --cover-html-dir=static/coverage')

@@ -68,3 +68,10 @@ class Environment(object):
             if self._parent.type == type_:
                 return self._parent
             return self._parent.find_parent_of_type(type_)
+
+    def get_parent(self):
+        return self._parent
+
+    def get_children(self):
+        return filter(None,
+                      (ref() for ref in self._children))

@@ -164,7 +164,7 @@ def test_exclude_outer_version_if_it_includes_a_single_version_which_is_subversi
     eq_(u'<p>Version description.</p>', version.raw_text)
 
 
-def test_dont_exclude_outer_version_if_it_includes_a_single_version_with_differ_number():
+def test_exclude_inner_version_if_it_is_included_into_an_outer_version_with_differ_number():
     art = create_user('art')
     changelog = Changelog.objects.create(
         namespace='python', name='pip', source='test+samples/celery/4')
@@ -172,10 +172,9 @@ def test_dont_exclude_outer_version_if_it_includes_a_single_version_with_differ_
 
     update_preview_or_changelog(changelog)
 
-    # there should be 3.1.0 and 3.1.1 versions
-    eq_(2, changelog.versions.all().count())
+    # there should be only a 3.1.0 because it includes 3.1.1
+    eq_(1, changelog.versions.all().count())
     eq_(1, changelog.versions.filter(number='3.1.0').count())
-    eq_(1, changelog.versions.filter(number='3.1.1').count())
 
 
 # def test_exclude_inner_version_if_it_is_greater_than_outer():

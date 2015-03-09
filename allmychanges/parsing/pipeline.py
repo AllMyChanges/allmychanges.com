@@ -753,6 +753,64 @@ def filter_trash_versions(versions):
     return grouped[best_source]
 
 
+def filter_versions(versions):
+    result = []
+    excluded = set()
+
+    # для начала, пропишем номера версий всем окружениям типа file_section
+    for v in versions:
+        file_section = v.find_parent_of_type('file_section')
+        if file_section:
+            file_section.version = v.version
+
+    for v in versions:
+        file_section = v.find_parent_of_type('file_section')
+        # if v.version == '3.1':
+        #     print_tree(v)
+        #     import pudb; pudb.set_trace()  # DEBUG
+        if file_section: # if not, then this is probably from VCS
+            children = file_section.get_children()
+            # предварительно выберем детей, к которых такая же версия
+            # если они есть, то понадобятся дельше
+            same_ver_children = [item
+                                 for item in children
+                                 if item.type == 'file_section'
+                                 and item.version == v.version]
+            # а тут нам нужны только дети типа file_section
+            # и у которых номера версий отличаются от текущей
+            children = [item
+                        for item in children
+                        if item.type == 'file_section'
+                           and item.version != v.version]
+            # если v это 1.0 а дети: 1.0.1, 1.0.2 и т.д.
+            if children and all(ch.version.startswith(v.version)
+                                for ch in children):
+                excluded.add(id(file_section))
+                continue
+
+            # если есть потомок с такой же версией, и он когда-то
+            # был исключен, то и этот узел надо исключить.
+            # такое случается, когда 1.2 содержит 1.2 а тот содержит 1.2.1, 1.2.3...
+            if same_ver_children and any(id(ch) in excluded
+                                         for ch in same_ver_children):
+                excluded.add(id(file_section))
+                continue
+
+            parent = file_section.get_parent()
+            parent_version = getattr(parent, 'version', None)
+            # если нашли 2.6 внутри 1.3
+            # или нашли 1.3 внутри 1.3
+            if parent_version and (not v.version.startswith(parent_version) \
+                                   or v.version == parent_version):
+                # в этом случае, не добавляем версию в excluded,
+                # иначе такую же версию верхнего уровня тоже исключим
+                continue
+
+        result.append(v)
+    return result
+
+
+
 def processing_pipe(*args, **kwargs):
     processors = dict(directory=get_files,
                       filename=read_file,
@@ -779,6 +837,43 @@ def vcs_processing_pipe(*args, **kwargs):
         versions = []
 
     return versions
+
+
+def print_tree(env):
+    """Output env tree for debugging puppose.
+    """
+    highlight_env = env
+    while env._parent:
+        env = env._parent
+
+    def print_env(env, padding):
+        t = env.type
+        comment = u''
+        if t == 'version':
+            comment = env.version
+        elif t == 'filename':
+            comment = env.filename
+        elif t == 'file_section':
+            comment = env.title
+
+        version = getattr(env, 'version', None)
+        if version:
+            comment += ' version=' + version
+
+        if env is highlight_env:
+            comment += ' <----------------'
+
+        print u'{padding}{t} {comment}'.format(
+            padding=u' ' * padding * 2,
+            t=t,
+            comment=comment)
+        for child in env._children:
+            child = child()
+            if child is not None:
+                print_env(child, padding + 1)
+    print_env(env, 0)
+
+
 
 
 def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
@@ -809,31 +904,6 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
                                  'version', 'title'))
         else:
             print item
-
-    def print_tree(env):
-        while env._parent:
-            env = env._parent
-
-        def print_env(env, padding):
-            t = env.type
-            comment = u''
-            if t == 'version':
-                comment = env.version
-            elif t == 'filename':
-                comment = env.filename
-            elif t == 'file_section':
-                comment = env.title
-
-            print u'{padding}{t} {comment}'.format(
-                padding=u' ' * padding * 2,
-                t=t,
-                comment=comment)
-            for child in env._children:
-                child = child()
-                if child is not None:
-                    print_env(child, padding + 1)
-        print_env(env, 0)
-
 
     def catch_errors(processor):
         @wraps(processor)
@@ -924,73 +994,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     # have less metadata go first
     versions.sort(cmp=compare_version_metadata)
 
-    # ====================================================================
-    # now we'll exclude versions which content includes few other versions
-    # first we need to numerate all versions
-    # logic is following;
-    #
-
-    for idx, version in enumerate(versions):
-        version.id = idx
-
-    # these are for debugging purposes
-    by_number = {v.version: v
-                 for v in versions}
-
-    by_id = {v.id: v
-             for v in versions}
-
-    #print_tree(root_env)
-
-    inclusions = defaultdict(list)
-
-    for i in versions:
-        if i.filename == 'VCS':
-            continue
-
-        for j in versions:
-            if i != j:
-                i_content = i.content
-                j_content = j.content
-
-                i_file_section = i.find_parent_of_type('file_section')
-
-                if i_content and j_content \
-                   and j_content in i_content \
-                   and i_file_section.is_parent_for(j):
-                    inclusions[i.id].append(j.id)
-
-    to_filter_out = set()
-
-    for key, values in inclusions.items():
-        if len(values) > 2:
-            # if filename has 3.1 in it, but there are versions like 3.1, 3.1.1 and 3.1.2,
-            # then version 3.1 should be filtered out.
-            to_filter_out.add(key)
-
-        else:
-            outer_id = key
-            inner_id = values[0]
-            outer_number = by_id[outer_id].version
-            inner_number = by_id[inner_id].version
-            if outer_number == inner_number:
-                # if filename has 3.1 in it, and it's content is another (single) version with number 3.1
-                # then latter should be excluded as it could miss some information.
-                to_filter_out.add(inner_id)
-            elif inner_number.startswith(outer_number):
-                # if filename has 3.1 in it and it's content includes a single 3.1.1 version in it
-                # then 3.1 should be filtered out.
-                to_filter_out.add(outer_id)
-            # elif compare_version_numbers(outer_number, inner_number) < 0:
-            #     # but if for some reason we have greater version inside lesser,
-            #     # for example 2.6 inside of 1.3.0
-            #     to_filter_out.add(inner_id)
-
-
-    # and filter them out
-    versions = [version
-                for version in versions
-                if version.id not in to_filter_out]
+    versions = filter_versions(versions)
 
     # and grouping them by version number
     # we leave only unique versions with maximum number of metadata

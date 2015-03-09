@@ -12,6 +12,7 @@ from allmychanges.parsing.pipeline import (
     highlight_keywords,
     parse_plain_file,
     parse_markdown_file,
+    filter_versions,
     parse_file)
 from allmychanges.env import Environment
 
@@ -25,7 +26,7 @@ def eq_(left, right):
     orig_eq_(left, right, '\n{0}\n!=\n{1}'.format(repr(left), repr(right)))
 
 
-env = Environment()
+env = Environment(type='root', title='')
 create_file = lambda filename, content: env.push(type='file_content',
                                                  filename=filename,
                                                  content=content)
@@ -421,3 +422,28 @@ def test_nodejs_parsing():
 <ul><li>Major refactor to evcom.</li></ul>
 <ul><li>Upgrade v8 to 1.3.4<br/>Upgrade libev to 3.8<br/>Upgrade http_parser to v0.2</li></ul>
 """)
+
+
+def test_versions_filter():
+    fs = env.push(type='file_section')
+    v1_0 = fs.push(version='1.0')
+    fs1 = fs.push(type='file_section')
+    v1_0_1 = fs1.push(version='1.0.1')
+    fs2 = fs.push(type='file_section')
+    v1_0_2 = fs2.push(version='1.0.2')
+
+    versions = filter_versions([v1_0, v1_0_1, v1_0_2])
+    eq_(2, len(versions))
+    eq_(v1_0_1, versions[0])
+    eq_(v1_0_2, versions[1])
+
+
+def test_versions_filter2():
+    fs = env.push(type='file_section')
+    v1_0_5 = fs.push(type='version', version='1.0.5')
+    fs_child = fs.push(type='file_section')
+    v2_6 = fs_child.push(type='version', version='2.6')
+
+    versions = filter_versions([v1_0_5, v2_6])
+    eq_(1, len(versions))
+    eq_(v1_0_5, versions[0])
