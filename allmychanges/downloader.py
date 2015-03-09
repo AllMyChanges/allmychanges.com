@@ -430,7 +430,7 @@ def rechttp_downloader(source,
     already_seen = set()
 
     search_list = [item
-                   for item in search_list
+                   for item, parser_name in search_list
                    if re.match('^https?://.*$', item) is not None]
     if search_list:
         search_patterns = [('^' + item + '$')
