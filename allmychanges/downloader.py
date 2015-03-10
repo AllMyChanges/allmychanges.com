@@ -463,7 +463,9 @@ def rechttp_downloader(source,
             path += 'index.html'
         return path.lstrip('/')
 
-    def make_absolute(url):
+    def make_absolute(url, base_url):
+        if is_http_url(url):
+            return url
         return urlparse.urljoin(base_url, url)
 
     def remove_fragment(url):
@@ -480,17 +482,31 @@ def rechttp_downloader(source,
         ensure_dir(os.path.dirname(fs_path))
 
         text = get_text_from_response(response)
-        with open(fs_path, 'w') as f:
-            f.write(text.encode('utf-8'))
 
         if response.headers['content-type'].startswith(
             'text/html'):
             tree = lxml.html.document_fromstring(text)
-            get_links = lxml.html.etree.XPath("//a/@href")
-            links = map(make_absolute, get_links(tree))
-            links = map(remove_fragment, links)
-            links = filter(pass_filters, links)
-            map(enqueue, links)
+
+            get_links = lxml.html.etree.XPath("//a")
+            for link in get_links(tree):
+                url = link.attrib.get('href')
+                if url:
+                    url = make_absolute(url, response.url)
+                    link.attrib['href'] = url
+                    url = remove_fragment(url)
+                    if pass_filters(url):
+                        enqueue(url)
+            get_images = lxml.html.etree.XPath("//img")
+            for img in get_images(tree):
+                src = img.attrib.get('src')
+                if src:
+                    src = make_absolute(src, response.url)
+                    img.attrib['src'] = src
+
+            text = lxml.html.tostring(tree)
+
+        with open(fs_path, 'w') as f:
+            f.write(text.encode('utf-8'))
 
 
 
