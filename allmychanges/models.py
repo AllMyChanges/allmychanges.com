@@ -17,6 +17,7 @@ from allmychanges.validators import URLValidator
 from allmychanges.downloader import normalize_url
 from allmychanges.utils import (
     split_filenames,
+    is_not_http_url,
 )
 from allmychanges import chat
 from allmychanges.downloader import (
@@ -190,8 +191,9 @@ class Downloadable(object):
         """Returns a list with all filenames and directories to check
         when searching a changelog."""
         def process(name):
-            if ':' in name:
-                return name.split(':', 1)
+            if is_not_http_url(name) \
+               and ':' in name:
+                return name.rsplit(':', 1)
             else:
                 return (name, None)
 

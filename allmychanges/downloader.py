@@ -12,7 +12,8 @@ import lxml
 
 from django.conf import settings
 from urlparse import urlsplit
-from .utils import cd, get_text_from_response
+from allmychanges.utils import cd, get_text_from_response, is_http_url
+from allmychanges.exceptions import DownloaderWarning
 from twiggy_goodies.threading import log
 
 
@@ -431,11 +432,13 @@ def rechttp_downloader(source,
 
     search_list = [item
                    for item, parser_name in search_list
-                   if re.match('^https?://.*$', item) is not None]
+                   if is_http_url(item)]
     if search_list:
+        limit_urls = 100
         search_patterns = [('^' + item + '$')
                            for item in search_list]
     else:
+        limit_urls = 10
         if base_url.endswith('/'):
             search_patterns = ['^' + base_url + '.*$']
         else:
@@ -492,11 +495,16 @@ def rechttp_downloader(source,
 
 
     try:
-        while queue:
+        while queue and len(already_seen) < limit_urls:
             url = queue.pop()
             already_seen.add(url)
             fetch_page(url)
 
+        if len(already_seen) == limit_urls:
+            raise DownloaderWarning('Please, specify one or more URL patterns in search list. Use regexes.')
+
+    except DownloaderWarning:
+        raise
     except Exception, e:
         if os.path.exists(base_path):
             shutil.rmtree(base_path)

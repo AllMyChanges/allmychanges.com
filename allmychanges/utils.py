@@ -271,3 +271,10 @@ def get_text_from_response(response):
     if response.encoding == 'ISO-8859-1':
         response.encoding = 'utf-8'
     return response.text
+
+
+def is_http_url(text):
+    return re.match('^https?://.*$', text, flags=re.IGNORECASE) is not None
+
+def is_not_http_url(text):
+    return not is_http_url(text)

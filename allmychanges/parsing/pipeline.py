@@ -18,7 +18,7 @@ from django.utils.encoding import force_text
 from allmychanges.crawler import (
     _extract_version, _extract_date,
     _parse_item)
-from allmychanges.utils import strip_long_text
+from allmychanges.utils import strip_long_text, is_not_http_url
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -940,8 +940,10 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     root_env = Environment()
     root_env.type = 'directory'
     root_env.dirname = root
-    root_env.ignore_list = ignore_list
-    root_env.search_list = search_list
+    root_env.ignore_list = filter(is_not_http_url, ignore_list)
+    root_env.search_list = [(item, parser_type)
+                            for item, parser_type in search_list
+                            if is_not_http_url(item)]
     # a dictionary to keep data between different processor's invocations
     root_env.cache = {'tmp-dir': tempfile.mkdtemp(dir=settings.TEMP_DIR)}
 
