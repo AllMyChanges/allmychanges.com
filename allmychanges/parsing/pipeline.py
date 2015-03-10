@@ -415,6 +415,12 @@ def create_section(title, content=[], version=None, date=None):
 get_section_title = itemgetter('title')
 get_section_content = itemgetter('content')
 
+XPath = lxml.html.etree.XPath
+XPATHS_TO_CUT_FROM_HTML = [
+    XPath('//*[contains(@class, "footer")]'),
+    XPath('//*[contains(@class, "related-links")]'),
+    XPath('//*[@id="footer"]'),
+]
 
 def parse_html_file(obj):
     """
@@ -426,8 +432,14 @@ def parse_html_file(obj):
 
     try:
         parser = lxml.html.HTMLParser(encoding='utf-8')
-        parsed = lxml.html.document_fromstring(obj.content.encode('utf-8'),
+        content = obj.content.encode('utf-8')
+        parsed = lxml.html.document_fromstring(content,
                                                parser=parser)
+
+        for xpath in XPATHS_TO_CUT_FROM_HTML:
+            elems = xpath(parsed)
+            for el in elems:
+                el.drop_tree()
     except Exception as e:
         # these errors are ignored
         if str(e) == 'Document is empty':
