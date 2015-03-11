@@ -26,7 +26,6 @@ if DEBUG:
     )
 
     DEBUG_TOOLBAR_CONFIG = {
-        'INTERCEPT_REDIRECTS': False,
         'SHOW_TOOLBAR_CALLBACK': 'allmychanges.utils.show_debug_toolbar'
     }
 
