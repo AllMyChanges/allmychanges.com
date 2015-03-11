@@ -114,9 +114,10 @@ _version_regexes = [
     # or this could be a similar case, when version number
     # is a part of a filename like this
     # release-notes/0.1.1.md
+    # or dist/kafka/0.8.0/RELEASE_NOTES.html
     # but not in this case
     # <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    r'[/a-zA-Z-]{ver}\.[^\d]',
+    r'[/a-zA-Z-]{ver}(?:\.[^\d]|/)(?![^ ]*")',
 ]
 
 _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded by brackets
