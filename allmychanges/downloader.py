@@ -12,7 +12,9 @@ import lxml
 
 from django.conf import settings
 from urlparse import urlsplit
-from allmychanges.utils import cd, get_text_from_response, is_http_url
+from allmychanges.utils import (
+    cd, get_text_from_response, is_http_url,
+    html_document_fromstring)
 from allmychanges.exceptions import DownloaderWarning
 from twiggy_goodies.threading import log
 
@@ -483,10 +485,9 @@ def rechttp_downloader(source,
 
         text = get_text_from_response(response)
 
-        if response.headers['content-type'].startswith(
+        if response.headers.get('content-type', '').startswith(
             'text/html'):
-            tree = lxml.html.document_fromstring(text)
-
+            tree = html_document_fromstring(text)
             get_links = lxml.html.etree.XPath("//a")
             for link in get_links(tree):
                 url = link.attrib.get('href')
@@ -521,9 +522,11 @@ def rechttp_downloader(source,
 
     except DownloaderWarning:
         raise
-    except Exception, e:
+    except Exception as e:
         if os.path.exists(base_path):
             shutil.rmtree(base_path)
+        with log.fields(url=url):
+            log.trace().error('Unexpected error when fetching data')
         raise RuntimeError('Unexpected exception "{0}" when fetching: {1}'.format(
             e, url))
     return base_path

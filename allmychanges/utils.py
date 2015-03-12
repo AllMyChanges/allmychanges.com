@@ -9,6 +9,7 @@ import graphitesend
 import time
 import times
 import threading
+import lxml
 
 from lxml import html
 from contextlib import contextmanager
@@ -276,5 +277,20 @@ def get_text_from_response(response):
 def is_http_url(text):
     return re.match('^https?://.*$', text, flags=re.IGNORECASE) is not None
 
+
 def is_not_http_url(text):
     return not is_http_url(text)
+
+
+def html_document_fromstring(text):
+    """Accepts unicode strings and uses special hack
+    to make sure lxml dont find charset encoding.
+    """
+    # the hack :)
+    match = re.search(ur'encoding=[\'"](?P<encoding>.*?)[\'"] ?\?>',
+                      text[:200],
+                      flags=re.IGNORECASE)
+    if match is not None:
+        text = text.encode(match.group('encoding'))
+
+    return lxml.html.document_fromstring(text)

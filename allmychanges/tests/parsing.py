@@ -447,3 +447,10 @@ def test_versions_filter2():
     versions = filter_versions([v1_0_5, v2_6])
     eq_(1, len(versions))
     eq_(v1_0_5, versions[0])
+
+
+def test_html_document_fromstring():
+    doc = html_document_fromstring(u"""<?xml version=\'1.0\' encoding=\'UTF-8\'?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>Blah</html>""")
+    assert doc != None

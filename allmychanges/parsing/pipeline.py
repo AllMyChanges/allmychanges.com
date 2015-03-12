@@ -18,7 +18,9 @@ from django.utils.encoding import force_text
 from allmychanges.crawler import (
     _extract_version, _extract_date,
     _parse_item)
-from allmychanges.utils import strip_long_text, is_not_http_url
+from allmychanges.utils import (
+    strip_long_text, is_not_http_url,
+    html_document_fromstring)
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -431,10 +433,7 @@ def parse_html_file(obj):
         return
 
     try:
-        parser = lxml.html.HTMLParser(encoding='utf-8')
-        content = obj.content.encode('utf-8')
-        parsed = lxml.html.document_fromstring(content,
-                                               parser=parser)
+        parsed = html_document_fromstring(obj.content)
 
         for xpath in XPATHS_TO_CUT_FROM_HTML:
             elems = xpath(parsed)
