@@ -738,40 +738,39 @@ def group_by_path(versions):
     with directories, starting from '.' and values
     are lists with all versions found inside this directory.
     """
-    result = defaultdict(list)
-    for version in versions:
+    make_obj = lambda: {'score': 0, 'versions': []}
+    result = defaultdict(make_obj)
+
+    for score, version in versions:
         path = version.filename.split(u'/')
         path = [name + u'/'
                 for name in path[:-1]] + path[-1:]
 
+        depth = 0
         while path:
-            result[''.join(path)].append(version)
+            result[''.join(path)]['score'] += score - depth
+            result[''.join(path)]['versions'].append(version)
             path = path[:-1]
+            depth += 1
     return result
 
 
 def filter_trash_versions(versions):
-    grouped = group_by_path(versions)
+    def calc_score(version):
+        if filename_looks_like_a_changelog(version.filename):
+            return 1000
+        return 10
 
-    def calc_score(source):
-        score = 10
+    scored = [(calc_score(version), version)
+              for version in versions]
+    grouped = group_by_path(scored)
 
-        # add points if name has explicit point that there is
-        # some version information
-        if filename_looks_like_a_changelog(source):
-            score += 1000
+    sources = grouped.items()
+    sources.sort(reverse=True, key=lambda item: item[1]['score'])
+    best_source = sources[0][0]
 
-        # and add point for each version inside this source
-        score += len(grouped[source])
-        return score
-
-    sources = [(calc_score(source), source)
-               for source in grouped]
-    sources.sort(reverse=True)
-
-    best_source = sources[0][1]
-
-    return grouped[best_source]
+    log.debug('Best source was choosen: ' + best_source)
+    return grouped[best_source]['versions']
 
 
 def filter_versions(versions):

@@ -26,6 +26,15 @@ def eq_(left, right):
     orig_eq_(left, right, '\n{0}\n!=\n{1}'.format(repr(left), repr(right)))
 
 
+def eq_dict(left, right):
+    from dictdiffer import diff
+    result = list(diff(left, right))
+    if result:
+        formatted = '\n' + '\n'.join(
+            map(repr, result))
+        raise AssertionError(formatted)
+
+
 env = Environment(type='root', title='')
 create_file = lambda filename, content: env.push(type='file_content',
                                                  filename=filename,
@@ -289,20 +298,22 @@ def test_grouping_by_path():
     env.type = 'version'
     v = lambda filename: env.push(filename=filename)
 
-    eq_({'CHANGES': [v('CHANGES')],
-         'docs/': [v('docs/notes/0.1.0.rst'),
-                   v('docs/notes/0.2.0.rst'),
-                   v('docs/README')],
-         'docs/README': [v('docs/README')],
-         'docs/notes/': [v('docs/notes/0.1.0.rst'),
-                         v('docs/notes/0.2.0.rst')],
-         'docs/notes/0.1.0.rst': [v('docs/notes/0.1.0.rst')],
-         'docs/notes/0.2.0.rst': [v('docs/notes/0.2.0.rst')]},
+    versions = [(10, v('docs/notes/0.1.0.rst')),
+                (10, v('docs/notes/0.2.0.rst')),
+                (10, v('docs/README')),
+                (1000, v('CHANGES'))]
 
-        group_by_path([v('docs/notes/0.1.0.rst'),
-                       v('docs/notes/0.2.0.rst'),
-                       v('docs/README'),
-                       v('CHANGES')]))
+    eq_({'CHANGES': {'score': 1000, 'versions': [v('CHANGES')]},
+         'docs/': {'score': 30 - 5, 'versions': [v('docs/notes/0.1.0.rst'),
+                                                 v('docs/notes/0.2.0.rst'),
+                                                 v('docs/README')]},
+         'docs/README': {'score': 10, 'versions': [v('docs/README')]},
+         'docs/notes/': {'score': 20 - 2, 'versions': [v('docs/notes/0.1.0.rst'),
+                                                       v('docs/notes/0.2.0.rst')]},
+         'docs/notes/0.1.0.rst': {'score': 10, 'versions': [v('docs/notes/0.1.0.rst')]},
+         'docs/notes/0.2.0.rst': {'score': 10, 'versions': [v('docs/notes/0.2.0.rst')]}},
+
+            group_by_path(versions))
 
 
 def test_strip_outer_tag():

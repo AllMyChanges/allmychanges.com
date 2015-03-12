@@ -458,6 +458,18 @@ def test_trash_versions_filtering():
     eq_(['CHANGELOG.md'], list(filenames))
 
 
+def test_trash_versions_filtering_on_separate_release_notes():
+    versions = []
+    versions.append(Version(filename='dist/kafka/0.8.2.1/RELEASE_NOTES.html', number='0.8.2.1'))
+    versions.append(Version(filename='dist/kafka/0.8.0/RELEASE_NOTES.html', number='0.8.0'))
+
+    new = filter_trash_versions(versions)
+    filenames = {v.filename for v in new}
+    eq_(['dist/kafka/0.8.0/RELEASE_NOTES.html',
+         'dist/kafka/0.8.2.1/RELEASE_NOTES.html'], list(filenames))
+
+
+
 def test_digest_does_not_include_preview_versions():
     today = datetime.datetime(2014, 1, 1, 9, 0, tzinfo=timezone.UTC()) # 9am
     week = datetime.timedelta(7)
