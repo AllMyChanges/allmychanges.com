@@ -448,7 +448,14 @@ def rechttp_downloader(source,
 
     search_patterns = map(re.compile, search_patterns)
 
+    ignore_patterns = filter(is_http_url, ignore_list)
+    ignore_patterns.append('.*\.(tar\.gz|tar\.bz2|tgz|tbz2|rar|zip|Z)$')
+    ignore_patterns = map(re.compile, ignore_patterns)
+
     def pass_filters(link):
+        for patt in ignore_patterns:
+            if patt.match(link) is not None:
+                return False
         for patt in search_patterns:
             if patt.match(link) is not None:
                 return True

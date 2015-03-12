@@ -2,7 +2,7 @@ import types
 import datetime
 
 from nose.tools import eq_ as orig_eq_
-from allmychanges.utils import first
+from allmychanges.utils import first, html_document_fromstring
 from allmychanges.parsing.pipeline import (
     get_markup,
     extract_metadata,

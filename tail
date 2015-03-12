@@ -3,7 +3,7 @@
 """JSON log tailer.
 
 Usage:
-  tail [--cross-finger] [--message=<text>] <filename>
+  tail [--cross-finger] [--message=<text>] [--grep=<text> <filename>
   tail (-h | --help)
   tail --version
 
@@ -12,6 +12,7 @@ Options:
   --version       Show version.
   --cross-finger  Output only if there was ERROR.
   --message=<text> Show only items with this text in message.
+  --grep=<text> Show only items with this text in any field.
 
 """
 
@@ -38,15 +39,20 @@ def print_item(item):
               help='Output only if there was ERROR.')
 @click.option('--message',
               help='Show only items with this text in message.')
+@click.option('--grep',
+              help='Show only items with this text in any field.')
 @click.option('--name',
               help='Show only items with logger name which matches to this regexp.')
 @click.argument('filename')
-def process(filename, cross_finger, message, name):
+def process(filename, cross_finger, message, grep, name):
     buffer = defaultdict(list)
 
-    def print_if_needed(item):
+    def print_if_needed(item, line):
         if message:
             if re.search(message, item['@message'], re.I) is None:
+                return
+        if grep:
+            if re.search(grep, line, re.I) is None:
                 return
         if name:
             if re.search(name, item['@fields'].get('name', ''), re.I) is None:
@@ -67,13 +73,13 @@ def process(filename, cross_finger, message, name):
                     echo('')
                     echo('=' * 80)
                     for item in buffer[uuid]:
-                        print_if_needed(item)
+                        print_if_needed(item, line)
                     del buffer[uuid]
             else:
                 if fields['level'] == 'ERROR':
-                    print_if_needed(item)
+                    print_if_needed(item, line)
         else:
-            print_if_needed(item)
+            print_if_needed(item, line)
 
 
 if __name__ == '__main__':

@@ -864,7 +864,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result['show_sources'] = True
 
         HUMANIZED = {
-            'waiting-in-the-queue': 'Wating in the queue.',
+            'waiting-in-the-queue': 'Waiting in the queue.',
             'downloading': 'Downloading sources.',
             'searching-versions': 'Searching versions.',
             'processing-vcs-history': 'Processing VCS history.',

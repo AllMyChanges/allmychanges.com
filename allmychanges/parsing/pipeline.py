@@ -91,18 +91,20 @@ def get_files(env, walk=os.walk):
     Uses: env.ignore_list, env.search_list and env.dirname.
     """
 
-    ignore_list = env.ignore_list
-    search_list = env.search_list
+    ignore_list = [re.compile('^' + item + '.*$')
+                   for item in env.ignore_list]
+    search_list = [(re.compile('^' + item + '.*$'), markup)
+                   for item, markup in env.search_list]
 
     def in_ignore_list(filename):
-        for ignore_prefix in ignore_list:
-            if filename.startswith(ignore_prefix):
+        for pattern in ignore_list:
+            if pattern.match(filename) is not None:
                 return True
         return False
 
     def search_in_search_list(filename):
-        for prefix, markup in search_list:
-            if filename.startswith(prefix):
+        for pattern, markup in search_list:
+            if pattern.match(filename) is not None:
                 return True, markup
         return False, None
 
@@ -116,23 +118,30 @@ def get_files(env, walk=os.walk):
             low_filename = rel_filename.lower()
             _, ext = os.path.splitext(low_filename)
 
-            if ext not in EXTENSIONS_TO_CHECK \
-               and not filename_looks_like_a_changelog(low_filename):
-                continue
+            with log.name_and_fields('get_files',
+                                     filename=rel_filename):
+                if ext not in EXTENSIONS_TO_CHECK \
+                   and not filename_looks_like_a_changelog(low_filename):
+                    log.debug('Skipped because extension not in ' + ','.join(EXTENSIONS_TO_CHECK))
+                    continue
 
-            if not in_ignore_list(rel_filename):
-                attrs = dict(type='filename',
-                             filename=full_filename)
+                if not in_ignore_list(rel_filename):
+                    attrs = dict(type='filename',
+                                 filename=full_filename)
 
-                if search_list:
-                    found, markup = search_in_search_list(rel_filename)
-                    if found:
-                        if markup:
-                            attrs['markup'] = markup
+                    if search_list:
+                        found, markup = search_in_search_list(rel_filename)
+                        if found:
+                            if markup:
+                                attrs['markup'] = markup
+                            yield env.push(**attrs)
+                        else:
+                            log.debug('Skipped because not match to search list.')
+
+                    else:
                         yield env.push(**attrs)
-
                 else:
-                    yield env.push(**attrs)
+                    log.debug('Skipped because matches to ignore list.')
 
 
 # TODO: remove
@@ -769,6 +778,12 @@ def filter_versions(versions):
     result = []
     excluded = set()
 
+    def log_excluded(s, reason):
+        with log.name_and_fields('filter_versions',
+                                 title=s.title,
+                                 version=s.version):
+            log.debug(reason)
+
     # для начала, пропишем номера версий всем окружениям типа file_section
     for v in versions:
         file_section = v.find_parent_of_type('file_section')
@@ -795,8 +810,10 @@ def filter_versions(versions):
                         if item.type == 'file_section'
                            and item.version != v.version]
             # если v это 1.0 а дети: 1.0.1, 1.0.2 и т.д.
-            if children and all(ch.version.startswith(v.version)
-                                for ch in children):
+            children_versions = [ch.version for ch in children]
+            if children and all(chv.startswith(v.version)
+                                for chv in children_versions):
+                log_excluded(v, 'Excluded because has children: ' + ', '.join(children_versions))
                 excluded.add(id(file_section))
                 continue
 
@@ -805,6 +822,7 @@ def filter_versions(versions):
             # такое случается, когда 1.2 содержит 1.2 а тот содержит 1.2.1, 1.2.3...
             if same_ver_children and any(id(ch) in excluded
                                          for ch in same_ver_children):
+                log_excluded(v, 'Excluded because has child with same version which was excluded in it\'s turn')
                 excluded.add(id(file_section))
                 continue
 
@@ -816,6 +834,7 @@ def filter_versions(versions):
                                    or v.version == parent_version):
                 # в этом случае, не добавляем версию в excluded,
                 # иначе такую же версию верхнего уровня тоже исключим
+                log_excluded(v, 'Excluded because parent version is ' + parent_version)
                 continue
 
         result.append(v)
