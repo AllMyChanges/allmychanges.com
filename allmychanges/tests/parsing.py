@@ -2,6 +2,7 @@ import types
 import datetime
 
 from nose.tools import eq_ as orig_eq_
+from unittest import skip
 from allmychanges.utils import first, html_document_fromstring
 from allmychanges.parsing.pipeline import (
     get_markup,
@@ -432,6 +433,30 @@ def test_nodejs_parsing():
 """, u"""
 <ul><li>Major refactor to evcom.</li></ul>
 <ul><li>Upgrade v8 to 1.3.4<br/>Upgrade libev to 3.8<br/>Upgrade http_parser to v0.2</li></ul>
+""")
+
+
+@skip('waiting for implementation')
+def test_plaintext_parsing_of_nested_lists():
+    _test_plain_parser(u"""
+2015.03.09 version 0.8.15
+* First
+  * Second
+    * Third
+      * Forth
+      * Fifths
+    * Six
+      * Seven
+      * Eight
+""", u"""
+<ul><li>First
+        <ul><li>Second
+                <ul><li>Third
+                        <ul><li>Fourth</li>
+                            <li>Fifths</li></ul></li>
+                    <li>Six
+                        <ul><li>Seven</li>
+                            <li>Eight</li></ul></li></ul></li></ul></li></ul>
 """)
 
 
