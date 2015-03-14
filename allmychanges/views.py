@@ -404,14 +404,12 @@ class PackageView(CommonContextMixin, TemplateView):
         result['package'] = package_data
         result['login_to_track'] = login_to_track
         result['already_tracked'] = already_tracked
-        return result
 
-    def get(self, *args, **kwargs):
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
                              'package-view',
-                             u'User opened package ' + self.request.path)
-        return super(PackageView, self).get(*args, **kwargs)
+                             u'User opened changelog:{0}'.format(changelog.pk))
+        return result
 
 
 class BadgeView(View):
