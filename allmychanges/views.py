@@ -770,6 +770,10 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                         HttpResponseRedirect(reverse('package', kwargs=dict(
                             name=changelog.name,
                             namespace=changelog.namespace))))
+                UserHistoryLog.write(self.request.user,
+                                     self.request.light_user,
+                                     'package-create',
+                                     u'User created changelog:{0}'.format(changelog.pk))
             except Changelog.DoesNotExist:
                 changelog = Changelog.objects.create(source=normalized_url)
                 if user:
@@ -778,6 +782,11 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                 else:
                     chat.send('Wow, light user {0} added new changelog with url: <{1}>'.format(
                         self.request.light_user, normalized_url))
+
+                UserHistoryLog.write(self.request.user,
+                                     self.request.light_user,
+                                     'package-create',
+                                     u'User created changelog:{0}'.format(changelog.pk))
 
             changelog.problem = None
             changelog.save()
@@ -819,7 +828,6 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         context['can_edit'] = changelog.editable_by(self.request.user,
                                                     self.request.light_user)
         return context
-
 
 
 class PreviewView(CachedMixin, CommonContextMixin, TemplateView):

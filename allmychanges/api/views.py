@@ -267,6 +267,12 @@ class ChangelogViewSet(HandleExceptionMixin,
             messages.warning(self.request,
                              'Because you are not logged in, we\'ll remember that you are a moderator for 24 hour. To make this permanent, please, login or sign up as soon as possible.')
 
+
+        if self.request.method == 'PUT':
+            UserHistoryLog.write(self.request.user,
+                                 self.request.light_user,
+                                 'package-edit',
+                                 u'User edited changelog:{0}'.format(self.object.pk))
         return response
 
     @action()
