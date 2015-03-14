@@ -427,6 +427,12 @@ def itunes_downloader(source,
 def rechttp_downloader(source,
                        search_list=[],
                        ignore_list=[]):
+    DEFAULT_UPPER_LIMIT = 100
+    UPPER_LIMITS = {
+        'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,
+    }
+    upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
+
     base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     base_url = source.replace('rechttp+', '')
     queue = [base_url]
@@ -436,7 +442,7 @@ def rechttp_downloader(source,
                    for item, parser_name in search_list
                    if is_http_url(item)]
     if search_list:
-        limit_urls = 100
+        limit_urls = upper_limit
         search_patterns = [('^' + item + '$')
                            for item in search_list]
     else:
@@ -485,6 +491,7 @@ def rechttp_downloader(source,
             queue.append(url)
 
     def fetch_page(url):
+#        print 'Fetching', url
         response = requests.get(url)
         filename = filename_from(response)
         fs_path = os.path.join(base_path, filename)
@@ -525,7 +532,16 @@ def rechttp_downloader(source,
             fetch_page(url)
 
         if len(already_seen) == limit_urls:
-            raise DownloaderWarning('Please, specify one or more URL patterns in search list. Use regexes.')
+            if limit_urls == upper_limit:
+                message = ('Please, specify more URL patterns '
+                           'because we hit the limit ({upper_limit} '
+                           'documents). Use regexes.')
+            else:
+                message = ('We downloaded 10 documents. '
+                           'Please, specify one or more URL '
+                           'patterns in search list to extend '
+                           'this limit up to {upper_limit}. Use regexes.')
+            raise DownloaderWarning(message.format(upper_limit=upper_limit))
 
     except DownloaderWarning:
         raise
