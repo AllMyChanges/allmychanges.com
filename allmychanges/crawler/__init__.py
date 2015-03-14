@@ -171,9 +171,11 @@ def _extract_version(line):
                 # also, we ignore versions ending with .x
                 # or with suffix -notes which sometimes used
                 # in filenames: https://github.com/numpy/numpy/tree/master/doc/release
+                lowered_line = line.lower()
                 if version.endswith('.x') \
                    or version.endswith('-notes') \
-                   or 'since' in line.lower():
+                   or 'since' in lowered_line \
+                   or 'upgrading to ' in lowered_line:
                     return None
 
                 return version
