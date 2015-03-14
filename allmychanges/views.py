@@ -664,6 +664,20 @@ class UserHistoryView(SuperuserRequiredMixin,
                                       .filter(user=user) \
                                       .prefetch_related('user') \
                                       .order_by('-id')
+
+        def get_changelog_url(match):
+            try:
+                ch = Changelog.objects.get(pk=match.group('pk'))
+                return ch.get_absolute_url()
+            except:
+                return 'Not Found'
+
+        def process_description(text):
+            return re.sub(ur'changelog:(?P<pk>\d+)',
+                          get_changelog_url,
+                          text)
+        for item in result['log']:
+            item.description = process_description(item.description)
         return result
 
 
