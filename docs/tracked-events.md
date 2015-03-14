@@ -2,10 +2,16 @@ Tracked events
 ==============
 
 We are tracking what user is doing during his life.
+
+IMPORTANT! When you add item into this list, please
+add this action into models.ACTIVE_USER_ACTIONS
+
 Here is a list of event which are tracked:
 
 * track: 'User tracked changelog:123'
+* untrack: 'User untracked changelog:123'
 * track-allmychanges: 'User tracked our project\'s changelog.'
+* untrack-allmychanges: 'User untracked our project\'s changelog.'
 * landing-track: 'User has tracked changelog:123'
 * landing-ignore: 'User has ignored changelog:123'
 * landing-digest-view: 'User opened a landing page with digest.'

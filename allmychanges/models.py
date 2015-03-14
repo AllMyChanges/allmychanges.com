@@ -665,7 +665,8 @@ class Version(models.Model):
 
 ACTIVE_USER_ACTIONS = (
     u'landing-digest-view', u'landing-track', u'landing-ignore',
-    u'login', u'package-view', u'profile-update', u'digest-view',
+    u'login', u'profile-update', u'digest-view',
+    u'package-view', u'package-create', u'package-edit',
     u'edit-digest-view', u'index-view', u'track', u'untrack',
     u'untrack-allmychanges', u'create-issue')
 
