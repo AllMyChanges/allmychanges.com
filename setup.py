@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='allmychanges',
+    name='allmychanges-website',
     version='0.19.1',
     description='A djangodash project.',
     author='Alexander Artemenko',

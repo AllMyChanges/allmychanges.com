@@ -59,12 +59,18 @@ class CommonContextMixin(object):
         result['settings'] = settings
         result['request'] = self.request
 
-        key = 'num_tracked_changelogs'
-        num_tracked_changelogs = cache.get(key)
-        if num_tracked_changelogs is None:
+        key = 'track_stats_for_footer'
+        stats = cache.get(key)
+        if stats is None:
             num_tracked_changelogs = Changelog.objects.count()
-            cache.set(key, num_tracked_changelogs, HOUR)
-        result[key] = num_tracked_changelogs
+            num_trackers = User.objects.count()
+            cache.set(key,
+                      (num_trackers, num_tracked_changelogs),
+                      HOUR)
+        else:
+            num_trackers, num_tracked_changelogs = stats
+        result['num_trackers'] = num_trackers
+        result['num_tracked_changelogs'] = num_tracked_changelogs
 
         return result
 
