@@ -18,10 +18,26 @@
         </td>
       </tr>
       <tr class="form__layout__row">
+        <td class="form__layout__left-column"><label class="label">Digest:</label></td>
+        <td class="form__layout__right-column">
+          {{ form.send_digest|add_class:"text-input profile-form__digest-field" }}
+          <p class="form__layout__right-column form__help">We could prepare you a digest with
+release notes updates on a daily or weekly basis.</p>
+        </td>
+      </tr>
+      <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">Timezone:</label></td>
         <td class="form__layout__right-column">
           {{ form.timezone|add_class:"text-input profile-form__timezone-field" }}
           <p class="form__help">Digests will be sent at 9:00 in given timezone.</p>
+        </td>
+      </tr>
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column"><label class="label">Slack integration:</label></td>
+        <td class="form__layout__right-column">
+          {{ form.slack_url|add_class:"text-input profile-form__slack-url" }}
+          <p class="form__layout__right-column form__help">Enter Slack's URL here and we'll
+publish all discovered versions in that channel.</p>
         </td>
       </tr>
       <tr class="form__layout__row">

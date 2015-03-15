@@ -37,7 +37,7 @@ from allmychanges.models import (Version,
                                  UserHistoryLog,
                                  Preview)
 from allmychanges import chat
-from allmychanges.notifications import send_email
+from allmychanges.notifications.email import send_email
 from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import (HOUR,
@@ -583,7 +583,7 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
 
     def get_form_class(self):
         from django.forms.models import modelform_factory
-        return modelform_factory(User, fields=('email', 'timezone'))
+        return modelform_factory(User, fields=('email', 'timezone', 'send_digest', 'slack_url'))
 
     def get_object(self, queryset=None):
         return self.request.user

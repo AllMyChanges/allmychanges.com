@@ -12,6 +12,7 @@ _threads = []
 _threads_lock = threading.Lock()
 
 def send(text):
+    # may be refactor it using notifications some day
     def remote_send():
         if settings.SLACK_URL:
             requests.post(settings.SLACK_URL,

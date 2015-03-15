@@ -88,6 +88,12 @@ class UserManager(BaseUserManager):
         return queryset
 
 
+SEND_DIGEST_CHOICES = (
+    ('daily', 'Every day'),
+    ('weekly', 'Every week (on Monday)'),
+    ('never', 'Never'))
+
+
 class User(AbstractBaseUser):
     """
     A fully featured User model with admin-compliant permissions that uses
@@ -106,6 +112,13 @@ class User(AbstractBaseUser):
                                         related_name='trackers')
     moderated_changelogs = models.ManyToManyField('Changelog', through='Moderator',
                                                   related_name='moderators')
+
+    # notification settings
+    send_digest = models.CharField(max_length=100,
+                                   choices=SEND_DIGEST_CHOICES,
+                                   default='daily')
+    slack_url = models.URLField(max_length=2000,
+                                default='')
 
     objects = UserManager()
 
@@ -661,6 +674,9 @@ class Version(models.Model):
 
     def __unicode__(self):
         return self.number
+
+    def get_absolute_url(self):
+        return self.changelog.get_absolute_url() + '#' + self.number
 
 
 ACTIVE_USER_ACTIONS = (

@@ -8,6 +8,7 @@ from django.conf import settings
 from allmychanges.utils import (
     count,
     count_time)
+from allmychanges.notifications import slack
 from allmychanges.changelog_updater import update_preview_or_changelog
 from allmychanges import chat
 
@@ -180,3 +181,37 @@ def update_changelog_task(source):
 @job
 def raise_exception():
     1/0
+
+
+@singletone()
+@job('default', timeout=600)
+@transaction.atomic
+@wait_chat_threads
+def notify_users_about_new_versions(changelog_id, version_ids):
+    """Notifies a changelog's trackers with their preferred methods
+    """
+    from .models import Changelog, Version
+
+    with log.fields(changelog_id=changelog_id):
+        log.info('Starting task')
+        changelog = Changelog.objects.get(pk=changelog_id)
+        trackers = changelog.trackers.all()
+
+        versions = Version.objects.filter(pk__in=version_ids)
+        slack_versions = u', '.join(
+            '<http://allmychanges.com{0}|{1}>'.format(
+                version.get_absolute_url(),
+                version.number)
+            for version in versions)
+
+        slack_text = u'Look, new {versions_form} of <{url}|{namespace}/{name}> {was_form} found: {versions}'.format(
+            url='http://allmychanges.com' + changelog.get_absolute_url(),
+            namespace=changelog.namespace,
+            name=changelog.name,
+            versions=slack_versions,
+            versions_form='version' + (len(version_ids) > 1 and u's' or u''),
+            was_form=(len(version_ids) > 1) and 'were' or 'was')
+
+        for user in trackers:
+            if user.slack_url:
+                slack.send(url=user.slack_url, text=slack_text)

@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from premailer import Premailer
 
-from allmychanges.notifications import send_email
+from allmychanges.notifications.email import send_email
 
 
 def send_email_using_template(address, subject, template, **context):

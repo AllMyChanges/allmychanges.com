@@ -12,7 +12,7 @@ from django.utils import timezone
 from allmychanges.models import UserHistoryLog
 from allmychanges.views import get_digest_for
 from allmychanges.utils import dt_in_window
-from allmychanges.notifications import send_email
+from allmychanges.notifications.email import send_email
 
 
 def send_digest_to(user, code_version='v2'):
