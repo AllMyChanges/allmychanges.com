@@ -51,11 +51,25 @@
   </div>
   <script>
     $(document).ready(function(){
+      // делаем табло со списком версий прилипающим кверху при прокрутке
       $(".version-links").sticky({
         topSpacing:0,
         className: "version-links__sticky",
         wrapperClassName: "version-links__wrapper"
       });
+
+      // обрабатываем клик, чтобы при прокрутке не загораживать
+      // кусок changelog с выбранной версией
+      var version_links_height = $('.version-links').height();
+
+      $('.version-links__item a').click(function (ev) {
+        ev.preventDefault();
+        var version = $(this).text();
+        var section_top = $('[name="' + version + '"]').position().top;
+        window.scroll(0, section_top - version_links_height - 10);
+      });
+    
+      // используем плагин, чтобы помечать ссылку с текущей версией
       $(".package-version__number a").waypoint({
         handler: function (direction) {
           $(".version-links__item").removeClass("version-links__selected-item");
