@@ -15,14 +15,15 @@ from allmychanges.utils import dt_in_window
 from allmychanges.notifications.email import send_email
 
 
-def send_digest_to(user, code_version='v2'):
+def send_digest_to(user, period='day'):
     now = timezone.now()
-    day_ago = now - datetime.timedelta(1)
-    week_ago = now - datetime.timedelta(7)
+    period_ago = now - datetime.timedelta(1 if period == 'day' else 7)
+    second_period_ago = now - datetime.timedelta(7 if period == 'day' else 30)
+    second_period_name = 'week' if period == 'day' else 'month'
 
     today_changes = get_digest_for(user.changelogs,
-                                   after_date=day_ago,
-                                   code_version=code_version)
+                                   after_date=period_ago,
+                                   code_version='v2')
 
     if today_changes:
         # if True, then this digest includes only our own changelog
@@ -30,7 +31,7 @@ def send_digest_to(user, code_version='v2'):
         only_allmychanges = (len(today_changes) == 1
                              and today_changes[0]['name'] == 'allmychanges')
 
-        print 'Sending {0} digest to {1} {2}'.format(code_version, user.username, user.email)
+        print 'Sending digest to {0} {1}'.format(user.username, user.email)
         UserHistoryLog.write(user, '',
                              'digest-sent',
                              'We send user an email with digest')
@@ -41,10 +42,10 @@ def send_digest_to(user, code_version='v2'):
                 print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
                     **version)
 
-        week_changes = get_digest_for(user.changelogs,
-                                      before_date=day_ago,
-                                      after_date=week_ago,
-                                      code_version=code_version)
+        other_changes = get_digest_for(user.changelogs,
+                                       before_date=period_ago,
+                                       after_date=second_period_ago,
+                                       code_version='v2')
         def send_to(email):
             if user.username != 'svetlyak40wt' \
                and not email.startswith('svetlyak.40wt') \
@@ -65,8 +66,8 @@ def send_digest_to(user, code_version='v2'):
                        'digest.html',
                        context=dict(current_user=user,
                                     today_changes=today_changes,
-                                    week_changes_count=len(
-                                        week_changes)),
+                                    second_period_name=second_period_name,
+                                    other_changes_count=len(other_changes)),
                        tags=['allmychanges', 'digest'])
 
         send_to(user.email)
@@ -75,6 +76,7 @@ def send_digest_to(user, code_version='v2'):
 
 class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
+    period = 'day'
 
     def handle(self, *args, **options):
         # this will disable cssutil's logger
@@ -96,5 +98,10 @@ class Command(LogMixin, BaseCommand):
         else:
             users = users.filter(timezone__in=send_for_timezones)
 
+        # selecting only users who should receive this king of digests
+        users = users.filter(send_digest='daily'
+                             if self.period == 'day'
+                             else 'weekly')
+
         for user in users:
-            send_digest_to(user, code_version='v2')
+            send_digest_to(user, period=self.period)
