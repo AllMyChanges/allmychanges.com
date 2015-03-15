@@ -118,7 +118,8 @@ class User(AbstractBaseUser):
                                    choices=SEND_DIGEST_CHOICES,
                                    default='daily')
     slack_url = models.URLField(max_length=2000,
-                                default='')
+                                default='',
+                                blank=True)
 
     objects = UserManager()
 
