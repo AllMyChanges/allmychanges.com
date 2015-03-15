@@ -66,7 +66,15 @@
         ev.preventDefault();
         var version = $(this).text();
         var section_top = $('[name="' + version + '"]').position().top;
-        window.scroll(0, section_top - version_links_height - 10);
+        console.log('version_links_height', version_links_height);
+
+        var top = section_top - (version_links_height + 20);
+        if ($('.version-links__sticky').length == 0) {
+          // это нужно потому, что когда заголовок становится липким, то его содержимое
+          // вычитается из высоты страницы, сдвигая все заголовки вверх
+          top -= version_links_height + 20;
+        }
+        window.scroll(0, top);
       });
     
       // используем плагин, чтобы помечать ссылку с текущей версией
