@@ -1,3 +1,8 @@
+0.20.1 (2015-03-16)
+===================
+
+* Don't send Slack notification when no new versions were found.
+
 0.20.0 (2015-03-15)
 ===================
 
