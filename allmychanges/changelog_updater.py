@@ -62,6 +62,9 @@ def fill_missing_dates2(raw_data):
 def update_changelog_from_raw_data3(obj, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
+    from allmychanges.models import Changelog
+    from allmychanges.tasks import notify_users_about_new_versions
+
     code_version = 'v2'
     now = timezone.now()
 
@@ -117,12 +120,15 @@ def update_changelog_from_raw_data3(obj, raw_data):
             num_discovered_versions=len(discovered_versions),
             num_new_versions=len(new_versions))
 
+    new_versions_ids = []
     for raw_version in raw_data:
         with log.fields(version_number=raw_version.version,
                         code_version=code_version):
             version, created = obj.versions.get_or_create(
                 number=raw_version.version,
                 code_version=code_version)
+            if created:
+                new_versions_ids.append(version.id)
 
         version.unreleased = getattr(raw_version, 'unreleased', False)
         version.filename = getattr(raw_version, 'filename', None)
@@ -138,6 +144,10 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.save()
 
     reorder_versions(list(obj.versions.all()))
+
+    if isinstance(obj, Changelog):
+        notify_users_about_new_versions.delay(
+            obj.id, new_versions_ids)
 
 
 def update_preview_or_changelog(obj):
