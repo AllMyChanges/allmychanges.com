@@ -373,6 +373,7 @@ class PackageView(CommonContextMixin, TemplateView):
 
         if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
             result['show_sources'] = True
+            result['show_issues'] = True
         else:
             result['show_sources'] = self.request.GET.get('show_sources', None)
 
@@ -404,6 +405,7 @@ class PackageView(CommonContextMixin, TemplateView):
         result['package'] = package_data
         result['login_to_track'] = login_to_track
         result['already_tracked'] = already_tracked
+        result['issues'] = changelog.issues.filter(resolved_at=None)
 
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,

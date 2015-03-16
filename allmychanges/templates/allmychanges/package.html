@@ -34,6 +34,10 @@
       <dt>Problem:</dt>
       <dd>{{package.changelog.problem}}</dd>
     {% endif %}
+    {% if show_issues and issues.count %}
+      <dt>Issues:</dt>
+      <dd><a href="/issues/?namespace={{package.namespace}}&amp;name={{package.name}}">{{issues.count}}</a></dd>
+    {% endif %}
       <dt>Versions:</dt>
       <dd>
   <ul class="version-links">
