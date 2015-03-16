@@ -430,6 +430,7 @@ def rechttp_downloader(source,
     DEFAULT_UPPER_LIMIT = 100
     UPPER_LIMITS = {
         'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,
+        'rechttp+http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
     }
     upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
@@ -491,7 +492,8 @@ def rechttp_downloader(source,
             queue.append(url)
 
     def fetch_page(url):
-#        print 'Fetching', url
+        if os.environ.get('DEV_DOWNLOAD', None):
+            print 'Fetching', url
         response = requests.get(url)
         filename = filename_from(response)
         fs_path = os.path.join(base_path, filename)
