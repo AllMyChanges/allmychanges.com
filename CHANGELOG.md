@@ -1,3 +1,46 @@
+0.20.0 (2015-03-15)
+===================
+
+This release bring significant improvements in our
+notification system. Now you could go into
+your [account's settings](http://allmychanges.com/account/settings/) and to select
+if you want to receive email digests daily or weekly.
+
+Or, you could turn email notifications off and enable Slack
+notification instead.
+
+How to enable Slack notifications
+---------------------------------
+
+1. Go to you Slack account.
+2. In channel's dropdown menu, choose "Add a service integration..."  
+   ![](https://img-fotki.yandex.ru/get/6810/13558447.f/0_b36af_fdb87a97_L.png)
+3. Next, filter all available integrations by "webhook" keyword.  
+   ![](https://img-fotki.yandex.ru/get/5500/13558447.f/0_b36ae_4eb39439_L.png)
+4. And select "Incoming WebHooks".
+5. Choose a channel to which notification should be sent by AllMyChanges.
+6. And push this huge "Add Incoming Webhook Integration" button :)
+7. Finally, copy value from "Webhook URL" field into "Slack Url field at
+   allmychanges's [account settings](http://allmychanges.com/account/settings/) page.
+
+
+Other good news
+---------------
+
+Also, our downloader was improved and now it is able to fetch multiple pages.
+This is required some tuning, but works pretty good. For example, whithout it
+we weren't able to process release notes of some important projects, but here
+they are:
+
+* [PostgreSQL](http://allmychanges.com/p/soft/postgresql/)
+* [Cloudera CDH](http://allmychanges.com/p/java/hadoop/)
+* [Apache Spark](http://allmychanges.com/p/java/spark/)
+* [Apache Kafka](http://allmychanges.com/p/java/kafka/)
+
+Take look at the settings of these projects (push "Tune" button on their pages)
+to understand how `rechttp` downloader works.
+
+
 0.19.1 (2015-03-05)
 ===================
 
