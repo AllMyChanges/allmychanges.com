@@ -145,7 +145,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
     reorder_versions(list(obj.versions.all()))
 
-    if isinstance(obj, Changelog):
+    if new_versions_ids and isinstance(obj, Changelog):
         notify_users_about_new_versions.delay(
             obj.id, new_versions_ids)
 
