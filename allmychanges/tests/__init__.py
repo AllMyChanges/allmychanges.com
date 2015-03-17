@@ -12,3 +12,4 @@ from .registration import *
 from .tasks import *
 from .version import *
 from .validators import *
+from .autocomplete import *

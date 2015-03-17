@@ -754,3 +754,46 @@ class EmailVerificationCode(models.Model):
                 hash=hash)
 
         return code
+
+
+AUTOCOMPLETE_TYPES = (
+    ('source', 'Source URL'),
+    ('namespace', 'Namespace'),
+    ('package', 'Package'))
+
+AUTOCOMPLETE_ORIGINS = (
+    ('app-store', 'App Store'),
+    ('pypi', 'PyPi'))
+
+
+class AutocompleteData(models.Model):
+    origin = models.CharField(max_length=100,
+                              choices=AUTOCOMPLETE_ORIGINS)
+    title = models.CharField(max_length=1000)
+    type = models.CharField(max_length=10,
+                            choices=AUTOCOMPLETE_TYPES)
+    source = models.CharField(max_length=1000,
+                              blank=True, null=True)
+    icon = models.CharField(max_length=1000,
+                            blank=True, null=True)
+    changelog = models.ForeignKey(Changelog,
+                                  blank=True, null=True,
+                                  related_name='autocomplete')
+
+    def __repr__(self):
+        return '<AutocompleteData: {0}>'.format(self.title.encode('utf-8'))
+
+    def save(self, *args, **kwargs):
+        super(AutocompleteData, self).save(*args, **kwargs)
+        if self.words.count() == 0:
+            for word in self.title.split():
+                self.words.create(word=word)
+
+
+class AutocompleteWord(models.Model):
+    word = models.CharField(max_length=100)
+    data = models.ForeignKey(AutocompleteData,
+                             related_name='words')
+
+    def __repr__(self):
+        return '<AutocompleteWord: {0}>'.format(self.word.encode('utf-8'))
