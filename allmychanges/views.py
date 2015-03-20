@@ -638,7 +638,7 @@ def delete_user_token(user, token):
     AccessToken.objects.filter(token=token).delete()
 
 
-class TokenView(CommonContextMixin, FormView):
+class TokenView(LoginRequiredMixin, CommonContextMixin, FormView):
     form_class = TokenForm
     template_name = 'allmychanges/token.html'
     success_url = '/account/token/'
