@@ -16,7 +16,8 @@ module.exports = {
         $('.track-button-container').each(function (idx, element) {
             React.render(
                 <TrackButton changelog_id={element.dataset['changelogId']}
-                             tracked={element.dataset['tracked']}/>,
+                             tracked={element.dataset['tracked']}
+                             num_trackers={element.dataset['numTrackers']}/>,
                 element);
         });
 

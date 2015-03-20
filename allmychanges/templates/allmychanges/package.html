@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="page-header">{{package.namespace}}/{{package.name}} <a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <a href="{{package.source|remove_source_prefix}}" class="button" title="Go to package's sources"><i class="fa fa-external-link-square fa-lg" style="margin-right: 5px"></i>Source</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <div class="track-button-container" data-changelog-id="{{package.changelog.id}}" data-tracked="{{already_tracked|lower}}"></div></h1>
+  <h1 class="page-header">{{package.namespace}}/{{package.name}} <a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <a href="{{package.source|remove_source_prefix}}" class="button" title="Go to package's sources"><i class="fa fa-external-link-square fa-lg" style="margin-right: 5px"></i>Source</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <div class="track-button-container" data-changelog-id="{{package.changelog.id}}" data-tracked="{{already_tracked|lower}}" data-num-trackers="{{num_trackers}}"></div></h1>
 
   <dl class="package-metadata">
     <dt>Badge for README:</dt>

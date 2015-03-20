@@ -406,6 +406,7 @@ class PackageView(CommonContextMixin, TemplateView):
         result['login_to_track'] = login_to_track
         result['already_tracked'] = already_tracked
         result['issues'] = changelog.issues.filter(resolved_at=None)
+        result['num_trackers'] = changelog.trackers.count()
 
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,

@@ -1302,6 +1302,18 @@ body.email {
 .track-button-container {
   display: inline-block;
 }
+.track-button {
+  position: relative;
+}
+.track-button__message {
+  width: 400px;
+  position: absolute;
+  top: -16px;
+  left: 70px;
+  font-size: 16px;
+  color: #808080;
+  font: proxima-nova, sans-serif;
+}
 /* override link style from email-reset */
 a {
   color: #15c;
