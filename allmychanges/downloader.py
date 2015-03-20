@@ -475,8 +475,17 @@ def rechttp_downloader(source,
     def filename_from(response):
         splitted = urlparse.urlsplit(response.url)
         path = splitted.path
+        ext = os.path.splitext(path)[1]
+        if re.search('\d', ext) is not None:
+            # we ignore extensions with numbers because
+            # most probably they are from urls like
+            # http://wiki.blender.org/index.php/Dev:Ref/Release_Notes/2.57b
+            ext = ''
+
         if path.endswith('/'):
             path += 'index.html'
+        elif not ext:
+            path += '.html'
         return path.lstrip('/')
 
     def make_absolute(url, base_url):
@@ -492,10 +501,12 @@ def rechttp_downloader(source,
             queue.append(url)
 
     def fetch_page(url):
-        if os.environ.get('DEV_DOWNLOAD', None):
-            print 'Fetching', url
         response = requests.get(url)
         filename = filename_from(response)
+
+        if os.environ.get('DEV_DOWNLOAD', None):
+            print 'Fetching', url, '->', filename
+
         fs_path = os.path.join(base_path, filename)
         ensure_dir(os.path.dirname(fs_path))
 
