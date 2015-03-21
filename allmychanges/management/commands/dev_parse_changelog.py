@@ -3,7 +3,7 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
-from allmychanges.utils import split_filenames
+from allmychanges.utils import split_filenames, parse_search_list
 
 
 def print_version(version, full=False):
@@ -33,12 +33,7 @@ class Command(LogMixin, BaseCommand):
         search_list = ignore_list = []
 
         if len(args) >= 1:
-            def parse_check(text):
-                if ':' in text:
-                    return text.split(':', 1)
-                return text, None
-
-            search_list = map(parse_check, split_filenames(args[0]))
+            search_list = parse_search_list(args[0])
         if len(args) >= 2:
             ignore_list = split_filenames(args[1])
 

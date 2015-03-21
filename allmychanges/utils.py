@@ -277,9 +277,15 @@ def get_text_from_response(response):
 def is_http_url(text):
     return re.match('^https?://.*$', text, flags=re.IGNORECASE) is not None
 
+is_not_http_url = lambda text: not is_http_url(text)
 
-def is_not_http_url(text):
-    return not is_http_url(text)
+
+def is_attr_pattern(text):
+    """Attribute patters are like '[title=Version \d.*]'
+    """
+    return text.startswith('[')
+
+is_not_attr_pattern = lambda text: not is_attr_pattern(text)
 
 
 def html_document_fromstring(text):
@@ -294,3 +300,27 @@ def html_document_fromstring(text):
         text = text.encode(match.group('encoding'))
 
     return lxml.html.document_fromstring(text)
+
+
+def parse_search_list(text):
+    """Parses comma-separated list of patterns for search.
+
+    Returns a list of tuples like [(pattern, markup)]
+    Some patterns could http urls or [attrname=pattern].
+
+    Http urls are used in rechttp downloader, to filter
+    only needed urls.
+
+    Attribute patterns are used to filter already processed
+    versions by attribute's value, for example by title.
+    """
+    def process(name):
+        if is_not_http_url(name) \
+           and is_not_attr_pattern(name) \
+           and ':' in name:
+            return name.rsplit(':', 1)
+        else:
+            return (name, None)
+
+    items = split_filenames(text)
+    return map(process, items)

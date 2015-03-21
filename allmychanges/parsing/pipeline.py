@@ -20,6 +20,7 @@ from allmychanges.crawler import (
     _parse_item)
 from allmychanges.utils import (
     strip_long_text, is_not_http_url,
+    is_http_url, is_attr_pattern,
     html_document_fromstring)
 from allmychanges.env import Environment
 from django.conf import settings
@@ -92,9 +93,11 @@ def get_files(env, walk=os.walk):
     """
 
     ignore_list = [re.compile('^' + item + '.*$')
-                   for item in env.ignore_list]
+                   for item in env.ignore_list
+                   if not (is_http_url(item) or is_attr_pattern(item))]
     search_list = [(re.compile('^' + item + '.*$'), markup)
-                   for item, markup in env.search_list]
+                   for item, markup in env.search_list
+                   if not (is_http_url(item) or is_attr_pattern(item))]
 
     def in_ignore_list(filename):
         for pattern in ignore_list:
@@ -519,8 +522,6 @@ def parse_html_file(obj):
         while stack[-1][0] >= h_level:
             stack.pop()
 
-        # if 'Level 2.1' == h_title:
-        #     import pudb; pudb.set_trace()  # DEBUG
         result_item = process_header(stack[-1][1],
                                      h_level,
                                      h_elem,
@@ -828,7 +829,7 @@ def filter_versions(versions):
         file_section = v.find_parent_of_type('file_section')
         # if v.version == '2.74':
         #     # print_tree(v)
-        #     import pudb; pudb.set_trace()  # DEBUG
+
         if file_section: # if not, then this is probably from VCS
             children = file_section.get_children()
             # предварительно выберем детей, к которых такая же версия
