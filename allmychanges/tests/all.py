@@ -10,7 +10,9 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from allmychanges.auth.pipeline import add_default_package
-from allmychanges.parsing.pipeline import filter_trash_versions
+from allmychanges.parsing.pipeline import (
+    filter_versions_by_source,
+    filter_versions_by_attribute)
 from allmychanges.models import (Version,
                                  User,
                                  Changelog,
@@ -30,6 +32,7 @@ from allmychanges.source_guesser import guess_source
 from allmychanges.views import get_digest_for
 
 from .utils import refresh, check_status_code, create_user
+
 
 def test_update_package_from_basic_structure():
     root = Environment()
@@ -434,7 +437,7 @@ def test_get_files_respect_ignore_and_search_lists():
         result)
 
 
-def test_trash_versions_filtering():
+def test_filtering_versions_by_source():
     # now check if CHANGELOG.md is preferred to large number of versions
     # from docs/ subdirectory
     versions = []
@@ -455,20 +458,40 @@ def test_trash_versions_filtering():
     versions.append(Version(filename="docs/sources/reference/api/docker_remote_api_v1.1.md", number="2.2"))
     versions.append(Version(filename="docs/sources/reference/api/docker_remote_api_v1.1.md", number="2.1"))
 
-    new = filter_trash_versions(versions)
+    new = filter_versions_by_source(versions)
     filenames = {v.filename for v in new}
     eq_(['CHANGELOG.md'], list(filenames))
 
 
-def test_trash_versions_filtering_on_separate_release_notes():
+def test_filtering_versions_by_source_on_separate_release_notes():
     versions = []
     versions.append(Version(filename='dist/kafka/0.8.2.1/RELEASE_NOTES.html', number='0.8.2.1'))
     versions.append(Version(filename='dist/kafka/0.8.0/RELEASE_NOTES.html', number='0.8.0'))
 
-    new = filter_trash_versions(versions)
+    new = filter_versions_by_source(versions)
     filenames = {v.filename for v in new}
     eq_(['dist/kafka/0.8.0/RELEASE_NOTES.html',
          'dist/kafka/0.8.2.1/RELEASE_NOTES.html'], list(filenames))
+
+
+def test_filtering_versions_by_attribute():
+    root = Environment()
+    versions = [
+        root.push(title='RELEASE_NOTES.html', number='0.8.2.1'),
+        root.push(title='Version 0.8.0 release notes', number='0.8.0')]
+
+    new = filter_versions_by_attribute(versions,
+                                       search_list=[(ur'[title=Version \d.*]', None)])
+    eq_(['0.8.0'], [v.number for v in new])
+
+    new = filter_versions_by_attribute(versions,
+                                       ignore_list=[ur'[title=.*\.html]'])
+    eq_(['0.8.0'], [v.number for v in new])
+
+    new = filter_versions_by_attribute(versions,
+                                       search_list=[],
+                                       ignore_list=[])
+    eq_(set(['0.8.0', '0.8.2.1']), {v.number for v in new})
 
 
 

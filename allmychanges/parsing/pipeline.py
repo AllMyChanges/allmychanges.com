@@ -500,12 +500,14 @@ def parse_html_file(obj):
             if isinstance(ch.tag, basestring):
                 return not ch.tag.lower().startswith('h') \
                     or header_level(ch) > level
+            return True
 
         children = list(takewhile(
             not_same_level_H,
             all_children))
 
         full_content = create_full_content(children)
+
         return parent.push(type='file_section',
                            title=title,
                            content=full_content)
@@ -755,7 +757,40 @@ def group_by_path(versions):
     return result
 
 
-def filter_trash_versions(versions):
+
+def filter_versions_by_attribute(versions, search_list=[], ignore_list=[]):
+    pattern = re.compile(ur'\[(?P<attribute>.+)=(?P<pat>.*)\]')
+    search_patterns = list(pattern.match(item[0]) for item in search_list)
+    search_patterns = [(match.group('attribute'), re.compile(match.group('pat')))
+                       for match in search_patterns if match is not None]
+
+    ignore_patterns = (pattern.match(item) for item in ignore_list)
+    ignore_patterns = [(match.group('attribute'), re.compile(match.group('pat')))
+                       for match in ignore_patterns if match is not None]
+
+    def not_to_ignore(version):
+        for attribute, pattern in ignore_patterns:
+            value = getattr(version, attribute, '')
+            if pattern.match(value) is not None:
+                return False
+        return  True
+
+    def in_search(version):
+        if search_patterns:
+            for attribute, pattern in search_patterns:
+                value = getattr(version, attribute, '')
+                if pattern.match(value) is not None:
+                    return True
+            return False
+        return  True
+
+    new = [v
+           for v in versions
+           if in_search(v) and not_to_ignore(v)]
+    return new
+
+
+def filter_versions_by_source(versions):
     def calc_score(version):
         if filename_looks_like_a_changelog(version.filename):
             return 1000
@@ -791,8 +826,8 @@ def filter_versions(versions):
 
     for v in versions:
         file_section = v.find_parent_of_type('file_section')
-        # if v.version == '3.1':
-        #     print_tree(v)
+        # if v.version == '2.74':
+        #     # print_tree(v)
         #     import pudb; pudb.set_trace()  # DEBUG
         if file_section: # if not, then this is probably from VCS
             children = file_section.get_children()
@@ -1018,9 +1053,12 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
 
     # print '\n'.join(map('{0[0]}: {0[1]}'.format, sorted(grouped2)))
 
+    versions = filter_versions_by_attribute(versions,
+                                            search_list=search_list,
+                                            ignore_list=ignore_list)
     # now we'll select a source with maximum number of versions
     # but not the root directory
-    versions = filter_trash_versions(versions)
+    versions = filter_versions_by_source(versions)
 
     # using customized comparison we make versions which
     # have less metadata go first
