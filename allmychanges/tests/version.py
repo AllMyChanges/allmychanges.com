@@ -1,12 +1,27 @@
 from nose.tools import eq_
 
-from ..version import compare_versions, reorder_versions
-from ..models import Version
-from .utils import refresh
+from allmychanges.version import compare_versions, reorder_versions
+from allmychanges.models import Version
+from allmychanges.tests.utils import refresh
 
 
 def test_version_comparison():
-    eq_(1, compare_versions('1.2.3', '1.2.1'))
+    # 0.8.2-beta < 0.8.2
+    eq_(-1, compare_versions('0.8.2-beta', '0.8.2'))
+    # 0.8.1 < 0.8.2-beta
+    eq_(-1, compare_versions('0.8.1', '0.8.2-beta'))
+    # 0.8.2-alfa < 0.8.2-beta
+    eq_(-1, compare_versions('0.8.2-alpha', '0.8.2-beta'))
+
+    # 0.8 < 0.8.1
+    eq_(-1, compare_versions('0.8', '0.8.1'))
+    # 0.8-alpha < 0.8.1-alpha
+    eq_(-1, compare_versions('0.8-alpha', '0.8.1-alpha'))
+
+    # simple case
+    eq_(-1, compare_versions('1.2.1', '1.2.3'))
+
+    # weird case compared lexicographically
     eq_(-1, compare_versions('2008g', '2014.10'))
 
 
