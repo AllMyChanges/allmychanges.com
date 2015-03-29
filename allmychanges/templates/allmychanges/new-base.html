@@ -94,7 +94,7 @@
       <div class="content">
         {% block no-email-warning %}
           {% if user.is_authenticated and not user.email %}
-            <div class="plate plate_warning">Please, <a href="{% url "account-settings" %}#notifications">setup email</a> and we will notify you when new versions will be discovered.</div>
+            <div class="plate plate_warning">To receive notifications about new versions, <a href="{% url "account-settings" %}#notifications">setup email</a>.</div>
           {% endif %}
         {% endblock %}
 

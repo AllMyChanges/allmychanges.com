@@ -324,3 +324,50 @@ def parse_search_list(text):
 
     items = split_filenames(text)
     return map(process, items)
+
+
+def first_sentences(text, max_length=1000):
+    """Returns first sentences with cumulative length no more than max_length.
+    If there is one very long sentence, then it will be cutted to max_length-1
+    and ... unicode symbol will be added to the end.
+    """
+    if len(text) <= max_length:
+        return text
+
+    sentences = []
+    regex = re.compile(ur'[.?!]( |\n)+')
+
+    pos = 0
+    match = regex.search(text, pos)
+    if match is None:
+        return text[:max_length - 1] + u'…'
+
+    while match is not None:
+        end = match.start()
+        group0 = match.group(0)
+
+        sentence = text[pos: end] + group0.strip()
+        sentences.append(sentence)
+        pos = end + len(group0)
+
+        match = regex.search(text, pos)
+
+    last_sentence = text[pos:]
+    sentences.append(last_sentence)
+
+    first_sentence = sentences[0]
+    if len(first_sentence) > max_length:
+        return first_sentence[:max_length - 1] + u'…'
+
+    sum_len = 0
+
+    for idx, sentence in enumerate(sentences):
+        sentence_len = len(sentence)
+        if idx > 0:
+            sentence_len += 1 # because we have to insert space between sentences
+
+        if sum_len + sentence_len > max_length:
+            return u' '.join(sentences[:idx])
+        sum_len += sentence_len
+
+    raise RuntimeError('Should never go here.')

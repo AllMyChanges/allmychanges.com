@@ -315,12 +315,21 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
         changelogs = self.request.GET.get('changelogs', '')
         self.changelogs = parse_ints(changelogs)
 
+        # this parameter is used in ios-promo because
+        # many apps are really old and we need to show
+        # something for them
+        self.long_period = self.request.GET.get('long-period', '')
+
         cache_key = 'digest-{changelogs}'.format(changelogs=join_ints(changelogs))
-        return cache_key, 4 * HOUR
+
+        if self.long_period:
+            # don't cache for ios-promo
+            return cache_key + '-long', 0
+        else:
+            return cache_key, 4 * HOUR
 
     def get_context_data(self, **kwargs):
         result = super(LandingDigestView, self).get_context_data(**kwargs)
-
         now = timezone.now()
         one_day = datetime.timedelta(1)
         day_ago = now - one_day
@@ -331,13 +340,25 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
         result['current_user'] = self.request.user
 
         changelogs = Changelog.objects.filter(pk__in=self.changelogs)
-        result['today_changes'] = get_digest_for(changelogs,
-                                                 after_date=day_ago,
-                                                 code_version=code_version)
-        result['week_changes'] = get_digest_for(changelogs,
-                                                before_date=day_ago,
-                                                after_date=week_ago,
-                                                code_version=code_version)
+
+        if self.long_period:
+            changelog_statuses = {ch.status for ch in changelogs}
+            if 'processing' not in changelog_statuses:
+                # we only return results if all changelogs are ready
+                result['long_changes'] = get_digest_for(
+                    changelogs,
+                    after_date=now - datetime.timedelta(365 * 5),
+                    code_version=code_version)
+        else:
+            result['today_changes'] = get_digest_for(
+                changelogs,
+                after_date=day_ago,
+                code_version=code_version)
+            result['week_changes'] = get_digest_for(
+                changelogs,
+                before_date=day_ago,
+                after_date=week_ago,
+                code_version=code_version)
         return result
 
     def get(self, *args, **kwargs):
@@ -582,11 +603,22 @@ class ChangeLogView(View):
 class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
     model = User
     template_name = 'allmychanges/account-settings.html'
-    success_url = '/account/settings/'
 
     def get_form_class(self):
         from django.forms.models import modelform_factory
         return modelform_factory(User, fields=('email', 'timezone', 'send_digest', 'slack_url'))
+
+    def get_context_data(self, **kwargs):
+        result = super(ProfileView, self).get_context_data(**kwargs)
+        result['from_registration'] = self.request.GET.get('registration')
+        return result
+
+    def get_success_url(self):
+        if self.request.POST.get('from_registration'):
+            return '/digest/'
+        else:
+            return '/account/settings/'
+
 
     def get_object(self, queryset=None):
         return self.request.user

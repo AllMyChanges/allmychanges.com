@@ -19,6 +19,7 @@ from allmychanges.models import (Version,
                                  Preview)
 from allmychanges.utils import (
     dt_in_window,
+    first_sentences,
     discard_seconds)
 from allmychanges.downloader import fake_downloader
 from allmychanges.changelog_updater import (
@@ -528,3 +529,13 @@ def test_active_changelogs_filtering():
     response = list(Changelog.objects.only_active())
     eq_(1, len(response))
     eq_(ch1.id, response[0].id)
+
+
+
+def test_first_sentences():
+    eq_(u'Blah.', first_sentences(u'Blah.', max_length=5))
+    eq_(u'Blah minor.', first_sentences(u'Blah minor. Again!', max_length=11))
+    eq_(u'Blah mino…', first_sentences(u'Blah minor. Again!', max_length=10))
+    eq_(u'Again!', first_sentences(u'Again! Blah minor.', max_length=7))
+    eq_(u'Blah minor.', first_sentences(u'Blah minor.\nAgain!', max_length=11))
+    eq_(u'Blah minor. Again!', first_sentences(u'Blah minor.\nAgain!\nAnd again.', max_length=20))

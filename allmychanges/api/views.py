@@ -2,14 +2,15 @@
 import re
 
 from django.utils import timezone
-from django.db.models import Max
+from django.db.models import Max, Q
 from django import forms
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 from itertools import islice
 from twiggy_goodies.threading import log
 from urllib import urlencode
 
-from rest_framework import viewsets, mixins, views, permissions
+from rest_framework import viewsets, mixins, permissions
 from rest_framework.exceptions import ParseError
 from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
@@ -19,6 +20,7 @@ from allmychanges.downloader import normalize_url
 from allmychanges.models import (Subscription,
                                  Issue,
                                  Version,
+                                 AutocompleteData,
                                  Changelog, UserHistoryLog)
 from allmychanges import chat
 from allmychanges.api.serializers import (
@@ -146,6 +148,65 @@ class SearchAutocompleteView(viewsets.ViewSet):
         return Response({'results': results})
 
 
+class SearchAutocomplete2View(viewsets.ViewSet):
+    def list(self, request, *args, **kwargs):
+        name = request.GET.get('q', '')
+        namespace = request.GET.get('namespace') # optional
+
+        results = []
+        sources = set()
+
+        def add_changelogs(changelogs):
+            for changelog in changelogs:
+                sources.add(changelog.source)
+                resource_uri = request.build_absolute_uri(
+                    reverse('changelog-detail',
+                            kwargs=dict(pk=changelog.pk)))
+                results.append(dict(type='package',
+                                    namespace=changelog.namespace,
+                                    name=changelog.name,
+                                    source=changelog.source,
+                                    resource_uri=resource_uri,
+                                    icon=changelog.icon,
+                                    url=changelog.get_absolute_url()))
+
+        if not namespace:
+            splitted = re.split(r'[ /]', name, 1)
+            if len(splitted) == 2:
+                namespace, name = splitted
+
+        if namespace:
+            add_changelogs(Changelog.objects.filter(namespace=namespace,
+                                                    name__icontains=name).distinct())
+        else:
+            namespaces = Changelog.objects.exclude(namespace=None).exclude(name=None).values_list('namespace', flat=True).distinct()
+            for namespace in namespaces:
+                if name in namespace:
+                    results.append(dict(type='namespace',
+                                         namespace=namespace,
+                                         url='/catalogue/#' + namespace))
+
+
+            add_changelogs(Changelog.objects.filter(name__icontains=name)
+                        .distinct())
+
+        data = AutocompleteData.objects.filter(
+            words__word__istartswith=name)
+        data = data.filter(origin='app-store')
+        data = data.distinct()
+
+        for item in data[:10]:
+            url = item.source
+            if url not in sources:
+                results.append(dict(type='add-new',
+                                    source=url,
+                                    name=item.title,
+                                    namespace='ios',
+                                    icon=item.icon,
+                                    url='/p/new/?' + urlencode(dict(url=url))))
+
+        return Response({'results': results})
+
 
 class LandingPackageSuggestView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
@@ -239,6 +300,14 @@ class ChangelogViewSet(HandleExceptionMixin,
         # saving to be able to check in `update` if the source was changed
         self.original_source = obj.source
         return obj
+
+    def create(self, *args, **kwargs):
+        response = super(ChangelogViewSet, self).create(
+            *args, **kwargs)
+        # put changelog into the queue right
+        # away
+        self.object.schedule_update()
+        return response
 
     def update(self, *args, **kwargs):
         response = super(ChangelogViewSet, self).update(*args, **kwargs)

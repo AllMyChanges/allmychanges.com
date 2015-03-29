@@ -66,6 +66,7 @@ class ChangelogSerializer(ModelSerializer):
             'namespace',
             'name',
             'source',
+            'icon',
             'created_at',
             'updated_at',
             'next_update_at',

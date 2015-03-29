@@ -33,6 +33,7 @@ MARKUP_CHOICES = (
 )
 NAME_LENGTH = 80
 NAMESPACE_LENGTH = 80
+DESCRIPTION_LENGTH = 255
 
 
 # based on http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
@@ -263,6 +264,8 @@ class Changelog(Downloadable, models.Model):
     downloader = models.CharField(max_length=10, blank=True, null=True)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
+    icon = models.CharField(max_length=1000,
+                            blank=True, null=True)
 
     class Meta:
         unique_together = ('namespace', 'name')
@@ -758,15 +761,21 @@ AUTOCOMPLETE_ORIGINS = (
     ('pypi', 'PyPi'))
 
 
+COMMON_WORDS = set('a,able,about,across,after,all,almost,also,am,among,an,and,any,are,as,at,be,because,been,but,by,can,cannot,could,dear,did,do,does,either,else,ever,every,for,from,get,got,had,has,have,he,her,hers,him,his,how,however,i,if,in,into,is,it,its,just,least,let,like,likely,may,me,might,most,must,my,neither,no,nor,not,of,off,often,on,only,or,other,our,own,rather,said,say,says,she,should,since,so,some,than,that,the,their,them,then,there,these,they,this,tis,to,too,twas,us,wants,was,we,were,what,when,where,which,while,who,whom,why,will,with,would,yet,you,your'.split(','))
+
+
 class AutocompleteData(models.Model):
     origin = models.CharField(max_length=100,
                               choices=AUTOCOMPLETE_ORIGINS)
-    title = models.CharField(max_length=1000)
+    title = models.CharField(max_length=255)
+    description = models.CharField(max_length=DESCRIPTION_LENGTH,
+                                   default='')
     type = models.CharField(max_length=10,
                             choices=AUTOCOMPLETE_TYPES)
-    source = models.CharField(max_length=1000,
-                              blank=True, null=True)
-    icon = models.CharField(max_length=1000,
+    source = models.CharField(max_length=255, # we need this because MySQL will output warning and break our migrations for greater length
+                              blank=True, null=True,
+                              db_index=True)
+    icon = models.CharField(max_length=255,
                             blank=True, null=True)
     changelog = models.ForeignKey(Changelog,
                                   blank=True, null=True,
@@ -778,14 +787,73 @@ class AutocompleteData(models.Model):
     def save(self, *args, **kwargs):
         super(AutocompleteData, self).save(*args, **kwargs)
         if self.words.count() == 0:
-            for word in self.title.split():
-                self.words.create(word=word)
+            self.add_words()
+
+    def add_words(self):
+        self.words.create(word=self.title.lower())
+
+        words = self.title.split()
+        words = (word.strip() for word in words)
+        words = set(word.lower() for word in words if len(word) > 3)
+        words -= COMMON_WORDS
+        for word in words:
+            self.words.create(word=word)
+
+    def add_words2(self):
+        AutocompleteWord.objects.using('second').create(data=self,
+                                                        word=self.title.lower())
+
+        words = self.title.split()
+        words = (word.strip() for word in words)
+        words = set(word.lower() for word in words if len(word) > 3)
+        words -= COMMON_WORDS
+        for word in words:
+            AutocompleteWord.objects.using('second').create(data=self, word=word)
 
 
 class AutocompleteWord(models.Model):
-    word = models.CharField(max_length=100)
+    word = models.CharField(max_length=100, db_index=True)
     data = models.ForeignKey(AutocompleteData,
                              related_name='words')
 
     def __repr__(self):
         return '<AutocompleteWord: {0}>'.format(self.word.encode('utf-8'))
+
+
+class AutocompleteWord2(models.Model):
+    word = models.CharField(max_length=100, unique=True)
+    data_objects = models.ManyToManyField(
+        AutocompleteData,
+        related_name='words2')
+
+    def __repr__(self):
+        return '<AutocompleteWord: {0}>'.format(self.word.encode('utf-8'))
+
+
+class AppStoreBatch(models.Model):
+    """To identify separate processing batches.
+    """
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class AppStoreUrl(models.Model):
+    """This model is used when we are fetching
+    data from app store for our autocomplete.
+
+    Use management command update_appstore_urls to populate this collection.
+    """
+    # we need this because MySQL will output warning and break our migrations for greater length
+    source = models.CharField(max_length=255,
+                              blank=True, null=True,
+                              unique=True)
+    autocomplete_data = models.OneToOneField(AutocompleteData,
+                                             blank=True, null=True,
+                                             related_name='appstore_url',
+                                             on_delete=models.SET_NULL)
+    batch = models.ForeignKey(AppStoreBatch,
+                              blank=True, null=True,
+                              related_name='urls',
+                              on_delete=models.SET_NULL)
+
+    def __repr__(self):
+        return '<AppStoreUrl: {0}>'.format(self.source.encode('utf-8'))

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-import logging
+import datetime
 
 from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 
-from allmychanges.utils import (
-    count,
-    count_time)
+from allmychanges.downloader import normalize_url
+from allmychanges.utils import count, first_sentences
 from allmychanges.notifications import slack
 from allmychanges.changelog_updater import update_preview_or_changelog
 from allmychanges import chat
@@ -215,3 +214,94 @@ def notify_users_about_new_versions(changelog_id, version_ids):
         for user in trackers:
             if user.slack_url:
                 slack.send(url=user.slack_url, text=slack_text)
+
+
+
+def process_appstore_url(url):
+    from .models import AutocompleteData, DESCRIPTION_LENGTH
+    source = url.source
+    # we need this because autocomplete compares
+    # these urls agains Changelog model where sources
+    # are normalized
+    # print '\nprocessing-appstore:', source
+    with log.name_and_fields('process_appstore_url', source=source):
+        try:
+            log.info('Processing')
+            if url.autocomplete_data is None:
+                source, username, repo, data = \
+                    normalize_url(source, return_itunes_data=True)
+
+                url.autocomplete_data = \
+                        AutocompleteData.objects.create(
+                    origin='app-store',
+                    title=u'{0} by {1}'.format(
+                        data['trackName'],
+                        data['sellerName']),
+                    description=first_sentences(
+                        data['description'],
+                        DESCRIPTION_LENGTH),
+                    source=source,
+                    icon=data['artworkUrl60'])
+                url.save()
+        except:
+            log.trace().error('Unable to process')
+
+
+@singletone()
+@job('default', timeout=60 * 60)
+@transaction.atomic
+@wait_chat_threads
+def process_appstore_batch(batch_id, size=100):
+    """Notifies a changelog's trackers with their preferred methods
+    """
+    from .models import AppStoreBatch
+
+    print 'Processing batch', batch_id
+    with log.name_and_fields('process_appstore_batch', batch_id=batch_id):
+        log.info('Starting task')
+        batch = AppStoreBatch.objects.get(pk=batch_id)
+        urls = list(batch.urls.filter(autocomplete_data=None))
+        for url in urls:
+            process_appstore_url(url)
+
+        start_new_appstore_batch.delay(size)
+    print 'Done with batch', batch_id
+
+
+from django.db import transaction
+
+@job('default', timeout=60)
+@transaction.atomic
+def start_new_appstore_batch(size=100, batch_id=None):
+    """Creates a new batch of AppStore urls to be processed.
+    """
+    from .models import AppStoreBatch, AppStoreUrl
+    if batch_id is None:
+        batch = AppStoreBatch.objects.create()
+    else:
+        batch = AppStoreBatch.objects.get(pk=batch_id)
+
+    ids = list(AppStoreUrl.objects.filter(batch=None).values_list('id', flat=True)[:size])
+    print '{0} ids were selected for batch {1}'.format(len(ids), batch.id)
+    AppStoreUrl.objects.filter(pk__in=ids, batch=None).update(batch=batch)
+
+    urls_count = AppStoreUrl.objects.filter(batch=batch).count()
+    if urls_count == 0:
+        free_urls_count = AppStoreUrl.objects.filter(batch=None).count()
+        print 'BAD, we aquired 0 urls but there is {0} free urls in database, retrying'.format(
+            free_urls_count)
+        start_new_appstore_batch.delay(size, batch_id=batch.id)
+    else:
+        print 'Batch {0} queued'.format(batch.id)
+        process_appstore_batch.delay(batch.id, size=size)
+
+
+def restart_old_appstore_batches():
+    from .models import AppStoreBatch
+    hour_ago = timezone.now() - datetime.timedelta(0, 60 * 60)
+    ids = AppStoreBatch.objects.filter(urls__autocomplete_data=None,
+                                       created__lte=hour_ago)
+    ids = ids.values_list('id', flat=True).distinct()
+
+    for pk in ids:
+        process_appstore_batch.delay(pk)

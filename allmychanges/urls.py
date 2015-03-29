@@ -94,6 +94,8 @@ urlpatterns = patterns(
     url(r'^tools/', ToolsView.as_view(), name='tools'),
     url(r'^landing/ru/', LandingView.as_view(landings=['ru1-green', 'ru1-red']), name='landing-ru'),
     url(r'^landing/en/', LandingView.as_view(landings=['en1-green']), name='landing-en'),
+    url(r'^for-ios/', LandingView.as_view(landings=['for-ios1']), name='landing-for-ios'),
+
     url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
     url(r'^account/token/', TokenView.as_view(), name='token'),
     url(r'^accounts/login/', LoginView.as_view(), name='login'),

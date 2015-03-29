@@ -7,6 +7,7 @@ from allmychanges.api.views import (
     AutocompleteNamespaceView,
     AutocompletePackageNameView,
     SearchAutocompleteView,
+    SearchAutocomplete2View,
     LandingPackageSuggestView,
     MessagesView,
     ChangelogViewSet,
@@ -25,6 +26,7 @@ router.register(r'messages', MessagesView, base_name='messages')
 router.register(r'autocomplete-namespaces', AutocompleteNamespaceView, base_name='autocomplete-namespaces')
 router.register(r'autocomplete-package-name', AutocompletePackageNameView, base_name='autocomplete-package-name')
 router.register(r'search-autocomplete', SearchAutocompleteView, base_name='search-autocomplete')
+router.register(r'search-autocomplete2', SearchAutocomplete2View, base_name='search-autocomplete2')
 router.register(r'landing-package-suggest', LandingPackageSuggestView, base_name='landing-package-suggest')
 router.register(r'validate-changelog-name', ValidateChangelogName, base_name='validate-changelog-name')
 

@@ -15,7 +15,7 @@ from urlparse import urlsplit
 from allmychanges.utils import (
     cd, get_text_from_response, is_http_url,
     html_document_fromstring)
-from allmychanges.exceptions import DownloaderWarning
+from allmychanges.exceptions import DownloaderWarning, AppStoreAppNotFound
 from twiggy_goodies.threading import log
 
 
@@ -30,9 +30,13 @@ def get_itunes_app_id(url):
 
 def get_itunes_app_data(app_id):
     url = 'https://itunes.apple.com/lookup?id={0}&lang=en_us'.format(app_id)
-    data = requests.get(url).json()
+    response = requests.get(url)
+    data = response.json()
     if data['resultCount'] > 0:
         return data['results'][0]
+    else:
+        raise AppStoreAppNotFound(app_id)
+
 
 
 fronts = [
@@ -204,7 +208,7 @@ def get_itunes_release_notes(app_id, fronts=_try_fronts):
             return data
 
 
-def normalize_url(url, for_checkout=True):
+def normalize_url(url, for_checkout=True, return_itunes_data=False):
     """Normalize url either for browser or for checkout.
     Usually, difference is in the schema.
     It normalizes url to 'git@github.com:{username}/{repo}' and also
@@ -243,7 +247,10 @@ def normalize_url(url, for_checkout=True):
         data = get_itunes_app_data(app_id)
         if data:
             # here we add iTunes Affilate token
-            return (data['trackViewUrl'] + '&at=1l3vwNn', None, None)
+            result = [data['trackViewUrl'] + '&at=1l3vwNn', None, None]
+            if return_itunes_data:
+                result.append(data)
+            return result
 
     return (url, None, url.rsplit('/')[-1])
 
@@ -390,38 +397,39 @@ def itunes_downloader(source,
     """
     app_id = get_itunes_app_id(source)
     data = get_itunes_release_notes(app_id)
-    history = data['pageData']['softwarePageData']['versionHistory']
-    if history:
-        def format_item(item):
-            version = item['versionString']
-            date = item['releaseDate']
-            notes = item.get('releaseNotes') or 'No description'
-            notes = notes.replace(u'•', u'*') # because of vk.com mothefuckers
-            notes = notes.replace(u'★', u'*') # because of temple run motherfuckers
-            text = u"""
-{version} ({date})
-==============
+    if data:
+        history = data['pageData']['softwarePageData']['versionHistory']
+        if history:
+            def format_item(item):
+                version = item['versionString']
+                date = item['releaseDate']
+                notes = item.get('releaseNotes') or 'No description'
+                notes = notes.replace(u'•', u'*') # because of vk.com mothefuckers
+                notes = notes.replace(u'★', u'*') # because of temple run motherfuckers
+                text = u"""
+    {version} ({date})
+    ==============
 
-{notes}
-            """.strip().format(version=version,
-                               date=date,
-                               notes=notes)
-            return text
+    {notes}
+                """.strip().format(version=version,
+                                   date=date,
+                                   notes=notes)
+                return text
 
-        path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-        try:
-            with cd(path):
-                with open('ChangeLog', 'w') as f:
-                    items = map(format_item, history)
-                    text = u'\n\n'.join(items)
-                    f.write(text.encode('utf-8'))
+            path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+            try:
+                with cd(path):
+                    with open('ChangeLog', 'w') as f:
+                        items = map(format_item, history)
+                        text = u'\n\n'.join(items)
+                        f.write(text.encode('utf-8'))
 
-        except Exception, e:
-            if os.path.exists(path):
-                shutil.rmtree(path)
-            raise RuntimeError('Unexpected exception "{0}" when fetching itunes app: {1}'.format(
-                repr(e), app_id))
-        return path
+            except Exception, e:
+                if os.path.exists(path):
+                    shutil.rmtree(path)
+                raise RuntimeError('Unexpected exception "{0}" when fetching itunes app: {1}'.format(
+                    repr(e), app_id))
+            return path
 
 
 def rechttp_downloader(source,
