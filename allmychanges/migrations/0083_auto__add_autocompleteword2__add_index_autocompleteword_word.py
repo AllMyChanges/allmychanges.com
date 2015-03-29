@@ -9,7 +9,6 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'AutocompleteWord2'
-        import pudb; pudb.set_trace()  # DEBUG
         db.create_table(u'allmychanges_autocompleteword2', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('word', self.gf('django.db.models.fields.CharField')(unique=True, max_length=100)),

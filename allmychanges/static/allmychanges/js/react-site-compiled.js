@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(12)
+	var PackageSelector = __webpack_require__(11)
 
 	module.exports = {
 	    render: function () {
@@ -137,7 +137,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(11)
+	var Promo = __webpack_require__(12)
 
 	module.exports = {
 	    render: function () {
@@ -517,6 +517,47 @@
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var Package = __webpack_require__(13)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {packages: []};
+	    },
+	    componentDidMount: function() {
+	        $.ajax({
+	            url: this.props.url,
+	            dataType: 'json',
+	            success: function(data) {
+	                this.setState({packages: data.results});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        var packages_list = this.state.packages.map(function (package) {
+	            return (
+	                React.createElement(Package, {key: package.id, 
+	                         changelog_id: package.id, 
+	                         namespace: package.namespace, 
+	                         name: package.name, 
+	                         versions: package.versions})
+	            );
+	        });
+	        return (
+	            React.createElement("ul", {className: "package-selector"}, 
+	                packages_list
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
 
@@ -540,7 +581,7 @@
 	        var really_fetch_suggestions = function(query, cb) {
 	            input_spinner.spin($('.input-spin-wrapper')[0]);
 
-	            $.get('/v1/search-autocomplete2/', {namespace: 'ios', q: query}, function(data) {
+	            $.get('/v1/search-autocomplete3/', {namespace: 'ios', q: query}, function(data) {
 	                input_spinner.stop();
 
 	                var results = data['results'];
@@ -643,7 +684,7 @@
 	                $.ajax({
 	                    url: '/v1/changelogs/',
 	                    data: {namespace: option.namespace,
-	                           name: option.name.slice(0, 80),
+	                           name: name.slice(0, 80),
 	                           icon: option.icon,
 	                           source: option.source},
 	                    method: 'POST',
@@ -697,47 +738,6 @@
 	                ), 
 	                login_link, 
 	                React.createElement("div", {className: "ios-promo__digest"})
-	            )
-	        );
-	    }
-	});
-
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Package = __webpack_require__(13)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {packages: []};
-	    },
-	    componentDidMount: function() {
-	        $.ajax({
-	            url: this.props.url,
-	            dataType: 'json',
-	            success: function(data) {
-	                this.setState({packages: data.results});
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error(this.props.url, status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    render: function() {
-	        var packages_list = this.state.packages.map(function (package) {
-	            return (
-	                React.createElement(Package, {key: package.id, 
-	                         changelog_id: package.id, 
-	                         namespace: package.namespace, 
-	                         name: package.name, 
-	                         versions: package.versions})
-	            );
-	        });
-	        return (
-	            React.createElement("ul", {className: "package-selector"}, 
-	                packages_list
 	            )
 	        );
 	    }

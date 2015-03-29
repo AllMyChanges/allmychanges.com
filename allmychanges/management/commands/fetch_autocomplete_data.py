@@ -4,7 +4,7 @@ import itertools
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from twiggy_goodies.threading import log
-from allmychanges.models import AutocompleteData
+from allmychanges.models import AutocompleteData, AutocompleteWord2
 from allmychanges.downloader import normalize_url
 from multiprocessing.dummy import Pool
 
@@ -80,11 +80,21 @@ def process():
     return start, middle, end
 
 
+def process_words2():
+    items = AutocompleteData.objects.all()
+    items = progress.bar(items.iterator(), expected_size=items.count(), every=100)
+    for item in items:
+        item2 = AutocompleteData.objects.using('second').get(pk=item.pk)
+        for word in item2.words.using('second').all():
+            word2 = AutocompleteWord2.objects.using('second').get(word=word.word)
+            item2.words2.add(word2)
+
+
 class Command(LogMixin, BaseCommand):
     help = u"""Fetches data for autocomplete from different sources"""
 
     def handle(self, *args, **options):
-        print process()
+        print process_words2()
         return
         # import cProfile, pstats, StringIO
         # pr = cProfile.Profile()

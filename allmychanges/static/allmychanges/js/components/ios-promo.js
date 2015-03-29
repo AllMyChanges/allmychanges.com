@@ -21,7 +21,7 @@ module.exports = React.createClass({
         var really_fetch_suggestions = function(query, cb) {
             input_spinner.spin($('.input-spin-wrapper')[0]);
 
-            $.get('/v1/search-autocomplete2/', {namespace: 'ios', q: query}, function(data) {
+            $.get('/v1/search-autocomplete3/', {namespace: 'ios', q: query}, function(data) {
                 input_spinner.stop();
 
                 var results = data['results'];
@@ -124,7 +124,7 @@ module.exports = React.createClass({
                 $.ajax({
                     url: '/v1/changelogs/',
                     data: {namespace: option.namespace,
-                           name: option.name.slice(0, 80),
+                           name: name.slice(0, 80),
                            icon: option.icon,
                            source: option.source},
                     method: 'POST',
