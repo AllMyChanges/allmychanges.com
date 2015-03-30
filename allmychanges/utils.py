@@ -331,11 +331,13 @@ def first_sentences(text, max_length=1000):
     If there is one very long sentence, then it will be cutted to max_length-1
     and ... unicode symbol will be added to the end.
     """
+    text = text.replace('\n', ' ')
+
     if len(text) <= max_length:
         return text
 
     sentences = []
-    regex = re.compile(ur'[.?!]( |\n)+')
+    regex = re.compile(ur'[.?!] +')
 
     pos = 0
     match = regex.search(text, pos)

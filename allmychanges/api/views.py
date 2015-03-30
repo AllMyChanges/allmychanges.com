@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import operator
 
 from django.utils import timezone
 from django.db.models import Max, Q
@@ -100,7 +101,8 @@ class AutocompletePackageNameView(viewsets.ViewSet):
                                      for name in names]})
 
 
-class SearchAutocompleteView(viewsets.ViewSet):
+# TODO: remove some day
+class SearchAutocomplete1View(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         q = request.GET.get('q', '')
         splitted = re.split(r'[ /]', q, 1)
@@ -148,6 +150,7 @@ class SearchAutocompleteView(viewsets.ViewSet):
         return Response({'results': results})
 
 
+# TODO: remove some day
 class SearchAutocomplete2View(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         name = request.GET.get('q', '')
@@ -209,7 +212,7 @@ class SearchAutocomplete2View(viewsets.ViewSet):
 
 
 
-class SearchAutocomplete3View(viewsets.ViewSet):
+class SearchAutocompleteView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         name = request.GET.get('q', '')
         namespace = request.GET.get('namespace') # optional
@@ -251,9 +254,21 @@ class SearchAutocomplete3View(viewsets.ViewSet):
             add_changelogs(Changelog.objects.filter(name__icontains=name)
                         .distinct())
 
-        data = AutocompleteData.objects.filter(
-            words2__word__istartswith=name)
-        data = data.filter(origin='app-store')
+        query = Q(words2__word__startswith=name)
+        # над этой частью надо подумать, ибо так не работает
+        # надо как-то ранжировать результаты автокомплита
+        # может попробовать засунуть их в elastic search
+        # if ' ' in name:
+        #     names = filter(None, name.split(' '))
+        #     query |= reduce(operator.__and__,
+        #                     (Q(words2__word__startswith=item)
+        #                      for item in names))
+
+        data = AutocompleteData.objects.filter(query)
+
+        if namespace == 'ios':
+            data = data.filter(origin='app-store')
+
         data = data.distinct()
 
         for item in data[:10]:

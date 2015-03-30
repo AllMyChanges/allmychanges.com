@@ -623,6 +623,33 @@ select {
 .first-step__list-item:nth-child(2):before {
   content: "2";
 }
+.help h1 {
+  font-family: pragmatica-web-condensed, sans-serif;
+  font-size: 30px;
+  line-height: 40px;
+  margin-bottom: 30px;
+}
+.help h2 {
+  font-family: pragmatica-web-condensed, sans-serif;
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 20px;
+}
+.help p,
+.help li {
+  font-size: 16px;
+  line-height: 25px;
+}
+.help p {
+  margin-top: 20px;
+}
+.help li {
+  list-style-position: inside;
+}
+.help ul,
+.help ol {
+  margin-top: 20px;
+}
 .subscribed-text {
   font-size: 1.5em;
   margin-bottom: 1em;

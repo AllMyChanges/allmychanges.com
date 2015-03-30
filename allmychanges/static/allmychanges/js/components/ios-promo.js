@@ -21,7 +21,7 @@ module.exports = React.createClass({
         var really_fetch_suggestions = function(query, cb) {
             input_spinner.spin($('.input-spin-wrapper')[0]);
 
-            $.get('/v1/search-autocomplete3/', {namespace: 'ios', q: query}, function(data) {
+            $.get('/v1/search-autocomplete/', {namespace: 'ios', q: query}, function(data) {
                 input_spinner.stop();
 
                 var results = data['results'];
