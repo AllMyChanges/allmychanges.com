@@ -638,7 +638,7 @@ select {
 .help p,
 .help li {
   font-size: 16px;
-  line-height: 25px;
+  line-height: 30px;
 }
 .help p {
   margin-top: 20px;
