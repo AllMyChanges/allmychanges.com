@@ -125,7 +125,7 @@ _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded
                                      r'\d+(?:\.\d+)+(-[a-z0-9.]+[a-z0-9])?'
                                      r'|\d+\.\d+'
                                      r')'
-                                     r'(-?[a-z0-9.]+[a-z0-9])?' # rc1, beta2 or maybe -something123 like suffix
+                                     r'(-?[a-zA-Z0-9.-]+[a-zA-Z0-9])?' # rc1, beta2 or maybe -something123 like suffix or .BETA-123
                                      r'(_\d+)?'                # or _12343 suffix like in the damn https://github.com/Test-More/TB2/blob/master/Changes
                                      r')'))
                     for item in _version_regexes]
