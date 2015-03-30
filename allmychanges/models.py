@@ -789,26 +789,21 @@ class AutocompleteData(models.Model):
         if self.words.count() == 0:
             self.add_words()
 
-    def add_words(self):
-        self.words.create(word=self.title.lower())
+    def add_words(self, db_name='default'):
+        if db_name == 'default':
+            data = self
+        else:
+            data = AutocompleteData.objects.using(db_name).get(pk=self.pk)
 
-        words = self.title.split()
+        words = data.title.split()
         words = (word.strip() for word in words)
         words = set(word.lower() for word in words if len(word) > 3)
         words -= COMMON_WORDS
-        for word in words:
-            self.words.create(word=word)
+        words.add(data.title.lower())
 
-    def add_words2(self):
-        AutocompleteWord.objects.using('second').create(data=self,
-                                                        word=self.title.lower())
-
-        words = self.title.split()
-        words = (word.strip() for word in words)
-        words = set(word.lower() for word in words if len(word) > 3)
-        words -= COMMON_WORDS
-        for word in words:
-            AutocompleteWord.objects.using('second').create(data=self, word=word)
+        words = [AutocompleteWord2.objects.using(db_name).get_or_create(word=word)[0]
+                 for word in words]
+        data.words2.add(*words)
 
 
 class AutocompleteWord(models.Model):

@@ -16,6 +16,7 @@ from allmychanges.parsing.pipeline import (
 from allmychanges.models import (Version,
                                  User,
                                  Changelog,
+                                 DESCRIPTION_LENGTH,
                                  Preview)
 from allmychanges.utils import (
     dt_in_window,

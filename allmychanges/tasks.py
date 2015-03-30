@@ -231,15 +231,22 @@ def process_appstore_url(url):
                 source, username, repo, data = \
                     normalize_url(source, return_itunes_data=True)
 
+                try:
+                    description = first_sentences(
+                        data['description'],
+                        DESCRIPTION_LENGTH)
+                except RuntimeError:
+                    with log.fields(description=data['description'][:DESCRIPTION_LENGTH * 2]):
+                        log.trace().error('Unable to get first sentences')
+                        description = data['description'][:DESCRIPTION_LENGTH].replace('\n', ' ')
+
                 url.autocomplete_data = \
                         AutocompleteData.objects.create(
                     origin='app-store',
                     title=u'{0} by {1}'.format(
                         data['trackName'],
                         data['sellerName']),
-                    description=first_sentences(
-                        data['description'],
-                        DESCRIPTION_LENGTH),
+                    description=description,
                     source=source,
                     icon=data['artworkUrl60'])
                 url.save()
@@ -288,9 +295,10 @@ def start_new_appstore_batch(size=100, batch_id=None):
     urls_count = AppStoreUrl.objects.filter(batch=batch).count()
     if urls_count == 0:
         free_urls_count = AppStoreUrl.objects.filter(batch=None).count()
-        print 'BAD, we aquired 0 urls but there is {0} free urls in database, retrying'.format(
-            free_urls_count)
-        start_new_appstore_batch.delay(size, batch_id=batch.id)
+        if free_urls_count > 0:
+            print 'BAD, we aquired 0 urls but there is {0} free urls in database, retrying'.format(
+                free_urls_count)
+            start_new_appstore_batch.delay(size, batch_id=batch.id)
     else:
         print 'Batch {0} queued'.format(batch.id)
         process_appstore_batch.delay(batch.id, size=size)
