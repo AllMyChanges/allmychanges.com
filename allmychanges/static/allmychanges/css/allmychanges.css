@@ -630,6 +630,116 @@ select {
 .first-step__list-item:nth-child(2):before {
   content: "2";
 }
+.front-message {
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 2em;
+  margin-right: 2em;
+  width: 75%;
+}
+.front-message p {
+  margin-bottom: 22px;
+}
+.front-header {
+  font-family: Georgia, sans-serif;
+  font-weight: 300;
+  line-height: 55px;
+  font-size: 48px;
+  margin-top: 37px;
+  margin-bottom: 18px;
+}
+.front-steps__step {
+  list-style: none;
+}
+.package-selector {
+  margin-top: 20px;
+}
+.package-selector__title {
+  white-space: nowrap;
+}
+.package-selector__item {
+  display: inline-block;
+  width: 220px;
+  overflow: hidden;
+  list-style: none;
+  margin-right: 44px;
+  margin-bottom: 20px;
+  vertical-align: top;
+}
+.package-selector__version {
+  list-style: none;
+  white-space: nowrap;
+}
+.package-selector__number {
+  font-weight: bold;
+  display: box;
+}
+.package-selector__date {
+  color: #808080;
+}
+.package-selector__versions {
+  margin-bottom: 22px;
+}
+.package-select__track-button {
+  background: #aaff72;
+  border: 1px solid #7acf7a;
+  border-radius: 3px;
+  font-size: 18px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.package-select__track-button_tracked {
+  background: #e8fed9;
+  cursor: default;
+}
+.package-select__track-button:hover {
+  background: #88dd50;
+}
+.package-select__track-button_tracked:hover {
+  background: #e8fed9;
+}
+.package-select__ignore-button {
+  background: #ffd738;
+  border: 1px solid #d6ae71;
+  border-radius: 3px;
+  font-size: 18px;
+  line-height: 22px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.package-select__ignore-button:hover {
+  background: #ddb516;
+}
+.package-selector__empty-digest {
+  height: 200px;
+}
+.package-selector__empty-digest > p {
+  font-size: 18px;
+  line-height: 22px;
+}
+.package-selector__login-plate > p {
+  font-size: 32px;
+  background: #e4ffd1;
+  line-height: 48px;
+  padding-left: 10px;
+  margin-left: -10px;
+  border-radius: 5px;
+  margin-top: 22px;
+}
+.large-login-button {
+  text-decoration: none;
+  color: #fefefe;
+  background: #c50ca8;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-bottom: 2px;
+  padding-top: 2px;
+  border-radius: 5px;
+}
+.large-login-button:hover {
+  color: #fefefe;
+  background: #0c82c5;
+}
 .help h1 {
   font-family: pragmatica-web-condensed, sans-serif;
   font-size: 30px;
@@ -1053,123 +1163,6 @@ body.email {
 }
 .text-input_with-token {
   width: 30em;
-}
-.front-message {
-  font-size: 18px;
-  line-height: 22px;
-  margin-bottom: 2em;
-  margin-right: 2em;
-  width: 75%;
-}
-.front-header {
-  font-family: Georgia, sans-serif;
-  font-weight: 300;
-  line-height: 55px;
-  font-size: 48px;
-  margin-top: 37px;
-  margin-bottom: 18px;
-}
-.front-descriptions {
-  margin-bottom: 3em;
-}
-.front-descriptions__item {
-  list-style: none;
-  width: 300px;
-  padding-right: 22px;
-  display: table-cell;
-  font-size: 24px;
-  line-height: 32px;
-}
-.front-steps__step {
-  list-style: none;
-}
-.package-selector {
-  margin-top: 20px;
-}
-.package-selector__title {
-  white-space: nowrap;
-}
-.package-selector__item {
-  display: inline-block;
-  width: 220px;
-  overflow: hidden;
-  list-style: none;
-  margin-right: 44px;
-  margin-bottom: 20px;
-  vertical-align: top;
-}
-.package-selector__version {
-  list-style: none;
-}
-.package-selector__number {
-  font-weight: bold;
-}
-.package-selector__date {
-  color: #808080;
-  margin-left: 10px;
-}
-.package-selector__versions {
-  margin-bottom: 22px;
-}
-.package-select__track-button {
-  background: #aaff72;
-  border: 1px solid #7acf7a;
-  border-radius: 3px;
-  font-size: 18px;
-  line-height: 22px;
-  cursor: pointer;
-}
-.package-select__track-button_tracked {
-  background: #e8fed9;
-  cursor: default;
-}
-.package-select__track-button:hover {
-  background: #88dd50;
-}
-.package-select__track-button_tracked:hover {
-  background: #e8fed9;
-}
-.package-select__ignore-button {
-  background: #ffd738;
-  border: 1px solid #d6ae71;
-  border-radius: 3px;
-  font-size: 18px;
-  line-height: 22px;
-  cursor: pointer;
-  margin-left: 10px;
-}
-.package-select__ignore-button:hover {
-  background: #ddb516;
-}
-.package-selector__empty-digest {
-  height: 200px;
-}
-.package-selector__empty-digest > p {
-  font-size: 18px;
-  line-height: 22px;
-}
-.package-selector__login-plate > p {
-  font-size: 32px;
-  background: #e4ffd1;
-  line-height: 48px;
-  padding-left: 10px;
-  margin-left: -10px;
-  border-radius: 5px;
-  margin-top: 22px;
-}
-.large-login-button {
-  text-decoration: none;
-  color: #fefefe;
-  background: #c50ca8;
-  padding-left: 6px;
-  padding-right: 6px;
-  padding-bottom: 2px;
-  padding-top: 2px;
-  border-radius: 5px;
-}
-.large-login-button:hover {
-  color: #fefefe;
-  background: #0c82c5;
 }
 .new-package__greeting {
   font-size: 24px;

@@ -1,0 +1,158 @@
+.front-message {
+    font-size: 18px;
+    line-height: 22px;
+    margin-bottom: 2em;
+    margin-right: 2em;
+    width: 75%;
+    
+    p {
+      margin-bottom: 22px;
+    }
+}
+
+level-1-header() {
+    font-family: Georgia, sans-serif;
+    font-weight: 300;
+
+    line-height: 55px;
+    font-size: 48px;
+    margin-top: 37px;
+    margin-bottom: 18px;
+}
+
+level-2-header() {
+    level-1-header();
+
+    font-size: 32px;
+    line-height: 44px;
+    margin-top: 30px;
+    margin-bottom: 14px;
+}
+
+level-3-header() {
+    level-1-header();
+
+    font-size: 24px;
+    line-height: 32px;
+    margin-top: 23px;
+    margin-bottom: 11px;
+}
+
+level-4-header() {
+    level-1-header();
+
+    font-size: 18px;
+    line-height: 22px;
+    margin-top: 15px;
+    margin-bottom: 7px;
+}
+
+.front-header {
+    level-1-header();
+}
+
+.front-steps__step {
+    list-style: none;
+}
+
+.package-selector {
+    margin-top: 20px;
+
+    &__title {
+        white-space: nowrap;
+    }
+    &__item {
+        display: inline-block;
+        width: 220px;
+        overflow: hidden;
+        list-style: none;
+        margin-right: 44px;
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    &__version {
+        list-style: none;
+        white-space: nowrap;
+    }
+    &__number {
+        font-weight: bold;
+        display: box;
+    }
+    &__date {
+        color: gray;
+    }
+    &__versions {
+        margin-bottom: 22px;
+    }
+}
+
+.package-select__track-button {
+    background: #AAFF72;
+    border: 1px solid #7ACF7A;
+    border-radius: 3px;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+}
+
+.package-select__track-button_tracked {
+    background: #E8FED9;
+    cursor: default;
+}
+
+.package-select__track-button:hover {
+    background: #AAFF72 - #222;
+}
+
+.package-select__track-button_tracked:hover {
+    background: #E8FED9;
+}
+
+.package-select__ignore-button {
+    background: #FFD738;
+    border: 1px solid #D6AE71;
+    border-radius: 3px;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.package-select__ignore-button:hover {
+    background: #FFD738 - #222;
+}
+
+
+.package-selector__empty-digest {
+    height: 200px;
+    > p {
+        font-size: 18px;
+        line-height: 22px;
+    }
+}
+
+.package-selector__login-plate > p {
+    font-size: 32px;
+    background: #E4FFD1;
+    line-height: 48px;
+    padding-left: 10px;
+    margin-left: -10px;
+    border-radius: 5px;
+    margin-top: 22px;
+}
+
+.large-login-button {
+    text-decoration: none;
+    color: #FEFEFE;
+    background: rgb(197, 12, 168);
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    padding-top: 2px;
+    border-radius: 5px;
+}
+
+.large-login-button:hover {
+    color: #FEFEFE;
+    background: rgb(12, 130, 197);
+}
