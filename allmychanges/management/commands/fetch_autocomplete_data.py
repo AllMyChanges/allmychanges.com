@@ -81,12 +81,12 @@ def process():
 
 
 def process_words2():
-    items = AutocompleteData.objects.all()
+    items = AutocompleteData.objects.all().using('server-side')
     items = progress.bar(items.iterator(), expected_size=items.count(), every=100)
     for item in items:
-        item2 = AutocompleteData.objects.using('second').get(pk=item.pk)
-        for word in item2.words.using('second').all():
-            word2 = AutocompleteWord2.objects.using('second').get(word=word.word)
+        item2 = AutocompleteData.objects.using('default').get(pk=item.pk)
+        for word in item2.words.using('default').all():
+            word2 = AutocompleteWord2.objects.using('default').get(word=word.word)
             item2.words2.add(word2)
 
 

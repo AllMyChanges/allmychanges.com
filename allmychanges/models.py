@@ -230,6 +230,7 @@ class Changelog(Downloadable, models.Model):
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)
+    # TODO: remove
     filename = models.CharField(max_length=1000,
                                help_text=('If changelog was discovered, then '
                                           'field will store it\'s filename'),
@@ -261,6 +262,8 @@ class Changelog(Downloadable, models.Model):
                                   blank=True)
     namespace = models.CharField(max_length=NAMESPACE_LENGTH, blank=True, null=True)
     name = models.CharField(max_length=NAME_LENGTH, blank=True, null=True)
+    description = models.CharField(max_length=DESCRIPTION_LENGTH,
+                                   default='')
     downloader = models.CharField(max_length=10, blank=True, null=True)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
