@@ -26,11 +26,12 @@ class Command(LogMixin, BaseCommand):
                 changes = git_changes.split(u'\n')
                 changes = [u'\t* {1} <https://github.com/svetlyak40wt/allmychanges/commit/{0}|{0}>'.format(
                     *item.split(' ', 1))
-                           for item in changes]
+                           for item in changes
+                           if item]
                 changes = u'\n'.join(changes)
                 chat.send('Deployed {current_hash}:\n{changes}'.format(
                     current_hash=current_hash,
-                    changes=changes))
+                    changes=changes or 'no changes'))
         else:
             chat.send('Deployed {current_hash}'.format(
                     current_hash=current_hash))
