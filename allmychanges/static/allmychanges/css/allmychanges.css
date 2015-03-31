@@ -402,6 +402,13 @@ select {
   color: #808080;
   float: right;
 }
+.magic-prompt__suggest-item-source {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 600px;
+  overflow: hidden;
+  color: #808080;
+}
 .magic-prompt .twitter-typeahead {
   width: 100%;
 }

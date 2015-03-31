@@ -214,7 +214,10 @@ class SearchAutocomplete2View(viewsets.ViewSet):
 
 class SearchAutocompleteView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
-        name = request.GET.get('q', '').lower()
+        name = request.GET.get('q', '').strip().lower()
+        if len(name) < 3:
+            return Response({'results': []})
+
         namespace = request.GET.get('namespace') # optional
 
         results = []
@@ -255,7 +258,7 @@ class SearchAutocompleteView(viewsets.ViewSet):
             add_changelogs(Changelog.objects.filter(name__icontains=name)
                         .distinct())
 
-        query = Q(words2__word__startswith=name)
+        query = Q(words2__word__istartswith=name)
         # над этой частью надо подумать, ибо так не работает
         # надо как-то ранжировать результаты автокомплита
         # может попробовать засунуть их в elastic search
