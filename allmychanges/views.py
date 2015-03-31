@@ -177,7 +177,7 @@ def get_package_data_for_template(changelog,
 
     result = dict(namespace=namespace,
                   name=name,
-                  description=changelog.description,
+                  description=getattr(changelog, 'description', ''),
                   source=changelog.source,
                   show_itunes_badge='itunes.apple.com' in changelog.source,
                   changelog=dict(
@@ -812,7 +812,12 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                                      'package-create',
                                      u'User created changelog:{0}'.format(changelog.pk))
             except Changelog.DoesNotExist:
-                changelog = Changelog.objects.create(source=normalized_url)
+                changelog = Changelog.objects.create(
+                    source=normalized_url,
+                    name=self.request.GET.get('name'),
+                    namespace=self.request.GET.get('namespace'),
+                    description=self.request.GET.get('description'),
+                )
                 if user:
                     chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
                         user.username, normalized_url))

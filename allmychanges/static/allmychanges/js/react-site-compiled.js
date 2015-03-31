@@ -416,27 +416,19 @@
 
 	        $(element).find('.magic-prompt__input').typeahead(
 	            {
-	                minLength: 1,
+	                minLength: 3,
 	                highlight: true
 	            },
 	            {
 	                name: 'magic-prompt',
-	                displayKey: 'value',
-	                
-	                // Just a little object that implements the necessary 
-	                // signature to plug into typeahead.js
 	                source: fetch_suggestions,
 	                templates: {
 	                    empty: '<div class="magic-prompt__no-matches">No matches found</div>',
 	                    suggestion: show_suggestion
 	                }
-	        }).focus();
-	        
-	        // Behind the scenes, this is just delegating to Backbone's router
-	        // to 'navigate' the main pane of the page to a different view
-	        $(element).on('typeahead:selected', function(jquery, option){
+	        }).on('typeahead:selected', function(ev, option){
 	            window.location = option.url;
-	        });
+	        }).focus();
 	    },
 	    
 	    componentWillUnmount: function(){

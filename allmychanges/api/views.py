@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
-import operator
 
 from django.utils import timezone
 from django.db.models import Max, Q
 from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.utils.encoding import force_str
 from itertools import islice
 from twiggy_goodies.threading import log
 from urllib import urlencode
@@ -292,13 +292,21 @@ class SearchAutocompleteView(viewsets.ViewSet):
         for item in data[:10]:
             url = item.source
             if url not in sources:
+                params = dict(
+                    url=url,
+                    name=item.title.split(' by ')[0],
+                    namespace='ios',
+                    description=item.description)
+                params = {key: force_str(value)
+                          for key, value in params.items()}
+                params = urlencode(params)
                 results.append(dict(type='add-new',
                                     source=url,
                                     name=item.title,
                                     namespace='ios',
                                     description=item.description,
                                     icon=item.icon,
-                                    url='/p/new/?' + urlencode(dict(url=url))))
+                                    url='/p/new/?' + params))
 
         return Response({'results': results})
 
