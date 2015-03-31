@@ -994,8 +994,13 @@ body.email {
 .package-selector {
   margin-top: 20px;
 }
+.package-selector__title {
+  white-space: nowrap;
+}
 .package-selector__item {
   display: inline-block;
+  width: 220px;
+  overflow: hidden;
   list-style: none;
   margin-right: 44px;
   margin-bottom: 20px;
