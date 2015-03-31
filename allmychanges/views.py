@@ -177,6 +177,7 @@ def get_package_data_for_template(changelog,
 
     result = dict(namespace=namespace,
                   name=name,
+                  description=changelog.description,
                   source=changelog.source,
                   show_itunes_badge='itunes.apple.com' in changelog.source,
                   changelog=dict(
