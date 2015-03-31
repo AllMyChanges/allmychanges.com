@@ -152,20 +152,24 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var metrika = __webpack_require__(13)
+
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
 	        return {show_popup: false,
 	                body_callback_installed: false};
 	    },
 	    handle_switcher_click: function (e) {
-	        console.log('Switcher click');
+	        UserStory.log(["user clicked report button"], ["buttons.report"]);
+	        metrika.reach_goal('CLICK-REPORT-BUTTON');
+
 	        e.nativeEvent.stopImmediatePropagation();
 	        e.preventDefault();
 
 	        if (this.state.body_callback_installed == false) {
 	            $(document).click(function() {
 	                this.setState({show_popup: false});
-	                console.log('Hiding from body click');
+	                UserStory.log(["hiding from body click"], ["buttons.report"]);
 	            }.bind(this));
 	            this.setState({body_callback_installed: true});
 	        }
@@ -182,10 +186,12 @@
 	        }
 	    },
 	    handle_popup_click: function (e) {
-	        console.log('Popup click');
+	        UserStory.log(["popup click"], ["buttons.report"]);
 	        e.nativeEvent.stopImmediatePropagation();
 	    },
 	    handle_post: function (e) {
+	        UserStory.log(["sending feedback to the server"], ["report.button"]);
+	        metrika.reach_goal('REPORT');
 	        e.preventDefault();
 	        var type = this.refs.type.getDOMNode().value.trim();
 	        var comment = this.refs.comment.getDOMNode().value.trim();
@@ -311,19 +317,22 @@
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var metrika = __webpack_require__(13)
+
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
 	        return {tracked: (this.props.tracked == 'true')};
 	    },
 	    perform_action: function(action, state_after) {
+	        UserStory.log(["performing action [action=", action, "]"], ["buttons.track"]);
 	        $.ajax({
 	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
 	            method: 'POST',
 	            dataType: 'json',
 	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
 	            success: function(data) {
-	                // console.log('Setting state to ', state_after);
 	                this.setState({tracked: state_after});
+	                metrika.reach_goal(action.toUpperCase());
 	            }.bind(this),
 	            error: function(xhr, status, err) {
 	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
@@ -707,7 +716,7 @@
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(13)
+	var Package = __webpack_require__(14)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -746,6 +755,20 @@
 
 /***/ },
 /* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = {
+	    reach_goal: function(name) {
+	        if (window.yaCounter !== undefined) {
+	            UserStory.log(["registering goal [name=", name, "]"], ["metrika.reach_goal"]);
+	            window.yaCounter.reachGoal(name);
+	        }
+	    }
+	}
+
+
+/***/ },
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	TrackButton = __webpack_require__(8)

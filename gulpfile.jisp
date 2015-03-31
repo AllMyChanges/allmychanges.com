@@ -39,6 +39,7 @@
   gulp.src    "allmychanges/static/allmychanges/js/react-site.js"
   plug.webpack   (output: (filename: "allmychanges/static/allmychanges/js/react-site-compiled.js")
                   module: (loaders: (list (test: /\.js$/ loader: "jsx"))))
+  plug.userStory ()
   gulp.dest   "./")
 
 

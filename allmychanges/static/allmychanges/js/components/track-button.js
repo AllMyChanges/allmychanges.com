@@ -1,16 +1,19 @@
+var metrika = require('./metrika.js')
+
 module.exports = React.createClass({
     getInitialState: function () {
         return {tracked: (this.props.tracked == 'true')};
     },
     perform_action: function(action, state_after) {
+        // performing action [action] @buttons.track
         $.ajax({
             url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
             method: 'POST',
             dataType: 'json',
             headers: {'X-CSRFToken': $.cookie('csrftoken')},
             success: function(data) {
-                // console.log('Setting state to ', state_after);
                 this.setState({tracked: state_after});
+                metrika.reach_goal(action.toUpperCase());
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());

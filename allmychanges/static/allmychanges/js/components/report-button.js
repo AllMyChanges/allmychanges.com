@@ -1,17 +1,21 @@
+var metrika = require('./metrika.js')
+
 module.exports = React.createClass({
     getInitialState: function () {
         return {show_popup: false,
                 body_callback_installed: false};
     },
     handle_switcher_click: function (e) {
-        console.log('Switcher click');
+        // user clicked report button @buttons.report
+        metrika.reach_goal('CLICK-REPORT-BUTTON');
+
         e.nativeEvent.stopImmediatePropagation();
         e.preventDefault();
 
         if (this.state.body_callback_installed == false) {
             $(document).click(function() {
                 this.setState({show_popup: false});
-                console.log('Hiding from body click');
+                // hiding from body click @buttons.report
             }.bind(this));
             this.setState({body_callback_installed: true});
         }
@@ -28,10 +32,12 @@ module.exports = React.createClass({
         }
     },
     handle_popup_click: function (e) {
-        console.log('Popup click');
+        // popup click @buttons.report
         e.nativeEvent.stopImmediatePropagation();
     },
     handle_post: function (e) {
+        // sending feedback to the server @report.button
+        metrika.reach_goal('REPORT');
         e.preventDefault();
         var type = this.refs.type.getDOMNode().value.trim();
         var comment = this.refs.comment.getDOMNode().value.trim();
