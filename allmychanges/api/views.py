@@ -229,6 +229,7 @@ class SearchAutocompleteView(viewsets.ViewSet):
                 results.append(dict(type='package',
                                     namespace=changelog.namespace,
                                     name=changelog.name,
+                                    description=changelog.description,
                                     source=changelog.source,
                                     resource_uri=resource_uri,
                                     icon=changelog.icon,
@@ -278,6 +279,7 @@ class SearchAutocompleteView(viewsets.ViewSet):
                                     source=url,
                                     name=item.title,
                                     namespace='ios',
+                                    description=item.description,
                                     icon=item.icon,
                                     url='/p/new/?' + urlencode(dict(url=url))))
 

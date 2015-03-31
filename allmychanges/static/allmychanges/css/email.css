@@ -732,6 +732,81 @@ a {
 .help ol {
   margin-top: 20px;
 }
+.landing-for-ios {
+  margin-top: 65px;
+}
+.ios-promo {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+.ios-promo__text {
+  font-size: 30px;
+  line-height: 40px;
+  margin-bottom: 30px;
+  color: #555;
+}
+.ios-promo__highlight {
+  font-weight: bold;
+  color: #222;
+}
+.ios-promo__input {
+  font-size: 24px;
+  line-height: 40px;
+  border: 1px solid #808080;
+  padding: 0 5px;
+  width: 100%;
+}
+.ios-promo__no-matches {
+  padding: 10px;
+}
+.ios-promo__selected-apps {
+  margin-top: 10px;
+}
+.ios-promo__selected-app {
+  list-style: none;
+  display: inline-block;
+  margin-right: 10px;
+}
+.ios-promo__thumb {
+  width: 57px;
+  height: 57px;
+}
+.ios-promo__suggest-item td {
+  vertical-align: top;
+}
+.ios-promo__suggest-item-name {
+  padding-left: 10px;
+}
+.ios-promo__suggest-item-description {
+  padding-left: 10px;
+  color: #808080;
+}
+.ios-promo__digest {
+  position: relative;
+}
+.ios-promo .twitter-typeahead {
+  width: 100%;
+}
+.ios-promo .tt-dropdown-menu {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #808080;
+  box-shadow: 0 0 3px #111;
+  margin-top: 10px;
+}
+.ios-promo .tt-suggestion {
+  border-bottom: 1px solid #808080;
+  font-size: 15px;
+  line-height: 20px;
+  padding: 10px;
+}
+.ios-promo .tt-cursor {
+  background: #88f;
+}
+.ios-promo .tt-suggestion:last-of-type {
+  border-bottom: none;
+}
 .subscribed-text {
   font-size: 1.5em;
   margin-bottom: 1em;
@@ -1346,80 +1421,6 @@ body.email {
   font-size: 16px;
   color: #808080;
   font: proxima-nova, sans-serif;
-}
-.landing-for-ios {
-  margin-top: 65px;
-}
-.ios-promo__logo {
-  color: #888;
-}
-.ios-promo__suggest-item td {
-  vertical-align: top;
-}
-.ios-promo__suggest-item td:nth-child(2) {
-  padding-left: 10px;
-}
-.ios-promo {
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-}
-.ios-promo__text {
-  font-size: 30px;
-  line-height: 40px;
-  margin-bottom: 30px;
-  color: #555;
-}
-.ios-promo__highlight {
-  font-weight: bold;
-  color: #222;
-}
-.ios-promo__input {
-  font-size: 24px;
-  line-height: 40px;
-  border: 1px solid #808080;
-  padding: 0 5px;
-  width: 100%;
-}
-.ios-promo__no-matches {
-  padding: 10px;
-}
-.ios-promo__selected-apps {
-  margin-top: 10px;
-}
-.ios-promo__selected-app {
-  list-style: none;
-  display: inline-block;
-  margin-right: 10px;
-}
-.ios-promo__thumb {
-  width: 57px;
-  height: 57px;
-}
-.ios-promo__digest {
-  position: relative;
-}
-.ios-promo .twitter-typeahead {
-  width: 100%;
-}
-.ios-promo .tt-dropdown-menu {
-  width: 100%;
-  background: #fff;
-  border: 1px solid #808080;
-  box-shadow: 0 0 3px #111;
-  margin-top: 10px;
-}
-.ios-promo .tt-suggestion {
-  border-bottom: 1px solid #808080;
-  font-size: 15px;
-  line-height: 20px;
-  padding: 10px;
-}
-.ios-promo .tt-cursor {
-  background: #88f;
-}
-.ios-promo .tt-suggestion:last-of-type {
-  border-bottom: none;
 }
 /* override link style from email-reset */
 a {

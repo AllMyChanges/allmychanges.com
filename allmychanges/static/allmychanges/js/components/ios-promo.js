@@ -40,7 +40,7 @@ module.exports = React.createClass({
             });
         };
 
-        var show_suggestion = _.template('<table class="ios-promo__suggest-item"><tr><td><img class="ios-promo__thumb" src="<%- icon %>"/></td><td><%- name %></td></tr></table>');
+        var show_suggestion = _.template('<table class="ios-promo__suggest-item"><tr><td rowspan="2"><img class="ios-promo__thumb" src="<%- icon %>"/></td><td class="ios-promo__suggest-item-name"><%- name %></td></tr><tr><td class="ios-promo__suggest-item-description"><%- description %></td></tr></table>');
 
         $(element).find('.ios-promo__input').typeahead(
             {

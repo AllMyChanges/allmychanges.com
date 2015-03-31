@@ -65,6 +65,7 @@ class ChangelogSerializer(ModelSerializer):
             'absolute_uri',
             'namespace',
             'name',
+            'description',
             'source',
             'icon',
             'created_at',
