@@ -62,6 +62,9 @@ def test_extract_version():
             eq_(v, _extract_version('2015-03-12 ({0})'.format(v)))
             eq_(v, _extract_version('2015-03-12 (v{0})'.format(v)))
 
+    # from https://app-updates.agilebits.com/product_history/OPI4
+    check('5.3.BETA-22')
+
     # from http://spark.apache.org/releases/spark-release-1-3-0.html
     check(None, 'Upgrading to Spark 1.3')
 

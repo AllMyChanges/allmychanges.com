@@ -415,31 +415,32 @@ level-4-header() {
 
 .package-selector {
     margin-top: 20px;
-}
 
-.package-selector__item {
-    display: inline-block;
-    list-style: none;
-    margin-right: 44px;
-    margin-bottom: 20px;
-    vertical-align: top;
-}
-
-.package-selector__version {
-    list-style: none;
-}
-
-.package-selector__number {
-    font-weight: bold;
-}
-
-.package-selector__date {
-    color: gray;
-    margin-left: 10px;
-}
-
-.package-selector__versions {
-    margin-bottom: 22px;
+    &__title {
+        white-space: nowrap;
+    }
+    &__item {
+        display: inline-block;
+        width: 220px;
+        overflow: hidden;
+        list-style: none;
+        margin-right: 44px;
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    &__version {
+        list-style: none;
+    }
+    &__number {
+        font-weight: bold;
+    }
+    &__date {
+        color: gray;
+        margin-left: 10px;
+    }
+    &__versions {
+        margin-bottom: 22px;
+    }
 }
 
 .package-select__track-button {

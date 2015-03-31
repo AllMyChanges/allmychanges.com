@@ -1,7 +1,7 @@
 import os
 from .default import *  # nopep8
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'no') == 'yes'
 TEMPLATE_DEBUG = DEBUG
 
 if DEBUG:

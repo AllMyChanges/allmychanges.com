@@ -11,10 +11,7 @@
         <td class="form__layout__left-column"><label class="label">Email:</label></td>
         <td class="form__layout__right-column">
           {{ form.email|add_class:"text-input profile-form__email-field" }}
-          <p class="form__layout__right-column form__help">We'll mail you when new versions will be discovered.<br/>
-            To unsubscribe, just leave it blank. But stop! Don't do it, because that way we'll be unable to reach
-            you in case if some critical updates become available for libraries you use.
-          </p>
+          <p class="form__layout__right-column form__help">We will mail you when new versions will be discovered.</p>
         </td>
       </tr>
       <tr class="form__layout__row">
@@ -37,13 +34,18 @@ release notes updates on a daily or weekly basis.</p>
         <td class="form__layout__right-column">
           {{ form.slack_url|add_class:"text-input profile-form__slack-url" }}
           <p class="form__layout__right-column form__help">Enter Slack's URL here and we'll
-publish all discovered versions in that channel.</p>
+publish all discovered versions in that channel. Need help? Read <a href="{% url 'help' topic='slack/' %}">more about Slack</a> integration!</p>
         </td>
       </tr>
       <tr class="form__layout__row">
         <td class="form__layout__left-column">
         <td class="form__layout__right-column">
-          <input type="submit" value="Save changes" class="button _good _large"/>
+          {% if from_registration %}
+            <input type="hidden" name="from_registration" value="yes"/>
+            <input type="submit" value="Proceed to the Digest" class="button _good _large"/>
+          {% else %}
+            <input type="submit" value="Save changes" class="button _good _large"/>
+          {% endif %}
         </td>
       </tr>
     </table>

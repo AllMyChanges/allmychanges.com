@@ -7,6 +7,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
     // returns an object instead of plain string
     $scope.namespace = $attrs['changelogNamespace'];
     $scope.name = $attrs['changelogName'];
+    $scope.description = $attrs['changelogDescription'];
     $scope.namespace_error = !$scope.namespace && 'Please, fill this field' || '';
     $scope.name_error = $scope.namespace_error;
     $scope.package_url = 'unknown';
@@ -47,6 +48,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
 
     $scope.orig_name = $scope.name;
     $scope.orig_namespace = $scope.namespace;
+    $scope.orig_description = $scope.description;
     $scope.orig_changelog_source = $scope.changelog_source;
     $scope.orig_search_list = undefined;
     $scope.orig_ignore_list = undefined;
@@ -71,6 +73,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
         $scope.save_button_title = 'Saving...';
         return $http.put('/v1/changelogs/' + $scope.changelog_id + '/',
                          {'namespace': $scope.namespace,
+                          'description': $scope.description,
                           'name': $scope.name,
                           'source': $scope.changelog_source,
                           'search_list': $scope.search_list,

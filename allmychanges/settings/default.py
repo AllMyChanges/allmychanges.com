@@ -1,4 +1,7 @@
 import os
+import MySQLdb.cursors
+
+
 here = lambda * x: os.path.join(os.path.abspath(os.path.dirname(__file__)), *x)
 
 PROJECT_ROOT = here('..', '..')
@@ -26,6 +29,12 @@ DATABASES = {
         'PORT': '',
     }
 }
+# To keep one connection for reading from server-side corsor
+# and to write to the second
+if not os.environ.get('MIGRATIONS'):
+    DATABASES['server-side'] = DATABASES['default'].copy()
+    DATABASES['server-side']['OPTIONS'] = {
+        'cursorclass': MySQLdb.cursors.SSCursor}
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts

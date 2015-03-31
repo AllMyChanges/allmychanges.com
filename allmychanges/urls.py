@@ -7,12 +7,12 @@ admin.autodiscover()
 
 from .views import (OldIndexView,
                     IssuesView,
+                    HelpView,
                     IssueDetailView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
                     SearchView,
-                    ToolsView,
                     DigestView,
                     LandingDigestView,
                     BadgeView,
@@ -77,6 +77,8 @@ urlpatterns = patterns(
     url(r'^catalogue/$', CatalogueView.as_view(), name='catalogue'),
     url(r'^issues/(?P<pk>.*)/$', IssueDetailView.as_view(), name='issue-detail'),
 
+    url(r'^help/(?P<topic>.*)$', HelpView.as_view(), name='help'),
+
     url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView.as_view(), name='edit-package'),
@@ -91,9 +93,10 @@ urlpatterns = patterns(
     url(r'^django-rq/', include('django_rq.urls')),
     url(r'^logout/', 'django.contrib.auth.views.logout', name='logout'),
     url(r'^style-guide/', StyleGuideView.as_view(), name='style-guide'),
-    url(r'^tools/', ToolsView.as_view(), name='tools'),
     url(r'^landing/ru/', LandingView.as_view(landings=['ru1-green', 'ru1-red']), name='landing-ru'),
     url(r'^landing/en/', LandingView.as_view(landings=['en1-green']), name='landing-en'),
+    url(r'^for-ios/', LandingView.as_view(landings=['for-ios1']), name='landing-for-ios'),
+
     url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
     url(r'^account/token/', TokenView.as_view(), name='token'),
     url(r'^accounts/login/', LoginView.as_view(), name='login'),

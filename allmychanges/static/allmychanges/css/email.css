@@ -526,6 +526,13 @@ a {
   color: #808080;
   float: right;
 }
+.magic-prompt__suggest-item-source {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 600px;
+  overflow: hidden;
+  color: #808080;
+}
 .magic-prompt .twitter-typeahead {
   width: 100%;
 }
@@ -577,7 +584,7 @@ a {
 .plate {
   background-color: #5cb85c;
   font-size: 15px;
-  line-height: 22px;
+  line-height: 26px;
   padding-left: 10px;
   padding-right: 10px;
   margin-left: -10px;
@@ -585,6 +592,7 @@ a {
   margin-top: 7px;
   color: #fefefe;
   border: 1px solid #3f903f;
+  border-radius: 3px;
 }
 .plate_warning {
   background-color: #d9534f;
@@ -703,6 +711,118 @@ a {
 }
 .first-step__list-item:nth-child(2):before {
   content: "2";
+}
+.help h1 {
+  font-family: pragmatica-web-condensed, sans-serif;
+  font-size: 30px;
+  line-height: 40px;
+  margin-bottom: 30px;
+}
+.help h2 {
+  font-family: pragmatica-web-condensed, sans-serif;
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 20px;
+}
+.help p,
+.help li {
+  font-size: 16px;
+  line-height: 30px;
+}
+.help p {
+  margin-top: 20px;
+}
+.help li {
+  list-style-position: inside;
+}
+.help ul,
+.help ol {
+  margin-top: 20px;
+}
+.landing-for-ios {
+  margin-top: 65px;
+}
+.ios-promo {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+.ios-promo__text {
+  font-size: 30px;
+  line-height: 40px;
+  margin-bottom: 30px;
+  color: #555;
+}
+.ios-promo__highlight {
+  font-weight: bold;
+  color: #222;
+}
+.ios-promo__input {
+  font-size: 24px;
+  line-height: 40px;
+  border: 1px solid #808080;
+  padding: 0 5px;
+  width: 100%;
+}
+.ios-promo__no-matches {
+  padding: 10px;
+}
+.ios-promo__selected-apps {
+  margin-top: 10px;
+}
+.ios-promo__selected-app {
+  list-style: none;
+  display: inline-block;
+  margin-right: 10px;
+}
+.ios-promo__thumb {
+  width: 57px;
+  height: 57px;
+}
+.ios-promo__suggest-item td {
+  vertical-align: top;
+}
+.ios-promo__suggest-item-name {
+  padding-left: 10px;
+}
+.ios-promo__suggest-item-description {
+  padding-left: 10px;
+  color: #808080;
+}
+.ios-promo__digest {
+  position: relative;
+}
+.ios-promo .twitter-typeahead {
+  width: 100%;
+}
+.ios-promo .tt-dropdown-menu {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #808080;
+  box-shadow: 0 0 3px #111;
+  margin-top: 10px;
+}
+.ios-promo .tt-suggestion {
+  border-bottom: 1px solid #808080;
+  font-size: 15px;
+  line-height: 20px;
+  padding: 10px;
+}
+.ios-promo .tt-cursor {
+  background: #88f;
+}
+.ios-promo .tt-suggestion:last-of-type {
+  border-bottom: none;
+}
+.page-header__package-title {
+  display: inline-block;
+}
+.page-header__buttons {
+  display: inline-block;
+  margin-left: 15px;
+  height: 30px;
+  position: relative;
+  top: -5px;
 }
 .subscribed-text {
   font-size: 1.5em;
@@ -1048,8 +1168,13 @@ body.email {
 .package-selector {
   margin-top: 20px;
 }
+.package-selector__title {
+  white-space: nowrap;
+}
 .package-selector__item {
   display: inline-block;
+  width: 220px;
+  overflow: hidden;
   list-style: none;
   margin-right: 44px;
   margin-bottom: 20px;

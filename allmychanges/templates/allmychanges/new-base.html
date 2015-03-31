@@ -87,6 +87,7 @@
           <li class="site-menu__item{% if menu_add_new %} site-menu__selected-item{% endif %}"><a href="{% url 'add-new' %}">Add&amp;Track</a></li>
           <li class="site-menu__item{% if menu_catalogue %} site-menu__selected-item{% endif %}"><a href="{% url 'catalogue' %}">Catalogue</a></li>
           <li class="site-menu__item{% if menu_digest %} site-menu__selected-item{% endif %}"><a href="{% url 'digest' %}">Digest</a></li>
+          <li class="site-menu__item{% if menu_help %} site-menu__selected-item{% endif %}"><a href="/help/">Help</a></li>
         </ul>
       </div>
       {% endblock header %}
@@ -94,7 +95,7 @@
       <div class="content">
         {% block no-email-warning %}
           {% if user.is_authenticated and not user.email %}
-            <div class="plate plate_warning">Please, <a href="{% url "account-settings" %}#notifications">setup email</a> and we will notify you when new versions will be discovered.</div>
+            <div class="plate plate_warning">To receive notifications about new versions, <a href="{% url "account-settings" %}#notifications">setup email</a>.</div>
           {% endif %}
         {% endblock %}
 

@@ -19,6 +19,8 @@
      data-changelog-name="{{ changelog.name }}"{% endif %}
 {% if changelog.namespace %}
      data-changelog-namespace="{{ changelog.namespace }}"{% endif %}
+{% if changelog.namespace %}
+     data-changelog-description="{{ changelog.description }}"{% endif %}
      data-search-list="{{ changelog.search_list }}"
      data-ignore-list="{{ changelog.ignore_list }}"
      data-mode="{{ mode }}"
@@ -63,6 +65,14 @@
         </td>
         <td class="new-package__button-cell">
         </td>
+       </tr>
+       <tr>
+         <td colspan="2" class="new-package__description-cell">
+           <div class="input">
+             <label class="input__label">Description:</label><span class="input__error" ng-if="description_error" ng-bind="description_error"></span><br/>
+             <input ng-model="description" type="text" placeholder="Tell us what it does" class="text-input"/>
+           </div>
+         </td>
        </tr>
        <tr>
          <td class="new-package__search-label">Search in these dirs and files:</td>
