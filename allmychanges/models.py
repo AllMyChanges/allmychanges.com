@@ -263,6 +263,7 @@ class Changelog(Downloadable, models.Model):
     namespace = models.CharField(max_length=NAMESPACE_LENGTH, blank=True, null=True)
     name = models.CharField(max_length=NAME_LENGTH, blank=True, null=True)
     description = models.CharField(max_length=DESCRIPTION_LENGTH,
+                                   blank=True,
                                    default='')
     downloader = models.CharField(max_length=10, blank=True, null=True)
     status = models.CharField(max_length=40, default='created')

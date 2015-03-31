@@ -214,7 +214,7 @@ class SearchAutocomplete2View(viewsets.ViewSet):
 
 class SearchAutocompleteView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
-        name = request.GET.get('q', '')
+        name = request.GET.get('q', '').lower()
         namespace = request.GET.get('namespace') # optional
 
         results = []
@@ -270,7 +270,21 @@ class SearchAutocompleteView(viewsets.ViewSet):
         if namespace == 'ios':
             data = data.filter(origin='app-store')
 
-        data = data.distinct()
+        data = list(data.distinct())
+
+        # sort results, so that thouse which title
+        # starts from the query go first and shorter title go first
+        def cmp(left, right):
+            left_title = left.title.lower()
+            if left_title.startswith(name):
+                right_title = right.title.lower()
+                if right_title.startswith(name):
+                    if len(right_title) < len(left_title):
+                        return -1
+                return 1
+            return -1
+
+        data.sort(cmp=cmp, reverse=True)
 
         for item in data[:10]:
             url = item.source
@@ -385,7 +399,8 @@ class ChangelogViewSet(HandleExceptionMixin,
             *args, **kwargs)
         # put changelog into the queue right
         # away
-        self.object.schedule_update()
+        if getattr(self, 'object', None):
+            self.object.schedule_update()
         return response
 
     def update(self, *args, **kwargs):

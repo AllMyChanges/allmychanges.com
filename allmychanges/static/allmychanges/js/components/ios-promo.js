@@ -125,6 +125,7 @@ module.exports = React.createClass({
                     url: '/v1/changelogs/',
                     data: {namespace: option.namespace,
                            name: name.slice(0, 80),
+                           description: option.name.slice(0, 255),
                            icon: option.icon,
                            source: option.source},
                     method: 'POST',
