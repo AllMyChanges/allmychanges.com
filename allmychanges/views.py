@@ -816,7 +816,7 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                     source=normalized_url,
                     name=self.request.GET.get('name'),
                     namespace=self.request.GET.get('namespace'),
-                    description=self.request.GET.get('description'),
+                    description=self.request.GET.get('description', ''),
                 )
                 if user:
                     chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
