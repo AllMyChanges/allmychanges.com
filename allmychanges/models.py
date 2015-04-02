@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import requests
 import time
 import math
 import datetime
@@ -429,6 +430,30 @@ class Changelog(Downloadable, models.Model):
     def clean(self):
         super(Changelog, self).clean()
         self.source, _, _ = normalize_url(self.source, for_checkout=False)
+
+
+    def update_description_from_source(self, fall_asleep_on_rate_limit=False):
+        # right now this works only for github urls
+        if 'github.com' not in self.source:
+            return
+
+        url, username, repo = normalize_url(self.source)
+        url = 'https://api.github.com/repos/{0}/{1}'.format(username, repo)
+
+        headers={'Authorization': 'token ' + settings.GITHUB_TOKEN}
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            data = response.json()
+            self.description = data.get('description', '')
+            self.save(update_fields=('description', ))
+
+        if fall_asleep_on_rate_limit:
+            remaining = int(response.headers['x-ratelimit-remaining'])
+            if remaining == 1:
+                to_sleep = int(response.headers['x-ratelimit-reset']) - time.time() + 10
+                print 'OK, now I need to sleep {0} seconds because of GitHub\'s rate limit.'.format(to_sleep)
+                time.sleep(to_sleep)
 
 
 class ChangelogTrack(models.Model):
