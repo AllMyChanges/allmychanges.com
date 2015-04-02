@@ -1,3 +1,51 @@
+0.21.0 (2015-04-02)
+===================
+
+Brand new autocomplete
+----------------------
+
+New autocomplete system was introduced.
+Previously it worked only by our own database,
+but now, when you are entering something into the
+search bar, it also searches through over 1 million
+apps from the Apple AppStore.
+
+Very soon we'll add other sources for autocomplete,
+such like PyPi, CPAN, NPM and GitHub.
+
+Package descriptions
+--------------------
+
+From today, each package on AllMyChanges have new attribute
+"description". It is optional, but we highly recomment to fill
+it. For github projects we filled it automatically and are
+planning to do this when new packages are added.
+
+Filtering by attribute
+----------------------
+
+Now when tuning how changelog is parsed, you can
+enter special filters into the "search list" textarea:
+
+    [title=Release notes for \d.*]
+
+This especially useful with `rechttp` downloader which
+downloads bunch os html pages and tries to figure out which
+parts of them are version descriptions. Using such
+"attribute filters" you can help the parser to understand
+which html headers are really contain version numbers.
+
+Other changes
+-------------
+
+* Rechttp downloader now adds '.html' extension to urls without backslash at the end.
+* Fixed error on a page for receiving [a token](http://allmychanges.com/account/token/) when
+user come without login.
+* Now we show number of trackers beside the "Track" button.
+* Fixed a way how version numbers are compared when we are sorting them
+(distutils's LooseVersion uses wrong algorithm).
+* Fixed version parsing when there are upper-case letters in a version number 5.3.BETA-22.
+
 0.20.1 (2015-03-16)
 ===================
 
