@@ -525,6 +525,8 @@
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var metrika = __webpack_require__(13)
+
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
 
@@ -610,21 +612,23 @@
 	                    }
 	                }.bind(this));
 	        }.bind(this);
+
 	        
-	        // Behind the scenes, this is just delegating to Backbone's router
-	        // to 'navigate' the main pane of the page to a different view
 	        var tracked_ids = [];
 	        $(element).on('typeahead:selected', function(jquery, option) {
-	            console.log("Adding app");
-	            // adding app to the list
+	            UserStory.log(["adding app to the list"], ["ios"]);
 	            var new_apps = _.union(this.state.selected_apps, [option]);
-	            console.log(new_apps.length);
 	            this.setState({selected_apps: new_apps});
 
 	            // clearing input
 	            $('.ios-promo__input.tt-input').typeahead('val', '');
 
 	            var track = function(resource_uri) {
+	                if (tracked_ids.length == 0) {
+	                    // регистрируем первый затреканный пакет
+	                    metrika.reach_goal('IOS-PROMO-TRACK-1');
+	                }
+
 	                var tracked_id = /.*\/(\d+)\//.exec(resource_uri)[1];
 
 	                $.ajax({
@@ -633,7 +637,7 @@
 	                    dataType: 'json',
 	                    headers: {'X-CSRFToken': $.cookie('csrftoken')},
 	                    success: function (data) {
-	                        console.log('Now we update the digest example');
+	                        UserStory.log(["update the digest example"], ["ios"]);
 	                        tracked_ids[tracked_ids.length] = tracked_id;
 	                        fetch_new_digest(tracked_ids);
 	                    },
@@ -684,13 +688,11 @@
 	        }
 
 	        var selected_apps = _.map(this.state.selected_apps, process_app);
-	        console.log('len');
-	        console.log(this.state.selected_apps.length);
 
 	        var login_link;
 	        if (this.state.selected_apps.length > 0) {
 	            if (this.state.digest_loaded) {
-	                login_link = (React.createElement("div", {className: "ios-promo__login"}, React.createElement("p", {className: "ios-promo__text"}, "Good job! Now, please, ", React.createElement("span", {className: "ios-promo__highlight"}, "login"), " via ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, "Twitter"), " ", React.createElement("span", {className: "ios-promo__highlight"}, "to receive notifications"), " about future updates.")));
+	                login_link = (React.createElement("div", {className: "ios-promo__login"}, React.createElement("p", {className: "ios-promo__text"}, "Good job! Now, please, ", React.createElement("span", {className: "ios-promo__highlight"}, "login"), " via ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " ", React.createElement("span", {className: "ios-promo__highlight"}, "to receive notifications"), " about future updates.")));
 	            }
 	        } else {
 	            login_link = (React.createElement("div", {className: "ios_promo__login"}, React.createElement("p", {className: "ios-promo__text"}, "Please, ", React.createElement("span", {className: "ios-promo__highlight"}, "select one or more applications"), " to continue.")));

@@ -1,3 +1,5 @@
+var metrika = require('./metrika.js')
+
 // uses jquery typeahead plugin:
 // http://twitter.github.io/typeahead.js/
 
@@ -83,21 +85,23 @@ module.exports = React.createClass({
                     }
                 }.bind(this));
         }.bind(this);
+
         
-        // Behind the scenes, this is just delegating to Backbone's router
-        // to 'navigate' the main pane of the page to a different view
         var tracked_ids = [];
         $(element).on('typeahead:selected', function(jquery, option) {
-            console.log("Adding app");
-            // adding app to the list
+            // adding app to the list @ios-promo
             var new_apps = _.union(this.state.selected_apps, [option]);
-            console.log(new_apps.length);
             this.setState({selected_apps: new_apps});
 
             // clearing input
             $('.ios-promo__input.tt-input').typeahead('val', '');
 
             var track = function(resource_uri) {
+                if (tracked_ids.length == 0) {
+                    // регистрируем первый затреканный пакет
+                    metrika.reach_goal('IOS-PROMO-TRACK-1');
+                }
+
                 var tracked_id = /.*\/(\d+)\//.exec(resource_uri)[1];
 
                 $.ajax({
@@ -106,7 +110,7 @@ module.exports = React.createClass({
                     dataType: 'json',
                     headers: {'X-CSRFToken': $.cookie('csrftoken')},
                     success: function (data) {
-                        console.log('Now we update the digest example');
+                        // update the digest example @ios-promo
                         tracked_ids[tracked_ids.length] = tracked_id;
                         fetch_new_digest(tracked_ids);
                     },
@@ -157,13 +161,11 @@ module.exports = React.createClass({
         }
 
         var selected_apps = _.map(this.state.selected_apps, process_app);
-        console.log('len');
-        console.log(this.state.selected_apps.length);
 
         var login_link;
         if (this.state.selected_apps.length > 0) {
             if (this.state.digest_loaded) {
-                login_link = (<div className="ios-promo__login"><p className="ios-promo__text">Good job! Now, please, <span className="ios-promo__highlight">login</span> via <a className="button _good _large" href="/login/twitter/">Twitter</a> <span className="ios-promo__highlight">to receive notifications</span> about future updates.</p></div>);
+                login_link = (<div className="ios-promo__login"><p className="ios-promo__text">Good job! Now, please, <span className="ios-promo__highlight">login</span> via <a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a> <span className="ios-promo__highlight">to receive notifications</span> about future updates.</p></div>);
             }
         } else {
             login_link = (<div className="ios_promo__login"><p className="ios-promo__text">Please, <span className="ios-promo__highlight">select one or more applications</span> to continue.</p></div>);
