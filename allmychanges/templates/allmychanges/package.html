@@ -3,9 +3,9 @@
 {% load allmychanges_tags %}
 
 {% block html-title %}{{package.namespace}}/{{package.name}}'s changelog at {{block.super}}{% endblock %}
-{% block extra_head %}
+{% block top_of_head %}
 {{ block.super }}
-<meta content="Package {{package.name}}'s changelog." name="description"></meta>
+<meta content="{{package.name|title}}'s release notes.{% if package.description %} {{package.name|title}}: {{package.description}}{% endif %}" name="description"></meta>
 <meta content="{{package.namespace}},{{package.name}},changelog,version,latest,release notes,release" name="keywords"></meta>
 {% endblock %}
 
