@@ -143,6 +143,9 @@ def test_parse_item():
 
 
 def test_extract_date():
+    # from https://github.com/lepture/mistune/blob/master/CHANGES.rst
+    eq_(date(2014, 12, 5), _extract_date('Released on Dec. 5, 2014.'))
+
     eq_(date(2014, 10, 31), _extract_date('31/10/2014'))
     eq_(date(2013, 3, 13), _extract_date('13th March 2013'))
     eq_(date(2014, 11, 3), _extract_date('3rd November 2014'))
