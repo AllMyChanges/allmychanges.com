@@ -35,4 +35,4 @@ dependencies from yours `requirements.txt` file:
 First, with `cat`, `grep` and `sed` you prepare and input file `data` in CSV format.
 And second – upload it to the service with `amch` command.
 
-Read more about this tool at [it's documentation](https://github.com/svetlyak40wt/allmychanges#installation).
+Read more about this tool in [it's documentation](https://github.com/svetlyak40wt/allmychanges#installation).
