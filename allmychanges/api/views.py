@@ -457,10 +457,15 @@ class ChangelogViewSet(HandleExceptionMixin,
 
         if user.is_authenticated():
             user.track(changelog)
+            chat.send(('Package <http://allmychanges.com{url}> was tracked by {username}.').format(
+                url=changelog.get_absolute_url(),
+                username=user.username))
         else:
             tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
             tracked_changelogs.add(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
+            chat.send(('Package <http://allmychanges.com{url}> was tracked by anonymous user.').format(
+                url=changelog.get_absolute_url()))
         return response
 
     @action()
@@ -469,6 +474,12 @@ class ChangelogViewSet(HandleExceptionMixin,
         if user.is_authenticated():
             changelog = Changelog.objects.get(pk=pk)
             user.untrack(changelog)
+            chat.send(('Package <http://allmychanges.com{url}> was untracked by {username}.').format(
+                url=changelog.get_absolute_url(),
+                username=user.username))
+        else:
+            chat.send(('Package <http://allmychanges.com{url}> was untracked by anonymous user.').format(
+                url=changelog.get_absolute_url()))
         return Response({'result': 'ok'})
 
 
