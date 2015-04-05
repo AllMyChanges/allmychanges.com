@@ -1,3 +1,29 @@
+0.22.0 (2015-04-05)
+==================
+
+This release includes two major features:
+
+1. Design became responsive and more usable on devices with a small screen.
+   Though not all pages are fixed yet, but frontpage and changelog os single
+   package are looking good now on my iphone :)
+2. Now XSL transformation could be applied to html pages before our
+   robot will make attempt to find version descriptions there. This allows
+   manually fix weird HTML markup whic brokes our data extraction algorithms.
+
+   This powerful feature is accessable only to service creators. It allowed
+   us to process release notes of [Minecraft][] and [3D Engine Unity][Unity],
+   and we hope to add more in the future.
+
+   If you encounter a changelog which looks good on the web, but service is
+   unable to handle it, [email us][support-email], and we'll be happy to help.
+
+Also, there were a few minor changes:
+
+* A bunch of SEO optimizations were introduced like micro formats support, meta tags,
+last-modified caching, etc..
+* Fixed date parsing for dates ended with dot, like "Released on Dec. 5, 2014."
+* Added description of `amch` command line utility to the [tools page][tools].
+
 0.21.0 (2015-04-02)
 ===================
 
@@ -741,6 +767,7 @@ setup.py uses setuptools.
 
 There are plenty directions for approvement. Stay tuned.
 
+[tools]: http://allmychanges.com/help/tools/
 [support-email]: mailto:help@allmychanges.com
 [Celery]: http://www.celeryproject.org/
 [celery-3.1]: https://github.com/celery/celery/tree/3.1
@@ -755,3 +782,6 @@ There are plenty directions for approvement. Stay tuned.
 [SleekXMPP]: http://allmychanges.com/p/python/sleekxmpp/
 [nodejs]: http://allmychanges.com/p/node/nodejs/
 [iojs]: http://allmychanges.com/p/javascript/iojs/
+[Minecraft]: http://allmychanges.com/p/games/minecraft/
+[Unity]: http://allmychanges.com/p/sdk/unity/
+
