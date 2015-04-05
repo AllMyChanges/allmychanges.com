@@ -255,3 +255,18 @@ def init_logging(filename, logstash=False):
     # and we need this to turn off python-rq's logging
     # configuration
     logging._handlers['fake-handler'] = handler
+
+
+# http://lxml.de/1.3/extensions.html
+import re
+from lxml import etree
+ns = etree.FunctionNamespace('http://allmychanges.com/functions')
+ns.prefix = 'amch'
+
+def sub(context, pattern, replacement, text):
+    return re.sub(pattern, replacement, text[0])
+ns['re.sub'] = sub
+
+def match(context, pattern, text):
+    return re.match(pattern, text[0]) is not None
+ns['re.sub'] = sub
