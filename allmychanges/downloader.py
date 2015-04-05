@@ -371,21 +371,10 @@ def hg_downloader(source,
 def http_downloader(source,
                     search_list=[],
                     ignore_list=[]):
-    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-    url = source.replace('http+', '')
-
-    try:
-        with cd(path):
-            response = requests.get(url)
-            with open('ChangeLog', 'w') as f:
-                f.write(get_text_from_response(response).encode('utf-8'))
-
-    except Exception, e:
-        if os.path.exists(path):
-            shutil.rmtree(path)
-        raise RuntimeError('Unexpected exception "{0}" when fetching: {1}'.format(
-            e, url))
-    return path
+    return rechttp_downloader(source,
+                              search_list,
+                              ignore_list,
+                              only_one=True)
 
 
 def itunes_downloader(source,
@@ -435,7 +424,11 @@ def itunes_downloader(source,
 def rechttp_downloader(source,
                        search_list=[],
                        ignore_list=[],
-                       xslt=''):
+                       only_one=False):
+    """
+    Param `only_one` needed to emulate http_downloader which fetches
+    only one page.
+    """
     DEFAULT_UPPER_LIMIT = 100
     UPPER_LIMITS = {
         'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,
@@ -451,16 +444,20 @@ def rechttp_downloader(source,
     search_list = [item
                    for item, parser_name in search_list
                    if is_http_url(item)]
-    if search_list:
-        limit_urls = upper_limit
-        search_patterns = [('^' + item + '$')
-                           for item in search_list]
+    if only_one:
+        limit_urls = 1
+        search_patterns = []
     else:
-        limit_urls = 10
-        if base_url.endswith('/'):
-            search_patterns = ['^' + base_url + '.*$']
+        if search_list:
+            limit_urls = upper_limit
+            search_patterns = [('^' + item + '$')
+                               for item in search_list]
         else:
-            search_patterns = ['^' + base_url.rsplit('/', 1)[0] + '/.*$']
+            limit_urls = 10
+            if base_url.endswith('/'):
+                search_patterns = ['^' + base_url + '.*$']
+            else:
+                search_patterns = ['^' + base_url.rsplit('/', 1)[0] + '/.*$']
 
     search_patterns = map(re.compile, search_patterns)
 
@@ -553,7 +550,7 @@ def rechttp_downloader(source,
             already_seen.add(url)
             fetch_page(url)
 
-        if len(already_seen) == limit_urls:
+        if len(already_seen) == limit_urls and not only_one:
             if limit_urls == upper_limit:
                 message = ('Please, specify more URL patterns '
                            'because we hit the limit ({upper_limit} '
