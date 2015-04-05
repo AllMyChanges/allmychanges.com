@@ -281,7 +281,7 @@ class Changelog(Downloadable, models.Model):
     def latest_version(self):
         versions = list(
             self.versions.exclude(unreleased=True) \
-                         .order_by('-discovered_at', '-number')[:1])
+                         .order_by('-order_idx')[:1])
         if versions:
             return versions[0]
 
