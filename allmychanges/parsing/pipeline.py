@@ -677,6 +677,11 @@ def process_version_description(html):
         # removing reST's fucking field-list from our nice changelog item
         text = re.sub(ur'<table class="docutils field-list".*?</table>', u'', text, flags=re.DOTALL | re.M)
 
+        def filter_div_attrs(name, value):
+            if name == 'style' and value == 'display: none':
+                return True
+            return False
+
         text = clean(text,
                      tags=[u'table', 'colgroup', 'col', 'tr', 'td', 'th', 'tbody', 'thead',
                            u'a', u'abbr', u'acronym', u'b', u'blockquote',
@@ -695,8 +700,9 @@ def process_version_description(html):
                      attributes={u'a': [u'href', u'title'],
                                  u'acronym': [u'title'],
                                  u'img': [u'src', u'width', u'height', u'title'],
-                                 u'abbr': [u'title']},
-                     styles=[])
+                                 u'abbr': [u'title'],
+                                 u'div': filter_div_attrs},
+                     styles=['display']) # NEVER ALLOW STYLE attribute without additional checking for style value
         return text
 
     def apply_filters(text):
