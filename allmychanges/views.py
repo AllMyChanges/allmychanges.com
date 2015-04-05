@@ -39,6 +39,8 @@ from allmychanges.models import (Version,
                                  Preview)
 from allmychanges import chat
 from allmychanges.notifications.email import send_email
+from allmychanges.http import LastModifiedMixin
+
 from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import (HOUR,
@@ -385,8 +387,16 @@ class LoginView(CommonContextMixin, TemplateView):
         return super(LoginView, self).get(request, **kwargs)
 
 
-class PackageView(CommonContextMixin, TemplateView):
+class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
     template_name = 'allmychanges/package.html'
+
+    def last_modified(self, *args, **kwargs):
+        discovered_versions = Version.objects.filter(
+            changelog__namespace=kwargs['namespace'],
+            changelog__name=kwargs['name']).order_by('-discovered_at')
+        latest = list(discovered_versions[:1].values_list('discovered_at', flat=True))
+        if latest:
+            return latest[0]
 
     def get_context_data(self, **kwargs):
         result = super(PackageView, self).get_context_data(**kwargs)
