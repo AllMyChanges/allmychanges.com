@@ -29,16 +29,18 @@ module.exports = React.createClass({
         this.perform_action('untrack', false);
     },
     render: function() {
-        var trackers_msg = '';
         var num_trackers = this.props.num_trackers;
 
+        var msg;
         if (num_trackers && num_trackers != '0') {
-            var msg = num_trackers + ' users already track it!'
+            msg = num_trackers + ' users already track it!'
             if (num_trackers == '1') {
                 msg = 'one user already tracks it!';
             }
-            trackers_msg = <div className="track-button__message">{msg}</div>;
+        } else {
+            msg = 'nobody tracks it, be the first!';
         }
+        var trackers_msg = <div className="track-button__message">{msg}</div>;
 
         if (this.state.tracked) {
             return (<div className="track-button">

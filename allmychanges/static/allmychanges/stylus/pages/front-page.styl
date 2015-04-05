@@ -13,9 +13,14 @@
 level-1-header() {
     font-family: Georgia, sans-serif;
     font-weight: 300;
-
-    line-height: 55px;
-    font-size: 48px;
+    @media (min-width: 600px) {
+        font-size: 48px;
+        line-height: 55px;
+    }
+    @media (max-width: 600px) {
+        font-size: 30px;
+        line-height: 40px;
+    }
     margin-top: 37px;
     margin-bottom: 18px;
 }

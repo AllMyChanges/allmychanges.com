@@ -303,9 +303,18 @@ select {
 }
 .header {
   padding-top: 1.5em;
-  padding-left: 100px;
   background-color: #eee;
   margin-bottom: 30px;
+}
+@media (max-width: 600px) {
+  .header {
+    padding-left: 10px;
+  }
+}
+@media (min-width: 600px) {
+  .header {
+    padding-left: 100px;
+  }
 }
 .logo {
   position: absolute;
@@ -378,9 +387,18 @@ select {
 .magic-prompt {
   width: 100%;
   box-sizing: border-box;
-  padding-left: 270px;
-  padding-right: 400px;
+  margin-top: 50px;
   position: relative;
+}
+@media (min-width: 600px) {
+  .magic-prompt {
+    padding-right: 100px;
+  }
+}
+@media (max-width: 600px) {
+  .magic-prompt {
+    padding-right: 20px;
+  }
 }
 .magic-prompt__input {
   font-size: 24px;
@@ -390,6 +408,7 @@ select {
   width: 100%;
 }
 .magic-prompt__submit {
+  display: none;
   font-size: 24px;
   line-height: 32px;
   position: absolute;
@@ -714,10 +733,20 @@ select {
 .front-header {
   font-family: Georgia, sans-serif;
   font-weight: 300;
-  line-height: 55px;
-  font-size: 48px;
   margin-top: 37px;
   margin-bottom: 18px;
+}
+@media (min-width: 600px) {
+  .front-header {
+    font-size: 48px;
+    line-height: 55px;
+  }
+}
+@media (max-width: 600px) {
+  .front-header {
+    font-size: 30px;
+    line-height: 40px;
+  }
 }
 .front-steps__step {
   list-style: none;
@@ -918,10 +947,12 @@ select {
   display: inline;
 }
 .page-header__buttons {
-  margin-bottom: 20px;
-  height: 30px;
+  margin-bottom: 15px;
   position: relative;
   top: -5px;
+}
+.page-header__buttons .button {
+  margin-bottom: 15px;
 }
 .subscribed-text {
   font-size: 1.5em;
@@ -955,18 +986,36 @@ body.email {
 .digest-source__version {
   color: #008000;
 }
-.content {
-  margin-left: 100px;
-  margin-right: 100px;
+@media (max-width: 600px) {
+  .content {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+@media (min-width: 600px) {
+  .content {
+    margin-left: 100px;
+    margin-right: 100px;
+  }
 }
 .footer {
-  margin-left: 100px;
-  margin-right: 100px;
   margin-top: 2em;
   margin-bottom: 1em;
   border-top: 1px solid #ddd;
   padding-top: 1em;
   color: #808080;
+}
+@media (max-width: 600px) {
+  .footer {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+@media (min-width: 600px) {
+  .footer {
+    margin-left: 100px;
+    margin-right: 100px;
+  }
 }
 .clear {
   clear: both;
@@ -1323,14 +1372,23 @@ body.email {
 .version-links__sticky .version-links {
   background: rgba(255,255,255,0.8);
   box-shadow: 0 0 5px;
-  margin-right: 95px;
-  left: 95px;
   padding: 0 5px 5px 5px;
+}
+@media (min-width: 600px) {
+  .version-links__sticky .version-links {
+    margin-right: 95px;
+    left: 95px;
+  }
+}
+@media (max-width: 600px) {
+  .version-links__sticky .version-links {
+    left: 0px;
+  }
 }
 .version-links__item {
   display: inline-block;
   margin-right: 10px;
-  min-width: 50px;
+  min-width: 40px;
 }
 .version-links__selected-item a {
   color: #000;
