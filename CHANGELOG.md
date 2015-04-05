@@ -11,8 +11,8 @@ This release includes two major features:
    manually fix weird HTML markup whic brokes our data extraction algorithms.
 
    This powerful feature is accessable only to service creators. It allowed
-   us to process release notes of [Minecraft][] and [3D Engine Unity][Unity],
-   and we hope to add more in the future.
+   us to process release notes of [Minecraft][], [3D Engine Unity][Unity]
+   and [Chrome][]. We hope to add more in the future.
 
    If you encounter a changelog which looks good on the web, but service is
    unable to handle it, [email us][support-email], and we'll be happy to help.
@@ -784,4 +784,4 @@ There are plenty directions for approvement. Stay tuned.
 [iojs]: http://allmychanges.com/p/javascript/iojs/
 [Minecraft]: http://allmychanges.com/p/games/minecraft/
 [Unity]: http://allmychanges.com/p/sdk/unity/
-
+[Chrome]: http://allmychanges.com/p/soft/chrome/
