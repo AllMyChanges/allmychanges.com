@@ -925,12 +925,11 @@ a {
 .ios-promo .tt-suggestion:last-of-type {
   border-bottom: none;
 }
-.page-header__package-title {
-  display: inline-block;
+.page-header__package-title div {
+  display: inline;
 }
 .page-header__buttons {
-  display: inline-block;
-  margin-left: 15px;
+  margin-bottom: 20px;
   height: 30px;
   position: relative;
   top: -5px;

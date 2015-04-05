@@ -10,15 +10,45 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="page-header"><div class="page-header__package-title">{{package.namespace}}/{{package.name}}</div><div class="page-header__buttons"><a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <a href="{{package.source|remove_source_prefix}}" class="button" title="Go to package's sources"><i class="fa fa-external-link-square fa-lg" style="margin-right: 5px"></i>Source</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <div class="track-button-container" data-changelog-id="{{package.changelog.id}}" data-tracked="{{already_tracked|lower}}" data-num-trackers="{{num_trackers}}"></div></div></h1>
+  <h1 class="page-header">
+    <div class="page-header__package-title" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+      <a href="/catalogue/" itemprop="url">
+        <span itemprop="title">All</span>
+      </a>
+      → 
+      <div itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+        <a href="/catalogue/#{{package.namespace}}" itemprop="url">
+          <span itemprop="title">{{package.namespace}}</span>
+        </a>
+        →
+        <div itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+          <a href="{{package.url}}" itemprop="url">
+            <span itemprop="title">{{package.name}}</span>
+          </a>
+          {% with package.changelog.obj.latest_version as latest_version %}
+            {% if latest_version %}
+              →
+              <div itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+                <a href="{{package.url}}#{{latest_version.number}}" itemprop="url">
+                  <span itemprop="title">{{latest_version.number}}</span>
+                </a>
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </h1>
+
+  <div class="page-header__buttons"><a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <a href="{{package.source|remove_source_prefix}}" class="button" title="Go to package's sources"><i class="fa fa-external-link-square fa-lg" style="margin-right: 5px"></i>Source</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <div class="track-button-container" data-changelog-id="{{package.changelog.id}}" data-tracked="{{already_tracked|lower}}" data-num-trackers="{{num_trackers}}"></div></div>
 
   <dl class="package-metadata">
-    <dt>Badge for README:</dt>
+    <!--dt>Badge for README:</dt>
     <dd>
       <div class="share-badge-container"
            data-namespace="{{package.namespace}}"
            data-name="{{package.name}}">Share Badge Should be Here</div>
-    </dd>
+    </dd-->
     {% if package.description %}
       <dt>Description:</dt>
       <dd>{{package.description}}</dd>

@@ -185,7 +185,7 @@ def get_package_data_for_template(changelog,
                       updated_at=changelog.updated_at,
                       next_update_at=getattr(changelog, 'next_update_at', None),
                       problem=changelog.problem,
-
+                      obj=changelog
                   ),
                   versions=versions)
     return result
