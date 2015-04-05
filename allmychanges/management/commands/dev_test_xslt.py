@@ -16,9 +16,10 @@ class Command(LogMixin, BaseCommand):
         doc = etree.parse(filename, parser)
 
         sys.stderr.write('Loading {0}\n'.format(template))
-        xslt = etree.XSLT(etree.parse(template))
+        pre_xslt = etree.parse(template)
+        transform = etree.XSLT(pre_xslt)
 
-        new_doc = xslt(doc)
+        new_doc = transform(doc)
 #        print etree.tostring(doc, pretty_print=True)
 #        print '\n================================\n'
         print etree.tostring(new_doc, pretty_print=True).encode('utf-8')
