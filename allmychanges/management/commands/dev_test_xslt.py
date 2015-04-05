@@ -1,4 +1,5 @@
 # /tmp/allmychanges/tmpAxgowO/2015/02/minecraft-1-8-2-is-now-available/index.html
+import sys
 
 from lxml import etree
 from django.core.management.base import BaseCommand
@@ -10,11 +11,14 @@ class Command(LogMixin, BaseCommand):
 
     def handle(self, *args, **options):
         filename, template = args
+        parser = etree.HTMLParser()
+        sys.stderr.write('Loading {0}\n'.format(filename))
+        doc = etree.parse(filename, parser)
+
+        sys.stderr.write('Loading {0}\n'.format(template))
         xslt = etree.XSLT(etree.parse(template))
 
-        parser = etree.HTMLParser()
-        doc = etree.parse(filename, parser)
         new_doc = xslt(doc)
-        print etree.tostring(doc, pretty_print=True)
-        print '\n================================\n'
-        print etree.tostring(new_doc, pretty_print=True)
+#        print etree.tostring(doc, pretty_print=True)
+#        print '\n================================\n'
+        print etree.tostring(new_doc, pretty_print=True).encode('utf-8')

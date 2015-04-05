@@ -75,6 +75,7 @@ class ChangelogSerializer(ModelSerializer):
             'latest_version',
             'ignore_list',
             'search_list',
+            'xslt',
         )
 
 
