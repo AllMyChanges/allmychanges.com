@@ -371,6 +371,7 @@ def hg_downloader(source,
 def http_downloader(source,
                     search_list=[],
                     ignore_list=[]):
+    source = source.replace('http+', '')
     return rechttp_downloader(source,
                               search_list,
                               ignore_list,
