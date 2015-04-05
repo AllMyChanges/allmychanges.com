@@ -1043,9 +1043,6 @@ body.email {
 }
 .package-version {
   list-style: none;
-/* Remove this after migration to one blob versions */
-/* Remove this after migration to one blob versions */
-/* Remove this after migration to one blob versions */
 }
 .package-version__number {
   display: inline-block;
@@ -1064,29 +1061,6 @@ body.email {
   color: #808080;
   font-family: pragmatica-web-condensed, sans-serif;
 }
-.package-version__items {
-  margin-left: 1em;
-  margin-top: 0.5em;
-  font-family: proxima-nova, sans-serif;
-  font-weight: 300;
-}
-.package-version__section-item {
-  list-style: none;
-  line-height: 1.667em;
-}
-.package-version__section-item > :first-child {
-  margin-left: 0;
-}
-.package-version__section-item > p,
-.package-version__section-item > blockquote,
-.package-version__section-item > dl,
-.package-version__section-item > div {
-  margin-left: 38px;
-}
-.package-version__section-item ul,
-.package-version__section-item ol {
-  margin-left: 16px;
-}
 .package-version__description {
   margin-left: 1em;
   margin-top: 0.5em;
@@ -1097,13 +1071,15 @@ body.email {
 /* show code blocks nicely */
 /* hide Django's permalinks */
 }
-.package-version__description ul {
+.package-version__description ul,
+.package-version__description ol {
   list-style-position: outside;
   margin-left: 16px;
   margin-top: 10px;
   margin-bottom: 10px;
 }
-.package-version__description li > ul {
+.package-version__description li > ul,
+.package-version__description li > ol {
   margin-left: 20px;
   margin-top: 0px;
 }
@@ -1159,67 +1135,6 @@ body.email {
   padding: 11px;
 }
 .package-version__description a[title="Permalink to this headline"] {
-  display: none;
-}
-.package-version__notes {
-  margin-left: 1em;
-  margin-top: 0.5em;
-  font-size: 16px;
-  line-height: 22px;
-  font-family: proxima-nova, sans-serif;
-  font-weight: 300;
-/* show code blocks nicely */
-/* hide Django's permalinks */
-}
-.package-version__notes ul,
-.package-version__notes ol {
-  margin-left: 16px;
-}
-.package-version__notes h2 {
-  font-size: 22px;
-  font-family: pragmatica-web-condensed, sans-serif;
-  line-height: 22px;
-  margin-top: 16px;
-  margin-bottom: 6px;
-}
-.package-version__notes h3 {
-  font-size: 16px;
-  font-family: pragmatica-web-condensed, sans-serif;
-  line-height: 22px;
-  font-variant: small-caps;
-  margin-top: 16px;
-  margin-bottom: 6px;
-}
-.package-version__notes h4 {
-  font-size: 16px;
-  font-family: pragmatica-web-condensed, sans-serif;
-  line-height: 22px;
-  font-variant: small-caps;
-  margin-top: 16px;
-  margin-bottom: 6px;
-  color: #808080;
-}
-.package-version__notes h1 tt,
-.package-version__notes h2 tt,
-.package-version__notes h3 tt,
-.package-version__notes h4 tt {
-  font-weight: normal;
-}
-.package-version__notes p {
-  font-size: 16px;
-  line-height: 22px;
-  margin-bottom: 11px;
-}
-.package-version__notes p:last-child {
-  margin-bottom: 0px;
-}
-.package-version__notes pre {
-  font-size: 12px;
-  background-color: #fafafa;
-  border: 1px solid #dfdfdf;
-  padding: 11px;
-}
-.package-version__notes a[title="Permalink to this headline"] {
   display: none;
 }
 .package-changes__package-title {
