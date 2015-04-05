@@ -854,6 +854,9 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             context['preview'] = preview
             context['can_edit'] = True
 
+            if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
+                context['can_edit_xslt'] = True
+
         context['mode'] = 'add-new'
         return context
 
@@ -879,6 +882,10 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         context['mode'] = 'edit'
         context['can_edit'] = changelog.editable_by(self.request.user,
                                                     self.request.light_user)
+
+        if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
+            context['can_edit_xslt'] = True
+
         return context
 
 
@@ -968,6 +975,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
                 parse_list(data.get('search_list', '')))
             preview.set_ignore_list(
                 parse_list(data.get('ignore_list', '')))
+            preview.xslt = data.get('xslt', '')
 
             if preview.source != data.get('source'):
                 preview.downloader = None

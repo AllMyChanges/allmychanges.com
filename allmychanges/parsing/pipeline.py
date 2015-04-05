@@ -7,6 +7,7 @@ import shutil
 import envoy
 import lxml.html
 
+from lxml import etree
 from operator import itemgetter
 from collections import defaultdict
 from functools import wraps
@@ -446,6 +447,10 @@ def parse_html_file(obj):
 
     try:
         parsed = html_document_fromstring(obj.content)
+        xslt = getattr(obj, 'xslt')
+        if xslt:
+            transform = etree.XSLT(etree.XML(xslt))
+            parsed = transform(parsed)
 
         for xpath in XPATHS_TO_CUT_FROM_HTML:
             elems = xpath(parsed)
@@ -942,7 +947,7 @@ def print_tree(env):
 
 
 
-def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
+def _processing_pipe(processors, root, ignore_list=[], search_list=[], xslt=''):
     def print_(item):
         t = item.type
         def get_content(content):
@@ -1010,6 +1015,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[]):
     root_env.search_list = [(item, parser_type)
                             for item, parser_type in search_list
                             if is_not_http_url(item)]
+    root_env.xslt = xslt
     # a dictionary to keep data between different processor's invocations
     root_env.cache = {'tmp-dir': tempfile.mkdtemp(dir=settings.TEMP_DIR)}
 

@@ -249,6 +249,7 @@ class Changelog(Downloadable, models.Model):
                                               ' and filenames to ignore searching'
                                               ' changelog.'),
                                    blank=True)
+    # TODO: выяснить зачем тут два поля check_list и search_list
     check_list = models.CharField(max_length=1000,
                                    default='',
                                    help_text=('Comma-separated list of directories'
@@ -261,6 +262,9 @@ class Changelog(Downloadable, models.Model):
                                               ' and filenames to search'
                                               ' changelog.'),
                                   blank=True)
+    xslt = models.TextField(default='',
+                            help_text=('XSLT transform to be applied to all html files.'),
+                            blank=True)
     namespace = models.CharField(max_length=NAMESPACE_LENGTH, blank=True, null=True)
     name = models.CharField(max_length=NAME_LENGTH, blank=True, null=True)
     description = models.CharField(max_length=DESCRIPTION_LENGTH,
@@ -601,6 +605,9 @@ class Preview(Downloadable, models.Model):
                                               ' and filenames to search'
                                               ' changelog.'),
                                    blank=True)
+    xslt = models.TextField(default='',
+                            help_text=('XSLT transform to be applied to all html files.'),
+                            blank=True)
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)

@@ -434,7 +434,8 @@ def itunes_downloader(source,
 
 def rechttp_downloader(source,
                        search_list=[],
-                       ignore_list=[]):
+                       ignore_list=[],
+                       xslt=''):
     DEFAULT_UPPER_LIMIT = 100
     UPPER_LIMITS = {
         'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,

@@ -8,9 +8,10 @@ from allmychanges.utils import split_filenames, parse_search_list
 
 def print_version(version, full=False):
     print ''
-    print u'{version} ({filename}, {date}, unreleased={unreleased})'.format(
+    print u'{version} ({filename}, "{title}", {date}, unreleased={unreleased})'.format(
         version=version.version,
         filename=version.filename,
+        title=version.title,
         unreleased=getattr(version, 'unreleased', 'not known'),
         date=getattr(version, 'date', None)).encode('utf-8')
 
@@ -31,16 +32,20 @@ class Command(LogMixin, BaseCommand):
 
     def handle(self, path, *args, **options):
         search_list = ignore_list = []
+        xslt = ''
 
         if len(args) >= 1:
             search_list = parse_search_list(args[0])
         if len(args) >= 2:
             ignore_list = split_filenames(args[1])
+        if len(args) >= 3:
+            with open(args[2]) as f:
+                xslt = f.read().decode('utf-8')
 
         pipe = processing_pipe
         if search_list and search_list[0][0] == 'VCS':
             pipe = vcs_processing_pipe
 
-        versions = pipe(path, ignore_list, search_list)
+        versions = pipe(path, ignore_list, search_list, xslt=xslt)
         for version in versions:
             print_version(version, options['full'])

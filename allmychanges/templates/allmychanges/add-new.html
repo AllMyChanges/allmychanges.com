@@ -23,6 +23,7 @@
      data-changelog-description="{{ changelog.description }}"{% endif %}
      data-search-list="{{ changelog.search_list }}"
      data-ignore-list="{{ changelog.ignore_list }}"
+     data-xslt="{{ changelog.xslt }}"
      data-mode="{{ mode }}"
      >
 
@@ -82,6 +83,14 @@
          <td class="new-package__search-input-wrap"><textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search." class="new-package__search-input" name="search_in" ng-model="search_list" ng-disabled="waiting"></textarea></td>
          <td class="new-package__ignore-input-wrap"><textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places." class="new-package__ignore-input" name="ignore" ng-model="ignore_list" ng-disabled="waiting"></textarea></td>
        </tr>
+       {% if can_edit_xslt %}
+       <tr>
+         <td colspan="2" class="new-package__xslt-label">XSLT mighty feature!</td>
+       </tr>
+       <tr>
+         <td colspan="2" class="new-package__xslt-wrap"><textarea placeholder="Behold XSLT's mighty power!" class="new-package__xslt-input" name="xslt" ng-model="xslt" ng-disabled="waiting"></textarea></td>
+       </tr>
+       {% endif %}
        <tr>
          <td colspan="2">
              {% verbatim %}

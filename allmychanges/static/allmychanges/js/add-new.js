@@ -13,6 +13,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
     $scope.package_url = 'unknown';
     $scope.search_list = $attrs['searchList'];
     $scope.ignore_list = $attrs['ignoreList'];
+    $scope.xslt = $attrs['xslt'];
 
     $scope.changelog_id = $attrs['changelogId'];
     $scope.preview_id = $attrs['previewId'];
@@ -52,12 +53,14 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
     $scope.orig_changelog_source = $scope.changelog_source;
     $scope.orig_search_list = undefined;
     $scope.orig_ignore_list = undefined;
+    $scope.orig_xslt = undefined;
 
 
     $scope.is_apply_button_disabled = function () {
         var result = ($scope.waiting == true
                       || ($scope.orig_search_list == $scope.search_list
                           && $scope.orig_ignore_list == $scope.ignore_list
+                          && $scope.orig_xslt == $scope.xslt
                           && $scope.orig_changelog_source == $scope.changelog_source));
         return result;
     }
@@ -77,7 +80,8 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
                           'name': $scope.name,
                           'source': $scope.changelog_source,
                           'search_list': $scope.search_list,
-                          'ignore_list': $scope.ignore_list}).success(
+                          'ignore_list': $scope.ignore_list,
+                          'xslt': $scope.xslt}).success(
                               function() {
                                   $scope.saving = false;
                                   $scope.save_button_title = 'Save';
@@ -130,6 +134,7 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
         $scope.problem = false;
         $scope.orig_search_list = $scope.search_list;
         $scope.orig_ignore_list = $scope.ignore_list;
+        $scope.orig_xslt = $scope.xslt;
         $scope.orig_changelog_source = $scope.changelog_source;
 
         wait_for_preview();
@@ -142,7 +147,8 @@ app.controller('AddNewCtrl', function ($scope, $attrs, $http, $cookies, $timeout
         $http.post('/preview/' + $scope.preview_id + '/',
                    {'source': $scope.changelog_source,
                     'search_list': $scope.search_list,
-                    'ignore_list': $scope.ignore_list})
+                    'ignore_list': $scope.ignore_list,
+                    'xslt': $scope.xslt})
             .success(update_preview_callback);
     };
 

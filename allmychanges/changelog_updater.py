@@ -171,7 +171,8 @@ def update_preview_or_changelog(obj):
                 obj.set_processing_status('searching-versions')
                 versions = processing_pipe(path,
                                            obj.get_ignore_list(),
-                                           obj.get_search_list())
+                                           obj.get_search_list(),
+                                           obj.xslt)
                 #print 'Num versions from pipeline:', len(versions)
 
                 if not versions:
