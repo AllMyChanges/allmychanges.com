@@ -8,7 +8,7 @@ This release includes two major features:
    package are looking good now on my iphone :)
 2. Now XSL transformation could be applied to html pages before our
    robot will make attempt to find version descriptions there. This allows
-   manually fix weird HTML markup whic brokes our data extraction algorithms.
+   to fix weird HTML markup which brokes our data extraction algorithms.
 
    This powerful feature is accessable only to service creators. It allowed
    us to process release notes of [Minecraft][], [3D Engine Unity][Unity]
