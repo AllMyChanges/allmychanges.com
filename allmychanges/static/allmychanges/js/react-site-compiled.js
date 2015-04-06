@@ -389,6 +389,7 @@
 	module.exports = React.createClass({displayName: 'exports',
 	    componentDidMount: function(){
 	        var element = this.getDOMNode();
+	        var input_spinner = new Spinner({left: '50%', top: '20px'}); 
 	        var fetch_timer;
 	        var fetch_suggestions = function(query, cb) {
 	            clearTimeout(fetch_timer);
@@ -397,7 +398,11 @@
 	            }, 500);
 	        }
 	        var really_fetch_suggestions = function(query, cb) {
+	            input_spinner.spin($('.input-spin-wrapper')[0]);
+
 	            $.get('/v1/search-autocomplete/', {q: query}, function(data) {
+	                input_spinner.stop();
+
 	                var results = data['results'];
 	                _.each(results, function(item) {
 	                    if (item.type == 'package') {
@@ -453,7 +458,7 @@
 	                React.createElement("form", {action: "/search/", method: "GET"}, 
 	                  React.createElement("input", {type: "search", name: "q", ref: "input", 
 	                         className: "magic-prompt__input", 
-	                         placeholder: "Search packages and namespaces"}), 
+	                         placeholder: "Search packages and namespaces"}), React.createElement("div", {className: "input-spin-wrapper"}), 
 	                  React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__submit", value: "Search"})
 	                )
 	            )

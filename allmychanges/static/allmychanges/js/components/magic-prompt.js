@@ -4,6 +4,7 @@
 module.exports = React.createClass({
     componentDidMount: function(){
         var element = this.getDOMNode();
+        var input_spinner = new Spinner({left: '50%', top: '20px'}); 
         var fetch_timer;
         var fetch_suggestions = function(query, cb) {
             clearTimeout(fetch_timer);
@@ -12,7 +13,11 @@ module.exports = React.createClass({
             }, 500);
         }
         var really_fetch_suggestions = function(query, cb) {
+            input_spinner.spin($('.input-spin-wrapper')[0]);
+
             $.get('/v1/search-autocomplete/', {q: query}, function(data) {
+                input_spinner.stop();
+
                 var results = data['results'];
                 _.each(results, function(item) {
                     if (item.type == 'package') {
@@ -68,7 +73,7 @@ module.exports = React.createClass({
                 <form action="/search/" method="GET">
                   <input type="search" name="q" ref="input" 
                          className="magic-prompt__input" 
-                         placeholder="Search packages and namespaces"/>
+                         placeholder="Search packages and namespaces"/><div className="input-spin-wrapper"></div>
                   <input type="submit" className="button _good _large magic-prompt__submit" value="Search"/>
                 </form>
             </div>
