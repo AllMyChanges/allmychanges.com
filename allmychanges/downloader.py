@@ -10,6 +10,7 @@ import requests
 import plistlib
 import lxml
 
+from cgi import parse_header
 from django.conf import settings
 from urlparse import urlsplit
 from allmychanges.utils import (
@@ -489,10 +490,15 @@ def rechttp_downloader(source,
             # http://wiki.blender.org/index.php/Dev:Ref/Release_Notes/2.57b
             ext = ''
 
+        ctype = response.headers.get('content-type')
+        if ctype:
+            ctype = parse_header(ctype)[0]
+
         if path.endswith('/'):
             path += 'index.html'
         elif not ext:
-            path += '.html'
+            if ctype == 'text/html':
+                path += '.html'
         return path.lstrip('/')
 
     def make_absolute(url, base_url):
