@@ -304,17 +304,89 @@ def test_grouping_by_path():
                 (10, v('docs/README')),
                 (1000, v('CHANGES'))]
 
-    eq_({'CHANGES': {'score': 1000, 'versions': [v('CHANGES')]},
-         'docs/': {'score': 30 - 5, 'versions': [v('docs/notes/0.1.0.rst'),
-                                                 v('docs/notes/0.2.0.rst'),
-                                                 v('docs/README')]},
-         'docs/README': {'score': 10, 'versions': [v('docs/README')]},
-         'docs/notes/': {'score': 20 - 2, 'versions': [v('docs/notes/0.1.0.rst'),
-                                                       v('docs/notes/0.2.0.rst')]},
-         'docs/notes/0.1.0.rst': {'score': 10, 'versions': [v('docs/notes/0.1.0.rst')]},
-         'docs/notes/0.2.0.rst': {'score': 10, 'versions': [v('docs/notes/0.2.0.rst')]}},
+    expected = {'./': {'score': 741, 'versions': [v('docs/notes/0.1.0.rst'), # 1
+                                                  v('docs/notes/0.2.0.rst'), # 1
+                                                  v('docs/README'),          # 3
+                                                  v('CHANGES')]},            # 736
+                './docs/': {'score': 14, 'versions': [v('docs/notes/0.1.0.rst'), # 3
+                                                    v('docs/notes/0.2.0.rst'), # 3
+                                                    v('docs/README')]},        # 8
+                './docs/notes/': {'score': 16, 'versions': [v('docs/notes/0.1.0.rst'),   # 8
+                                                          v('docs/notes/0.2.0.rst')]}, # 8
 
+                './CHANGES': {'score': 1000, 'versions': [v('CHANGES')]},
+                './docs/README': {'score': 10, 'versions': [v('docs/README')]},
+                './docs/notes/0.1.0.rst': {'score': 10, 'versions': [v('docs/notes/0.1.0.rst')]},
+                './docs/notes/0.2.0.rst': {'score': 10, 'versions': [v('docs/notes/0.2.0.rst')]}}
+    result = dict(group_by_path(versions))
+    # from pprint import pprint
+    # pprint(expected)
+    # pprint(result)
+    eq_(expected, result)
+
+
+
+def test_grouping_by_path1():
+    env = Environment()
+    env.type = 'version'
+    v = lambda filename: env.push(filename=filename)
+
+    versions = [(10, v('0.1.0.rst')),
+                (10, v('0.2.0.rst'))]
+
+    eq_({'./': {'score': 16, 'versions': [v('0.1.0.rst'),    # 8
+                                          v('0.2.0.rst')]},  # 8
+         './0.1.0.rst': {'score': 10, 'versions': [v('0.1.0.rst')]},
+         './0.2.0.rst': {'score': 10, 'versions': [v('0.2.0.rst')]}},
             group_by_path(versions))
+
+
+def test_grouping_by_path2():
+    env = Environment()
+    env.type = 'version'
+    v = lambda filename: env.push(filename=filename)
+
+    versions = [(10, v('news/0.1.0.rst')),
+                (10, v('news/0.2.0.rst'))]
+
+
+    expected = {'./': {'score': 6, 'versions': [v('news/0.1.0.rst'),
+                                                v('news/0.2.0.rst')]},
+                './news/': {'score': 16, 'versions': [v('news/0.1.0.rst'),
+                                                      v('news/0.2.0.rst')]},
+                './news/0.1.0.rst': {'score': 10, 'versions': [v('news/0.1.0.rst')]},
+                './news/0.2.0.rst': {'score': 10, 'versions': [v('news/0.2.0.rst')]}}
+    result = dict(group_by_path(versions))
+    # from pprint import pprint
+    # pprint(expected)
+    # pprint(result)
+    eq_(expected, result)
+
+
+def test_grouping_by_path3():
+    env = Environment()
+    env.type = 'version'
+    v = lambda filename: env.push(filename=filename)
+
+    versions = [(10, v('news/0.1.0.rst')),
+                (10, v('news/0.2.0.rst')),
+                (1000, v('ChangeLog'))]
+
+
+    expected = {'./': {'score': 742, 'versions': [v('news/0.1.0.rst'),       # 3
+                                                   v('news/0.2.0.rst'),      # 3
+                                                   v('ChangeLog')]},         # 736
+                './news/': {'score': 16, 'versions': [v('news/0.1.0.rst'),   # 8 +
+                                                      v('news/0.2.0.rst')]}, # 8
+                './ChangeLog': {'score': 1000, 'versions': [v('ChangeLog')]},
+                './news/0.1.0.rst': {'score': 10, 'versions': [v('news/0.1.0.rst')]},
+                './news/0.2.0.rst': {'score': 10, 'versions': [v('news/0.2.0.rst')]}}
+    result = dict(group_by_path(versions))
+    # from pprint import pprint
+    # pprint(expected)
+    # pprint(result)
+    eq_(expected, result)
+
 
 
 def test_strip_outer_tag():
