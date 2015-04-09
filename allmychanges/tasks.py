@@ -218,7 +218,9 @@ def notify_users_about_new_versions(changelog_id, version_ids):
 
 
 def process_appstore_url(url):
-    from .models import AutocompleteData, DESCRIPTION_LENGTH
+    from .models import AutocompleteData, AppStoreUrl, DESCRIPTION_LENGTH
+    from .exceptions import AppStoreAppNotFound
+
     source = url.source
     # we need this because autocomplete compares
     # these urls agains Changelog model where sources
@@ -227,29 +229,58 @@ def process_appstore_url(url):
     with log.name_and_fields('process_appstore_url', source=source):
         try:
             log.info('Processing')
-            if url.autocomplete_data is None:
+            try:
                 source, username, repo, data = \
                     normalize_url(source, return_itunes_data=True)
+            except AppStoreAppNotFound:
+                data = url.autocomplete_data
+                if data is not None:
+                    AutocompleteData.objects.filter(pk=data.id).delete()
+                AppStoreUrl.objects.filter(pk=url.pk).delete()
+                return
 
-                try:
-                    description = first_sentences(
-                        data['description'],
-                        DESCRIPTION_LENGTH)
-                except RuntimeError:
-                    with log.fields(description=data['description'][:DESCRIPTION_LENGTH * 2]):
-                        log.trace().error('Unable to get first sentences')
-                        description = data['description'][:DESCRIPTION_LENGTH].replace('\n', ' ')
+            try:
+                description = first_sentences(
+                    data['description'],
+                    DESCRIPTION_LENGTH)
+            except RuntimeError:
+                with log.fields(description=data['description'][:DESCRIPTION_LENGTH * 2]):
+                    log.trace().error('Unable to get first sentences')
+                    description = data['description'][:DESCRIPTION_LENGTH].replace('\n', ' ')
 
+            title = u'{0} by {1}'.format(data['trackName'],
+                                         data['sellerName'])
+            icon = data['artworkUrl60']
+            rating = data.get('averageUserRating',
+                              data.get('averageUserRatingForCurrentVersion'))
+            rating_count = data.get('userRatingCount',
+                                    data.get('userRatingCountForCurrentVersion'))
+            if rating > 0 and rating_count > 0:
+                score = rating * rating_count
+            else:
+                score = 0
+            print score, 'for', source
+
+            if url.autocomplete_data is None:
                 url.autocomplete_data = \
                         AutocompleteData.objects.create(
-                    origin='app-store',
-                    title=u'{0} by {1}'.format(
-                        data['trackName'],
-                        data['sellerName']),
-                    description=description,
-                    source=source,
-                    icon=data['artworkUrl60'])
-                url.save()
+                            origin='app-store',
+                            title=title,
+                            description=description,
+                            source=source,
+                            score=score,
+                            icon=icon)
+            else:
+                data = url.autocomplete_data
+                data.title = title
+                data.description = description
+                data.score = score
+                data.icon = icon
+                data.save()
+
+            url.rating = rating
+            url.rating_count = rating_count
+            url.save()
         except:
             log.trace().error('Unable to process')
 
@@ -257,9 +288,8 @@ def process_appstore_url(url):
 @singletone()
 @job('default', timeout=60 * 60)
 @transaction.atomic
-@wait_chat_threads
 def process_appstore_batch(batch_id, size=100):
-    """Notifies a changelog's trackers with their preferred methods
+    """ Обрабатывает пачку урлов.
     """
     from .models import AppStoreBatch
 
@@ -267,7 +297,12 @@ def process_appstore_batch(batch_id, size=100):
     with log.name_and_fields('process_appstore_batch', batch_id=batch_id):
         log.info('Starting task')
         batch = AppStoreBatch.objects.get(pk=batch_id)
-        urls = list(batch.urls.filter(autocomplete_data=None))
+        # раньше этот код был нужен, чтобы продолжать обработку только тех урлов
+        # для которых еще нет autocomplete_data
+        # но сейчас process_appstore_url обновляет autocomplete_data если она есть
+        # или создает если её нет
+#        urls = list(batch.urls.filter(autocomplete_data=None))
+        urls = batch.urls.all()
         for url in urls:
             process_appstore_url(url)
 
@@ -280,7 +315,8 @@ from django.db import transaction
 @job('default', timeout=60)
 @transaction.atomic
 def start_new_appstore_batch(size=100, batch_id=None):
-    """Creates a new batch of AppStore urls to be processed.
+    """Ставит пачку AppStoreUrl на обработку
+    При этом берутся только те урлы, которые еще не присутствуют в других батчах.
     """
     from .models import AppStoreBatch, AppStoreUrl
     if batch_id is None:

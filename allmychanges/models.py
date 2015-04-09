@@ -816,6 +816,11 @@ class AutocompleteData(models.Model):
     changelog = models.ForeignKey(Changelog,
                                   blank=True, null=True,
                                   related_name='autocomplete')
+    score = models.IntegerField(default=0,
+                                help_text=('A value from 0 to infinity. '
+                                           'Items with bigger values '
+                                           'should appear at the top '
+                                           'of the suggest.'))
 
     def __repr__(self):
         return '<AutocompleteData: {0}>'.format(self.title.encode('utf-8'))
@@ -885,6 +890,8 @@ class AppStoreUrl(models.Model):
                               blank=True, null=True,
                               related_name='urls',
                               on_delete=models.SET_NULL)
+    rating = models.FloatField(blank=True, null=True)
+    rating_count = models.IntegerField(blank=True, null=True)
 
     def __repr__(self):
         return '<AppStoreUrl: {0}>'.format(self.source.encode('utf-8'))
