@@ -1,5 +1,4 @@
 # coding: utf-8
-import math
 import re
 import codecs
 import os
@@ -757,19 +756,13 @@ def group_by_path(versions):
     result = defaultdict(make_obj)
 
     for score, version in versions:
-        filename = u'./' + version.filename
-        path = filename.split(u'/')
+        path = version.filename.split(u'/')
         path = [name + u'/'
                 for name in path[:-1]] + path[-1:]
 
         depth = 0
         while path:
-            if depth > 0:
-                curr_score = int(math.ceil(score / (math.exp(depth) / 2)))
-            else:
-                curr_score = score
-
-            result[''.join(path)]['score'] += curr_score
+            result[''.join(path)]['score'] += score - depth
             result[''.join(path)]['versions'].append(version)
             path = path[:-1]
             depth += 1

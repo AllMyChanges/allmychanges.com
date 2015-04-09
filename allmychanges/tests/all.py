@@ -466,54 +466,14 @@ def test_filtering_versions_by_source():
 
 
 def test_filtering_versions_by_source_on_separate_release_notes():
-    root = Environment()
-    filenames = [
-        'dist/kafka/0.8.2.1/RELEASE_NOTES.html',
-        'dist/kafka/0.8.0/RELEASE_NOTES.html',
-        'dist/kafka/0.7.0/RELEASE_NOTES.html',
-        'dist/kafka/0.6.0/RELEASE_NOTES.html',
-    ]
-    versions = [root.push(filename=filename)
-                for filename in filenames]
+    versions = []
+    versions.append(Version(filename='dist/kafka/0.8.2.1/RELEASE_NOTES.html', number='0.8.2.1'))
+    versions.append(Version(filename='dist/kafka/0.8.0/RELEASE_NOTES.html', number='0.8.0'))
 
     new = filter_versions_by_source(versions)
-    new_filenames = [v.filename for v in new]
-    eq_(filenames, new_filenames)
-
-
-def test_filtering_versions_by_source_on_separate_release_notes2():
-    root = Environment()
-    filenames = [
-        'beta-v1-061/index.html',
-        'beta-v1-071/index.html',
-        'beta-v1-07/index.html',
-        'beta-v1-06/index.html',
-    ]
-    versions = [root.push(filename=filename)
-                for filename in filenames]
-
-    new = filter_versions_by_source(versions)
-    new_filenames = [v.filename for v in new]
-    eq_(filenames, new_filenames)
-
-
-def test_filtering_versions_by_source_on_separate_release_notes3():
-    root = Environment()
-    filenames = [
-        'docs/beta-v1-061/index.html',
-        'docs/beta-v1-071/index.html',
-        'docs/beta-v1-07/index.html',
-        'docs/beta-v1-05/index.html',
-        'docs/beta-v1-04/index.html',
-    ]
-    versions = [root.push(filename=filename)
-                for filename in filenames]
-    versions.append(root.push(filename='index.html')) # this should be excluded
-
-    new = filter_versions_by_source(versions)
-    new_filenames = [v.filename for v in new]
-    eq_(filenames, new_filenames)
-
+    filenames = {v.filename for v in new}
+    eq_(['dist/kafka/0.8.0/RELEASE_NOTES.html',
+         'dist/kafka/0.8.2.1/RELEASE_NOTES.html'], list(filenames))
 
 
 def test_filtering_versions_by_attribute():
