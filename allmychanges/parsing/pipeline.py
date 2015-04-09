@@ -447,7 +447,7 @@ def parse_html_file(obj):
 
     try:
         parsed = html_document_fromstring(obj.content)
-        xslt = getattr(obj, 'xslt')
+        xslt = getattr(obj, 'xslt', None)
         if xslt:
             transform = etree.XSLT(etree.XML(xslt))
             parsed = transform(parsed)
