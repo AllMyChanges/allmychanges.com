@@ -28,7 +28,7 @@ KATO_URL = 'https://api.kato.im/rooms/fc6183a8a19599ff6a148a35870878414fcc5a5735
 
 LOG_FILENAME = '/var/log/allmychanges/django-root.log'
 try:
-    init_logging(LOG_FILENAME, logstash=False)
+    init_logging(LOG_FILENAME, logstash=True)
 except OSError:
     pass
 
