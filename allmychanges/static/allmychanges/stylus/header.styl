@@ -8,7 +8,8 @@
            padding-left: 100px;
     }
     padding-top: 1.5em;
-    background-color: #EEE;
+    background-color: dark-blue-color;
+    border-bottom: 2px solid light-blue-color;
     margin-bottom: 30px;
 }
 
@@ -23,11 +24,11 @@
     }
     &__link {
         text-decoration: none;
-        color: black;
+        color: yellow-color;
         transition: all ease 500ms;  
     }
     &__link:hover {
-        color: #4466FF;
+        color: light-red-color;
     }
 }
 
@@ -38,6 +39,7 @@
 
     &__greeting {
         display:inline-block;
+        color: yellow-color;
         width: 160px;
         white-space: nowrap;
         overflow: hidden;
@@ -45,9 +47,15 @@
         top: 6px;
         text-align: right;
     }
+    &__logout-link {
+      border-radius: 0;
+    }
 
     &__profile-link {
-        black-link();
+      color: yellow-color;
+      &:hover {
+        color: light-red-color;
+      }
     }
 }
 
@@ -56,7 +64,6 @@
   display: block;
   margin: 0;
   padding: 20px 0px 10px 0px;
-  border-bottom: 1px solid gray;
 }
 .site-menu__item {
   display: inline-block;
@@ -65,20 +72,20 @@
   display: block;
   font-size: 20px;
   margin-right: 30px;
-  color: text-color;
+  color: yellow-color;
   text-decoration: none;
-  border-bottom: 5px solid #555;
+  border-bottom: 5px solid light-blue-color;
   transition: 0.2s;
   &:hover {
-      color: link-color;
-      border-bottom: 5px solid link-color;
+      color: light-red-color;
+      border-bottom: 5px solid dark-red-color;
   }
 }
 .site-menu__selected-item a {
-  border-bottom: 5px solid red;
+  border-bottom: 5px solid light-red-color;
   &:hover {
-      color: text-color;
-      border-bottom: 5px solid red;
+      color: light-red-color;
+      border-bottom: 5px solid dark-red-color;
       cursor: default;
   }
 }
@@ -100,7 +107,7 @@
     &__input {
         font-size: 24px;
         line-height: 40px;
-        border: 1px solid gray;
+        border: 2px solid light-blue-color;
         padding: 0 5px;
         width: 100%;
         -webkit-appearance: none;
@@ -133,20 +140,20 @@
     .tt-dropdown-menu {
         width: 100%;
         background: white;
-        border: 1px solid gray;
+        border: 1px solid light-blue-color;
         box-shadow: 0 0 3px #111;
         margin-top: 10px;
     }
 
     .tt-suggestion {
-        border-bottom: 1px solid gray;
+        border-bottom: 1px solid light-blue-color;
         font-size: 15px;
         line-height: 20px;
         padding: 10px;
     }
  
     .tt-cursor {
-        background: #88F;
+        background: yellow-color;
     }
 
     .tt-suggestion:last-of-type {
