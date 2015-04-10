@@ -124,9 +124,10 @@ def get_files(env, walk=os.walk):
 
             with log.name_and_fields('get_files',
                                      filename=rel_filename):
+                # TODO: перенести эту проверку внутрь за ignore и search
                 if ext not in EXTENSIONS_TO_CHECK \
                    and not filename_looks_like_a_changelog(low_filename):
-                    log.debug('Skipped because extension not in ' + ','.join(EXTENSIONS_TO_CHECK))
+#                    log.debug('Skipped because extension not in ' + ','.join(EXTENSIONS_TO_CHECK))
                     continue
 
                 if not in_ignore_list(rel_filename):
