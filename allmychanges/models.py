@@ -3,8 +3,8 @@ import requests
 import time
 import math
 import datetime
-import md5
 
+from hashlib import md5
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -773,7 +773,7 @@ class EmailVerificationCode(models.Model):
 
     @staticmethod
     def new_code_for(user):
-        hash = md5.md5(str(time.time()) + settings.SECRET_KEY).hexdigest()
+        hash = md5(str(time.time()) + settings.SECRET_KEY).hexdigest()
 
         try:
             code = user.email_verification_code
