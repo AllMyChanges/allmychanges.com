@@ -4,11 +4,14 @@ from allmychanges.models import Changelog
 
 
 class Command(LogMixin, BaseCommand):
-    help = u"""Tests crawler on selected projects."""
+    help = u"""Deletes versions with sources which starts with given prefixes."""
 
     def handle(self, *args, **options):
         name = args[0]
         sources = args[1:]
-        changelog = Changelog.objects.get(name=name)
-        changelog.versions.filter(
-            filename__in=sources).delete()
+
+        changelogs = Changelog.objects.filter(name=name)
+        for changelog in changelogs:
+            for source in sources:
+                changelog.versions.filter(
+                    filename__startswith=source).delete()
