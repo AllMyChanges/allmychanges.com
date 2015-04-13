@@ -165,7 +165,7 @@ module.exports = React.createClass({
         var login_link;
         if (this.state.selected_apps.length > 0) {
             if (this.state.digest_loaded) {
-                login_link = (<div className="ios-promo__login"><p className="ios-promo__text">Good job! Now, please, <span className="ios-promo__highlight">login</span> via <a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a> <span className="ios-promo__highlight">to receive notifications</span> about future updates.</p></div>);
+                login_link = (<div className="ios-promo__login"><p className="ios-promo__text">Good job! Now, please, login with <a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a> to receive notifications about future updates.</p></div>);
             }
         } else {
             login_link = (<div className="ios_promo__login"><p className="ios-promo__text">Please, <span className="ios-promo__highlight">select one or more applications</span> to continue.</p></div>);
@@ -173,12 +173,14 @@ module.exports = React.createClass({
 
         return (
             <div className="ios-promo">
-                <input type="search" name="q" ref="input" 
-                       className="ios-promo__input" 
-                       placeholder="Search iOS apps and add them to the list"/><div className="input-spin-wrapper"></div>
-                <ul className="ios-promo__selected-apps">
-                  {selected_apps}
-                </ul>
+                <div className="ios-promo__input-wrapper">
+                  <input type="search" name="q" ref="input" 
+                         className="ios-promo__input" 
+                         placeholder="Search iOS apps and add them to the list"/><div className="input-spin-wrapper"></div>
+                  <ul className="ios-promo__selected-apps">
+                    {selected_apps}
+                  </ul>
+                </div>
                 {login_link}
                 <div className="ios-promo__digest"></div>
             </div>

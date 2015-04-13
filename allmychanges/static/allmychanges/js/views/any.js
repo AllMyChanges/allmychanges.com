@@ -1,3 +1,4 @@
+var LoginMenu = require('../components/login-menu.js')
 var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
@@ -34,6 +35,12 @@ module.exports = {
         $('.magic-prompt-container').each(function (idx, element) {
             React.render(
                 <MagicPrompt />,
+                element);
+        });
+        $('.login-menu-container').each(function (idx, element) {
+            React.render(
+                <LoginMenu opened={element.dataset['opened']}
+                           username={element.dataset['username']}/>,
                 element);
         });
     }

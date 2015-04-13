@@ -65,11 +65,10 @@
         <div class="logo">
           <h1 class="logo__text"><a class="logo__link" href="/">AllMyChanges.com</a></h1>
         </div>
-
         {% block login-plate %}
         <div class="login-plate">
           {% if request.user.is_authenticated %}
-            <div class="login-plate__greeting">Hi, <a class="login-plate__profile-link" href="{% url "account-settings" %}">{{ request.user }}</a>!</div> <a class="login-plate__logout-link button" href="{% url "logout" %}?next={{ request.get_full_path }}">Logout</a>
+            <div class="login-plate__greeting">Hi, <div class="login-menu-container" data-username="{{ request.user }}"></div>!</div>
           {% else %}
             <span class="login-plate__buttons">Login with: <a href="{% url "social:begin" "github" %}">GitHub</a> or <a href="{% url "social:begin" "twitter" %}">Twitter</a></span>
           {% endif %}
@@ -90,6 +89,7 @@
       </div>
       {% endblock header %}
 
+     {% block full-content %}
       <div class="content">
         {% block no-email-warning %}
           {% if user.is_authenticated and not user.email %}
@@ -99,6 +99,7 @@
 
         {% block content %}{% endblock content %}
       </div>
+     {% endblock full-content %}
 
       {% block footer %}
       <div class="footer">

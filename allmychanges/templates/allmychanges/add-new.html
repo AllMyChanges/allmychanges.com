@@ -51,6 +51,8 @@
                   <div angucomplete-alt class="autocomplete-input" placeholder="Namespace (e.g. python, node)" pause="100" remote-url="/v1/autocomplete-namespaces/?q=" remote-url-data-field="results" title-field="name" minlength="1" override-suggestions="true" selected-object="selected_namespace_unused" input-class="text-input"  input-changed="namespace_changed" {% if changelog.namespace %}initial-value="{{changelog.namespace}}"{% endif %}/></div>
                 </div>
               </td>
+           </tr>
+           <tr>
               <td class="namespace-name-cell__name-cell">
                 <div class="input">
                   <label class="input__label">Name:</label><span class="input__error" ng-if="name_error" ng-bind="name_error"></span><br/>
@@ -68,7 +70,7 @@
         </td>
        </tr>
        <tr>
-         <td colspan="2" class="new-package__description-cell">
+         <td class="new-package__description-cell">
            <div class="input">
              <label class="input__label">Description:</label><span class="input__error" ng-if="description_error" ng-bind="description_error"></span><br/>
              <input ng-model="description" type="text" placeholder="Tell us what it does" class="text-input"/>
@@ -77,29 +79,33 @@
        </tr>
        <tr>
          <td class="new-package__search-label">Search in these dirs and files:</td>
-         <td class="new-package__ignore-label">Ignore these dirs and files:</td>
        </tr>
        <tr>
          <td class="new-package__search-input-wrap"><textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search." class="new-package__search-input" name="search_in" ng-model="search_list" ng-disabled="waiting"></textarea></td>
+       </tr>
+       <tr>
+         <td class="new-package__ignore-label">Ignore these dirs and files:</td>
+       </tr>
+       <tr>
          <td class="new-package__ignore-input-wrap"><textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places." class="new-package__ignore-input" name="ignore" ng-model="ignore_list" ng-disabled="waiting"></textarea></td>
        </tr>
        {% if can_edit_xslt %}
        <tr>
-         <td colspan="2" class="new-package__xslt-label">XSLT mighty feature!</td>
+         <td class="new-package__xslt-label">XSLT mighty feature!</td>
        </tr>
        <tr>
-         <td colspan="2" class="new-package__xslt-wrap"><textarea placeholder="Behold XSLT's mighty power!" class="new-package__xslt-input" name="xslt" ng-model="xslt" ng-disabled="waiting"></textarea></td>
+         <td class="new-package__xslt-wrap"><textarea placeholder="Behold XSLT's mighty power!" class="new-package__xslt-input" name="xslt" ng-model="xslt" ng-disabled="waiting"></textarea></td>
        </tr>
        {% endif %}
        <tr>
-         <td colspan="2">
+         <td>
              {% verbatim %}
              <p class="plate plate_{{message.tags}}" ng-repeat="message in messages">{{message.message}}</p>
              {% endverbatim %}
          </td>
        </tr>
        <tr class="ng-cloak">
-        <td class="new-package__button-cell" colspan="2">
+        <td class="new-package__button-cell">
           <input type="submit" class="button _large magic-prompt__apply" value="Update Preview" ng-click="update_preview()" ng-disabled="is_apply_button_disabled()"/>
           {% if mode == 'edit' %}
             <input type="submit" class="button _good _large magic-prompt__apply" ng-value="save_button_title" ng-click="save()" ng-disabled="!can_save()"/>
@@ -130,10 +136,17 @@
 {% endif %}
 
 {% else %}{% comment %} changelog is None {% endcomment %}
-
   <div class="add-page__container">
-    <p class="add-page__text">Please enter an URL pointing to a repository or direct link to a changelog file.
-      This could be something like that:</p>
+    <p class="add-page__text">Please enter an URL pointing to a repository or direct link to a changelog file.</p>
+
+    <form method="GET" action="." class="add-page__form">
+      <input type="text" placeholder="Repository's URL or direct link" name="url" class="add-page__input"/>
+      <input type="submit" value="Add" class="button _large _bad add-page__submit-button"/>
+      <div class="clear-both"></div>
+      {% csrf_token %}
+    </form>
+
+    <p class="add-page__text">This could be something like that:</p>
 
     <ul class="add-page__examples">
       <li class="add-page__example"><a href="https://github.com/rust-lang/rust">https://github.com/rust-lang/rust</a></li>
@@ -142,12 +155,6 @@
       <li class="add-page__example"><a href="https://www.virtualbox.org/wiki/Changelog">https://www.virtualbox.org/wiki/Changelog</a></li>
     </ul>
 
-    <form method="GET" action="." class="add-page__form">
-      <input type="text" placeholder="Repository's URL or direct link" name="url" class="add-page__input"/>
-      <input type="submit" value="Add" class="button _large _bad add-page__submit-button"/>
-      <div class="clear-both"></div>
-      {% csrf_token %}
-    </form>
 
     <p class="add-page__text">You know, we are able to work with git and mercurial repositories and with direct links
       to files, accessable via http. Just try it!</p>

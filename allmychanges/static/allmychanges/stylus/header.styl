@@ -11,16 +11,14 @@
     background-color: dark-blue-color;
     border-bottom: 2px solid light-blue-color;
     margin-bottom: 30px;
+    min-height: 50px;
 }
 
 .logo {
-    position: absolute
-    top: 32px
-    z-index: 1000
-
     &__text {
         font-size: 2em
         font-family: header-font
+        color: yellow-color;
     }
     &__link {
         text-decoration: none;
@@ -36,26 +34,14 @@
     position: absolute
     right: 20px
     top: 5px
+    color: yellow-color;
 
     &__greeting {
         display:inline-block;
-        color: yellow-color;
-        width: 160px;
         white-space: nowrap;
-        overflow: hidden;
         position: relative;
         top: 6px;
         text-align: right;
-    }
-    &__logout-link {
-      border-radius: 0;
-    }
-
-    &__profile-link {
-      color: yellow-color;
-      &:hover {
-        color: light-red-color;
-      }
     }
 }
 
@@ -101,7 +87,7 @@
     @media (max-width: 600px) {
         padding-right: 20px;
     }
-    margin-top: 50px;
+    margin-top: 25px;
     position: relative;
 
     &__input {

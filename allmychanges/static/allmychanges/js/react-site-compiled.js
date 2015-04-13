@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(12)
+	var PackageSelector = __webpack_require__(13)
 
 	module.exports = {
 	    render: function () {
@@ -73,12 +73,13 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ReportButton = __webpack_require__(5)
-	var ResolveButton = __webpack_require__(6)
-	var DeleteButton = __webpack_require__(7)
-	var TrackButton = __webpack_require__(8)
-	var MagicPrompt = __webpack_require__(9)
-	var Share = __webpack_require__(10)
+	var LoginMenu = __webpack_require__(5)
+	var ReportButton = __webpack_require__(6)
+	var ResolveButton = __webpack_require__(7)
+	var DeleteButton = __webpack_require__(8)
+	var TrackButton = __webpack_require__(9)
+	var MagicPrompt = __webpack_require__(10)
+	var Share = __webpack_require__(11)
 
 	module.exports = {
 	    render: function () {
@@ -111,6 +112,12 @@
 	                React.createElement(MagicPrompt, null),
 	                element);
 	        });
+	        $('.login-menu-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(LoginMenu, {opened: element.dataset['opened'], 
+	                           username: element.dataset['username']}),
+	                element);
+	        });
 	    }
 	}
 
@@ -119,7 +126,7 @@
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Share = __webpack_require__(10)
+	var Share = __webpack_require__(11)
 
 	module.exports = {
 	    render: function () {
@@ -137,7 +144,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(11)
+	var Promo = __webpack_require__(12)
 
 	module.exports = {
 	    render: function () {
@@ -152,7 +159,45 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(13)
+	var metrika = __webpack_require__(14)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {opened: (this.props.opened == 'true')};
+	    },
+	    open: function () {
+	        this.setState({opened: true});
+	    },
+	    close: function () {
+	        this.setState({opened: false});
+	    },
+	    render: function() {
+	        if (this.state.opened) {
+	            return (React.createElement("div", {className: "login-menu"}, 
+	                      React.createElement("a", {className: "login-menu__button", 
+	                              onClick: this.close, 
+	                              title: "Click to close a menu."}, this.props.username), 
+	                      React.createElement("ul", {className: "login-menu__items"}, 
+	                        React.createElement("li", null, React.createElement("a", {href: "/account/settings/"}, "Settings")), 
+	                        React.createElement("li", null, React.createElement("a", {href: "/logout/?next=/"}, "Logout"))
+	                      )
+	                    ));
+	        } else {
+	            return (React.createElement("div", {className: "login-menu"}, 
+	                      React.createElement("a", {className: "login-menu__button", 
+	                              onClick: this.open, 
+	                              title: "Click to open a menu."}, this.props.username)
+	                    ));
+	        }
+	    }
+	});
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(14)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -248,7 +293,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
@@ -281,7 +326,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
@@ -314,10 +359,10 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(13)
+	var metrika = __webpack_require__(14)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -380,7 +425,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// uses jquery typeahead plugin:
@@ -468,7 +513,7 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = React.createClass({displayName: 'exports',
@@ -529,10 +574,10 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(13)
+	var metrika = __webpack_require__(14)
 
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
@@ -699,7 +744,7 @@
 	        var login_link;
 	        if (this.state.selected_apps.length > 0) {
 	            if (this.state.digest_loaded) {
-	                login_link = (React.createElement("div", {className: "ios-promo__login"}, React.createElement("p", {className: "ios-promo__text"}, "Good job! Now, please, ", React.createElement("span", {className: "ios-promo__highlight"}, "login"), " via ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " ", React.createElement("span", {className: "ios-promo__highlight"}, "to receive notifications"), " about future updates.")));
+	                login_link = (React.createElement("div", {className: "ios-promo__login"}, React.createElement("p", {className: "ios-promo__text"}, "Good job! Now, please, login with ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " to receive notifications about future updates.")));
 	            }
 	        } else {
 	            login_link = (React.createElement("div", {className: "ios_promo__login"}, React.createElement("p", {className: "ios-promo__text"}, "Please, ", React.createElement("span", {className: "ios-promo__highlight"}, "select one or more applications"), " to continue.")));
@@ -707,11 +752,13 @@
 
 	        return (
 	            React.createElement("div", {className: "ios-promo"}, 
-	                React.createElement("input", {type: "search", name: "q", ref: "input", 
-	                       className: "ios-promo__input", 
-	                       placeholder: "Search iOS apps and add them to the list"}), React.createElement("div", {className: "input-spin-wrapper"}), 
-	                React.createElement("ul", {className: "ios-promo__selected-apps"}, 
-	                  selected_apps
+	                React.createElement("div", {className: "ios-promo__input-wrapper"}, 
+	                  React.createElement("input", {type: "search", name: "q", ref: "input", 
+	                         className: "ios-promo__input", 
+	                         placeholder: "Search iOS apps and add them to the list"}), React.createElement("div", {className: "input-spin-wrapper"}), 
+	                  React.createElement("ul", {className: "ios-promo__selected-apps"}, 
+	                    selected_apps
+	                  )
 	                ), 
 	                login_link, 
 	                React.createElement("div", {className: "ios-promo__digest"})
@@ -722,10 +769,10 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(14)
+	var Package = __webpack_require__(15)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -763,7 +810,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {
@@ -777,10 +824,10 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	TrackButton = __webpack_require__(8)
+	TrackButton = __webpack_require__(9)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {

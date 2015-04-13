@@ -1,0 +1,66 @@
+.catalogue-namespaces {
+  width: 100%;
+  transition: width 500ms;
+  background: yellow-color;
+  &_transition {
+    width: 200px;
+  }
+  &_selected {
+    display: table-cell;
+    width: 200px;
+  }
+}
+
+.catalogue-namespace {
+  font-size: 20px
+  line-height: 20px
+  list-style: none
+
+  transition: all ease 500ms;
+  & a {
+    display: block;
+    padding: 10px;
+    transition: all ease 500ms;
+  }
+
+  &:hover {
+    background: light-blue-color
+    & a {
+      color: white
+    }
+  }
+
+  &_selected {
+    background: light-blue-color
+    & a {
+      color: white
+      text-decoration: none
+
+      &:before {
+          content: "+"
+          float: right
+          transform: rotate(45deg)
+      }
+    }
+  }
+}
+
+.catalogue-packages {
+    display: none
+    list-style: outside none none;
+    padding-left: 20px;
+    border: 2px solid yellow-color;
+
+
+    & li {
+        display: inline-block;
+        white-space: nowrap;
+        min-width: 200px;
+        line-height: 40px;
+    }
+    
+    &_visible {
+        display: table-cell
+    }
+
+}
