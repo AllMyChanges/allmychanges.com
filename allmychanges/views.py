@@ -1252,5 +1252,4 @@ class HelpView(CommonContextMixin, TemplateView):
             result['content'] = html
 
         result['menu_help'] = True
-        result['test_url'] = self.request.build_absolute_uri('/blah')
         return result
