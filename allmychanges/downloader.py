@@ -191,7 +191,7 @@ def get_itunes_release_notes(app_id, fronts=_try_fronts):
         url = 'https://itunes.apple.com/app/id{0}?mt=8'.format(app_id)
         headers = {'X-Apple-Store-Front': '{0}-2,28'.format(front)}
         response = requests.get(url, headers=headers)
-        if response.status_code == 400:
+        if response.status_code == 400 or response.status_code == 403:
             return get_itunes_release_notes(app_id, fronts=fronts[1:])
 
         ctype = response.headers.get('content-type', '').split(';')[0].strip()
