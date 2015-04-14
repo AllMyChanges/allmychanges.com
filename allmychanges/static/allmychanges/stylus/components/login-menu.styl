@@ -1,0 +1,42 @@
+.login-menu {
+    &-container {
+        display: inline-block;
+        position: relative;
+    }
+
+    &__button {
+        color: yellow-color;
+        text-decoration: none;
+        border-bottom: 1px dashed yellow-color;
+        cursor: pointer;
+    }
+
+    &__items {
+        position: absolute;
+        list-style: none;
+        background: yellow-color;
+        width: 100%;
+        border: 1px solid light-blue-color;
+        top: 120%;
+        z-index: 1000;
+
+        > li {
+            border-bottom: 1px solid light-blue-color;
+            &:last-child {
+                border-bottom: none;
+            }
+
+            & > a {
+                text-decoration: none;
+                color: dark-blue-color;
+                display: block;
+                padding: 5px 10px;
+                font-weight: bold;
+                &:hover {
+                    background-color: light-blue-color;
+                    color: yellow-color;
+                }
+            }
+        }
+    }
+}

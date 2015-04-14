@@ -85,16 +85,34 @@ def process_words2():
     items = progress.bar(items.iterator(), expected_size=items.count(), every=100)
     for item in items:
         item2 = AutocompleteData.objects.using('default').get(pk=item.pk)
-        for word in item2.words.using('default').all():
-            word2 = AutocompleteWord2.objects.using('default').get(word=word.word)
-            item2.words2.add(word2)
+        title = item2.title.split(u' by ', 1)[0]
+        title = title.replace(' ', '').lower()[:40]
+        word, created = AutocompleteWord2.objects.get_or_create(word=title)
+        item2.words2.add(word)
+
+def process_duplicates():
+    items = AutocompleteData.objects.all().using('server-side')
+    items = progress.bar(items.iterator(), expected_size=items.count(), every=100)
+
+    seen = set()
+    ids_to_remove = []
+    for item in items:
+        if item.source in seen:
+            ids_to_remove.append(item.id)
+        else:
+            seen.add(item.source)
+
+    while ids_to_remove:
+        ids = ids_to_remove[-100:]
+        ids_to_remove = ids_to_remove[:-100]
+        AutocompleteData.objects.filter(pk__in=ids).delete()
 
 
 class Command(LogMixin, BaseCommand):
     help = u"""Fetches data for autocomplete from different sources"""
 
     def handle(self, *args, **options):
-        print process_words2()
+        process_duplicates()
         return
         # import cProfile, pstats, StringIO
         # pr = cProfile.Profile()

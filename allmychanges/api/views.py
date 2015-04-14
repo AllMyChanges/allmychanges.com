@@ -258,7 +258,8 @@ class SearchAutocompleteView(viewsets.ViewSet):
             add_changelogs(Changelog.objects.filter(name__icontains=name)
                         .distinct())
 
-        query = Q(words2__word__istartswith=name)
+        query = name.replace(' ', '').lower()
+        query = Q(words2__word__istartswith=query)
         # над этой частью надо подумать, ибо так не работает
         # надо как-то ранжировать результаты автокомплита
         # может попробовать засунуть их в elastic search
@@ -273,7 +274,10 @@ class SearchAutocompleteView(viewsets.ViewSet):
         if namespace == 'ios':
             data = data.filter(origin='app-store')
 
-        data = list(data.distinct())
+        data = data.order_by('-score')
+        data = data.distinct()
+        data = list(data[:10])
+
 
         # sort results, so that thouse which title
         # starts from the query go first and shorter title go first
@@ -287,9 +291,9 @@ class SearchAutocompleteView(viewsets.ViewSet):
                 return 1
             return -1
 
-        data.sort(cmp=cmp, reverse=True)
+#        data.sort(cmp=cmp, reverse=True)
 
-        for item in data[:10]:
+        for item in data:
             url = item.source
             if url not in sources:
                 params = dict(
