@@ -72,6 +72,20 @@ Using amch to import requirements.txt
     cat requirements.txt| grep -v '^-e' | sed -e 's/\([^=]\+\).*/python,\1/' -e '1 i\namespace,name' | head | amch import
 
 
+How to transfer autocomplete data
+---------------------------------
+
+    # skate
+    mysqldump -u allmychanges -pallmychanges  allmychanges_art allmychanges_autocompletedata allmychanges_autocompleteword2 allmychanges_autocompleteword2_data_objects | bzip2 > autocomplete.sql.bz2
+
+    # local
+    scp skate:allmychanges.com/autocomplete.sql.bz2 ./
+    scp allmychanges.com/autocomplete.sql.bz2 clupea:allmychanges.com/
+
+    # clupea
+    bzcat autocomplete.sql.bz2| mysql -u allmychanges -pallmychanges allmychanges
+
+
 Interesting projects
 --------------------
 

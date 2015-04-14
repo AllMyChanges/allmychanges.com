@@ -1034,9 +1034,9 @@ a:hover {
   position: absolute;
   list-style: none;
   background: #f4cb89;
-  width: 100%;
   border: 1px solid #588c8c;
   top: 120%;
+  right: -5px;
   z-index: 1000;
 }
 .login-menu__items > li {
