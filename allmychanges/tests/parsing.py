@@ -175,6 +175,8 @@ def test_prerender_inserts_labels_into_content_items():
 
 
 def test_keywords_highlighting():
+    eq_('Some <span class="changelog-highlight-fix">breaking changes</span>',
+        highlight_keywords('Some breaking changes'))
     eq_('Various <span class="changelog-highlight-fix">bugfixes</span>',
         highlight_keywords('Various bugfixes'))
     eq_('<span class="changelog-highlight-fix">Fixed a bug</span> where blah minor',
