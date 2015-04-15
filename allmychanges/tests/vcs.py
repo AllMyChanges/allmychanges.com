@@ -195,31 +195,31 @@ introduced as well."""))
 
 
 def test_version_bumps_are_remove_from_commit_message():
-    # http://allmychanges.com/p/python/sleekxmpp/
+    # https://allmychanges.com/p/python/sleekxmpp/
     eq_('', process_vcs_message('Bump to 1.3.1'))
     eq_('', process_vcs_message('bump version'))
     eq_('', process_vcs_message('Bump minor version'))
     eq_('', process_vcs_message('Bump version in prep for 1.2.0'))
     eq_('', process_vcs_message('Bump version to 1.1.10'))
 
-    # http://allmychanges.com/p/python/pip/#6.0.6
+    # https://allmychanges.com/p/python/pip/#6.0.6
     eq_('', process_vcs_message('Bump release for 6.0.6'))
     eq_('', process_vcs_message('Bump for release of 6.0.2'))
 
-    # http://allmychanges.com/p/javascript/angucomplete-alt/
+    # https://allmychanges.com/p/javascript/angucomplete-alt/
     eq_('', process_vcs_message('Update to v0.0.32'))
     eq_('', process_vcs_message('Update to 0.0.32'))
 
-    # http://allmychanges.com/p/javascript/react-intl/
+    # https://allmychanges.com/p/javascript/react-intl/
     eq_('', process_vcs_message('Build for 1.0.2'))
 
-    #http://allmychanges.com/p/python/pip-autoremove/
+    #https://allmychanges.com/p/python/pip-autoremove/
     eq_('And some text<br/>\nto keep', process_vcs_message("""V0.8.0
 
 And some text
 to keep"""))
 
-    #http://allmychanges.com/p/CSS/normalize.css/
+    #https://allmychanges.com/p/CSS/normalize.css/
     eq_('', process_vcs_message('3.0.2'))
 
 

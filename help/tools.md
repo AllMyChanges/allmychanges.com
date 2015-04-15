@@ -5,7 +5,7 @@ Bookmarklet
 -----------
 
 Save this link to to your favorites or drag onto bookmarks toolbar:  
-<a href="javascript:location.href='http://allmychanges.com/search/?q=' + encodeURIComponent(location.href)"
+<a href="javascript:location.href='https://allmychanges.com/search/?q=' + encodeURIComponent(location.href)"
    style="text-decoration: none; border-bottom: 1px dotted;"
    onclick="return false">View Changelog</a>
 

@@ -5,4 +5,4 @@ Allow: /$
 Allow: /sitemap.xml
 Disallow: /
 Disallow: /*/edit/
-Sitemap: http://allmychanges.com/sitemap.xml
+Sitemap: https://allmychanges.com/sitemap.xml

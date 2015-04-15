@@ -461,14 +461,14 @@ class ChangelogViewSet(HandleExceptionMixin,
 
         if user.is_authenticated():
             user.track(changelog)
-            chat.send(('Package <http://allmychanges.com{url}> was tracked by {username}.').format(
+            chat.send(('Package <https://allmychanges.com{url}> was tracked by {username}.').format(
                 url=changelog.get_absolute_url(),
                 username=user.username))
         else:
             tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
             tracked_changelogs.add(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
-            chat.send(('Package <http://allmychanges.com{url}> was tracked by anonymous user.').format(
+            chat.send(('Package <https://allmychanges.com{url}> was tracked by anonymous user.').format(
                 url=changelog.get_absolute_url()))
         return response
 
@@ -478,11 +478,11 @@ class ChangelogViewSet(HandleExceptionMixin,
         if user.is_authenticated():
             changelog = Changelog.objects.get(pk=pk)
             user.untrack(changelog)
-            chat.send(('Package <http://allmychanges.com{url}> was untracked by {username}.').format(
+            chat.send(('Package <https://allmychanges.com{url}> was untracked by {username}.').format(
                 url=changelog.get_absolute_url(),
                 username=user.username))
         else:
-            chat.send(('Package <http://allmychanges.com{url}> was untracked by anonymous user.').format(
+            chat.send(('Package <https://allmychanges.com{url}> was untracked by anonymous user.').format(
                 url=changelog.get_absolute_url()))
         return Response({'result': 'ok'})
 
@@ -579,7 +579,7 @@ class IssueViewSet(HandleExceptionMixin,
                 self.request.light_user,
                 'create-issue',
                 'Created issue for <changelog:{0}>'.format(changelog.id))
-            chat.send('New issue was created for <http://allmychanges.com/issues/?namespace={namespace}&name={name}|{namespace}/{name}>.'.format(
+            chat.send('New issue was created for <https://allmychanges.com/issues/?namespace={namespace}&name={name}|{namespace}/{name}>.'.format(
                 namespace=changelog.namespace,
                 name=changelog.name))
 
@@ -591,7 +591,7 @@ class IssueViewSet(HandleExceptionMixin,
         if issue.editable_by(user, self.request.light_user):
             issue.resolved_at = timezone.now()
             issue.save(update_fields=('resolved_at',))
-            chat.send(('Issue <http://allmychanges.com/issues/{issue_id}/|#{issue_id}> '
+            chat.send(('Issue <https://allmychanges.com/issues/{issue_id}/|#{issue_id}> '
                        'for {namespace}/{name} was resolved by {username}.').format(
                 issue_id=issue.id,
                 namespace=issue.changelog.namespace,

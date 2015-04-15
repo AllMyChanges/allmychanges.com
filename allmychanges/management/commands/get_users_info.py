@@ -27,7 +27,7 @@ class Command(LogMixin, BaseCommand):
             if packages:
                 prn('\tPackages:')
                 for changelog in user.changelogs.all():
-                    prn(u'\t\t{0} {1} (http://allmychanges.com{2})'.format(changelog.namespace,
+                    prn(u'\t\t{0} {1} (https://allmychanges.com{2})'.format(changelog.namespace,
                                              changelog.name,
                                              changelog.get_absolute_url()))
             else:

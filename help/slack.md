@@ -14,4 +14,4 @@ Enable them, following these steps:
 5. Choose a channel to which notification should be sent by AllMyChanges.
 6. And push this huge "Add Incoming Webhook Integration" button :)
 7. Finally, copy value from "Webhook URL" field into "Slack Url field at
-   allmychanges's [account settings](http://allmychanges.com/account/settings/) page.
+   allmychanges's [account settings](https://allmychanges.com/account/settings/) page.

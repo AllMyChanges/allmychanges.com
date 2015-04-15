@@ -198,13 +198,13 @@ def notify_users_about_new_versions(changelog_id, version_ids):
 
         versions = Version.objects.filter(pk__in=version_ids)
         slack_versions = u', '.join(
-            '<http://allmychanges.com{0}|{1}>'.format(
+            '<https://allmychanges.com{0}|{1}>'.format(
                 version.get_absolute_url(),
                 version.number)
             for version in versions)
 
         slack_text = u'Look, new {versions_form} of <{url}|{namespace}/{name}> {was_form} found: {versions}'.format(
-            url='http://allmychanges.com' + changelog.get_absolute_url(),
+            url='https://allmychanges.com' + changelog.get_absolute_url(),
             namespace=changelog.namespace,
             name=changelog.name,
             versions=slack_versions,

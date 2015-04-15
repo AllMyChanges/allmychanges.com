@@ -69,14 +69,14 @@ class UserManager(BaseUserManager):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
 
-        chat.send('New user <http://allmychanges.com/u/{0}/history/|{0}> with email "{1}" (from create)'.format(kwargs.get('username'), email))
+        chat.send('New user <https://allmychanges.com/u/{0}/history/|{0}> with email "{1}" (from create)'.format(kwargs.get('username'), email))
         return super(UserManager, self).create(*args, **kwargs)
 
     def create_user(self, username, email=None, password=None, **extra_fields):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
 
-        chat.send('New user <http://allmychanges.com/u/{0}/history/|{0}> with email "{1}" (from create_user)'.format(username, email))
+        chat.send('New user <https://allmychanges.com/u/{0}/history/|{0}> with email "{1}" (from create_user)'.format(username, email))
         return self._create_user(username, email, password,
                                  **extra_fields)
 
@@ -345,7 +345,7 @@ class Changelog(Downloadable, models.Model):
         issue = self.issues.create(type=type,
                                    comment=comment.format(related_versions=joined_versions),
                                    related_versions=joined_versions)
-        chat.send(u'New issue of type "{issue.type}" with comment: "{issue.comment}" was created for <http://allmychanges.com/issues/?namespace={issue.changelog.namespace}&name={issue.changelog.name}|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
+        chat.send(u'New issue of type "{issue.type}" with comment: "{issue.comment}" was created for <https://allmychanges.com/issues/?namespace={issue.changelog.namespace}&name={issue.changelog.name}|{issue.changelog.namespace}/{issue.changelog.name}>'.format(
             issue=issue))
 
     def resolve_issues(self, type):

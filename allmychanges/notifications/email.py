@@ -15,7 +15,7 @@ def send_email(recipient, subject, template, context={}, tags=[]):
                      name)
         for name in ('email.css',)]
     premailer = Premailer(body,
-                          base_url='http://allmychanges.com/',
+                          base_url='https://allmychanges.com/',
                           external_styles=external_styles,
                           disable_validation=True)
     body = premailer.transform()
