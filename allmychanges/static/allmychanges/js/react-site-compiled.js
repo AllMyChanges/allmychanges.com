@@ -93,6 +93,7 @@
 	            React.render(
 	                React.createElement(TrackButton, {changelog_id: element.dataset['changelogId'], 
 	                             tracked: element.dataset['tracked'], 
+	                             username: username, 
 	                             num_trackers: element.dataset['numTrackers']}),
 	                element);
 	        });
@@ -366,7 +367,9 @@
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
-	        return {tracked: (this.props.tracked == 'true')};
+	        UserStory.log(["init track button for [this.props.username=", this.props.username, "]"], ["buttons.track"]);
+	        return {tracked: (this.props.tracked == 'true'),
+	                show_popup: false};
 	    },
 	    perform_action: function(action, state_after) {
 	        UserStory.log(["performing action [action=", action, "]"], ["buttons.track"]);
@@ -378,6 +381,11 @@
 	            success: function(data) {
 	                this.setState({tracked: state_after});
 	                metrika.reach_goal(action.toUpperCase());
+
+	                if (this.props.username == '') {
+	                    UserStory.log(["if user is anonymous, then show him a fullscreen popup"], ["buttons.track"]);
+	                    this.setState({show_popup: true});
+	                }
 	            }.bind(this),
 	            error: function(xhr, status, err) {
 	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
@@ -392,8 +400,25 @@
 	        e.preventDefault();
 	        this.perform_action('untrack', false);
 	    },
+	    handle_popup_click: function (e) {
+	        UserStory.log(["popup click"], ["buttons.report"]);
+	        e.nativeEvent.stopImmediatePropagation();
+	    },
 	    render: function() {
 	        var num_trackers = this.props.num_trackers;
+	        var popup;
+
+	        if (this.state.show_popup) {
+	            popup = (
+	                React.createElement("div", {className: "modal-popup", onClick: this.handle_popup_click}, 
+	                    React.createElement("div", {className: "modal-popup__content modal-popup__please-login"}, 
+	                      React.createElement("p", null, "Good job! You've made first step, tracking this package."), 
+	                      React.createElement("p", null, "Now, to receive notifications about future updates, you need to login via:"), 
+	                      React.createElement("p", null, React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"))
+	                    )
+	                ));
+	        }
+
 
 	        var msg;
 	        if (num_trackers && num_trackers != '0') {
@@ -410,7 +435,8 @@
 	            return (React.createElement("div", {className: "track-button"}, 
 	                      React.createElement("button", {className: "button _bad", 
 	                              onClick: this.untrack, 
-	                              title: "Click to unsubscribe from this package."}, "Untrack")
+	                              title: "Click to unsubscribe from this package."}, "Untrack"), 
+	                      popup
 	                    ));
 	        } else {
 	            return (React.createElement("div", {className: "track-button"}, 

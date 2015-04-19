@@ -51,6 +51,10 @@
       <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 
       <script type="text/javascript">
+        // этот username может использоваться при инициализации различных
+        // компонентов в views/*.js
+        var username = "{{ request.user.username }}";
+
         UserStory.configure({
           on: ['*']
         });

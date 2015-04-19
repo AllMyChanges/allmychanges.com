@@ -18,6 +18,7 @@ module.exports = {
             React.render(
                 <TrackButton changelog_id={element.dataset['changelogId']}
                              tracked={element.dataset['tracked']}
+                             username={username}
                              num_trackers={element.dataset['numTrackers']}/>,
                 element);
         });
