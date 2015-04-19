@@ -589,25 +589,6 @@ class IssueViewSet(HandleExceptionMixin,
         issue = Issue.objects.get(pk=pk)
 
         if issue.editable_by(user, self.request.light_user):
-            issue.resolved_at = timezone.now()
-            issue.save(update_fields=('resolved_at',))
-            chat.send(('Issue <https://allmychanges.com/issues/{issue_id}/|#{issue_id}> '
-                       'for {namespace}/{name} was resolved by {username}.').format(
-                issue_id=issue.id,
-                namespace=issue.changelog.namespace,
-                name=issue.changelog.name,
-                username=user.username))
-
-            if issue.type == 'auto-paused':
-                changelog = issue.changelog
-                with log.fields(changelog_id=changelog.id):
-                    log.info('Resuming changelog updates')
-                    changelog.resume()
-
-                    chat.send('Autopaused package {namespace}/{name} was resumed {username}.'.format(
-                        namespace=changelog.namespace,
-                        name=changelog.name,
-                        username=user.username))
-
+            issue.resolve(user)
             return Response({'result': 'ok'})
         raise AccessDenied()

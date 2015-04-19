@@ -512,6 +512,28 @@ Issue(changelog={self.changelog},
             .filter(deployed_at__lte=self.created_at) \
             .order_by('-id')[:3]
 
+    def resolve(self, user):
+        self.resolved_at = timezone.now()
+        self.save(update_fields=('resolved_at',))
+        chat.send(('Issue <https://allmychanges.com/issues/{issue_id}/|#{issue_id}> '
+                   'for {namespace}/{name} was resolved by {username}.').format(
+            issue_id=self.id,
+            namespace=self.changelog.namespace,
+            name=self.changelog.name,
+            username=user.username))
+
+        if self.type == 'auto-paused':
+            changelog = self.changelog
+            with log.fields(changelog_id=changelog.id):
+                log.info('Resuming changelog updates')
+                changelog.resume()
+
+                chat.send('Autopaused package {namespace}/{name} was resumed {username}.'.format(
+                    namespace=changelog.namespace,
+                    name=changelog.name,
+                    username=user.username))
+
+
 
 class IssueComment(models.Model):
     issue = models.ForeignKey(Issue, related_name='comments')
