@@ -42,29 +42,44 @@
 .textarea
     height: 200px
 
+
+colored-button(bg-color, fg-color) {
+    color: fg-color
+    background-color: bg-color
+    border-color: (@background-color - 10%)
+    background-image: linear-gradient(@background-color, @border-color)
+
+    &:hover {
+        background-color: (@background-color - 20%)
+        border-color: (@background-color - 10%)
+        background-image: linear-gradient(@background-color, @border-color)
+    }
+
+    &:disabled {
+        color: @color
+        background-color: (@background-color + 50%)
+        border-color: (@background-color - 10%)
+        background-image: linear-gradient(@background-color, @border-color)
+
+        &:hover {
+            background-color: @background-color
+            border-color: @border-color
+            background-image: linear-gradient(@background-color, @border-color)
+        }
+    }
+}
+
+
 .button
     display: inline-block
     font-size: 15px
     font-family: arial
     font-weight: normal
     line-height: 15px
-    color: button-text-color
-    background-color: button-color
     box-sizing: border-box
     border: 1px solid (button-color - 10%)
     cursor: pointer
     -webkit-appearance: none
-
-    &:hover
-        background-color: (button-color - 20%)
-
-    &:disabled
-        color: (@color + 40%)
-        cursor: not-allowed
-        &:hover
-            background-color: @background-color
-
-
     text-decoration: none
     padding-top: 5px
     padding-bottom: @padding-top
@@ -74,48 +89,17 @@
 
     border-radius: 3px
 
-    &._good
-        color: good-button-text-color
-        background-color: good-button-color
-        border-color: (@background-color - 10%)
-        &:hover
-            background-color: (@background-color - 20%)
+    &:disabled
+        cursor: not-allowed
 
-        &:disabled
-            color: @color
-            background-color: (@background-color + 50%)
-            border-color: (@background-color + 40%)
-            &:hover
-                background-color: @background-color
+    colored-button(button-color, button-text-color)
 
-
-    &._bad
-        color: bad-button-text-color
-        background-color: bad-button-color
-        border-color: (@background-color - 10%)
-        &:hover
-            background-color: (@background-color - 20%)
-
-        &:disabled
-            color: @color
-            background-color: (@background-color + 50%)
-            border-color: (@background-color + 40%)
-            &:hover
-                background-color: @background-color
-
+    &._good, &._green
+        colored-button(good-button-color, good-button-text-color)
+    &._bad, &._red
+        colored-button(bad-button-color, bad-button-text-color)
     &._blue
-        color: blue-button-text-color
-        background-color: blue-button-color
-        border-color: (@background-color - 10%)
-        &:hover
-            background-color: (@background-color - 20%)
-
-        &:disabled
-            color: @color
-            background-color: (@background-color + 50%)
-            border-color: (@background-color + 40%)
-            &:hover
-                background-color: @background-color
+        colored-button(blue-button-color, blue-button-text-color)
 
     &._medium
         font-size: 20px
