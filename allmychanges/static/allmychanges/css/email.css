@@ -731,6 +731,7 @@ a:hover {
 .new-package__ignore-input,
 .new-package__xslt-input {
   width: 100%;
+  box-sizing: border-box;
 }
 .new-package__search-label,
 .new-package__ignore-label,
