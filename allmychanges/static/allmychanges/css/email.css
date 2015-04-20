@@ -738,11 +738,6 @@ a:hover {
 .new-package__xslt-label {
   padding-top: 12px;
 }
-.new-package__search-label,
-.new-package__search-input-wrap,
-.new-package__namespace-name-cell {
-  padding-right: 10px;
-}
 .new-package__search-input,
 .new-package__ignore-input,
 .new-package__xslt-input {
@@ -779,7 +774,6 @@ a:hover {
   color: #f00;
 }
 .namespace-name-cell__namespace-cell {
-  padding-right: 10px;
   vertical-align: bottom;
 }
 .catalogue-namespaces {
