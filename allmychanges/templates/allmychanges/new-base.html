@@ -6,6 +6,7 @@
     {% block top_of_head %}{% endblock top_of_head %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="o3IAeq_hx-mO-SFVh1Q2PRsu5Hp0ybnYFUfMG7pvlrQ" />
 
     {% compress css %}
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
@@ -41,6 +42,12 @@
       <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script>
 
       <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
+
+      <!-- этот pubsub используется в реактовских компонентах -->
+      <script src="/static/bower_components/pubsub-js/src/pubsub.js" type="text/javascript" charset="utf-8"></script>
+
+
+      <!-- старые ангуларовские вьюхи от которых надо избавиться -->
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/landing-page.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/allmychanges/js/add-new.js" type="text/javascript" charset="utf-8"></script>
@@ -64,6 +71,9 @@
 </head>
 
 <body class="page">
+   {% block notifications %}
+     <div class="notifications-container"></div>
+   {% endblock %}
       {% block header %}
       <div class="header">
         <div class="logo">
