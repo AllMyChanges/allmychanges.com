@@ -351,19 +351,19 @@ a {
 }
 .button._good {
   color: #fff;
-  background-color: #588c8c;
-  border-color: #4f7e7e;
+  background-color: #37cc6a;
+  border-color: #2fba5f;
 }
 .button._good:hover {
-  background-color: #467070;
+  background-color: #2aa554;
 }
 .button._good:disabled {
   color: #fff;
-  background-color: #a8c9c9;
-  border-color: #cbdfdf;
+  background-color: #9be5b5;
+  border-color: #c3efd3;
 }
 .button._good:disabled:hover {
-  background-color: #a8c9c9;
+  background-color: #9be5b5;
 }
 .button._bad {
   color: #fff;
@@ -380,6 +380,22 @@ a {
 }
 .button._bad:disabled:hover {
   background-color: #fc718b;
+}
+.button._blue {
+  color: #fff;
+  background-color: #2962f0;
+  border-color: #1150ec;
+}
+.button._blue:hover {
+  background-color: #0f47d2;
+}
+.button._blue:disabled {
+  color: #fff;
+  background-color: #94b0f8;
+  border-color: #bfd0fb;
+}
+.button._blue:disabled:hover {
+  background-color: #94b0f8;
 }
 .button._medium {
   font-size: 20px;
@@ -912,37 +928,8 @@ a:hover {
 .package-selector__versions {
   margin-bottom: 22px;
 }
-.package-select__track-button {
-  color: #fff;
-  background: #588c8c;
-  border: 1px solid #011c26;
-  border-radius: 3px;
-  font-size: 18px;
-  line-height: 22px;
-  cursor: pointer;
-}
-.package-select__track-button_tracked {
-  background: #e8fed9;
-  cursor: default;
-}
-.package-select__track-button:hover {
-  background: #366a6a;
-}
-.package-select__track-button_tracked:hover {
-  background: #e8fed9;
-}
 .package-select__ignore-button {
-  color: #fff;
-  background: #d9042b;
-  border: 1px solid #6b0c22;
-  border-radius: 3px;
-  font-size: 18px;
-  line-height: 22px;
-  cursor: pointer;
   margin-left: 10px;
-}
-.package-select__ignore-button:hover {
-  background: #b70009;
 }
 .package-selector__empty-digest {
   height: 200px;
@@ -953,26 +940,8 @@ a:hover {
 }
 .package-selector__login-plate > p {
   font-size: 32px;
-  background: #e4ffd1;
   line-height: 48px;
-  padding-left: 10px;
-  margin-left: -10px;
-  border-radius: 5px;
   margin-top: 22px;
-}
-.large-login-button {
-  text-decoration: none;
-  color: #fefefe;
-  background: #c50ca8;
-  padding-left: 6px;
-  padding-right: 6px;
-  padding-bottom: 2px;
-  padding-top: 2px;
-  border-radius: 5px;
-}
-.large-login-button:hover {
-  color: #fefefe;
-  background: #0c82c5;
 }
 .help h1 {
   font-family: pragmatica-web-condensed, sans-serif;

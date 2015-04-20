@@ -103,6 +103,20 @@
             &:hover
                 background-color: @background-color
 
+    &._blue
+        color: blue-button-text-color
+        background-color: blue-button-color
+        border-color: (@background-color - 10%)
+        &:hover
+            background-color: (@background-color - 20%)
+
+        &:disabled
+            color: @color
+            background-color: (@background-color + 50%)
+            border-color: (@background-color + 40%)
+            &:hover
+                background-color: @background-color
+
     &._medium
         font-size: 20px
         line-height: 20px
