@@ -39,7 +39,7 @@ module.exports = React.createClass({
         if (this.state.show) {
             notifications = _.map(this.state.items,
                                 function(item) {
-                                        return <li className={"notifications__item notifications__" + item.class} key={item.id}>{item.text}<div className="notifications__close-button" onClick={closeItem2(item.id)}>+</div></li>
+                                        return <li className={"notifications__item notifications__" + item.class} key={item.id}><div className="notifications__close-button" onClick={closeItem2(item.id)}>+</div>{item.text}</li>
                                 });
         }
         return  (<ul className="notifications">{notifications}</ul>);

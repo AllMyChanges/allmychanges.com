@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(14)
+	var PackageSelector = __webpack_require__(13)
 
 	module.exports = {
 	    render: function () {
@@ -152,7 +152,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(13)
+	var Promo = __webpack_require__(14)
 
 	module.exports = {
 	    render: function () {
@@ -259,6 +259,7 @@
 	                   comment: comment},
 	            success: function(data) {
 	                this.setState({show_popup: false});
+	                PubSub.publish('show-info', 'Thank you for reporing about the issue. We\'ll fix it as soon as possible.');
 	            }.bind(this),
 	            error: function(xhr, status, err) {
 	                console.error(this.props.url, status, err.toString());
@@ -651,7 +652,7 @@
 	        if (this.state.show) {
 	            notifications = _.map(this.state.items,
 	                                function(item) {
-	                                        return React.createElement("li", {className: "notifications__item notifications__" + item.class, key: item.id}, item.text, React.createElement("div", {className: "notifications__close-button", onClick: closeItem2(item.id)}, "+"))
+	                                        return React.createElement("li", {className: "notifications__item notifications__" + item.class, key: item.id}, React.createElement("div", {className: "notifications__close-button", onClick: closeItem2(item.id)}, "+"), item.text)
 	                                });
 	        }
 	        return  (React.createElement("ul", {className: "notifications"}, notifications));
@@ -661,6 +662,47 @@
 
 /***/ },
 /* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Package = __webpack_require__(16)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {packages: []};
+	    },
+	    componentDidMount: function() {
+	        $.ajax({
+	            url: this.props.url,
+	            dataType: 'json',
+	            success: function(data) {
+	                this.setState({packages: data.results});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        var packages_list = this.state.packages.map(function (package) {
+	            return (
+	                React.createElement(Package, {key: package.id, 
+	                         changelog_id: package.id, 
+	                         namespace: package.namespace, 
+	                         name: package.name, 
+	                         versions: package.versions})
+	            );
+	        });
+	        return (
+	            React.createElement("ul", {className: "package-selector"}, 
+	                packages_list
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var metrika = __webpack_require__(15)
@@ -848,47 +890,6 @@
 	                ), 
 	                login_link, 
 	                React.createElement("div", {className: "ios-promo__digest"})
-	            )
-	        );
-	    }
-	});
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Package = __webpack_require__(16)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {packages: []};
-	    },
-	    componentDidMount: function() {
-	        $.ajax({
-	            url: this.props.url,
-	            dataType: 'json',
-	            success: function(data) {
-	                this.setState({packages: data.results});
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error(this.props.url, status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    render: function() {
-	        var packages_list = this.state.packages.map(function (package) {
-	            return (
-	                React.createElement(Package, {key: package.id, 
-	                         changelog_id: package.id, 
-	                         namespace: package.namespace, 
-	                         name: package.name, 
-	                         versions: package.versions})
-	            );
-	        });
-	        return (
-	            React.createElement("ul", {className: "package-selector"}, 
-	                packages_list
 	            )
 	        );
 	    }
