@@ -5,6 +5,8 @@ var DeleteButton = require('../components/delete-button.js')
 var TrackButton = require('../components/track-button.js')
 var MagicPrompt = require('../components/magic-prompt.js')
 var Share = require('../components/share.js')
+var Notifications = require('../components/notifications.js')
+
 
 module.exports = {
     render: function () {
@@ -42,6 +44,11 @@ module.exports = {
             React.render(
                 <LoginMenu opened={element.dataset['opened']}
                            username={element.dataset['username']}/>,
+                element);
+        });
+        $('.notifications-container').each(function (idx, element) {
+            React.render(
+                <Notifications/>,
                 element);
         });
     }

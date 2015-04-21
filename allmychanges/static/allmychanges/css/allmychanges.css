@@ -1098,6 +1098,39 @@ a:hover {
   line-height: 40px;
   margin-bottom: 30px;
 }
+.notifications {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  list-style: none;
+  z-index: 50000;
+}
+.notifications__item {
+  padding: 5px 10px 5px 100px;
+}
+@media (max-width: 600px) {
+  .notifications__item {
+    padding: 5px 10px 5px 10px;
+  }
+}
+.notifications__info {
+  color: #fff;
+  background-color: rgba(55,204,106,0.8);
+  background-image: linear-gradient(rgba(55,204,106,0.8), rgba(42,165,84,0.8));
+}
+.notifications__warning {
+  color: #fff;
+  background-color: rgba(217,4,43,0.8);
+  background-image: linear-gradient(rgba(217,4,43,0.8), rgba(174,3,34,0.8));
+}
+.notifications__close-button {
+  float: right;
+  transform: rotate(45deg);
+  font-size: 30px;
+  margin-top: -3px;
+  cursor: pointer;
+}
 .page {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;

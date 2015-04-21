@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(13)
+	var PackageSelector = __webpack_require__(14)
 
 	module.exports = {
 	    render: function () {
@@ -80,6 +80,8 @@
 	var TrackButton = __webpack_require__(9)
 	var MagicPrompt = __webpack_require__(10)
 	var Share = __webpack_require__(11)
+	var Notifications = __webpack_require__(12)
+
 
 	module.exports = {
 	    render: function () {
@@ -119,6 +121,11 @@
 	                           username: element.dataset['username']}),
 	                element);
 	        });
+	        $('.notifications-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(Notifications, null),
+	                element);
+	        });
 	    }
 	}
 
@@ -145,7 +152,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(12)
+	var Promo = __webpack_require__(13)
 
 	module.exports = {
 	    render: function () {
@@ -160,7 +167,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(14)
+	var metrika = __webpack_require__(15)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -198,7 +205,7 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(14)
+	var metrika = __webpack_require__(15)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -363,7 +370,7 @@
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(14)
+	var metrika = __webpack_require__(15)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -603,7 +610,60 @@
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(14)
+	// пример использования нотификаций:
+	// PubSub.publish('show-info', 'Привет мир!');
+
+	module.exports = React.createClass({displayName: 'exports',
+	    componentDidMount: function() {
+	        PubSub.subscribe('show-info', this.newItem);
+	        PubSub.subscribe('show-warning', this.newItem);
+	    },
+	    newItem: function (msg, data) {
+	        this.counter += 1;
+	        var item = {'id': this.counter,
+	                    'text': data}
+	        
+	        if (msg == 'show-warning') {
+	            item['class'] = 'warning';
+	        } else {
+	            item['class'] = 'info';
+	        }
+
+	        var items = this.state.items;
+	        items[items.length] = item;
+	        this.setState({show: true, items: items});
+	    },
+	    getInitialState: function () {
+	        this.counter = 0;
+	        return {show: false, items: []};
+	    },
+	    render: function() {
+	        var notifications;
+	        var closeItem2 = function (item_id) {
+	            return function() {
+	                UserStory.log(["closing item [item_id=", item_id, "]"], ["notifications"]);
+	                items = this.state.items;
+	                items = _.filter(items, function(item) {return item.id != item_id});
+	                this.setState({items: items});
+	            }.bind(this);
+	        }.bind(this);
+
+	        if (this.state.show) {
+	            notifications = _.map(this.state.items,
+	                                function(item) {
+	                                        return React.createElement("li", {className: "notifications__item notifications__" + item.class, key: item.id}, item.text, React.createElement("div", {className: "notifications__close-button", onClick: closeItem2(item.id)}, "+"))
+	                                });
+	        }
+	        return  (React.createElement("ul", {className: "notifications"}, notifications));
+	    }
+	});
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(15)
 
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
@@ -795,10 +855,10 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(15)
+	var Package = __webpack_require__(16)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -836,7 +896,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {
@@ -850,7 +910,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	TrackButton = __webpack_require__(9)

@@ -1,0 +1,34 @@
+.notifications {
+    position: fixed
+    top: 0
+    left: 0
+    width: 100%
+    list-style: none
+    z-index: 50000;
+
+    &__item {
+        padding: 5px 10px 5px 100px
+        @media (max-width: 600px) {
+            padding: 5px 10px 5px 10px
+        }
+    }
+
+    &__info {
+        color: white
+        background-color: bright-green-color - rgba(0,0,0,0.2)
+        background-image: linear-gradient(@background-color, @background-color - 20%)
+    }
+
+    &__warning {
+        color: white
+        background-color: light-red-color - rgba(0,0,0,0.2)
+        background-image: linear-gradient(@background-color, @background-color - 20%)
+    }
+    &__close-button {
+        float: right;
+        transform: rotate(45deg);
+        font-size: 30px;
+        margin-top: -3px;
+        cursor: pointer;
+    }
+}
