@@ -1012,6 +1012,58 @@ a:hover {
 .page-header__buttons .button {
   margin-bottom: 15px;
 }
+.version-links-container__wrapper {
+  height: auto !important;
+}
+.version-links-container .version-links__buttons {
+  display: none;
+}
+.version-links-container .track-button__message {
+  display: none;
+}
+.version-links-container__sticky {
+  box-sizing: border-box;
+  width: 100%;
+}
+.version-links-container__sticky ul.version-links {
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.version-links-container__sticky .version-links__buttons {
+  display: block;
+}
+.version-links-container__sticky .version-links__buttons .button {
+  margin-bottom: 0px;
+}
+.version-links-container__sticky .version-links-container {
+  left: 0px;
+  background: rgba(255,255,255,0.8);
+  box-shadow: 0 0 5px;
+  padding: 0 5px 5px 5px;
+}
+@media (min-width: 600px) {
+  .version-links-container__sticky .version-links-container {
+    padding-left: 95px;
+    padding-right: 95px;
+  }
+}
+.version-links-container .version-links {
+  list-style: none;
+  margin-bottom: 20px;
+  clear: both;
+}
+.version-links-container .version-links__item {
+  display: inline-block;
+  margin-right: 10px;
+  min-width: 40px;
+}
+.version-links-container .version-links__selected-item a {
+  color: #000;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: default;
+}
 .guide__header-background {
   background-color: #011c26;
   padding-top: 20px;
@@ -1130,6 +1182,28 @@ a:hover {
   font-size: 30px;
   margin-top: -3px;
   cursor: pointer;
+}
+.report-button {
+  display: inline-block;
+}
+.report-button__dropdown {
+  display: inline-block;
+}
+.report-button__popup {
+  position: absolute;
+  margin-top: 10px;
+  z-index: 30000;
+  width: 400px;
+  background-color: #fff;
+  padding: 10px;
+  display: block;
+  border: 1px solid #cbcbcb;
+  box-shadow: 0px 10px 20px -4px rgba(0,0,0,0.4);
+}
+@media (max-width: 600px) {
+  .report-button__popup {
+    left: 0px;
+  }
 }
 .page {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1374,58 +1448,6 @@ body.email {
 }
 .autocomplete-input {
   width: 100%;
-}
-.dropdown {
-  display: inline-block;
-}
-.report-button {
-  display: inline-block;
-}
-.popup {
-  position: absolute;
-  margin-top: 10px;
-  z-index: 30000;
-  width: 400px;
-  background-color: #fff;
-  padding: 10px;
-  display: block;
-  border: 1px solid #cbcbcb;
-  box-shadow: 0px 10px 20px -4px rgba(0,0,0,0.4);
-}
-.version-links {
-  list-style: none;
-  margin-bottom: 20px;
-  clear: both;
-}
-.version-links__wrapper {
-  height: auto !important;
-}
-.version-links__sticky .version-links {
-  background: rgba(255,255,255,0.8);
-  box-shadow: 0 0 5px;
-  padding: 0 5px 5px 5px;
-}
-@media (min-width: 600px) {
-  .version-links__sticky .version-links {
-    margin-right: 95px;
-    left: 95px;
-  }
-}
-@media (max-width: 600px) {
-  .version-links__sticky .version-links {
-    left: 0px;
-  }
-}
-.version-links__item {
-  display: inline-block;
-  margin-right: 10px;
-  min-width: 40px;
-}
-.version-links__selected-item a {
-  color: #000;
-  text-decoration: none;
-  font-weight: bold;
-  cursor: default;
 }
 .track-button-container {
   display: inline-block;

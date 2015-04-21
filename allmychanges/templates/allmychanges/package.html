@@ -74,11 +74,19 @@
     {% endif %}
       <dt>Versions:</dt>
       <dd>
+
+
+<div class="version-links-container">
   <ul class="version-links">
     {% for version in package.versions %}
       <li class="version-links__item version-links__item-{{ version.number|replace_dots }}"><a href="#{{ version.number }}">{{ version.number }}</a></li>
     {% endfor %}
   </ul>
+      <!-- START buttons -->
+  <div class="version-links__buttons"><a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <a href="{{package.source|remove_source_prefix}}" class="button" title="Go to package's sources"><i class="fa fa-external-link-square fa-lg" style="margin-right: 5px"></i>Source</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <div class="track-button-container" data-changelog-id="{{package.changelog.id}}" data-tracked="{{already_tracked|lower}}" data-num-trackers="{{num_trackers}}"></div></div>
+      <!-- END buttons -->
+</div>
+
       </dd>
   </dl>
 
@@ -90,10 +98,10 @@
   <script>
     $(document).ready(function(){
       // делаем табло со списком версий прилипающим кверху при прокрутке
-      $(".version-links").sticky({
+      $(".version-links-container").sticky({
         topSpacing:0,
-        className: "version-links__sticky",
-        wrapperClassName: "version-links__wrapper"
+        className: "version-links-container__sticky",
+        wrapperClassName: "version-links-container__wrapper"
       });
 
       // обрабатываем клик, чтобы при прокрутке не загораживать

@@ -12,3 +12,67 @@
       }
   }
 }
+
+.version-links-container {
+    &__wrapper {
+        height: auto !important;
+    }
+    .version-links__buttons {
+        display: none;
+    }
+    .track-button__message {
+        // yt показываем сколько уже трекает в плашке,
+        // там и так места мало
+        display: none;
+    }
+
+    &__sticky {
+        box-sizing: border-box;
+        width: 100%;
+
+        ul.version-links {
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .version-links__buttons {
+            display: block;
+            
+            .button {
+                margin-bottom: 0px;
+            }
+        }
+
+        .version-links-container {
+            left: 0px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 5px;
+            padding: 0 5px 5px 5px;
+            @media (min-width: 600px) {
+                padding-left: 95px;
+                padding-right: 95px;
+            }
+            @media (max-width: 600px) {
+            }
+        }
+    }
+
+
+    .version-links {
+        list-style: none;
+        margin-bottom: 20px;
+        clear: both;
+        &__item {
+            display: inline-block;
+            margin-right: 10px;
+            min-width: 40px;
+        }
+        &__selected-item a {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: default;
+        }
+    }
+}
+

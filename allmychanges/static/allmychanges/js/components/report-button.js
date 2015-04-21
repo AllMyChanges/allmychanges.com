@@ -62,7 +62,7 @@ module.exports = React.createClass({
     render: function() {
         var popup;
         if (this.state.show_popup) {
-            popup = <div className="popup" onClick={this.handle_popup_click}>
+            popup = <div className="report-button__popup" onClick={this.handle_popup_click}>
                 <form className="form" onSubmit={this.handle_post}>
                   <label htmlFor="type">Problem type:</label>
                   <select className="select-box" ref="type" placeholder="Some issue type">
@@ -89,6 +89,6 @@ module.exports = React.createClass({
                 </form>
             </div>;
         }
-        return  (<div className="dropdown"><button className="button" onClick={this.handle_switcher_click} title="If you found some issues with this changelog, please file this issue."><i className="fa fa-exclamation-circle fa-lg" style={{color: '#D9534F', marginRight: '5px'}}></i>Report</button>{popup}</div>);
+        return  (<div className="report-button__dropdown"><button className="button" onClick={this.handle_switcher_click} title="If you found some issues with this changelog, please file this issue."><i className="fa fa-exclamation-circle fa-lg" style={{color: '#D9534F', marginRight: '5px'}}></i>Report</button>{popup}</div>);
     }
 });
