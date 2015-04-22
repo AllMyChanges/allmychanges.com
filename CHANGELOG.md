@@ -1,5 +1,24 @@
+0.23.0 (2015-04-22)
+===================
+
+This is release of minor improvements.
+
+* Whole site went behind a HTTPS.
+* Typography was fixed here and there.
+* Buttons become more colorful and gradientish.
+* Functions `amch:re.sub` and `amch:re.match` were available in XSLT transformations.
+* Now we show spinner while waiting for autocomplete, because
+  it is not optimized yet and sometimes takes really long to go through
+  a billion of iOS apps, searching a term.
+* Recursive http downloader was fixed to not add .html extensions to files
+  with other content type.
+* When anonymous track a package we show him (or her) a popup, explaining
+  that to receive notifications he (or she) should login.
+* And finally, now we show action buttons (report, track, etc.) on a
+  sticky header along with version numbers.
+
 0.22.0 (2015-04-05)
-==================
+===================
 
 This release includes two major features:
 
