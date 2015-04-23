@@ -921,6 +921,20 @@ a:hover {
 .help ol {
   margin-top: 20px;
 }
+.help .anchor {
+  color: #333;
+  text-decoration: none;
+  cursor: text;
+}
+.help .anchor:hover:after {
+  content: "permalink";
+  display: inline;
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 10px;
+  position: relative;
+  top: -15px;
+}
 .landing-for-ios {
   margin-top: 65px;
 }

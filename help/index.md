@@ -1,7 +1,6 @@
 Help Pages
 ==========
 
-Here you can read about:
-
-* [Slack integration](slack/);
-* [Tools](tools/) for working with AllMyChanges.
+* [Frequently Asked Questions](faq/).
+* [Tools](tools/) for batch uploading to AllMyChanges.
+* [Slack integration](slack/).

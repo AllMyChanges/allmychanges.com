@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(14)
+	var PackageSelector = __webpack_require__(15)
 
 	module.exports = {
 	    render: function () {
@@ -81,6 +81,7 @@
 	var MagicPrompt = __webpack_require__(10)
 	var Share = __webpack_require__(11)
 	var Notifications = __webpack_require__(12)
+	var FeedbackForm = __webpack_require__(13)
 
 
 	module.exports = {
@@ -126,6 +127,11 @@
 	                React.createElement(Notifications, null),
 	                element);
 	        });
+	        $('.feedback-form-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(FeedbackForm, {page: element.dataset['page']}),
+	                element);
+	        });
 	    }
 	}
 
@@ -152,7 +158,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(13)
+	var Promo = __webpack_require__(14)
 
 	module.exports = {
 	    render: function () {
@@ -167,7 +173,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(15)
+	var metrika = __webpack_require__(16)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -205,7 +211,7 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(15)
+	var metrika = __webpack_require__(16)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -371,7 +377,7 @@
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(15)
+	var metrika = __webpack_require__(16)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -664,7 +670,76 @@
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(15)
+	var metrika = __webpack_require__(16)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {enable_submit: false};
+	    },
+	    handle_form_keypress: function (e) {
+	        if (e.key == 'Enter' && (e.metaKey || e.ctrlKey)) {
+	            this.handle_post(e);
+	        }
+	    },
+	    handle_comment_change: function (e) {
+	        this.setState({
+	            enable_submit: (this.refs.comment.getDOMNode().value.trim().length > 0)});
+	    },
+	    handle_post: function (e) {
+	        UserStory.log(["sending feedback to the server"], ["report.button"]);
+	        metrika.reach_goal('REPORT');
+	        e.preventDefault();
+	        var comment = this.refs.comment.getDOMNode().value.trim();
+	        var email = this.refs.email.getDOMNode().value.trim();
+
+	        $.ajax({
+	            url: '/v1/issues/',
+	            dataType: 'json',
+	            type: 'POST',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            data: {type: 'feedback',
+	                   email: email,
+	                   page: this.props.page,
+	                   comment: comment},
+	            success: function(data) {
+	                this.setState({show_popup: false});
+	                this.refs.comment.getDOMNode().value = '';
+	                PubSub.publish('show-info', 'Thank you for sharing your ideas!');
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        var form = React.createElement("form", {className: "form", onSubmit: this.handle_post}, 
+	            React.createElement("input", {ref: "email", className: "text-input", placeholder: "Your email will let us answer you, but it is optional.", type: "text", maxLength: "100"}), 
+	            React.createElement("textarea", {className: "textarea", 
+	                      ref: "comment", 
+	                      onKeyPress: this.handle_form_keypress, 
+	                      onChange: this.handle_comment_change, 
+	                      placeholder: "Please, describe your ideas here."}
+	            ), React.createElement("br", null), 
+	            React.createElement("table", {className: "form-buttons"}, 
+	               React.createElement("tr", null, 
+	                  React.createElement("td", {className: "form-buttons__back"}), 
+	                  React.createElement("td", {className: "form-buttons__next"}, 
+	                     React.createElement("button", {className: "button _good", 
+	                             disabled: this.state.enable_submit ? false: "disabled"}, "Send")
+	                  )
+	               )
+	            )
+	        );
+	        return  form;
+	    }
+	});
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(16)
 
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
@@ -856,10 +931,10 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(16)
+	var Package = __webpack_require__(17)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -897,7 +972,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = {
@@ -911,7 +986,7 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	TrackButton = __webpack_require__(9)

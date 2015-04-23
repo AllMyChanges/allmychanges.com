@@ -470,7 +470,9 @@ class Issue(models.Model):
     """Keeps track any issues, related to a changelog.
     """
     changelog = models.ForeignKey(Changelog,
-                                  related_name='issues')
+                                  related_name='issues',
+                                  blank=True,
+                                  null=True)
     user = models.ForeignKey(User, blank=True, null=True)
     light_user = models.CharField(max_length=40, blank=True, null=True)
     type = models.CharField(max_length=40)
@@ -479,6 +481,8 @@ class Issue(models.Model):
     resolved_at = models.DateTimeField(blank=True, null=True)
     related_versions = models.TextField(default='', blank=True,
                                         help_text='Comma-separated list of versions, related to this issue')
+    email = models.CharField(max_length=100, blank=True, null=True)
+    page = models.CharField(max_length=100, blank=True, null=True)
 
     def __repr__(self):
         return """

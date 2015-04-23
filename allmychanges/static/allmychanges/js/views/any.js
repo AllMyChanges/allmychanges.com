@@ -6,6 +6,7 @@ var TrackButton = require('../components/track-button.js')
 var MagicPrompt = require('../components/magic-prompt.js')
 var Share = require('../components/share.js')
 var Notifications = require('../components/notifications.js')
+var FeedbackForm = require('../components/feedback-form.js')
 
 
 module.exports = {
@@ -49,6 +50,11 @@ module.exports = {
         $('.notifications-container').each(function (idx, element) {
             React.render(
                 <Notifications/>,
+                element);
+        });
+        $('.feedback-form-container').each(function (idx, element) {
+            React.render(
+                <FeedbackForm page={element.dataset['page']}/>,
                 element);
         });
     }

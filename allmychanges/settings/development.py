@@ -42,4 +42,4 @@ if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR)
 
 
-ALLOWED_HOSTS = ['localhost', 'art.dev.allmychanges.com']
+ALLOWED_HOSTS = ['localhost', 'art.dev.allmychanges.com', 'skate.svetlyak.ru']

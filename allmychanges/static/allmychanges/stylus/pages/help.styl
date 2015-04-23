@@ -25,4 +25,22 @@
     ul, ol {
         margin-top: 20px;
     }
+
+    .anchor {
+        color: text-color;
+        text-decoration: none;
+        cursor: text;
+
+        &:hover {
+            &:after {
+                content: "permalink"
+                display: inline;
+                cursor: pointer;
+                font-size: 10px;
+                line-height: 10px;
+                position: relative;
+                top: -15px;
+            }
+        }
+    }
 }

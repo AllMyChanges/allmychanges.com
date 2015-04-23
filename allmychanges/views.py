@@ -1251,5 +1251,8 @@ class HelpView(CommonContextMixin, TemplateView):
             html = markdown2.markdown(f.read())
             result['content'] = html
 
-        result['menu_help'] = True
+        if topic == 'faq':
+            result['menu_faq'] = True
+        else:
+            result['menu_help'] = True
         return result

@@ -574,14 +574,25 @@ class IssueViewSet(HandleExceptionMixin,
     def post_save(self, obj, created=False):
         if created:
             changelog = obj.changelog
+            if changelog:
+                history_message = 'Created issue for <changelog:{0}>'.format(changelog.id)
+                chat_message = (
+                    'New issue was created for '
+                    '<https://allmychanges.com/issues/?id={pk}|{namespace}/{name}>.').format(
+                        pk=obj.id, namespace=changelog.namespace, name=changelog.name)
+            else:
+                history_message = 'Feedback was given at page "{0}"'.format(obj.page)
+                chat_message = (
+                    'Feedback was given for page {page} '
+                    '<https://allmychanges.com/issues/?id={pk}|#{pk}>.').format(
+                        pk=obj.id, page=obj.page)
+
             UserHistoryLog.write(
                 self.request.user,
                 self.request.light_user,
                 'create-issue',
-                'Created issue for <changelog:{0}>'.format(changelog.id))
-            chat.send('New issue was created for <https://allmychanges.com/issues/?namespace={namespace}&name={name}|{namespace}/{name}>.'.format(
-                namespace=changelog.namespace,
-                name=changelog.name))
+                history_message)
+            chat.send(chat_message)
 
     @action()
     def resolve(self, request, pk=None):
