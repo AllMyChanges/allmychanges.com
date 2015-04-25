@@ -96,6 +96,13 @@ Why don't you extract information from GitHub Releases API?
 
 Because it's is very few who really uses it. Tell us about some popular projects, writing their release notes at github, and we'll add this feature to our roadmap. Use <a href="#feedback">feedback form</a>.
 
+Are there any recommendations how to write good release notes?
+--------------------------------------------------------------
+
+There is a good description at [KeepAChangelog](http://keepachangelog.com) site.
+Also, there is a [SemanticReleaseNotes](http://www.semanticreleasenotes.org) proposal which
+is aimed to provide us with a new textual format for release notes.
+
 
 <a name="feedback"></a>
 Didn't find answer to your question? Ask it and we'll answer.
