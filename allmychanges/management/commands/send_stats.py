@@ -6,9 +6,9 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
-from allmychanges.models import Changelog, ChangelogTrack, Version, User, Issue, F
+from allmychanges.models import Changelog, ChangelogTrack, Version, User, Issue
 from django.utils import timezone
-from django.db.models import Count
+from django.db.models import Count, F
 
 
 def get_stats_from_file():
