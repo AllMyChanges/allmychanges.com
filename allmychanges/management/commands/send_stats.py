@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from django.conf import settings
 from allmychanges.utils import graphite_send
-from allmychanges.models import Changelog, ChangelogTrack, Version, User, Issue
+from allmychanges.models import Changelog, ChangelogTrack, Version, User, Issue, F
 from django.utils import timezone
 from django.db.models import Count
 
@@ -73,6 +73,20 @@ def get_stats():
     stats['db.versions.v1-unreleased'] = Version.objects.filter(code_version='v1', unreleased=True).exclude(changelog__filename=None).count()
     stats['db.versions.v2-unreleased'] = Version.objects.filter(code_version='v2', unreleased=True).count()
     stats['db.users-with-emails'] = User.objects.exclude(email=None).count()
+
+    num_users = User.objects.all().count()
+    first_day_avg = float(sum(
+        User.objects.all()
+            .filter(changelogtrack__created_at__lt=F('date_joined') + datetime.timedelta(1))
+            .annotate(ch_count=Count('changelogtrack')).values_list('ch_count', flat=True))) \
+        / num_users
+    other_days_avg = float(sum(
+        User.objects.all()
+            .filter(changelogtrack__created_at__gte=F('date_joined') + datetime.timedelta(1))
+            .annotate(ch_count=Count('changelogtrack')).values_list('ch_count', flat=True))) \
+        / num_users
+    stats['db.tracks.first-day.avg'] = first_day_avg
+    stats['db.tracks.other-days.avg'] = other_days_avg
 
     now = timezone.now()
     minute_ago = now - datetime.timedelta(0, 60)
