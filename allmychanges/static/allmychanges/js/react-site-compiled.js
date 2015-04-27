@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(15)
+	var PackageSelector = __webpack_require__(14)
 
 	module.exports = {
 	    render: function () {
@@ -158,7 +158,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(14)
+	var Promo = __webpack_require__(15)
 
 	module.exports = {
 	    render: function () {
@@ -436,12 +436,12 @@
 
 	        var msg;
 	        if (num_trackers && num_trackers != '0') {
-	            msg = num_trackers + ' users already track it!'
+	            msg = num_trackers + ' followers'
 	            if (num_trackers == '1') {
-	                msg = 'one user already tracks it!';
+	                msg = 'one follower';
 	            }
 	        } else {
-	            msg = 'nobody tracks it, be the first!';
+	            msg = 'nobody follows it, be the first!';
 	        }
 	        var trackers_msg = React.createElement("div", {className: "track-button__message"}, msg);
 
@@ -449,14 +449,14 @@
 	            return (React.createElement("div", {className: "track-button"}, 
 	                      React.createElement("button", {className: "button _bad", 
 	                              onClick: this.untrack, 
-	                              title: "Click to unsubscribe from this package."}, "Untrack"), 
+	                              title: "Click to unsubscribe from this package."}, "Unfollow"), 
 	                      popup
 	                    ));
 	        } else {
 	            return (React.createElement("div", {className: "track-button"}, 
 	                      React.createElement("button", {className: "button _good", 
 	                              onClick: this.track, 
-	                              title: "Click to receive notifications about new versions."}, "Track it!"), 
+	                              title: "Click to receive notifications about new versions."}, "Follow"), 
 	                      trackers_msg
 	                    ));
 	        }
@@ -739,6 +739,47 @@
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var Package = __webpack_require__(17)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {packages: []};
+	    },
+	    componentDidMount: function() {
+	        $.ajax({
+	            url: this.props.url,
+	            dataType: 'json',
+	            success: function(data) {
+	                this.setState({packages: data.results});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        var packages_list = this.state.packages.map(function (package) {
+	            return (
+	                React.createElement(Package, {key: package.id, 
+	                         changelog_id: package.id, 
+	                         namespace: package.namespace, 
+	                         name: package.name, 
+	                         versions: package.versions})
+	            );
+	        });
+	        return (
+	            React.createElement("ul", {className: "package-selector"}, 
+	                packages_list
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var metrika = __webpack_require__(16)
 
 	// uses jquery typeahead plugin:
@@ -924,47 +965,6 @@
 	                ), 
 	                login_link, 
 	                React.createElement("div", {className: "ios-promo__digest"})
-	            )
-	        );
-	    }
-	});
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Package = __webpack_require__(17)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {packages: []};
-	    },
-	    componentDidMount: function() {
-	        $.ajax({
-	            url: this.props.url,
-	            dataType: 'json',
-	            success: function(data) {
-	                this.setState({packages: data.results});
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error(this.props.url, status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    render: function() {
-	        var packages_list = this.state.packages.map(function (package) {
-	            return (
-	                React.createElement(Package, {key: package.id, 
-	                         changelog_id: package.id, 
-	                         namespace: package.namespace, 
-	                         name: package.name, 
-	                         versions: package.versions})
-	            );
-	        });
-	        return (
-	            React.createElement("ul", {className: "package-selector"}, 
-	                packages_list
 	            )
 	        );
 	    }

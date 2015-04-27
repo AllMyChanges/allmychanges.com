@@ -57,12 +57,12 @@ module.exports = React.createClass({
 
         var msg;
         if (num_trackers && num_trackers != '0') {
-            msg = num_trackers + ' users already track it!'
+            msg = num_trackers + ' followers'
             if (num_trackers == '1') {
-                msg = 'one user already tracks it!';
+                msg = 'one follower';
             }
         } else {
-            msg = 'nobody tracks it, be the first!';
+            msg = 'nobody follows it, be the first!';
         }
         var trackers_msg = <div className="track-button__message">{msg}</div>;
 
@@ -70,14 +70,14 @@ module.exports = React.createClass({
             return (<div className="track-button">
                       <button className="button _bad"
                               onClick={this.untrack}
-                              title="Click to unsubscribe from this package.">Untrack</button>
+                              title="Click to unsubscribe from this package.">Unfollow</button>
                       {popup}
                     </div>);
         } else {
             return (<div className="track-button">
                       <button className="button _good"
                               onClick={this.track}
-                              title="Click to receive notifications about new versions.">Track it!</button>
+                              title="Click to receive notifications about new versions.">Follow</button>
                       {trackers_msg}
                     </div>);
         }
