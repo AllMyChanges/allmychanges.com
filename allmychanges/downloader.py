@@ -379,6 +379,42 @@ def http_downloader(source,
                               only_one=True)
 
 
+def google_play_downloader(source,
+                           search_list=[],
+                           ignore_list=[]):
+    """Downloads latest release note from Google Play.
+    """
+    response = requests.get(source)
+    text = get_text_from_response(response)
+    tree = html_document_fromstring(text)
+    get_recent_changes = lxml.html.etree.XPath(
+        '//node()[@class="recent-change"]/text()')
+    get_version = lxml.html.etree.XPath(
+        '//node()[@itemprop="softwareVersion"]/text()')
+    changes = get_recent_changes(tree)
+    version = get_version(tree)
+
+    content = u''
+    if version:
+        content += version[0].strip()
+        content += u'\n=======\n\n'
+        content += u'\n'.join(changes)
+        content += u'\n'
+
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    try:
+        with cd(path):
+            with open('ChangeLog', 'w') as f:
+                f.write(content.encode('utf-8'))
+
+    except Exception, e:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        raise RuntimeError('Unexpected exception "{0}" when fetching google app: {1}'.format(
+            repr(e), source))
+    return path
+
+
 def itunes_downloader(source,
                       search_list=[],
                       ignore_list=[]):
@@ -587,6 +623,9 @@ def guess_downloader(url):
 
     if parts.hostname == 'itunes.apple.com':
         return 'itunes'
+
+    if parts.hostname == 'play.google.com':
+        return 'google_play'
 
     if parts.hostname == 'github.com':
         url, username, repo = normalize_url(url)
