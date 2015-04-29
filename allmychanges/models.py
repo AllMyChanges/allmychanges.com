@@ -637,7 +637,7 @@ class Preview(Downloadable, models.Model):
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)
-    downloader = models.CharField(max_length=10, blank=True, null=True)
+    downloader = models.CharField(max_length=20, blank=True, null=True)
     done = models.BooleanField(default=False)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
