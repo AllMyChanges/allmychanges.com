@@ -15,6 +15,7 @@ from django.conf import settings
 from urlparse import urlsplit
 from allmychanges.utils import (
     cd, get_text_from_response, is_http_url,
+    first_sentences,
     html_document_fromstring)
 from allmychanges.exceptions import DownloaderWarning, AppStoreAppNotFound
 from twiggy_goodies.threading import log
@@ -379,6 +380,71 @@ def http_downloader(source,
                               only_one=True)
 
 
+def google_play_guesser(source):
+    from allmychanges.models import DESCRIPTION_LENGTH
+
+    response = requests.get(source)
+    text = get_text_from_response(response)
+    tree = html_document_fromstring(text)
+
+    def get_text(xpath, doc):
+        getter = lxml.html.etree.XPath(xpath)
+        items = getter(doc)
+        if items:
+            return items[0]
+
+    name = get_text('//node()[@itemprop="name"]/div/text()', tree)
+    if name:
+        name = name.split(' -', 1)[0]
+
+    description = get_text('//node()[@class="id-app-orig-desc"]/text()', tree)
+    if description:
+        description = first_sentences(description,
+                                      DESCRIPTION_LENGTH)
+
+    icon = get_text('//node()[@class="cover-image"]/@src', tree)
+    return dict(namespace='android',
+                name=name,
+                description=description,
+                icon=icon)
+
+
+def get_github_api_url(base_url, handle):
+    match = re.match("^https?://github.com/(?P<repo>[^/]+)/(?P<username>[^/]+)",
+                    base_url)
+    if match is not None:
+        data = match.groupdict()
+        data["handle"] = handle
+        return "https://api.github.com/repos/{repo}/{username}/{handle}".format(
+            **data)
+
+
+def git_guesser(source):
+    from allmychanges.models import DESCRIPTION_LENGTH
+    name = None
+    namespace = None
+    description = None
+    api_url = get_github_api_url(source, '')
+    if api_url:
+        response = requests.get(api_url.rstrip('/'))
+        data = response.json()
+        try:
+            name = data['name']
+            namespace = data['language']
+            if namespace:
+                namespace = namespace.lower()
+            description = data['description']
+            if description:
+                description = first_sentences(description,
+                                              DESCRIPTION_LENGTH)
+        except KeyError:
+            pass
+
+    return dict(namespace=namespace,
+                name=name,
+                description=description)
+
+
 def google_play_downloader(source,
                            search_list=[],
                            ignore_list=[]):
@@ -657,3 +723,15 @@ def guess_downloader(url):
 
 def get_downloader(name):
     return globals().get(name + '_downloader')
+
+
+def get_namespace_guesser(name):
+    """Actually it is not only namespace guesser,
+    but also a name and description guesser.
+
+    Each guesser should return a dict with name, namespace and description fields.
+    """
+    null_guesser = lambda url: dict(namespace=None,
+                                    name=None,
+                                    description=None)
+    return globals().get(name + '_guesser', null_guesser)

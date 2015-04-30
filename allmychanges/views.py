@@ -46,7 +46,10 @@ from oauth2_provider.models import Application, AccessToken
 from allmychanges.utils import (HOUR,
                                 parse_ints,
                                 join_ints)
-from allmychanges.downloader import normalize_url
+from allmychanges.downloader import (
+    normalize_url,
+    guess_downloader,
+    get_namespace_guesser)
 
 
 
@@ -822,12 +825,24 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                                      'package-create',
                                      u'User created changelog:{0}'.format(changelog.pk))
             except Changelog.DoesNotExist:
+                params = dict(name=self.request.GET.get('name'),
+                              namespace=self.request.GET.get('namespace'),
+                              description=self.request.GET.get('description', ''),
+                              icon=self.request.GET.get('icon', ''))
+
+                if not params['name']:
+                    downloader = guess_downloader(normalized_url)
+                    guesser = get_namespace_guesser(downloader)
+                    guessed = guesser(normalized_url)
+                    guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
+                                                                 guessed['name'])
+                    for key, value in guessed.items():
+                        if value:
+                            params[key] = value
+
                 changelog = Changelog.objects.create(
-                    source=normalized_url,
-                    name=self.request.GET.get('name'),
-                    namespace=self.request.GET.get('namespace'),
-                    description=self.request.GET.get('description', ''),
-                )
+                    source=normalized_url, **params)
+
                 if user:
                     chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
                         user.username, normalized_url))
@@ -913,11 +928,13 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result = super(PreviewView, self).get_context_data(**kwargs)
         # initially there is no versions in the preview
         # and we'll show versions from changelog if any exist
-        if self.preview.status == 'created':
-            obj = self.preview.changelog
-        else:
-            obj = self.preview
+        preview = self.preview
+        changelog = preview.changelog
 
+        if preview.status == 'created':
+            obj = changelog
+        else:
+            obj = preview
 
         code_version = 'v2'
         filter_args = {'code_version': code_version}

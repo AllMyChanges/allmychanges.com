@@ -289,6 +289,22 @@ class Changelog(Downloadable, models.Model):
         if versions:
             return versions[0]
 
+    @staticmethod
+    def create_uniq_name(namespace, name):
+        """Returns a name which is unique in given namespace.
+        Name is created by incrementing a value."""
+        if namespace and name:
+            base_name = name
+            counter = 0
+
+            while Changelog.objects.filter(
+                    namespace=namespace,
+                    name=name).exists():
+                counter += 1
+                name = '{0}{1}'.format(base_name, counter)
+        return name
+
+
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
         return reverse('package', kwargs=dict(
@@ -649,6 +665,10 @@ class Preview(Downloadable, models.Model):
     @property
     def name(self):
         return self.changelog.name
+
+    @property
+    def description(self):
+        return self.changelog.description
 
     def set_status(self, status, **kwargs):
         changed_fields = ['status', 'updated_at']
