@@ -465,6 +465,9 @@ class ChangelogViewSet(HandleExceptionMixin,
                 url=changelog.get_absolute_url(),
                 username=user.username))
         else:
+            action_description = 'Anonymous user tracked changelog:{0}'.format(changelog.id)
+            UserHistoryLog.write(None, self.request.light_user, 'track', action_description)
+
             tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
             tracked_changelogs.add(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
@@ -482,6 +485,9 @@ class ChangelogViewSet(HandleExceptionMixin,
                 url=changelog.get_absolute_url(),
                 username=user.username))
         else:
+            action_description = 'Anonymous user untracked changelog:{0}'.format(changelog.id)
+            UserHistoryLog.write(None, self.request.light_user, 'untrack', action_description)
+
             chat.send(('Package <https://allmychanges.com{url}> was untracked by anonymous user.').format(
                 url=changelog.get_absolute_url()))
         return Response({'result': 'ok'})
