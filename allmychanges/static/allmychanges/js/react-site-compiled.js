@@ -54,7 +54,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(14)
+	var PackageSelector = __webpack_require__(15)
 
 	module.exports = {
 	    render: function () {
@@ -158,7 +158,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(15)
+	var Promo = __webpack_require__(14)
 
 	module.exports = {
 	    render: function () {
@@ -739,47 +739,6 @@
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(17)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {packages: []};
-	    },
-	    componentDidMount: function() {
-	        $.ajax({
-	            url: this.props.url,
-	            dataType: 'json',
-	            success: function(data) {
-	                this.setState({packages: data.results});
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error(this.props.url, status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    render: function() {
-	        var packages_list = this.state.packages.map(function (package) {
-	            return (
-	                React.createElement(Package, {key: package.id, 
-	                         changelog_id: package.id, 
-	                         namespace: package.namespace, 
-	                         name: package.name, 
-	                         versions: package.versions})
-	            );
-	        });
-	        return (
-	            React.createElement("ul", {className: "package-selector"}, 
-	                packages_list
-	            )
-	        );
-	    }
-	});
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var metrika = __webpack_require__(16)
 
 	// uses jquery typeahead plugin:
@@ -965,6 +924,47 @@
 	                ), 
 	                login_link, 
 	                React.createElement("div", {className: "ios-promo__digest"})
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Package = __webpack_require__(17)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {packages: []};
+	    },
+	    componentDidMount: function() {
+	        $.ajax({
+	            url: this.props.url,
+	            dataType: 'json',
+	            success: function(data) {
+	                this.setState({packages: data.results});
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    render: function() {
+	        var packages_list = this.state.packages.map(function (package) {
+	            return (
+	                React.createElement(Package, {key: package.id, 
+	                         changelog_id: package.id, 
+	                         namespace: package.namespace, 
+	                         name: package.name, 
+	                         versions: package.versions})
+	            );
+	        });
+	        return (
+	            React.createElement("ul", {className: "package-selector"}, 
+	                packages_list
 	            )
 	        );
 	    }

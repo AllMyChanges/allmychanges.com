@@ -1186,6 +1186,9 @@ a:hover {
     padding: 5px 10px 5px 10px;
   }
 }
+.notifications__link {
+  color: #fff;
+}
 .notifications__info {
   color: #fff;
   background-color: rgba(55,204,106,0.8);

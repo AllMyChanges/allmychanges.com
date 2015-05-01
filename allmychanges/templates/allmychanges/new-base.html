@@ -105,12 +105,6 @@
 
      {% block full-content %}
       <div class="content">
-        {% block no-email-warning %}
-          {% if user.is_authenticated and not user.email %}
-            <div class="plate plate_warning">To receive notifications about new versions, <a href="{% url "account-settings" %}#notifications">setup email</a>.</div>
-          {% endif %}
-        {% endblock %}
-
         {% block content %}{% endblock content %}
       </div>
      {% endblock full-content %}
@@ -124,6 +118,19 @@
         </p>
       </div>
       {% endblock footer %}
+
+{% block no-email-warning %}
+    {% if user.is_authenticated and not user.email %}
+        <script type="text/javascript">
+          setTimeout(function () {
+              PubSub.publish('show-warning',
+          ['To receive notifications about new versions, please ',
+           React.createElement("a", {href: "{% url "account-settings" %}#notifications", "className": "notifications__link"}, "setup email"),
+           '.']);
+          }, 3000);
+        </script>
+    {% endif %}
+{% endblock %}
 
 
 {% if settings.METRIKA_ID %}
