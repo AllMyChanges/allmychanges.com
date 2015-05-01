@@ -75,8 +75,8 @@ class CommonContextMixin(object):
                       HOUR)
         else:
             num_trackers, num_tracked_changelogs = stats
-        result['num_trackers'] = num_trackers
-        result['num_tracked_changelogs'] = num_tracked_changelogs
+        result['total_num_trackers'] = num_trackers
+        result['total_num_tracked_changelogs'] = num_tracked_changelogs
 
         return result
 
