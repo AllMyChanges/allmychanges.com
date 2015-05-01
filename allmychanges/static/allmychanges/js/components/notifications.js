@@ -5,6 +5,7 @@ module.exports = React.createClass({
     componentDidMount: function() {
         PubSub.subscribe('show-info', this.newItem);
         PubSub.subscribe('show-warning', this.newItem);
+        $(document).trigger('notifications-mounted');
     },
     newItem: function (msg, data) {
         this.counter += 1;

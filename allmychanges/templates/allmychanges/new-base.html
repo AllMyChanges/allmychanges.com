@@ -122,12 +122,14 @@
 {% block no-email-warning %}
     {% if user.is_authenticated and not user.email %}
         <script type="text/javascript">
-          setTimeout(function () {
+          $(document).bind(
+            'notifications-mounted',
+            function () {
               PubSub.publish('show-warning',
-          ['To receive notifications about new versions, please ',
-           React.createElement("a", {href: "{% url "account-settings" %}#notifications", "className": "notifications__link"}, "setup email"),
-           '.']);
-          }, 3000);
+                ['To receive notifications about new versions, please ',
+                 React.createElement("a", {href: "{% url "account-settings" %}#notifications", "className": "notifications__link"}, "setup email"),
+                '.']);
+          });
         </script>
     {% endif %}
 {% endblock %}
