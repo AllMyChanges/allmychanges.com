@@ -14,8 +14,13 @@ module.exports = React.createClass({
             dataType: 'json',
             headers: {'X-CSRFToken': $.cookie('csrftoken')},
             success: function(data) {
-                this.setState({tracked: state_after});
                 metrika.reach_goal(action.toUpperCase());
+
+                if (this.props.on_track !== undefined) {
+                    this.props.on_track();
+                }
+
+                this.setState({tracked: state_after});
 
                 if (this.props.username == '') {
                     // if user is anonymous, then show him a fullscreen popup @buttons.track
@@ -47,7 +52,7 @@ module.exports = React.createClass({
             popup = (
                 <div className="modal-popup" onClick={this.handle_popup_click}>
                     <div className="modal-popup__content modal-popup__please-login">
-                      <p>Good job! You've made first step, tracking this package.</p>
+                      <p>Good job! You\'ve made first step, tracking this package.</p>
                       <p>Now, to receive notifications about future updates, you need to login via:</p>
                       <p><a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a> or <a className="button _good _large" href="/login/twitter/"><i className="fa fa-github fa-lg"></i> GitHub</a></p>
                     </div>
@@ -55,16 +60,19 @@ module.exports = React.createClass({
         }
 
 
-        var msg;
-        if (num_trackers && num_trackers != '0') {
-            msg = num_trackers + ' followers'
-            if (num_trackers == '1') {
-                msg = 'one follower';
+        var trackers_msg;
+        if (num_trackers) {
+            var msg;
+            if (num_trackers && num_trackers != '0') {
+                msg = num_trackers + ' followers';
+                if (num_trackers == '1') {
+                    msg = 'one follower';
+                }
+            } else {
+                msg = 'nobody follows it, be the first!';
             }
-        } else {
-            msg = 'nobody follows it, be the first!';
+            trackers_msg = <div className="track-button__message">{msg}</div>;
         }
-        var trackers_msg = <div className="track-button__message">{msg}</div>;
 
         if (this.state.tracked) {
             return (<div className="track-button">

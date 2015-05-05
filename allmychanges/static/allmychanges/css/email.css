@@ -931,50 +931,6 @@ a:hover {
 .front-steps__step {
   list-style: none;
 }
-.package-selector {
-  margin-top: 20px;
-}
-.package-selector__title {
-  white-space: nowrap;
-}
-.package-selector__item {
-  display: inline-block;
-  width: 220px;
-  overflow: hidden;
-  list-style: none;
-  margin-right: 44px;
-  margin-bottom: 20px;
-  vertical-align: top;
-}
-.package-selector__version {
-  list-style: none;
-  white-space: nowrap;
-}
-.package-selector__number {
-  font-weight: bold;
-  display: box;
-}
-.package-selector__date {
-  color: #808080;
-}
-.package-selector__versions {
-  margin-bottom: 22px;
-}
-.package-select__ignore-button {
-  margin-left: 10px;
-}
-.package-selector__empty-digest {
-  height: 200px;
-}
-.package-selector__empty-digest > p {
-  font-size: 18px;
-  line-height: 22px;
-}
-.package-selector__login-plate > p {
-  font-size: 32px;
-  line-height: 48px;
-  margin-top: 22px;
-}
 .help h1 {
   font-family: pragmatica-web-condensed, sans-serif;
   font-size: 30px;
@@ -1412,21 +1368,6 @@ body.email {
 }
 .autocomplete-input {
   width: 100%;
-}
-.track-button-container {
-  display: inline-block;
-}
-.track-button {
-  position: relative;
-}
-.track-button__message {
-  width: 400px;
-  position: absolute;
-  top: -16px;
-  left: 70px;
-  font-size: 16px;
-  color: #808080;
-  font: proxima-nova, sans-serif;
 }
 /* override link style from email-reset */
 a {

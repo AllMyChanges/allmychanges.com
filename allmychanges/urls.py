@@ -15,6 +15,7 @@ from .views import (OldIndexView,
                     SearchView,
                     DigestView,
                     LandingDigestView,
+                    PackageSelectorVersionsView,
                     BadgeView,
                     AfterLoginView,
                     FirstStepView,
@@ -69,6 +70,7 @@ urlpatterns = patterns(
 
     url(r'^digest/$', DigestView.as_view(), name='digest'),
     url(r'^landing-digest/$', LandingDigestView.as_view(), name='landing-digest'),
+    url(r'^package-selector-versions/$', PackageSelectorVersionsView.as_view(), name='package-selector-versions'),
     url(r'^preview/(?P<pk>.*?)/$', PreviewView.as_view(), name='preview'),
 
     url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),

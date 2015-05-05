@@ -805,6 +805,9 @@ def filter_versions_by_attribute(versions, search_list=[], ignore_list=[]):
 
 
 def filter_versions_by_source(versions):
+    if not versions:
+        return versions
+
     def calc_score(version):
         if filename_looks_like_a_changelog(version.filename):
             return 1000

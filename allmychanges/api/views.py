@@ -7,6 +7,7 @@ from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_str
+from django.http import HttpResponse
 from itertools import islice
 from twiggy_goodies.threading import log
 from urllib import urlencode
@@ -321,45 +322,33 @@ class LandingPackageSuggestView(viewsets.ViewSet):
         def process_versions(versions):
             return [{'id': v.id,
                      'number': v.number,
-                     'date': v.date or v.discovered_at.date()}
+                     'date': v.date or v.discovered_at.date(),
+                     'text': v.processed_text}
                     for v in versions]
 
-        tracked = parse_ints(request.GET.get('tracked', ''))
-        ignored = parse_ints(request.GET.get('ignored', ''))
         limit = int(request.GET.get('limit', '3'))
         versions_limit = int(request.GET.get('versions_limit', '3'))
-        skip = parse_ints(request.GET.get('skip', ''))
-        skip += tracked + ignored
+        user = request.user
 
-        track_id = request.GET.get('track_id')
-        ignore_id = request.GET.get('ignore_id')
+        if user.is_authenticated():
+            tracked_changelogs = set(user.changelogs.all().values_list('id', flat=True))
+            skipped_changelogs = set(user.skips_changelogs.all().values_list('id', flat=True))
+        else:
+            tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
+            skipped_changelogs = set(parse_ints(request.COOKIES.get('skipped-changelogs', '')))
 
-        if track_id:
-            UserHistoryLog.write(request.user, request.light_user,
-                'landing-track',
-                'User has tracked changelog:{0}'.format(track_id))
-
-        if ignore_id:
-            UserHistoryLog.write(request.user, request.light_user,
-                'landing-ignore',
-                'User has ignored changelog:{0}'.format(ignore_id))
-
+        skip = tracked_changelogs | skipped_changelogs
         changelogs = Changelog.objects.exclude(name=None).exclude(pk__in=skip).annotate(latest_date=Max('versions__discovered_at')).order_by('-latest_date')
 
         changelogs = (ch for ch in changelogs
                       if ch.versions.filter(code_version='v2').count() > 0)
-
-        # we won't suggest changlogs which are already tracked
-        if self.request.user.is_authenticated():
-            tracked_changelogs = set(self.request.user.changelogs.values_list('id', flat=True))
-            changelogs = (ch for ch in changelogs
-                          if ch.pk not in tracked_changelogs)
 
         changelogs = islice(changelogs, limit)
 
         return Response({'results': [{'id': ch.id,
                                       'name': ch.name,
                                       'namespace': ch.namespace,
+                                      'description': ch.description,
                                       'versions': process_versions(ch.versions.filter(code_version='v2')[:versions_limit])}
                                      for ch in changelogs]})
 
@@ -478,8 +467,10 @@ class ChangelogViewSet(HandleExceptionMixin,
     @action()
     def untrack(self, request, pk=None):
         user = self.request.user
+        changelog = Changelog.objects.get(pk=pk)
+        response = Response({'result': 'ok'})
+
         if user.is_authenticated():
-            changelog = Changelog.objects.get(pk=pk)
             user.untrack(changelog)
             chat.send(('Package <https://allmychanges.com{url}> was untracked by {username}.').format(
                 url=changelog.get_absolute_url(),
@@ -488,10 +479,39 @@ class ChangelogViewSet(HandleExceptionMixin,
             action_description = 'Anonymous user untracked changelog:{0}'.format(changelog.id)
             UserHistoryLog.write(None, self.request.light_user, 'untrack', action_description)
 
+            tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
+            tracked_changelogs.remove(pk)
+            response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
+
             chat.send(('Package <https://allmychanges.com{url}> was untracked by anonymous user.').format(
                 url=changelog.get_absolute_url()))
-        return Response({'result': 'ok'})
+        return response
 
+
+    @action()
+    def skip(self, request, pk=None):
+        """Saves user's intent to not recommend him that package anymore.
+        """
+        user = self.request.user
+        changelog = Changelog.objects.get(pk=pk)
+        response = Response({'result': 'ok'})
+
+        if user.is_authenticated():
+            user.skip(changelog)
+            chat.send(('Package <https://allmychanges.com{url}> was skipped by {username}.').format(
+                url=changelog.get_absolute_url(),
+                username=user.username))
+        else:
+            action_description = 'Anonymous user skipped changelog:{0}'.format(changelog.id)
+            UserHistoryLog.write(None, self.request.light_user, 'skip', action_description)
+
+            skipped_changelogs = set(parse_ints(request.COOKIES.get('skipped-changelogs', '')))
+            skipped_changelogs.add(pk)
+            response.set_cookie('skipped-changelogs', join_ints(skipped_changelogs))
+
+            chat.send(('Package <https://allmychanges.com{url}> was skipped by anonymous user.').format(
+                url=changelog.get_absolute_url()))
+        return response
 
 
 # это пока нигде не используется, надо дорабатывать
