@@ -165,6 +165,16 @@ class User(AbstractBaseUser):
                 user=self,
                 changelog=changelog).delete()
 
+    def skip(self, changelog):
+        if not self.does_skip(changelog):
+            action = 'skip'
+            action_description = 'User skipped changelog:{0}'.format(changelog.id)
+
+            UserHistoryLog.write(self, '', action, action_description)
+            ChangelogSkip.objects.create(
+                user=self,
+                changelog=changelog)
+
 
 class Subscription(models.Model):
     email = models.EmailField()
@@ -282,10 +292,11 @@ class Changelog(Downloadable, models.Model):
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)
 
+    def latest_versions(self, limit):
+        return self.versions.exclude(unreleased=True) \
+                            .order_by('-order_idx')[:limit]
     def latest_version(self):
-        versions = list(
-            self.versions.exclude(unreleased=True) \
-                         .order_by('-order_idx')[:1])
+        versions = list(self.latest_versions(1))
         if versions:
             return versions[0]
 
@@ -479,6 +490,12 @@ class Changelog(Downloadable, models.Model):
 class ChangelogTrack(models.Model):
     user = models.ForeignKey(User)
     changelog = models.ForeignKey(Changelog)
+    created_at = models.DateTimeField(default=timezone.now)
+
+
+class ChangelogSkip(models.Model):
+    user = models.ForeignKey(User, related_name='skips_changelogs')
+    changelog = models.ForeignKey(Changelog, related_name='skipped_by_users')
     created_at = models.DateTimeField(default=timezone.now)
 
 

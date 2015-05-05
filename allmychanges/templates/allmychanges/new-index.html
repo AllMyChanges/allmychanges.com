@@ -12,29 +12,5 @@
 
 <h1 class="front-header">Try to follow some projects now</h1>
 
-{% verbatim %}
-<div ng-controller="LandingPageCtrl">
-  <ul class="package-selector">
-    <li ng-repeat="package in packages" class="package-selector__item" package-selector-line package="package">
-    </li>
-  </ul>
-
-  <h1 class="front-header package-selector__next">To continue, follow at least five projects…</h1>
-
-  <div class="package-selector__empty-digest" ng-if="tracked_len &lt; 5">
-    <p>Track at least five packages and you'll see their changelogs' digest.</p>
-  </div>
-
-  <div class="package-selector__login-plate" ng-if="tracked_len &gt;= 5">
-    <p>To save your results, login via <a href="/login/github/" class="button _large _blue"><i class="fa fa-github fa-lg"></i> Github</a> or <a href="/login/twitter/" class="button _large _blue"><i class="fa fa-twitter fa-lg"></i> Twitter</a>!</p>
-  </div>
-  <div class="package-selector__digest" ng-if="tracked_len &gt;= 5">
-    <p>Here is you digest:</p>
-  </div>
-  <div class="package-selector__login-plate" ng-if="tracked_len &gt;= 5">
-    <p>To save your results, login via <a href="/login/github/" class="button _large _blue"><i class="fa fa-github fa-lg"></i> Github</a> or <a href="/login/twitter/" class="button _large _blue"><i class="fa fa-twitter fa-lg"></i> Twitter</a>!</p>
-  </div>
-</div>
-{% endverbatim %}
-
+<div class="landing-page-container"></div>
 {% endblock content %}

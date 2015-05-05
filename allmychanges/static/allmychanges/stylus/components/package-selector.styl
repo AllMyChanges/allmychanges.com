@@ -1,0 +1,104 @@
+.package-selector {
+    margin-top: 20px;
+
+    &__title {
+        white-space: nowrap;
+    }
+    &__description {
+        color: gray-text-color
+        font-weight: normal
+    }
+    &__tracked-msg {
+        p {
+            margin-top: 20px
+        }
+        ul {
+            list-style: none
+            margin-top: 20px
+            li {
+                display: inline-block
+                font-weight: bold
+            }
+            li:after {
+                content: ","
+                margin-right: 10px;
+            }
+            li:last-child:after {
+                content: ""
+            }
+        }
+    }
+    &__item {
+        display: inline-block;
+        overflow: hidden;
+        list-style: none;
+        margin-right: 44px;
+        margin-bottom: 20px;
+        vertical-align: top;
+    }
+    &__version {
+        list-style: none;
+        white-space: nowrap;
+        margin-top: 15px
+    }
+    &__number {
+        font-weight: bold;
+        display: box;
+    }
+    &__date {
+        color: gray;
+    }
+    &__versions {
+        margin-bottom: 22px
+        max-height: 200px
+        width: 100%
+        overflow: hidden   
+    }
+    &__buttons {
+        margin-top: 20px
+        & .track-button {
+            margin-right: 150px;
+            @media (max-width: 800px) {
+                margin-right: 30px;
+            }
+        }
+        & .button {
+            font-size: 30px;
+            line-height: 30px;
+        }
+    }
+}
+
+.package-select__track-button {
+}
+
+.package-select__track-button_tracked {
+}
+
+.package-select__track-button:hover {
+}
+
+.package-select__track-button_tracked:hover {
+}
+
+.package-select__ignore-button {
+    margin-left: 10px;
+}
+
+.package-select__ignore-button:hover {
+}
+
+
+.package-selector__empty-digest {
+    height: 200px;
+    > p {
+        font-size: 18px;
+        line-height: 22px;
+    }
+}
+
+.package-selector__login-plate > p {
+    font-size: 32px;
+    line-height: 48px;
+    margin-top: 22px;
+}

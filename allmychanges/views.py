@@ -376,6 +376,31 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
         return response
 
 
+class PackageSelectorVersionsView(CachedMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/landing-versions.html'
+
+    def get_cache_params(self, *args, **kwargs):
+        changelog = self.request.GET.get('changelog')
+        self.changelog = int(changelog)
+        cache_key = 'landing-versions-{changelog}'.format(changelog=changelog)
+        return cache_key, 4 * HOUR
+
+    def get_context_data(self, **kwargs):
+        result = super(PackageSelectorVersionsView, self).get_context_data(**kwargs)
+        changelog = Changelog.objects.get(pk=self.changelog)
+        versions = list(changelog.latest_versions(3))
+
+        result['package'] = dict(
+            namespace=changelog.namespace,
+            name=changelog.name,
+            versions=versions)
+        return result
+
+    def get(self, *args, **kwargs):
+        response = super(PackageSelectorVersionsView, self).get(*args, **kwargs)
+        return response
+
+
 class LoginView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/login.html'
 
@@ -522,6 +547,20 @@ class AfterLoginView(LoginRequiredMixin, RedirectView):
                                 user.track(changelog)
                             except Exception:
                                 log.trace().error('Unable to save landing package')
+
+            skipped_changelogs = parse_ints(self.request.COOKIES.get('skipped-changelogs', ''))
+            log.info('Cookie skipped-changelogs={0}'.format(skipped_changelogs))
+
+            if skipped_changelogs:
+                log.info('Merging skipped changelogs')
+
+                for changelog_id in skipped_changelogs:
+                    with log.fields(changelog_id=changelog_id):
+                        try:
+                            changelog = Changelog.objects.get(pk=changelog_id)
+                            user.skip(changelog)
+                        except Exception:
+                            log.trace().error('Unable to merge skipped changelog')
 
         return response
 
