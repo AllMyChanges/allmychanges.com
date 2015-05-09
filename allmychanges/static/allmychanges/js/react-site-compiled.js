@@ -1055,8 +1055,18 @@
 	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
 	                React.createElement("p", null, "You are following these packages:"), 
 	                React.createElement("ul", null, tracked), 
-	                React.createElement("p", null, "To receive notifications on future releases, please, login with ", React.createElement("a", {className: "button _good _large", href: "/login/github/"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"))
+	                React.createElement("p", null, "To receive notifications on future releases, please, login with ", React.createElement("a", {className: "button _good _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"))
 	            ));
+
+	            // when first package is tracked, scroll down
+	            // to show the buttons
+	            if (tracked.length == 1) {
+	                setTimeout(function() {
+	                    $('html, body').animate({
+	                        scrollTop: $("#package-selector__login-button-id").offset().top
+	                    }, 2000)
+	                }, 500);
+	            }
 	        }
 	                                        
 	        return (
