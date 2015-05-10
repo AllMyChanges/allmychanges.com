@@ -1115,7 +1115,10 @@
 	    React.createElement("div", {className: "package-selector__package"}, 
 	      React.createElement("h1", {className: "package-selector__title"}, React.createElement("a", {href: url}, this.props.namespace, "/", this.props.name)), 
 	      React.createElement("h2", {className: "package-selector__description"}, this.props.description), 
-	      React.createElement("iframe", {className: "package-selector__versions", src: "/package-selector-versions/?changelog=" + this.props.changelog_id}), 
+	      React.createElement("div", {className: "package-selector__versions-wrapper"}, 
+	        React.createElement("div", {className: "package-selector__versions-grad"}), 
+	        React.createElement("iframe", {className: "package-selector__versions", scrolling: "no", src: "/package-selector-versions/?changelog=" + this.props.changelog_id})
+	      ), 
 	      React.createElement("div", {className: "package-selector__buttons"}, 
 	        React.createElement(TrackButton, {changelog_id: this.props.changelog_id, num_trackers: false, on_track: on_track}), 
 	        React.createElement(SkipButton, {changelog_id: this.props.changelog_id, on_skip: this.props.skip_handler})
