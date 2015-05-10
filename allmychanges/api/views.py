@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from itertools import islice
 from twiggy_goodies.threading import log
 from urllib import urlencode
+from collections import defaultdict
 
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.exceptions import ParseError
@@ -338,18 +339,31 @@ class LandingPackageSuggestView(viewsets.ViewSet):
             skipped_changelogs = set(parse_ints(request.COOKIES.get('skipped-changelogs', '')))
 
         skip = tracked_changelogs | skipped_changelogs
-        changelogs = Changelog.objects.exclude(name=None).exclude(pk__in=skip).annotate(latest_date=Max('versions__discovered_at')).order_by('-latest_date')
+        tracked_namespaces = Changelog.objects.exclude(name=None).filter(pk__in=tracked_changelogs).values_list('namespace', flat=True)
+        skipped_namespaces = Changelog.objects.exclude(name=None).filter(pk__in=skipped_changelogs).values_list('namespace', flat=True)
+        scores = defaultdict(int)
+        for ns in tracked_namespaces:
+            scores[ns] += 1
+        for ns in skipped_namespaces:
+            scores[ns] -= 1
 
-        changelogs = (ch for ch in changelogs
-                      if ch.versions.filter(code_version='v2').count() > 0)
+        changelog_ids = list(Changelog.objects.only_active() \
+                                      .values_list('id', 'namespace'))
+        changelog_ids.sort(key=lambda item: scores.get(item[1], 0),
+                           reverse=True)
+        changelog_ids = (item for item in changelog_ids
+                         if item[0] not in skip)
 
-        changelogs = islice(changelogs, limit)
+        changelog_ids = [item[0]
+                         for item in islice(changelog_ids, limit)]
+
+        changelogs = Changelog.objects.filter(pk__in=changelog_ids)
 
         return Response({'results': [{'id': ch.id,
                                       'name': ch.name,
                                       'namespace': ch.namespace,
                                       'description': ch.description,
-                                      'versions': process_versions(ch.versions.filter(code_version='v2')[:versions_limit])}
+                                      'versions': process_versions(ch.versions.all()[:versions_limit])}
                                      for ch in changelogs]})
 
 
