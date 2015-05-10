@@ -73,7 +73,7 @@ module.exports = React.createClass({
             tracked_msg = (<div className="package-selector__tracked-msg">
                 <p>You are following these packages:</p>
                 <ul>{tracked}</ul>
-                <p>To receive notifications on future releases, please, login with&nbsp;<a className="button _good _large" href="/login/github/" id="package-selector__login-button-id"><i className="fa fa-github fa-lg"></i> GitHub</a> or <a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a></p>
+                <p>To receive notifications on future releases, please, <br/>login with&nbsp;<a className="button _green _large" href="/login/github/" id="package-selector__login-button-id"><i className="fa fa-github fa-lg"></i> GitHub</a> or <a className="button _blue _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a></p>
             </div>);
 
             // when first package is tracked, scroll down

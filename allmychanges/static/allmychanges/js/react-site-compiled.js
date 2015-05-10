@@ -1055,7 +1055,7 @@
 	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
 	                React.createElement("p", null, "You are following these packages:"), 
 	                React.createElement("ul", null, tracked), 
-	                React.createElement("p", null, "To receive notifications on future releases, please, login with ", React.createElement("a", {className: "button _good _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"))
+	                React.createElement("p", null, "To receive notifications on future releases, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"))
 	            ));
 
 	            // when first package is tracked, scroll down
