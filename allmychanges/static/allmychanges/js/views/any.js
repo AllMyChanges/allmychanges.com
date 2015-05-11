@@ -8,6 +8,16 @@ var Share = require('../components/share.js')
 var Notifications = require('../components/notifications.js')
 var FeedbackForm = require('../components/feedback-form.js')
 
+/* make introjs globally available */
+window.intro = require('../components/intro.js')
+
+$(document).ready(function() {
+    window.intro.push({'element': $(".magic-prompt")[0],
+                       'intro': 'Using this search bar, you could search for packages and add a source URLs.'
+                      }, 500);
+
+    setTimeout(window.intro.start, 15000);
+});
 
 module.exports = {
     render: function () {

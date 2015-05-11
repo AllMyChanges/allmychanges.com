@@ -11,6 +11,7 @@
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
     <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
     <link href="{% static 'angular/angucomplete-alt.css' %}" rel="stylesheet">
+    <link href="{% static 'bower_components/intro.js/introjs.css' %}" rel="stylesheet">
     {% endcompress %}
 
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
@@ -45,6 +46,8 @@
       <!-- этот pubsub используется в реактовских компонентах -->
       <script src="/static/bower_components/pubsub-js/src/pubsub.js" type="text/javascript" charset="utf-8"></script>
 
+      <!-- используем для привлечения внимания к элементам на странице -->
+      <script src="/static/bower_components/intro.js/intro.js" type="text/javascript" charset="utf-8"></script>
 
       <!-- старые ангуларовские вьюхи от которых надо избавиться -->
       <script src="/static/allmychanges/js/app.js" type="text/javascript" charset="utf-8"></script>
@@ -194,7 +197,7 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 {% endif %}
 
 {% compress js %}
-<script src="/static/allmychanges/js/react-site-compiled.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/allmychanges/js-compiled/react-site.js" type="text/javascript" charset="utf-8"></script>
 {% endcompress %}
 </body>
 </html>
