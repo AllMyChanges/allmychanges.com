@@ -112,6 +112,8 @@ class User(AbstractBaseUser):
                                 default='UTC')
     changelogs = models.ManyToManyField('Changelog', through='ChangelogTrack',
                                         related_name='trackers')
+    skips_changelogs = models.ManyToManyField('Changelog', through='ChangelogSkip',
+                                              related_name='skipped_by')
     moderated_changelogs = models.ManyToManyField('Changelog', through='Moderator',
                                                   related_name='moderators')
 
@@ -134,7 +136,7 @@ class User(AbstractBaseUser):
 
     def does_track(self, changelog):
         """Check if this user tracks given changelog."""
-        return self.changelogs.filter(pk=changelog.pk).count() == 1
+        return self.changelogs.filter(pk=changelog.id).exists()
 
     def track(self, changelog):
         if not self.does_track(changelog):
@@ -164,6 +166,10 @@ class User(AbstractBaseUser):
             ChangelogTrack.objects.filter(
                 user=self,
                 changelog=changelog).delete()
+
+    def does_skip(self, changelog):
+        """Check if this user skipped this changelog in package selector."""
+        return self.skips_changelogs.filter(pk=changelog.id).exists()
 
     def skip(self, changelog):
         if not self.does_skip(changelog):
@@ -494,8 +500,8 @@ class ChangelogTrack(models.Model):
 
 
 class ChangelogSkip(models.Model):
-    user = models.ForeignKey(User, related_name='skips_changelogs')
-    changelog = models.ForeignKey(Changelog, related_name='skipped_by_users')
+    user = models.ForeignKey(User)
+    changelog = models.ForeignKey(Changelog)
     created_at = models.DateTimeField(default=timezone.now)
 
 

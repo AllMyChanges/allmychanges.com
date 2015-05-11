@@ -6,7 +6,7 @@ module.exports = {
 
         if (element !== null) {
             React.render(
-                <PackageSelector url='/v1/landing-package-suggest/?limit=20&amp;versions_limit=5'/>,
+                <PackageSelector url='/v1/landing-package-suggest/?limit=1&amp;versions_limit=5'/>,
                 element);
         }
     }

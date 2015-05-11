@@ -68,22 +68,26 @@ module.exports = React.createClass({
                                 return (
             <li key={changelog.id}>{changelog.namespace}/{changelog.name}</li>);});
 
-        var tracked_msg;
+        var tracked_msg, login_msg;
+        if (username == '') {
+            login_msg = (<p>To receive notifications on future releases, please, <br/>login with&nbsp;<a className="button _green _large" href="/login/github/" id="package-selector__login-button-id"><i className="fa fa-github fa-lg"></i> GitHub</a> or <a className="button _blue _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a></p>);
+        }
+        
         if (tracked.length > 0) {
             tracked_msg = (<div className="package-selector__tracked-msg">
-                <p>You are following these packages:</p>
+                <p>You've followed these packages:</p>
                 <ul>{tracked}</ul>
-                <p>To receive notifications on future releases, please, <br/>login with&nbsp;<a className="button _green _large" href="/login/github/" id="package-selector__login-button-id"><i className="fa fa-github fa-lg"></i> GitHub</a> or <a className="button _blue _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a></p>
+                {login_msg}
             </div>);
 
             // when first package is tracked, scroll down
             // to show the buttons
-            if (tracked.length == 1) {
+            if (login_msg && tracked.length == 1) {
                 setTimeout(function() {
                     $('html, body').animate({
                         scrollTop: $("#package-selector__login-button-id").offset().top
                     }, 2000)
-                }, 500);
+                }, 200);
             }
         }
                                         

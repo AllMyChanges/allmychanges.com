@@ -63,7 +63,7 @@
 
 	        if (element !== null) {
 	            React.render(
-	                React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=20&versions_limit=5"}),
+	                React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"}),
 	                element);
 	        }
 	    }
@@ -1050,22 +1050,26 @@
 	                                return (
 	            React.createElement("li", {key: changelog.id}, changelog.namespace, "/", changelog.name));});
 
-	        var tracked_msg;
+	        var tracked_msg, login_msg;
+	        if (username == '') {
+	            login_msg = (React.createElement("p", null, "To receive notifications on future releases, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter")));
+	        }
+	        
 	        if (tracked.length > 0) {
 	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
-	                React.createElement("p", null, "You are following these packages:"), 
+	                React.createElement("p", null, "You've followed these packages:"), 
 	                React.createElement("ul", null, tracked), 
-	                React.createElement("p", null, "To receive notifications on future releases, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"))
+	                login_msg
 	            ));
 
 	            // when first package is tracked, scroll down
 	            // to show the buttons
-	            if (tracked.length == 1) {
+	            if (login_msg && tracked.length == 1) {
 	                setTimeout(function() {
 	                    $('html, body').animate({
 	                        scrollTop: $("#package-selector__login-button-id").offset().top
 	                    }, 2000)
-	                }, 500);
+	                }, 200);
 	            }
 	        }
 	                                        
