@@ -1,3 +1,33 @@
+0.24.0 (2015-05-11)
+===================
+
+Go Google Go!
+-------------
+
+Them main feature of this release is support for [Google Play](https://allmychanges.com/catalogue/#android) URLs.
+Find your favorite Android apps on Google Play, paste their URLs
+right into the AllMyChanges's search bar and subscribe on the
+release notes.
+
+Changelog Roulette
+------------------
+
+Secondary change we would like to introduce is a better and smarter changelog suggestion on the front
+page. Now it takes into account which packages did you track or skip in the past. There isn't machine
+learning behind yet, but now it is much more interesting to flip through different packages, viewing
+their latest release notes. Did I say you shoudl try it? No? Okay, [Go And Try It](https://allmychanges.com/)!
+
+Other Changes
+-------------
+
+* Now we have a [FAQ page](https://allmychanges.com/help/faq/).
+* Also, another help page was added – [Changelog Generators](https://allmychanges.com/help/changelog-generators/).
+  It should help you to keep better release notes spending less time writing them.
+* Few minor changes were introduced, like renaming of "Track" button into "Follow" button, etc..
+* Also site now uses gorgeous [Intro.js](https://allmychanges.com/p/javascript/intro.js/) to show tooltips
+  when you hang on a page for more than 15 seconds. We are thinking how to make this feature less annoying
+  and more helpful. If you have any ideas, please [share them][support-email] with us.
+
 0.23.0 (2015-04-22)
 ===================
 
@@ -787,7 +817,7 @@ setup.py uses setuptools.
 There are plenty directions for approvement. Stay tuned.
 
 [tools]: http://allmychanges.com/help/tools/
-[support-email]: mailto:help@allmychanges.com
+[support-email]: mailto:support@allmychanges.com
 [Celery]: http://www.celeryproject.org/
 [celery-3.1]: https://github.com/celery/celery/tree/3.1
 [sbcl]: http://allmychanges.com/p/common-lisp/sbcl/
