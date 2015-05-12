@@ -28,6 +28,7 @@ Other Changes
   when you hang on a page for more than 15 seconds. We are thinking how to make this feature less annoying
   and more helpful. If you have any ideas, please [share them][support-email] with us.
 
+
 0.23.0 (2015-04-22)
 ===================
 
