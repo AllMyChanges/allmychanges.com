@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
+	var PackageSelector = __webpack_require__(17)
 
 	module.exports = {
 	    render: function () {
@@ -92,7 +92,21 @@
 	                       'intro': 'Using this search bar, you could search for packages and add a source URLs.'
 	                      }, 500);
 
-	    setTimeout(window.intro.start, 15000);
+	    var intro_was_shown = false;
+	    var show_intro = function () {
+	        UserStory.log(["may be showing intro if [intro_was_shown=", intro_was_shown, "]"], ["intro.show"]);
+	        if (!intro_was_shown) {
+	            window.intro.start()
+	            intro_was_shown = true;
+	        }
+	    };
+
+	    UserStory.log(["setting idle timer"], ["intro.idle"]);
+	    window.intro_idle = new Idle({
+	        onAway : show_intro,
+	        awayTimeout : 15000
+	    });
+	    window.intro_idle.start();
 	});
 
 	module.exports = {
@@ -184,7 +198,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(17)
+	var Landing = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -1010,27 +1024,6 @@
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
-	    }
-	});
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var Package = __webpack_require__(20)
 	var metrika = __webpack_require__(19)
 
@@ -1130,6 +1123,27 @@
 	                tracked_msg
 	            )
 	        );
+	    }
+	});
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PackageSelector = __webpack_require__(17)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
 	    }
 	});
 

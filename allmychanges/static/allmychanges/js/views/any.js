@@ -16,7 +16,21 @@ $(document).ready(function() {
                        'intro': 'Using this search bar, you could search for packages and add a source URLs.'
                       }, 500);
 
-    setTimeout(window.intro.start, 15000);
+    var intro_was_shown = false;
+    var show_intro = function () {
+        // may be showing intro if [intro_was_shown] @intro.show
+        if (!intro_was_shown) {
+            window.intro.start()
+            intro_was_shown = true;
+        }
+    };
+
+    // setting idle timer @intro.idle
+    window.intro_idle = new Idle({
+        onAway : show_intro,
+        awayTimeout : 15000
+    });
+    window.intro_idle.start();
 });
 
 module.exports = {

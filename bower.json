@@ -23,6 +23,7 @@
     "waypoints": "~3.1.1",
     "react": "~0.13.2",
     "pubsub-js": "~1.5.2",
-    "intro.js": "~1.0.0"
+    "intro.js": "~1.0.0",
+    "idle.js": "~1.0.0"
   }
 }
