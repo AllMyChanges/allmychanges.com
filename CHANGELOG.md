@@ -1,3 +1,9 @@
+0.24.1 (2015-05-14)
+===================
+
+* Login via GitHub button was fixed at popup appearing after clicking on "Follow" button. Closes issue #30. Thanks to Denis Gladkikh (@outcoldman) for reporting.
+* Now tooltips are shown only after 15 seconds of inactivity at the page. More improvements are waiting in our roadmap.
+
 0.24.0 (2015-05-11)
 ===================
 
