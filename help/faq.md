@@ -91,6 +91,18 @@ When sources are downloaded, we are trying to find handwritten release notes usi
 
 If processors were not able to find handwritten release notes, then we start another processor which tries to group release notes around versions. Right now it works only for git repositories and cases when there are tags with version numbers or for python and npm packages where we know how to extract version numbers.
 
+How far back in time does it go? Looks like a few months or few versions.
+-------------------------------------------------------------------------
+
+For iOS apps, it downloads all versions which are available from AppStore. And keeps them forever.
+
+But for Google Play, it is only able to download a latest release description, so history starts
+from the point you add an app's URL into AllMyChanges.
+
+For other software, AllMyChanges parses release notes from the URL you gave, and all depends how
+many versions already there. But anyway, it keeps historical records even in case they will be deleted
+from original source.
+
 Why don't you extract information from GitHub Releases API?
 -----------------------------------------------------
 
