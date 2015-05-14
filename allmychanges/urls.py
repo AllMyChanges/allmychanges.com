@@ -12,6 +12,7 @@ from .views import (OldIndexView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
+                    RenderView,
                     SearchView,
                     DigestView,
                     LandingDigestView,
@@ -55,6 +56,7 @@ urlpatterns = patterns(
                               content_type='text/plain')),
 
     url(r'^search/$', SearchView.as_view(), name='search'),
+    url(r'^.*/snap/$', RenderView.as_view(), name='snap'),
 
     # TODO REMOVE THESE TWO
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),

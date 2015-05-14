@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import threading
 import datetime
 import anyjson
 import time
@@ -11,6 +12,7 @@ import markdown2
 
 from itertools import groupby
 from operator import itemgetter
+from hashlib import sha1
 from braces.views import (LoginRequiredMixin,
                           UserPassesTestMixin)
 from django.views.generic import (TemplateView,
@@ -1312,3 +1314,33 @@ class HelpView(CommonContextMixin, TemplateView):
         else:
             result['menu_help'] = True
         return result
+
+
+class RenderView(RedirectView):
+    permanent = False
+
+    def __init__(self, *args, **kwargs):
+        super(RenderView, self).__init__(*args, **kwargs)
+        self._browser = None
+        self._browser_lock = threading.Lock()
+
+    def get_redirect_url(self):
+        url = self.request.build_absolute_uri(self.request.path[:-5])
+        with log.name_and_fields('renderer', url=url):
+            log.info('Snapshot for url was requested')
+
+            filename = sha1(url).hexdigest() + '.png'
+            full_path = os.path.join(settings.SNAPSHOTS_ROOT, filename)
+            redirect_url = self.request.build_absolute_uri(
+                os.path.join(settings.SNAPSHOTS_URL, filename))
+
+            if not os.path.exists(full_path):
+                with self._browser_lock:
+                    if self._browser is None:
+                        log.info('Creating browser instance')
+                        from allmychanges.browser import Browser
+                        self._browser = Browser()
+                    log.info('Creating snapshot')
+                    self._browser.save_image(url, full_path, width=590)
+
+        return redirect_url

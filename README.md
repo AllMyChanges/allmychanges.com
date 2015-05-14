@@ -7,6 +7,7 @@ How to setup
 ------------
 
     $ sudo apt-get install mysql-server redis-server python-dev libxml2-dev libxslt1-dev logtail python-virtualenv python-pip python-mysqldb mercurial memcached libmemcached-tools
+    $ sudo apt-get install python-qt4 xvfb # to render changelog images
     $ chmod +x scripts/create-env.sh
     $ scripts/create-env.sh
     $ source env/bin/activate
