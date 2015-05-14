@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(17)
+	var PackageSelector = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -198,7 +198,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(18)
+	var Landing = __webpack_require__(17)
 
 	module.exports = {
 	    render: function () {
@@ -473,7 +473,7 @@
 	                    React.createElement("div", {className: "modal-popup__content modal-popup__please-login"}, 
 	                      React.createElement("p", null, "Good job! You\\'ve made first step, tracking this package."), 
 	                      React.createElement("p", null, "Now, to receive notifications about future updates, you need to login via:"), 
-	                      React.createElement("p", null, React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"))
+	                      React.createElement("p", null, React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/github/"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"))
 	                    )
 	                ));
 	        }
@@ -1024,6 +1024,27 @@
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var PackageSelector = __webpack_require__(18)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
+	    }
+	});
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var Package = __webpack_require__(20)
 	var metrika = __webpack_require__(19)
 
@@ -1123,27 +1144,6 @@
 	                tracked_msg
 	            )
 	        );
-	    }
-	});
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var PackageSelector = __webpack_require__(17)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
 	    }
 	});
 

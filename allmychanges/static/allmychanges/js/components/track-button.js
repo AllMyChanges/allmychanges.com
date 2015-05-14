@@ -54,7 +54,7 @@ module.exports = React.createClass({
                     <div className="modal-popup__content modal-popup__please-login">
                       <p>Good job! You\'ve made first step, tracking this package.</p>
                       <p>Now, to receive notifications about future updates, you need to login via:</p>
-                      <p><a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a> or <a className="button _good _large" href="/login/twitter/"><i className="fa fa-github fa-lg"></i> GitHub</a></p>
+                      <p><a className="button _good _large" href="/login/twitter/"><i className="fa fa-twitter fa-lg"></i> Twitter</a> or <a className="button _good _large" href="/login/github/"><i className="fa fa-github fa-lg"></i> GitHub</a></p>
                     </div>
                 </div>);
         }
