@@ -1,0 +1,12 @@
+{% extends "allmychanges/snap-base.html" %}
+{% load md2 %}
+{% load allmychanges_tags %}
+
+{% block content %}
+  <div class="package-changes">
+    <ul class="package-changes__version">
+      {% include "allmychanges/blocks/package-changes.html" %}
+    </ul>
+  </div>
+  </script>
+{% endblock content %}

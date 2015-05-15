@@ -9,6 +9,7 @@ from .views import (OldIndexView,
                     IssuesView,
                     HelpView,
                     IssueDetailView,
+                    SleepView,
                     IndexView,
                     UserHistoryView,
                     HumansView,
@@ -57,6 +58,7 @@ urlpatterns = patterns(
 
     url(r'^search/$', SearchView.as_view(), name='search'),
     url(r'^.*/snap/$', RenderView.as_view(), name='snap'),
+    url(r'^sleep/$', SleepView.as_view(), name='sleep'),
 
     # TODO REMOVE THESE TWO
     url(r'^old-index/$', OldIndexView.as_view(), name='old-index'),

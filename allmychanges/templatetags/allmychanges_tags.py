@@ -36,3 +36,7 @@ def replace_dots(value):
 def debug(value):
     import pdb; pdb.set_trace()  # DEBUG
     return value
+
+@register.filter
+def screenshot_url(request):
+    return request.build_absolute_uri(request.path) + 'snap/'

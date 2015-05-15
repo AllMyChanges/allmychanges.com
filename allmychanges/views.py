@@ -140,7 +140,8 @@ def get_package_data_for_template(changelog,
                                   limit_versions,
                                   after_date,
                                   code_version='v1',
-                                  ordering=None):
+                                  ordering=None,
+                                  show_unreleased=True):
     name = changelog.name
     namespace = changelog.namespace
 
@@ -161,7 +162,12 @@ def get_package_data_for_template(changelog,
                 unreleased_versions.append(version)
             else:
                 normal_versions.append(version)
-        versions_queryset = unreleased_versions + normal_versions
+
+        if show_unreleased:
+            versions_queryset = unreleased_versions + normal_versions
+        else:
+            # we need this to hide unreleased versions from screenshots
+            versions_queryset = normal_versions
     else:
         versions_queryset = versions_queryset[:limit_versions]
 
@@ -418,7 +424,10 @@ class LoginView(CommonContextMixin, TemplateView):
 
 
 class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
-    template_name = 'allmychanges/package.html'
+    def get_template_names(self):
+        if self.request.GET.get('snap'):
+            return 'allmychanges/package-snap.html'
+        return 'allmychanges/package.html'
 
     def last_modified(self, *args, **kwargs):
         discovered_versions = Version.objects.filter(
@@ -463,7 +472,8 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
             100,
             None,
             code_version=code_version,
-            ordering=('-order_idx',))
+            ordering=('-order_idx',),
+            show_unreleased=not self.request.GET.get('snap'))
 
         result['package'] = package_data
         result['login_to_track'] = login_to_track
@@ -1316,7 +1326,7 @@ class HelpView(CommonContextMixin, TemplateView):
         return result
 
 
-class RenderView(RedirectView):
+class RenderView(View):
     permanent = False
 
     def __init__(self, *args, **kwargs):
@@ -1324,15 +1334,16 @@ class RenderView(RedirectView):
         self._browser = None
         self._browser_lock = threading.Lock()
 
-    def get_redirect_url(self):
-        url = self.request.build_absolute_uri(self.request.path[:-5])
+    def get(self, request):
+        url = request.build_absolute_uri(request.path[:-5]) + '?snap=yes'
+
         with log.name_and_fields('renderer', url=url):
             log.info('Snapshot for url was requested')
 
             filename = sha1(url).hexdigest() + '.png'
             full_path = os.path.join(settings.SNAPSHOTS_ROOT, filename)
-            redirect_url = self.request.build_absolute_uri(
-                os.path.join(settings.SNAPSHOTS_URL, filename))
+            # redirect_url = request.build_absolute_uri(
+            #     os.path.join(settings.SNAPSHOTS_URL, filename))
 
             if not os.path.exists(full_path):
                 with self._browser_lock:
@@ -1343,4 +1354,19 @@ class RenderView(RedirectView):
                     log.info('Creating snapshot')
                     self._browser.save_image(url, full_path, width=590)
 
-        return redirect_url
+        with open(full_path, 'rb') as f:
+            content = f.read()
+
+        response = HttpResponse(content, content_type='image/png')
+        response['Content-Length'] = len(content)
+        return response
+
+
+class SleepView(RedirectView):
+    permanent = False
+
+    def get_redirect_url(self):
+        log.info('TEST SLEEP for 30 secs')
+        time.sleep(30)
+        log.info('TEST SLEEP for 30 secs DONE')
+        return '/sleep/'
