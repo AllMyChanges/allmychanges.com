@@ -495,8 +495,8 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
 
             print 'Showing card to twitter bot'
 #            image_url = 'https://pbs.twimg.com/media/CFG4AwSUgAAU0eH.jpg'
-            image_url = 'https://pbs.twimg.com/media/CFG3i1hWIAA6WbT.png'
-#            image_url = 'http://media.svetlyak.ru/gallery/120830/03-34-01.jpg'
+#            image_url = 'https://pbs.twimg.com/media/CFG3i1hWIAA6WbT.png'
+            image_url = 'http://media.svetlyak.ru/gallery/120830/03-34-01.jpg'
             twitter = dict(card='summary_large_image',
                            site='@allmychanges',
                            title=changelog.name + "'s release notes.",
