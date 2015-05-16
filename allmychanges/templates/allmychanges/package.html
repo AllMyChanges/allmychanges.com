@@ -7,13 +7,6 @@
 {{ block.super }}
 <meta content="{{package.name|title}}'s release notes.{% if package.description %} {{package.description}}{% endif %}" name="description"></meta>
 <meta content="{{package.namespace}},{{package.name}},changelog,version,latest,release notes,release" name="keywords"></meta>
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:site" content="@allmychanges">
-<meta name="twitter:title" content="{{package.name|title}}'s release notes.">
-<meta name="twitter:description" content="{% if package.description %}{{package.description}}{% else %}Latest versions{% endif %}">
-<meta name="twitter:image" content="{{request|screenshot_url}}">
-
-
 {% endblock %}
 
 {% block content %}

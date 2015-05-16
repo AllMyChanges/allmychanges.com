@@ -481,6 +481,35 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
         result['issues'] = changelog.issues.filter(resolved_at=None)
         result['num_trackers'] = changelog.trackers.count()
 
+        # twitter card
+        if self.request.META.get('HTTP_USER_AGENT', '').lower().startswith('twitterbot'):
+            # with open('static/shots/55a4a1916a5b747a15f5e43a5128f9e9f2abafd3.png', 'rb') as f:
+            #     from requests_oauthlib import OAuth1
+            #     auth = OAuth1('MqSwRY2fa3PC8rA8XrWmvBgcw', 'MAa8BU031BHCREoGOxNo8m8FvBm5Hj6D7zdVoHwQxnZHw632C5',
+            #                   '7148262-pv9vR4JJp76vmRL5Yn8XDG3mHYTOz0vLTMGTslY28K', 'OAg3N5mGSfPOX9U2juHz9xV1JtL6VDPoaDinU89sQwF75')
+            #     response = requests.post(
+            #         'https://upload.twitter.com/1.1/media/upload.json',
+            #         auth=auth,
+            #         files={'media': ('screenshot.png', f.read(), 'image/png')})
+            #     image_url = response.json()['media_id_string']
+
+            print 'Showing card to twitter bot'
+#            image_url = 'https://pbs.twimg.com/media/CFG4AwSUgAAU0eH.jpg'
+            image_url = 'https://pbs.twimg.com/media/CFG3i1hWIAA6WbT.png'
+#            image_url = 'http://media.svetlyak.ru/gallery/120830/03-34-01.jpg'
+            # twitter = dict(card='summary_large_image',
+            #                site='@allmychanges',
+            #                title=changelog.name + "'s release notes.",
+            #                description=changelog.description if changelog.description else 'Latest versions of ' + changelog.name,
+            #                image=image_url)
+            twitter = dict(card='photo',
+                           site='@allmychanges',
+                           title=changelog.name + "'s release notes.",
+                           image=image_url)
+            twitter['image:width'] = 600
+            twitter['image:height'] = 232
+            result['twitter_card'] = twitter
+
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
                              'package-view',

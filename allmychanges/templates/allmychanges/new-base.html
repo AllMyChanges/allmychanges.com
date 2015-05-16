@@ -4,7 +4,10 @@
 <head>
     <title>{% block html-title %}AllMyChanges.com, release notes tracker{% endblock %}</title>
     {% block top_of_head %}{% endblock top_of_head %}
-
+    {% if twitter_card %}
+      {% for name, content in twitter_card.items %}<meta name="twitter:{{name}}" content="{{content}}">
+      {% endfor %}
+    {% endif %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% compress css %}
