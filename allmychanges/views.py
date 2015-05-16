@@ -1326,15 +1326,16 @@ class HelpView(CommonContextMixin, TemplateView):
         return result
 
 
+_browser = None
+_browser_lock = threading.Lock()
+
+
 class RenderView(View):
     permanent = False
 
-    def __init__(self, *args, **kwargs):
-        super(RenderView, self).__init__(*args, **kwargs)
-        self._browser = None
-        self._browser_lock = threading.Lock()
-
     def get(self, request):
+        global _browser
+
         url = request.build_absolute_uri(request.path[:-5]) + '?snap=yes'
 
         with log.name_and_fields('renderer', url=url):
@@ -1346,13 +1347,13 @@ class RenderView(View):
             #     os.path.join(settings.SNAPSHOTS_URL, filename))
 
             if not os.path.exists(full_path):
-                with self._browser_lock:
-                    if self._browser is None:
+                with _browser_lock:
+                    if _browser is None:
                         log.info('Creating browser instance')
                         from allmychanges.browser import Browser
-                        self._browser = Browser()
+                        _browser = Browser()
                     log.info('Creating snapshot')
-                    self._browser.save_image(url, full_path, width=590)
+                    _browser.save_image(url, full_path, width=480)
 
         with open(full_path, 'rb') as f:
             content = f.read()
