@@ -494,20 +494,21 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
             #     image_url = response.json()['media_id_string']
 
             print 'Showing card to twitter bot'
+            image_url = self.request.build_absolute_uri(self.request.path) + 'snap/'
 #            image_url = 'https://pbs.twimg.com/media/CFG4AwSUgAAU0eH.jpg'
-            image_url = 'https://pbs.twimg.com/media/CFG3i1hWIAA6WbT.png'
+#            image_url = 'https://pbs.twimg.com/media/CFG3i1hWIAA6WbT.png'
 #            image_url = 'http://media.svetlyak.ru/gallery/120830/03-34-01.jpg'
-            # twitter = dict(card='summary_large_image',
-            #                site='@allmychanges',
-            #                title=changelog.name + "'s release notes.",
-            #                description=changelog.description if changelog.description else 'Latest versions of ' + changelog.name,
-            #                image=image_url)
-            twitter = dict(card='photo',
+            twitter = dict(card='summary_large_image',
                            site='@allmychanges',
                            title=changelog.name + "'s release notes.",
+                           description=changelog.description if changelog.description else 'Latest versions of ' + changelog.name,
                            image=image_url)
-            twitter['image:width'] = 600
-            twitter['image:height'] = 232
+            # twitter = dict(card='photo',
+            #                site='@allmychanges',
+            #                title=changelog.name + "'s release notes.",
+            #                image=image_url)
+            # twitter['image:width'] = 600
+            # twitter['image:height'] = 232
             result['twitter_card'] = twitter
 
         UserHistoryLog.write(self.request.user,
