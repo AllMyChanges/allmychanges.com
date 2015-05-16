@@ -42,6 +42,12 @@
 
   <div class="page-header__buttons"><a href="{% url "edit-package" namespace=namespace name=name %}" class="button" title="Tune namespace, name, source and other parameters for this changelog."><i class="fa fa-cog fa-lg" style="margin-right: 5px"></i>Tune</a> <a href="{{package.source|remove_source_prefix}}" class="button" title="Go to package's sources"><i class="fa fa-external-link-square fa-lg" style="margin-right: 5px"></i>Source</a> <div class="report-button" data-changelog-id="{{package.changelog.id}}"></div> <div class="track-button-container" data-changelog-id="{{package.changelog.id}}" data-tracked="{{already_tracked|lower}}" data-num-trackers="{{num_trackers}}"></div></div>
 
+  {% if request.GET.intent %}
+<script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
+<a href="https://twitter.com/intent/tweet?in_reply_to=599416629890576384">Reply</a>
+<a href="https://twitter.com/intent/retweet?tweet_id=599416629890576384">Retweet</a>
+<a href="https://twitter.com/intent/favorite?tweet_id=599416629890576384">Favorite</a>
+  {% endif %}
   <dl class="package-metadata">
     <!--dt>Badge for README:</dt>
     <dd>
