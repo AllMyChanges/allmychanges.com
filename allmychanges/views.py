@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import subprocess
 import threading
 import datetime
 import anyjson
@@ -450,8 +451,6 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
             result['show_sources'] = self.request.GET.get('show_sources', None)
 
         filter_args = {'code_version': code_version}
-
-        changelog = None
 
         changelog = get_object_or_404(
             Changelog.objects.prefetch_related('versions'),
@@ -1367,6 +1366,8 @@ class RenderView(View):
         global _browser
 
         url = request.build_absolute_uri(request.path[:-5]) + '?snap=yes'
+        if 'version' in request.GET:
+            url += '&version=' + request.GET['version']
 
         with log.name_and_fields('renderer', url=url):
             log.info('Snapshot for url was requested')
@@ -1377,13 +1378,18 @@ class RenderView(View):
             #     os.path.join(settings.SNAPSHOTS_URL, filename))
 
             if not os.path.exists(full_path):
-                with _browser_lock:
-                    if _browser is None:
-                        log.info('Creating browser instance')
-                        from allmychanges.browser import Browser
-                        _browser = Browser()
-                    log.info('Creating snapshot')
-                    _browser.save_image(url, full_path, width=480)
+                subprocess.check_call([settings.PROJECT_ROOT + '/makescreenshot',
+                                       url,
+                                       full_path,
+                                       '--width', '480',
+                                       '--height', '0'])
+                # with _browser_lock:
+                #     if _browser is None:
+                #         log.info('Creating browser instance')
+                #         from allmychanges.browser import Browser
+                #         _browser = Browser()
+                #     log.info('Creating snapshot')
+                #     _browser.save_image(url, full_path, width=480)
 
         with open(full_path, 'rb') as f:
             content = f.read()

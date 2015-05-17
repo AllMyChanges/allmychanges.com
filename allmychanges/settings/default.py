@@ -65,6 +65,8 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
 
+BASE_URL = 'http://skate.svetlyak.ru'
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
 MEDIA_ROOT = ''
@@ -213,6 +215,12 @@ EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 GITHUB_TOKEN = '6d7d8605f0d53f29b6e049267e8bcbc80577b27f'
 SLACK_URL = 'https://hooks.slack.com/services/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'
 KATO_URL = 'https://api.kato.im/rooms/1cade7d59009707e553d60bc9e0760f54dcb8d1f18544d5d2a4c4914998440c1/simple'
+
+# these are used to post tweets about new versions
+TWITTER_CREDS = ('KuAbS2vX9eM5fOrGJ2KPQm4gH',
+                 'kBkPXY0UuVmoCxHwY38SVkCL0dh5AJJdlNeJtrUgpQ9rBj6T1b',
+                 '3260479588-Fjoj5ATZHgepipegP2IxFTL675s2bVpfCzT3G3v',
+                 '6SeGn2urZzs2ztBuRLD4GdTVuejPx170uAoFEHMXgBfBl')
 
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8

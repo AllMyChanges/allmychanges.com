@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
 import requests
 import time
 import math
 import datetime
+import subprocess
 
-from hashlib import md5
+from hashlib import md5, sha1
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
@@ -767,7 +769,10 @@ class Version(models.Model):
                                     help_text=('This field is used to reorder versions '
                                                'according their version numbers and to '
                                                'fetch them from database efficiently.'))
-
+    tweet_id = models.CharField(max_length=1000,
+                                help_text=('Tweet id or None if we did not tweeted about this version yet.'),
+                                blank=True,
+                                null=True)
     objects = VersionManager()
 
     class Meta:
@@ -778,6 +783,49 @@ class Version(models.Model):
 
     def get_absolute_url(self):
         return self.changelog.get_absolute_url() + '#' + self.number
+
+    def post_tweet(self):
+        if self.unreleased:
+            raise RuntimeError('Unable to tweet about unreleased version')
+
+        ch = self.changelog
+        image_url = settings.BASE_URL + ch.get_absolute_url() \
+                    + '?snap=1&version=' + self.number
+        filename = sha1(image_url).hexdigest() + '.png'
+        full_path = os.path.join(settings.SNAPSHOTS_ROOT, filename)
+
+        print image_url, full_path
+        subprocess.check_call([
+            settings.PROJECT_ROOT + '/makescreenshot',
+            '--width', '590',
+            '--height', '600',
+            image_url,
+            full_path])
+
+        with open(full_path, 'rb') as f:
+            from requests_oauthlib import OAuth1
+            auth = OAuth1(*settings.TWITTER_CREDS)
+            response = requests.post(
+                'https://upload.twitter.com/1.1/media/upload.json',
+                auth=auth,
+                files={'media': ('screenshot.png',
+                                 f.read(), 'image/png')})
+            media_id = response.json()['media_id_string']
+
+            url = settings.BASE_URL + self.get_absolute_url()
+            text = '{0} of {1}/{2} was released: {3}'.format(
+                self.number, ch.namespace, ch.name, url)
+            response = requests.post(
+                'https://api.twitter.com/1.1/statuses/update.json',
+                auth=auth,
+                data={'status': text,
+                      'media_ids': media_id})
+            if response.status_code == 200:
+                self.tweet_id = response.json()['id_str']
+                self.save(update_fields=('tweet_id',))
+        return full_path
+
+
 
 
 ACTIVE_USER_ACTIONS = (

@@ -194,7 +194,8 @@ def count_time(metric_key):
 
 
 def show_debug_toolbar(request):
-    return True
+    if not request.GET.get('snap'):
+        return True
 
 
 def discard_seconds(dt):
