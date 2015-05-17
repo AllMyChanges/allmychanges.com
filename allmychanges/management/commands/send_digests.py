@@ -73,7 +73,6 @@ def send_digest_to(user, period='day'):
         send_to(user.email)
 
 
-
 class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
     period = 'day'
