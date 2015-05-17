@@ -187,7 +187,11 @@ def get_package_data_for_template(changelog,
                              show_discovered_as_well=show_discovered_as_well,
                              filename=version.filename,
                              processed_text=version.processed_text,
-                             unreleased=version.unreleased))
+                             unreleased=version.unreleased,
+                             tweet_id=version.tweet_id))
+
+    latest_version = changelog.latest_version() \
+                     if isinstance(changelog, Changelog) else None
 
     result = dict(namespace=namespace,
                   name=name,
@@ -199,7 +203,8 @@ def get_package_data_for_template(changelog,
                       updated_at=changelog.updated_at,
                       next_update_at=getattr(changelog, 'next_update_at', None),
                       problem=changelog.problem,
-                      obj=changelog
+                      obj=changelog,
+                      tweet_id=latest_version.tweet_id if latest_version else None,
                   ),
                   versions=versions)
     return result
