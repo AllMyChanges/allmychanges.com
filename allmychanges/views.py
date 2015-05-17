@@ -1412,3 +1412,19 @@ class SleepView(RedirectView):
         time.sleep(30)
         log.info('TEST SLEEP for 30 secs DONE')
         return '/sleep/'
+
+
+class TrackListView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/track-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TrackListView, self).get_context_data(**kwargs)
+        if self.request.user.is_authenticated():
+            changelogs = list(self.request.user.changelogs.exclude(name=None).order_by('namespace', 'name'))
+        else:
+            changelogs = []
+        context['changelogs'] = changelogs
+        if len(changelogs) <= 7:
+            namespaces = sorted(set(ch.namespace for ch in changelogs))
+            context['suggest_namespaces'] = namespaces
+        return context

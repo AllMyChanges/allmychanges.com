@@ -1,0 +1,25 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block content %}
+  <h1 class="page-header">You are tracking these packages</h1>
+
+  {% if changelogs %}
+    <ul class="track-list">
+    {% for changelog in changelogs %}
+      {% with latest_version=changelog.latest_version %}
+      <li class="track-list__item">
+        <h2 class="track-list__item-title"><a href="{{ changelog.get_absolute_url }}">{{ changelog.namespace }}/{{ changelog.name }}</a>{% if latest_version %} ({{latest_version.number }}){% endif %}</h2>
+        <p class="track-list__item-description">{% if changelog.description %}{{ changelog.description }}{% else %}Please <a href="{{ changelog.get_absolute_url }}edit/">enter</a> description.{% endif %}</p>
+      </li>
+      {% endwith %}
+    {% endfor %}
+    </ul>
+
+    {% if suggest_namespaces %}
+      <p>Hmm, you are following only few projects. Go and find more packages about {% for namespace in suggest_namespaces %}{% if not forloop.first %}{% if not forloop.last %}, {% else %} and {% endif %}{% endif %}<a href="/catalogue/#{{namespace}}">{{namespace}}</a>{% endfor %}.</p>
+    {% endif %}
+  {% else %}
+    <p>Hmm, there isn't any packages in your track list. Go and follow some in the <a href="/catalogue/">Catalogue</a>.</p>
+  {% endif %}
+  
+{% endblock content %}

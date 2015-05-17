@@ -1320,6 +1320,15 @@ a:hover {
   color: #808080;
   font: proxima-nova, sans-serif;
 }
+.track-list {
+  margin-left: 16px;
+}
+.track-list__item {
+  margin-bottom: 20px;
+}
+.track-list__item-description {
+  color: #777;
+}
 .tweet-button {
   display: inline-block;
   width: 75px;

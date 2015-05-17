@@ -18,6 +18,7 @@ module.exports = React.createClass({
                               title="Click to close a menu.">{this.props.username}</a>
                       <ul className="login-menu__items">
                         <li><a href="/account/settings/">Settings</a></li>
+                        <li><a href="/account/track-list/">Track list</a></li>
                         <li><a href="/logout/?next=/">Logout</a></li>
                       </ul>
                     </div>);

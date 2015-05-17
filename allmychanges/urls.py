@@ -8,6 +8,7 @@ admin.autodiscover()
 from .views import (OldIndexView,
                     IssuesView,
                     HelpView,
+                    TrackListView,
                     IssueDetailView,
                     SleepView,
                     IndexView,
@@ -104,6 +105,7 @@ urlpatterns = patterns(
     url(r'^for-ios/', LandingView.as_view(landings=['for-ios1']), name='landing-for-ios'),
 
     url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
+    url(r'^account/track-list/', TrackListView.as_view(), name='track-list'),
     url(r'^account/token/', TokenView.as_view(), name='token'),
     url(r'^accounts/login/', LoginView.as_view(), name='login'),
     url(r'^raise-exception/', RaiseExceptionView.as_view(), name='raise-exception'),
