@@ -788,13 +788,16 @@ class Version(models.Model):
         if self.unreleased:
             raise RuntimeError('Unable to tweet about unreleased version')
 
+        if self.tweet_id:
+            return # because we already posted a tweet
+
+
         ch = self.changelog
         image_url = settings.BASE_URL + ch.get_absolute_url() \
                     + '?snap=1&version=' + self.number
         filename = sha1(image_url).hexdigest() + '.png'
         full_path = os.path.join(settings.SNAPSHOTS_ROOT, filename)
 
-        print image_url, full_path
         subprocess.check_call([
             settings.PROJECT_ROOT + '/makescreenshot',
             '--width', '590',

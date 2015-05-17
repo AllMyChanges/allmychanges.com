@@ -349,3 +349,14 @@ def restart_old_appstore_batches():
 
     for pk in ids:
         process_appstore_batch.delay(pk)
+
+
+@job('default', timeout=60)
+@transaction.atomic
+def post_tweet(changelog_id=None):
+    """Делаем скриншот последней версии пакета.
+    """
+    from .models import Changelog
+    ch = Changelog.objects.get(pk=changelog_id)
+    v = ch.latest_version()
+    v.post_tweet()

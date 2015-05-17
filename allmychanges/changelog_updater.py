@@ -63,7 +63,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
     from allmychanges.models import Changelog
-    from allmychanges.tasks import notify_users_about_new_versions
+    from allmychanges.tasks import notify_users_about_new_versions, post_tweet
 
     code_version = 'v2'
     now = timezone.now()
@@ -148,6 +148,8 @@ def update_changelog_from_raw_data3(obj, raw_data):
     if new_versions_ids and isinstance(obj, Changelog):
         notify_users_about_new_versions.delay(
             obj.id, new_versions_ids)
+        post_tweet.delay(
+            changelog_id=obj.id)
 
 
 def update_preview_or_changelog(obj):
