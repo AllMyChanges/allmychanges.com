@@ -1,3 +1,52 @@
+0.25.0 (2015-05-18)
+===================
+
+This release includes two major features: "track list" page and "sharing like a pro".
+First one will let you checkout which packages you are followed and sencond one
+will make easier to share new releases to you friends on twitter.
+
+Track List
+----------
+
+A lot of users were asking this feature. They wanted to see a list of
+packages they are following on one page. Now this is possible.
+
+Open this page by clicking this item in a dropdown menu:
+
+![](https://img-fotki.yandex.ru/get/5606/13558447.f/0_b49c5_b956a514_M.png)
+
+In a list you will see packages with their descriptions and latest version numbers.
+All sorted alphabetically. If you have any ideas how to improve this page, please
+[tweet to @allmychanges][tweet-us].
+
+Share Like a Pro
+----------------
+
+Looking how often people are sharing pieces of release notes as a screenshots,
+we decided to implement Twitter Cards specification to show parts of a changelog
+as an image right in a twitter timeline.
+
+Sadly, but this does not work. Twitter hides images from twitter cards by default
+and you have to click on a tweet. So, we started a small research to find out a
+best way to share fresh release notes with your friends.
+
+And solution was found! Now, when our robot discovers a new version of a package,
+she makes it's screenshot and posts it as a tweet to a [@NewReleaseNotes][tw-new-release-notes]
+account.
+
+For versions which were twitted this way, we show standart "Tweet" button on
+web and email. Clicking on this button will open a new window where you can
+retweet the original post. And you friends will see this retweet with a
+screenshot of the changelog.
+
+If you don't like an idea to retweet, then just share a link to the changelog
+and twitter will show a twitter card for it.
+
+Finally
+-------
+
+Hey, are you still reading this? Go and test these new features!
+
 0.24.1 (2015-05-14)
 ===================
 
@@ -824,7 +873,6 @@ setup.py uses setuptools.
 There are plenty directions for approvement. Stay tuned.
 
 [tools]: http://allmychanges.com/help/tools/
-[support-email]: mailto:support@allmychanges.com
 [Celery]: http://www.celeryproject.org/
 [celery-3.1]: https://github.com/celery/celery/tree/3.1
 [sbcl]: http://allmychanges.com/p/common-lisp/sbcl/
@@ -841,3 +889,6 @@ There are plenty directions for approvement. Stay tuned.
 [Minecraft]: http://allmychanges.com/p/games/minecraft/
 [Unity]: http://allmychanges.com/p/sdk/unity/
 [Chrome]: http://allmychanges.com/p/soft/chrome/
+[support-email]: mailto:support@allmychanges.com
+[tweet-us]: https://twitter.com/intent/tweet?text=@allmychanges hey, guys, 
+[tw-new-release-notes]: https://twitter.com/NewReleaseNotes
