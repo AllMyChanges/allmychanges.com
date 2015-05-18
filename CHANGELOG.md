@@ -35,9 +35,19 @@ she makes it's screenshot and posts it as a tweet to a [@NewReleaseNotes][tw-new
 account.
 
 For versions which were twitted this way, we show standart "Tweet" button on
-web and email. Clicking on this button will open a new window where you can
-retweet the original post. And you friends will see this retweet with a
-screenshot of the changelog.
+web and email:
+
+![](https://img-fotki.yandex.ru/get/3301/13558447.f/0_b49c9_10c736a3_L.png)
+
+Clicking on this button will open a new window where you can
+retweet the original post:
+
+![](https://img-fotki.yandex.ru/get/6100/13558447.f/0_b49c7_b4541d65_L.png)
+
+And you friends will see this retweet with a
+screenshot of the changelog:
+
+![](https://img-fotki.yandex.ru/get/6100/13558447.f/0_b49c7_b4541d65_L.png)
 
 If you don't like an idea to retweet, then just share a link to the changelog
 and twitter will show a twitter card for it.
