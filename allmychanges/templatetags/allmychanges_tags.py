@@ -40,3 +40,10 @@ def debug(value):
 @register.filter
 def screenshot_url(request):
     return request.build_absolute_uri(request.path) + 'snap/'
+
+@register.filter
+def site_url(request):
+    if isinstance(request, basestring):
+        # probably called from email sender
+        return 'https://allmychanges.com/'
+    return request.build_absolute_uri('/')

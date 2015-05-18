@@ -1336,6 +1336,13 @@ a:hover {
   position: relative;
   top: 9px;
 }
+.tweet-button-small {
+  display: inline-block;
+  width: 55px;
+  height: 20px;
+  position: relative;
+  top: 5px;
+}
 .page {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 16px;

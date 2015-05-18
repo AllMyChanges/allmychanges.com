@@ -71,6 +71,9 @@ def send_digest_to(user, period='day'):
                        tags=['allmychanges', 'digest'])
 
         send_to(user.email)
+# for testing emails
+#        send_to('svetlyak.40wt@gmail.com')
+
 
 
 class Command(LogMixin, BaseCommand):
