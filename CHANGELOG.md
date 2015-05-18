@@ -47,7 +47,7 @@ retweet the original post:
 And you friends will see this retweet with a
 screenshot of the changelog:
 
-![](https://img-fotki.yandex.ru/get/6100/13558447.f/0_b49c7_b4541d65_L.png)
+![](https://img-fotki.yandex.ru/get/4210/13558447.f/0_b49c6_c18ea39e_L.png)
 
 If you don't like an idea to retweet, then just share a link to the changelog
 and twitter will show a twitter card for it.
