@@ -1384,10 +1384,10 @@ class RenderView(View):
 
             if not os.path.exists(full_path):
                 subprocess.check_call([settings.PROJECT_ROOT + '/makescreenshot',
+                                       '--width', '590',
+                                       '--height', '600',
                                        url,
-                                       full_path,
-                                       '--width', '480',
-                                       '--height', '0'])
+                                       full_path])
                 # with _browser_lock:
                 #     if _browser is None:
                 #         log.info('Creating browser instance')

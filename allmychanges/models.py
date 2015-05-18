@@ -816,8 +816,11 @@ class Version(models.Model):
             media_id = response.json()['media_id_string']
 
             url = settings.BASE_URL + self.get_absolute_url()
-            text = '{0} of {1}/{2} was released: {3}'.format(
-                self.number, ch.namespace, ch.name, url)
+            text = '{number} of {namespace}/{name} was released: {url} #{namespace} #release'.format(
+                number=self.number,
+                namespace=ch.namespace,
+                name=ch.name,
+                url=url)
             response = requests.post(
                 'https://api.twitter.com/1.1/statuses/update.json',
                 auth=auth,
