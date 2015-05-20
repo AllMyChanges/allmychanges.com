@@ -537,6 +537,7 @@ def rechttp_downloader(source,
     UPPER_LIMITS = {
         'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,
         'rechttp+http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
+        'rechttp+https://enterprise.github.com/releases': 1000,
     }
     upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
