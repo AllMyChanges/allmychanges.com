@@ -1207,20 +1207,29 @@ def get_cohort_for(date, span_months):
     return User.objects.filter(date_joined__range=
                                (date.date(), date.replace(months=span_months).date()))
 
+def expand_weeks(start, end):
+    date = start
+    while date < end:
+        yield date
+        date = date.replace(days=7)
 
 def get_cohort_stats(cohort, date):
     stats = []
     today = arrow.utcnow()
-    total = float(cohort.count())
 
     while date < today:
-        stats.append(cohort.filter(history_log__action__in=ACTIVE_USER_ACTIONS,
-                                   history_log__created_at__range=(
-                                       date.date(), date.replace(months=+1).date())) \
-                     .distinct().count())
-        date = date.replace(months=+1)
-    return [item / total if total else 0 for item in stats]
-
+        next_date = date.replace(days=7)
+        stats.append((date,
+                      cohort.filter(
+                          history_log__action__in=ACTIVE_USER_ACTIONS,
+                          history_log__created_at__range=(
+                              date.date(), next_date.date())) \
+                      .distinct().count()))
+        date = next_date
+    return stats
+    # total = float(cohort.count())
+    # return [(dt, item / total if total else 0)
+    #         for dt, item in stats]
 
 
 class AdminDashboardView(SuperuserRequiredMixin,
@@ -1258,9 +1267,12 @@ class AdminDashboardView(SuperuserRequiredMixin,
             idx = idx * span_months
             new_cohort = [dict(date=date.format('YYYY-MM-DD'),
                                value=0)
-                          for date in all_dates[:idx]]
-            for value, date in zip(cohort, all_dates[idx:]):
-                new_data = dict(value=value, date=date.format('YYYY-MM-DD'))
+                          for date in expand_weeks(
+                                  all_dates[0],
+                                  all_dates[idx])]
+            for date, value in cohort:
+                new_data = dict(value=value,
+                                date=date.format('YYYY-MM-DD'))
                 new_cohort.append(new_data)
             new_stats.append(new_cohort)
 
