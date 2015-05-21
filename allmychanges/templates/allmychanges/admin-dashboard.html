@@ -9,6 +9,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js" charset="utf-8"></script>
   <script src="{% static 'metricsgraphics/metricsgraphics.js' %}" type="text/javascript" charset="utf-8"></script>
 
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+
   <h1 class="page-header">{{ title }}</h1>
 
   <h2 class="page-subheader">Users, joined in last two weeks</h2>
@@ -43,8 +45,12 @@
 var data = {{ data|safe }};
 var data_legend = {{ data_legend|safe }};
 var markers = {{ markers|safe }};
+var series = [];
 
 for(var i=0;i<data.length;i++) {
+    var item = {"name": i,
+                "data": R.map(R.prop('value'), data[i])};
+    series.push(item);
     data[i] = MG.convert.date(data[i], 'date');
 }
 markers = MG.convert.date(markers, 'date');
@@ -72,4 +78,52 @@ MG.data_graphic({
 });
   </script>
 
+  <h2>Retention Highcharts</h2>
+  <div id="retention-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+  <script>
+    $(function () {
+    console.log('Creating chart');
+    $('#retention-graph').highcharts({
+        chart: {
+            type: 'area'
+        },
+        title: {
+            text: 'User Retention by Quater Cohorts'
+        },
+        xAxis: {
+            categories: data_legend,
+            tickmarkPlacement: 'on',
+            title: {
+                enabled: false
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Active users'
+            },
+            labels: {
+                formatter: function () {
+                    return this.value;
+                }
+            }
+        },
+        tooltip: {
+            shared: true,
+            valueSuffix: ' user'
+        },
+        plotOptions: {
+            area: {
+                stacking: 'normal',
+                lineColor: '#666666',
+                lineWidth: 1,
+                marker: {
+                    lineWidth: 1,
+                    lineColor: '#666666'
+                }
+            }
+        },
+        series: series
+    });
+});
+</script>
 {% endblock content %}
