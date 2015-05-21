@@ -1203,7 +1203,7 @@ import arrow
 from allmychanges.models import User, ACTIVE_USER_ACTIONS
 
 
-def get_cohort_for(date, span_months):
+def get_cohort_users(date, span_months):
     return User.objects.filter(date_joined__range=
                                (date.date(), date.replace(months=span_months).date()))
 
@@ -1213,23 +1213,29 @@ def expand_weeks(start, end):
         yield date
         date = date.replace(days=7)
 
-def get_cohort_stats(cohort, date):
+def get_cohort_stats(start_from, cohort):
+    """Возвращает новый словарь, добавляя к когорте поле data.
+    При этом data, это словарик, содержащий число активных пользователей
+    из этой когорты в прошедших неделях. Отсчет идет с даты start_from.
+    """
     stats = []
     today = arrow.utcnow()
+    cohort_starts_at = cohort['date']
 
+    date = start_from
     while date < today:
         next_date = date.replace(days=7)
-        stats.append((date,
-                      cohort.filter(
-                          history_log__action__in=ACTIVE_USER_ACTIONS,
-                          history_log__created_at__range=(
-                              date.date(), next_date.date())) \
-                      .distinct().count()))
+        if date >= cohort_starts_at:
+            active_users = cohort['users'].filter(
+                history_log__action__in=ACTIVE_USER_ACTIONS,
+                history_log__created_at__range=(
+                    date.date(), next_date.date())) \
+                                          .distinct().count()
+        else:
+            active_users = None
+        stats.append(active_users)
         date = next_date
-    return stats
-    # total = float(cohort.count())
-    # return [(dt, item / total if total else 0)
-    #         for dt, item in stats]
+    return dict(cohort, data=stats)
 
 
 class AdminDashboardView(SuperuserRequiredMixin,
@@ -1257,29 +1263,21 @@ class AdminDashboardView(SuperuserRequiredMixin,
         span_months = 3
         all_dates = arrow.Arrow.range('month', start_date, now)
         cohort_dates = all_dates[::span_months]
-        cohorts = [get_cohort_for(date, span_months)
+        cohorts = [{'date': date,
+                    'name': date.format('YYYY-MM-DD'),
+                    'span': span_months,
+                    'users': get_cohort_users(date, span_months)}
                    for date in cohort_dates]
 
-        stats = map(get_cohort_stats, cohorts, cohort_dates)
-        new_stats = []
+        stats = map(lambda cohort: get_cohort_stats(start_date, cohort),
+                    cohorts)
 
-        for idx, cohort in enumerate(stats):
-            idx = idx * span_months
-            new_cohort = [dict(date=date.format('YYYY-MM-DD'),
-                               value=0)
-                          for date in expand_weeks(
-                                  all_dates[0],
-                                  all_dates[idx])]
-            for date, value in cohort:
-                new_data = dict(value=value,
-                                date=date.format('YYYY-MM-DD'))
-                new_cohort.append(new_data)
-            new_stats.append(new_cohort)
-
-        limit = 8
-        result['data'] = anyjson.serialize(new_stats[-limit:])
+        stats = [dict(data=item['data'], name=item['name'])
+                 for item in stats]
+        result['data'] = anyjson.serialize(stats)
         data_legend = [dt.humanize() for dt in cohort_dates]
-        result['data_legend'] = anyjson.serialize(data_legend[-limit:])
+        result['data_legend'] = anyjson.serialize(data_legend)
+
         markers = [dict(date=dt.format('YYYY-MM-DD'),
                         label=dt.humanize()) for dt in cohort_dates]
         result['markers'] = anyjson.serialize(markers)

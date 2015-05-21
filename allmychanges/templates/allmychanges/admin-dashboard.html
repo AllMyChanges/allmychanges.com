@@ -37,63 +37,25 @@
   {% endif %}
 
   <h2 class="page-subheader">Retention</h2>
-  <div class="graphs"></div>
 
-  <div class="legend"></div>
-  <script>
-var data = {{ data|safe }};
-var data_legend = {{ data_legend|safe }};
-var markers = {{ markers|safe }};
-var series = [];
-
-for(var i=0;i<data.length;i++) {
-    var item = {"name": i,
-                "data": R.map(R.prop('value'), data[i])};
-    series.push(item);
-    data[i] = MG.convert.date(data[i], 'date');
-}
-markers = MG.convert.date(markers, 'date');
-
-<!-- var dt_format = d3.time.format("%Y-%m-%d"); -->
-<!-- for(var i=0; i < markers.length; i++) { -->
-<!--     markers[i][0] = dt_format.parse(markers[i][0]); -->
-<!-- } -->
-
-
-MG.data_graphic({
-  data: data,
-  legend: data_legend,
-  legend_target: ".legend",
-  markers: markers,
-  width: 800,
-  height: 400,
-  <!-- xax_count: 12, -->
-  xax_format: d3.time.format('%b'),
-  target: ".graphs",
-  x_accessor: "date",
-  y_accessor: "value",
-  interpolate: "linear",
-  full_width: true
-});
-  </script>
-
-  <h2>Retention Highcharts</h2>
   <div id="retention-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
   <script>
+    var series = {{ data|safe }};
+    var data_legend = R.map(R.prop('name'), series);
+
     $(function () {
-    console.log('Creating chart');
     $('#retention-graph').highcharts({
         chart: {
             type: 'area'
         },
         title: {
-            text: 'User Retention by Quater Cohorts'
+            text: 'Quater Cohorts Retention'
         },
         xAxis: {
             categories: data_legend,
             tickmarkPlacement: 'on',
             title: {
-                enabled: false
+                text: 'Weeks in past'
             }
         },
         yAxis: {
@@ -112,12 +74,19 @@ MG.data_graphic({
         },
         plotOptions: {
             area: {
+                pointStart: - series[0].data.length,
                 stacking: 'normal',
                 lineColor: '#666666',
                 lineWidth: 1,
                 marker: {
+                    enabled: false,
                     lineWidth: 1,
-                    lineColor: '#666666'
+                    lineColor: '#666666',
+                    states: {
+                        hover: {
+                            enabled: true
+                        }
+                    }
                 }
             }
         },
