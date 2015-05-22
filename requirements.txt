@@ -41,7 +41,7 @@ python-openid==2.2.5  # requirements.in:16 ~> python-social-auth==0.1.26
 python-social-auth==0.1.26  # requirements.in:16
 pytz==2014.10  # requirements.in:20 ~> twiggy-goodies==0.5.0
 requests-oauthlib==0.4.2  # requirements.in:16 ~> python-social-auth==0.1.26
-requests==2.5.1  # requirements.in:16 ~> python-social-auth==0.1.26
+requests==2.7.0  # requirements.in:16 ~> python-social-auth==0.1.26
 rq==0.4.6  # requirements.in:10 and requirements.in:11 ~> django-rq==0.7.0
 setuptools==12.0.5  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32 ~> pyopenssl==0.14 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2 and requirements.in:32 ~> pyopenssl==0.14 ~> cryptography==0.7.2
 six==1.9.0  # requirements.in:31 ~> ndg-httpsclient==0.3.3 and requirements.in:32 ~> pyopenssl==0.14 and requirements.in:32 ~> pyopenssl==0.14
