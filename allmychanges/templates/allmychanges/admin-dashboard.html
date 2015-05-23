@@ -28,6 +28,7 @@
       <td><a href="{% url 'user-history' username=user.username %}">{{user.username}}</a></td>
       <td>{{user.email}}</td>
       <td>{{user.num_changelogs}}</td>
+      <td>{{user.auth_providers|join:", "}}</td>
     </tr>
     {% endfor %}
   </table>

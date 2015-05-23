@@ -1251,10 +1251,12 @@ class AdminDashboardView(SuperuserRequiredMixin,
         period = int(self.request.GET.get('period', 14))
         period = timezone.now() - datetime.timedelta(period)
 
-        users = User.objects \
+        users = list(User.objects \
                     .filter(date_joined__gte=period) \
                     .order_by('-date_joined') \
-                    .annotate(num_changelogs=Count('changelogs'))
+                    .annotate(num_changelogs=Count('changelogs')))
+        for user in users:
+            user.auth_providers = user.social_auth.all().values_list('provider', flat=True)
         result['users'] = users
 
         # calculating cohorts for retention graphs
