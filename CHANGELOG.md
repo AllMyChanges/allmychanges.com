@@ -1,3 +1,36 @@
+0.26.0 (2015-05-24)
+===================
+
+Many of you were begging us to make AllMyChanges work with
+GitHub's releases API. And now this feature was implemented.
+
+Among 700 packages in our database, only 500 are hosted at
+the GitHub and 100 of them are using GitHub's Releases.
+Now for all of these projects we can provide even better
+release notes.
+
+Here is piece of [ramda.js's][ramdajs] release notes collected
+from git commit messages:
+
+![](https://img-fotki.yandex.ru/get/9799/13558447.f/0_b4b95_eccbe71f_L.pn)
+
+It is amazing how hand-written release notes are better:
+
+![](https://img-fotki.yandex.ru/get/5103/13558447.f/0_b4b94_6c99f0d5_L.png)
+
+And they are available for 20% of projects, hosted at the GitHub now.
+
+Subscribe on them at AllMyChanges and we'll deliver new release right
+into you mail box.
+
+Other visible changes
+---------------------
+
+* Now we allow embedded video players in release notes.
+* `<br>` tags were fixed  in sanitizer.
+* Screenshots published into the twitter [@NewReleaseNotes][tw-new-release-notes]
+  were improved.
+
 0.25.0 (2015-05-18)
 ===================
 
