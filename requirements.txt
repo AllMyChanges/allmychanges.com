@@ -3,6 +3,7 @@
 -e git+git://github.com/svetlyak40wt/django-sendmail-backend@ce08fe6af41f5e9ef6d88e9aec11fe5798a145d6#egg=django-sendmail-backend  # requirements.in:37
 -e git+git://github.com/svetlyak40wt/logster.git@1aaf0732b49c384130a0e27dd27f66098b1b285f#egg=logster  # requirements.in:36
 -e git+git://github.com/trentm/python-markdown2@596d48b4279259561ca96329538c65de4c00edde#egg=python-markdown2  # requirements.in:39
+
 anyjson==0.3.3  # requirements.in:17
 arrow==0.5.0  # requirements.in:18 ~> times==0.7
 bleach==1.4.1  # requirements.in:27
@@ -51,3 +52,4 @@ sphinx==1.2.3  # requirements.in:26
 times==0.7  # requirements.in:18
 twiggy-goodies==0.5.0  # requirements.in:20
 twiggy==0.4.5  # requirements.in:20 ~> twiggy-goodies==0.5.0
+closeio==0.1

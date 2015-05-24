@@ -31,6 +31,7 @@ plumbum
 ndg-httpsclient
 pyOpenSSL
 orderedset
+closeio
 
 git+git://github.com/svetlyak40wt/django-oauth-toolkit
 git+git://github.com/svetlyak40wt/logster.git@allmychanges
