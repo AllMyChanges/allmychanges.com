@@ -369,12 +369,22 @@ def github_releases_downloader(source,
                 if releases:
                     for release in releases:
                         if not release.get('draft'):
-                            title =(release['name'],
-                                    release['tag_name'],
-                                    release['published_at'])
+                            name = release.get('name', '')
+                            tag = release.get('tag_name', '').strip('v')
+                            # если тег совпадает с названием, то не надо
+                            # добавлять лишнего подзаголовка
+                            if name == tag:
+                                name = None
+
+                            title =(tag, release['published_at'])
                             title = filter(None, (item.strip() for item in title))
                             f.write(u' '.join(title))
                             f.write('\n===============\n\n')
+
+                            if name:
+                                f.write(name)
+                                f.write('\n-----------\n\n')
+
                             f.write(release['body'])
                             f.write('\n\n')
         except:
