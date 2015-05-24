@@ -17,6 +17,8 @@ def create(user):
     """Добавляет нашего пользователя в CRM базу."""
     emails = []
     if user.email:
+        # добавляем, как office, а для вручную добавленного email
+        # проставляем home
         emails.append(dict(email=user.email, type='office'))
 
     tracks = _get_user_tracks(user)
@@ -62,6 +64,7 @@ def update(user, crm_user):
         'custom.LastLogin': _format_date(user.last_login),
         'custom.Changelogs': u', '.join(tracks) or None,
         'custom.NumChangelogs': len(tracks),
+        'custom.SendDigests': user.send_digest or 'not given',
     }
     api = Client(settings.CLOSEIO_KEY)
     api.put('lead/' + crm_user['id'], data=data)
