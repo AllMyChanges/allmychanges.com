@@ -457,6 +457,10 @@ def get_github_api_url(username, repo, handle):
             handle=handle, username=username,  repo=repo)
 
 
+def get_github_auth_headers():
+    return {'Authorization': 'token ' + settings.GITHUB_TOKEN}
+
+
 def git_guesser(source):
     from allmychanges.models import DESCRIPTION_LENGTH
     name = None
@@ -467,7 +471,8 @@ def git_guesser(source):
     api_url = get_github_api_url(username, repo, '')
 
     if api_url:
-        response = requests.get(api_url.rstrip('/'))
+        response = requests.get(api_url.rstrip('/'),
+                                headers=get_github_auth_headers())
         data = response.json()
         try:
             name = data['name']
@@ -731,7 +736,8 @@ def get_github_releases(username, repo):
     api_url = get_github_api_url(username, repo, 'releases')
     if api_url:
         with log.name_and_fields('downloader.github', url=api_url):
-            response = requests.get(api_url)
+            response = requests.get(api_url,
+                                    headers=get_github_auth_headers())
             if response.status_code != 200:
                 with log.fields(status_code=response.status_code):
                     log.error('Bad status code from GitHub')
