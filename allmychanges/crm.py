@@ -24,7 +24,8 @@ def create(user):
               'Profile': 'https://allmychanges.com/u/{0}/'.format(user.username),
               'Joined': _format_date(user.date_joined),
               'LastLogin': _format_date(user.last_login),
-              'Changelogs': u', '.join(tracks),}
+              'Changelogs': u', '.join(tracks),
+              'NumChangelogs': len(tracks)}
 
     auth_templates = {'twitter': ('Twitter', 'https://twitter.com/{username}'),
                       'github': ('GitHub', 'https://github.com/{username}/')}
@@ -60,6 +61,7 @@ def update(user, crm_user):
         'custom.Joined': _format_date(user.date_joined), # убрать после ручного запуска
         'custom.LastLogin': _format_date(user.last_login),
         'custom.Changelogs': u', '.join(tracks),
+        'custom.NumChangelogs': len(tracks),
     }
     api = Client(settings.CLOSEIO_KEY)
     api.put('lead/' + crm_user['id'], data=data)
