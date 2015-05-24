@@ -738,8 +738,13 @@ def get_github_releases(username, repo):
         with log.name_and_fields('downloader.github', url=api_url):
             response = requests.get(api_url,
                                     headers=get_github_auth_headers())
-            if response.status_code != 200:
-                with log.fields(status_code=response.status_code):
+            status_code = response.status_code
+
+            if status_code == 404:
+                return
+
+            if status_code != 200:
+                with log.fields(status_code=status_code):
                     log.error('Bad status code from GitHub')
                 raise RuntimeError('Bad status code from GitHub')
             data = response.json()
