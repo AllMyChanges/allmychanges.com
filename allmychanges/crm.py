@@ -4,13 +4,27 @@ from closeio_api import Client
 from django.conf import settings
 
 
+def _format_date(dt):
+    return dt.strftime(u'%Y-%m-%dT%H:%M:%S')
+
+def _get_user_tracks(user):
+    tracks = user.changelogs.all().values_list('namespace', 'name')
+    tracks = sorted(list(tracks))
+    return map(u'{0[0]}/{0[1]}'.format, tracks)
+
+
 def create(user):
     """Добавляет нашего пользователя в CRM базу."""
     emails = []
     if user.email:
         emails.append(dict(email=user.email, type='office'))
+
+    tracks = _get_user_tracks(user)
     custom = {'Login': user.username,
-              'Profile': 'https://allmychanges.com/u/{0}/'.format(user.username)}
+              'Profile': 'https://allmychanges.com/u/{0}/'.format(user.username),
+              'Joined': _format_date(user.date_joined),
+              'LastLogin': _format_date(user.last_login),
+              'Changelogs': u', '.join(tracks),}
 
     auth_templates = {'twitter': ('Twitter', 'https://twitter.com/{username}'),
                       'github': ('GitHub', 'https://github.com/{username}/')}
@@ -40,8 +54,15 @@ def get(user):
         return results['data'][0]
 
 
-def update(user):
-    pass
+def update(user, crm_user):
+    tracks = _get_user_tracks(user)
+    data = {
+        'custom.Joined': _format_date(user.date_joined), # убрать после ручного запуска
+        'custom.LastLogin': _format_date(user.last_login),
+        'custom.Changelogs': u', '.join(tracks),
+    }
+    api = Client(settings.CLOSEIO_KEY)
+    api.put('lead/' + crm_user['id'], data=data)
 
 
 def sync(user):
@@ -50,4 +71,4 @@ def sync(user):
     if crm_user is None:
         create(user)
     else:
-        update(user)
+        update(user, crm_user)
