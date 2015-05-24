@@ -1,4 +1,5 @@
 # coding: utf-8
+import codecs
 import urlparse
 import anyjson
 import tempfile
@@ -351,6 +352,37 @@ def git_downloader(source,
 
     return path
 
+
+def github_releases_downloader(source,
+                                search_list=[],
+                                ignore_list=[]):
+    url, username, repo = normalize_url(source)
+    releases = get_github_releases(username, repo)
+
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    with cd(path):
+        try:
+            with codecs.open(
+                    os.path.join(path, 'ChangeLog.md'),
+                    'w',
+                    'utf-8') as f:
+                if releases:
+                    for release in releases:
+                        if not release.get('draft'):
+                            title =(release['name'],
+                                    release['tag_name'],
+                                    release['published_at'])
+                            title = filter(None, (item.strip() for item in title))
+                            f.write(u' '.join(title))
+                            f.write('\n===============\n\n')
+                            f.write(release['body'])
+                            f.write('\n\n')
+        except:
+            shutil.rmtree(path)
+            raise
+    return path
+
+
 def hg_downloader(source,
                   search_list=[],
                   ignore_list=[]):
@@ -409,14 +441,10 @@ def google_play_guesser(source):
                 icon=icon)
 
 
-def get_github_api_url(base_url, handle):
-    match = re.match("^https?://github.com/(?P<repo>[^/]+)/(?P<username>[^/]+)",
-                    base_url)
-    if match is not None:
-        data = match.groupdict()
-        data["handle"] = handle
-        return "https://api.github.com/repos/{repo}/{username}/{handle}".format(
-            **data)
+def get_github_api_url(username, repo, handle):
+    if username and repo:
+        return "https://api.github.com/repos/{username}/{repo}/{handle}".format(
+            handle=handle, username=username,  repo=repo)
 
 
 def git_guesser(source):
@@ -424,7 +452,10 @@ def git_guesser(source):
     name = None
     namespace = None
     description = None
-    api_url = get_github_api_url(source, '')
+
+    source, username, repo = normalize_url(source)
+    api_url = get_github_api_url(username, repo, '')
+
     if api_url:
         response = requests.get(api_url.rstrip('/'))
         data = response.json()
@@ -443,6 +474,8 @@ def git_guesser(source):
     return dict(namespace=namespace,
                 name=name,
                 description=description)
+
+github_releases_guesser = git_guesser
 
 
 def google_play_downloader(source,
@@ -684,6 +717,18 @@ def rechttp_downloader(source,
     return base_path
 
 
+def get_github_releases(username, repo):
+    api_url = get_github_api_url(username, repo, 'releases')
+    if api_url:
+        with log.name_and_fields('downloader.github', url=api_url):
+            response = requests.get(api_url)
+            if response.status_code != 200:
+                with log.fields(status_code=response.status_code):
+                    log.error('Bad status code from GitHub')
+                raise RuntimeError('Bad status code from GitHub')
+            data = response.json()
+        return data
+
 
 def guess_downloader(url):
     parts = urlsplit(url)
@@ -697,6 +742,11 @@ def guess_downloader(url):
     if parts.hostname == 'github.com':
         url, username, repo = normalize_url(url)
         if username and repo:
+            # first wi'll check for release
+            releases = get_github_releases(username, repo)
+            if releases:
+                return 'github_releases'
+
             # then we sure it is a git repo
             # otherwise, we have to try downloaders one after another
             return 'git'
