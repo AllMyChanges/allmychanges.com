@@ -733,6 +733,18 @@ def get_github_releases(username, repo):
 def guess_downloader(url):
     parts = urlsplit(url)
 
+    start_map = {'test+': 'fake',
+                 'rechttp+': 'rechttp',
+                 'git+': 'git',
+                 'http+': 'http',
+                 'gh-releases+': 'github_releases',
+                 'github-releases+': 'github_releases',
+                 'github_releases+': 'github_releases'}
+
+    for prefix, downloader in start_map.items():
+        if url.startswith(prefix):
+            return downloader
+
     if parts.hostname == 'itunes.apple.com':
         return 'itunes'
 
@@ -750,12 +762,6 @@ def guess_downloader(url):
             # then we sure it is a git repo
             # otherwise, we have to try downloaders one after another
             return 'git'
-
-    if url.startswith('test+'):
-        return 'fake'
-
-    if url.startswith('rechttp+'):
-        return 'rechttp'
 
     downloaders = [('git', git_downloader),
                    ('hg', hg_downloader),
