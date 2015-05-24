@@ -369,8 +369,8 @@ def github_releases_downloader(source,
                 if releases:
                     for release in releases:
                         if not release.get('draft'):
-                            name = release.get('name', '')
-                            tag = release.get('tag_name', '').strip('v')
+                            name = release.get('name', '').lstrip('v')
+                            tag = release.get('tag_name', '').lstrip('v')
                             # если тег совпадает с названием, то не надо
                             # добавлять лишнего подзаголовка
                             if name == tag:
@@ -385,7 +385,8 @@ def github_releases_downloader(source,
                                 f.write(name)
                                 f.write('\n-----------\n\n')
 
-                            f.write(release['body'])
+                            body = re.sub(ur'^# ', u'## ', release['body'])
+                            f.write(body)
                             f.write('\n\n')
         except:
             shutil.rmtree(path)
