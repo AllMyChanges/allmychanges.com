@@ -18,7 +18,7 @@ It is amazing how hand-written release notes are better:
 
 ![](https://img-fotki.yandex.ru/get/5103/13558447.f/0_b4b94_6c99f0d5_L.png)
 
-And they are available for 20% of projects, hosted at the GitHub now.
+And GitHub Releases are available for 20% of projects, hosted at the GitHub now.
 
 Subscribe on them at AllMyChanges and we'll deliver new release right
 into you mail box.
