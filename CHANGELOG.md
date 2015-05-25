@@ -9,7 +9,7 @@ the GitHub and 100 of them are using GitHub's Releases.
 Now for all of these projects we can provide even better
 release notes.
 
-Here is piece of [ramda.js's][ramdajs] release notes collected
+Here is piece of [libsass's][libsass] release notes collected
 from git commit messages:
 
 ![](https://img-fotki.yandex.ru/get/9799/13558447.f/0_b4b95_eccbe71f_L.pn)
@@ -935,3 +935,4 @@ There are plenty directions for approvement. Stay tuned.
 [support-email]: mailto:support@allmychanges.com
 [tweet-us]: https://twitter.com/intent/tweet?text=@allmychanges hey, guys, 
 [tw-new-release-notes]: https://twitter.com/NewReleaseNotes
+[libsass]: https://allmychanges.com/p/c%2B%2B/libsass/
