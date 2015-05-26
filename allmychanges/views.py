@@ -793,10 +793,22 @@ class UserHistoryView(SuperuserRequiredMixin,
     def get_context_data(self, **kwargs):
         result = super(UserHistoryView, self).get_context_data(**kwargs)
         user = User.objects.get(username=kwargs['username'])
+
+        h = user.history_log.all()
+        if self.request.GET.get('all') is None:
+            h = h.filter(action__in=ACTIVE_USER_ACTIONS)
+
+        grouped = groupby(h, lambda item: item.created_at.date())
+        count = lambda iterable: sum(1 for item in iterable)
+        timestamp = lambda dt: arrow.get(dt).timestamp
+        grouped = dict((str(timestamp(key)), count(item)) for key, item in grouped)
+
+        result['activity_heat_map'] = grouped
+
         result['log'] = UserHistoryLog.objects \
                                       .filter(user=user) \
                                       .prefetch_related('user') \
-                                      .order_by('-id')
+                                      .order_by('-id')[:20]
 
         def get_changelog_url(match):
             try:

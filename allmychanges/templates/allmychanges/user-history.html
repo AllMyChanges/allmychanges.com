@@ -3,8 +3,28 @@
 {% block login-plate %}{% endblock %}
 
 {% block content %}
-  <div class="box box_coming-soon">
-    <h1 class="page-header page-header_coming-soon">User history</h1>
+  <!-- для отображения загруженности ангажированности пользователя -->
+  <script src="/static/bower_components/d3/d3.js" type="text/javascript" charset="utf-8"></script>
+  <script src="/static/bower_components/cal-heatmap/cal-heatmap.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="/static/bower_components/cal-heatmap/cal-heatmap.css" />
+
+  <h1 class="page-header">User activity</h1>
+  <div id="cal-heatmap"></div>
+
+  <script type="text/javascript">
+    var cal = new CalHeatMap();
+    var activity_heat_map = {{activity_heat_map|safe}};
+    var year_ago = new Date();
+    year_ago.setFullYear(year_ago.getFullYear() - 1);
+
+    cal.init({domain: 'month',
+              subDomain: 'day',
+              tooltip: true,
+              start: year_ago,
+              data: activity_heat_map});
+  </script>
+
+    <h1 class="page-header">User history</h1>
     <table class="user-history table">
       <thead>
       <tr>
@@ -28,5 +48,4 @@
       {% endfor %}
       </tbody>
     </table>
-  </div>
 {% endblock content %}
