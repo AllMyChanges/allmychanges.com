@@ -71,7 +71,7 @@
     {% endif %}
     {% if show_issues and issues.count %}
       <dt>Issues:</dt>
-      <dd><a href="/issues/?namespace={{package.namespace}}&amp;name={{package.name}}">{{issues.count}}</a></dd>
+      <dd><a href="/issues/?namespace={{package.namespace|urlencode}}&amp;name={{package.name|urlencode}}">{{issues.count}}</a></dd>
     {% endif %}
       <dt>Versions:</dt>
       <dd>
