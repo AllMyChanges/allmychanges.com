@@ -785,6 +785,9 @@ class Version(models.Model):
         return self.changelog.get_absolute_url() + '#' + self.number
 
     def post_tweet(self):
+        if not settings.TWITTER_CREDS:
+            return
+
         if self.unreleased:
             raise RuntimeError('Unable to tweet about unreleased version')
 

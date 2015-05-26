@@ -35,7 +35,7 @@ def test_guesser():
 
 
 def test_guesser_called_during_the_changelog_download():
-    ch = Changelog.objects.create(source='https://github.com/svetlyak40wt/django-fields')
+    ch = Changelog.objects.create(source='https://github.com/svetlyak40wt/django-perfect404')
     eq_(None, ch.downloader)
 
     path = ch.download()

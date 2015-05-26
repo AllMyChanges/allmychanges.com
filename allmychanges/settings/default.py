@@ -218,10 +218,7 @@ KATO_URL = 'https://api.kato.im/rooms/1cade7d59009707e553d60bc9e0760f54dcb8d1f18
 CLOSEIO_KEY = '34c5992096c7f67bd5d22f24e4e87a5837f58af5f326f2cdfda932d4'
 
 # these are used to post tweets about new versions
-TWITTER_CREDS = ('KuAbS2vX9eM5fOrGJ2KPQm4gH',
-                 'kBkPXY0UuVmoCxHwY38SVkCL0dh5AJJdlNeJtrUgpQ9rBj6T1b',
-                 '3260479588-Fjoj5ATZHgepipegP2IxFTL675s2bVpfCzT3G3v',
-                 '6SeGn2urZzs2ztBuRLD4GdTVuejPx170uAoFEHMXgBfBl')
+TWITTER_CREDS = None
 
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
