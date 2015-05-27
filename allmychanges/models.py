@@ -819,7 +819,7 @@ class Version(models.Model):
             media_id = response.json()['media_id_string']
 
             url = settings.BASE_URL + self.get_absolute_url()
-            text = '{number} of {namespace}/{name} was released: {url} #{namespace} #release'.format(
+            text = '{number} of {namespace}/{name} was released: {url} #{namespace} #{name} #release'.format(
                 number=self.number,
                 namespace=ch.namespace,
                 name=ch.name,
