@@ -77,15 +77,24 @@ def get_user_actions_heatmap(user, only_active=True):
 def get_graph_data(from_date, to_date):
     cursor = connection.cursor()
 
-    def get_data(state):
+    def get_data(state, negative=False):
         cursor.execute('SELECT date, count(state) '
                        'FROM allmychanges_userstatehistory '
                        'WHERE state=%s GROUP BY date',
                        state)
         data = dict(cursor.fetchall())
-        return list(map_days(from_date, to_date, data.get))
+        data = list(map_days(from_date, to_date, data.get))
+        if negative:
+            data = [item if item is None else -item
+                    for item in data]
+        return data
 
     labels = list(map_days(from_date, to_date, lambda day: day))
-    data = tuple(dict(data=get_data(state), name=state)
-                 for state in ('registered', 'churned', 'resurrected'))
-    return labels, data
+    data1 = tuple(dict(data=get_data(state),
+                       name=state,
+                       stack='positive')
+                  for state in ('registered', 'resurrected'))
+    data2 = (dict(data=get_data('churned', negative=True),
+                  name='churned',
+                  stack='negative'),)
+    return labels, data1 + data2

@@ -102,9 +102,8 @@
   <div id="churn-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
   <script>
     $(function () {
-      var series = {{ churn_data|safe }};
+      var data = {{ churn_data|safe }};
       var x_labels = {{ churn_labels|safe }};
-      var data_legend = R.map(R.prop('name'), series);
 
     $('#churn-graph').highcharts({
         chart: {
@@ -137,7 +136,6 @@
         },
         plotOptions: {
             area: {
-//                pointStart: - series[0].data.length,
                 stacking: 'normal',
                 lineColor: '#666666',
                 lineWidth: 1,
@@ -153,7 +151,7 @@
                 }
             }
         },
-        series: series
+        series: data,
     });
   });
   </script>
