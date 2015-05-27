@@ -876,6 +876,13 @@ class UserHistoryLog(models.Model):
                                       description=description)
 
 
+class UserStateHistory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name='state_history')
+    date = models.DateField()
+    state = models.CharField(max_length=40)
+
+
 class DeploymentHistory(models.Model):
     hash = models.CharField(max_length=32, default='')
     description = models.TextField()

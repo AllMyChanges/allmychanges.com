@@ -13,3 +13,4 @@ from .tasks import *
 from .version import *
 from .validators import *
 from .autocomplete import *
+from .churn import *

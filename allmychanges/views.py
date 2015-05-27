@@ -40,6 +40,7 @@ from allmychanges.models import (Version,
                                  User,
                                  UserHistoryLog,
                                  Preview)
+from allmychanges.churn import get_user_actions_heatmap
 from allmychanges import chat
 from allmychanges.notifications.email import send_email
 from allmychanges.http import LastModifiedMixin
@@ -794,14 +795,12 @@ class UserHistoryView(SuperuserRequiredMixin,
         result = super(UserHistoryView, self).get_context_data(**kwargs)
         user = User.objects.get(username=kwargs['username'])
 
-        h = user.history_log.all()
-        if self.request.GET.get('all') is None:
-            h = h.filter(action__in=ACTIVE_USER_ACTIONS)
+        heatmap = get_user_actions_heatmap(
+            user,
+            only_active=self.request.GET.get('all') is None)
 
-        grouped = groupby(h, lambda item: item.created_at.date())
-        count = lambda iterable: sum(1 for item in iterable)
         timestamp = lambda dt: arrow.get(dt).timestamp
-        grouped = dict((str(timestamp(key)), count(item)) for key, item in grouped)
+        grouped = dict((str(timestamp(date)), count) for date, count in heatmap)
 
         result['activity_heat_map'] = grouped
 
@@ -1289,12 +1288,15 @@ class AdminDashboardView(SuperuserRequiredMixin,
         stats = [dict(data=item['data'], name=item['name'])
                  for item in stats]
         result['data'] = anyjson.serialize(stats)
-        data_legend = [dt.humanize() for dt in cohort_dates]
-        result['data_legend'] = anyjson.serialize(data_legend)
 
-        markers = [dict(date=dt.format('YYYY-MM-DD'),
-                        label=dt.humanize()) for dt in cohort_dates]
-        result['markers'] = anyjson.serialize(markers)
+        # для отображения роста и потерь аудитории
+        from allmychanges import churn
+        churn_labels, churn_data = churn.get_graph_data(
+            now.replace(months=-12), now)
+        result['churn_data'] = anyjson.serialize(churn_data)
+        result['churn_labels'] = anyjson.serialize(
+            [arrow.get(date).format('YYYY-MM-DD')
+             for date in churn_labels])
         return result
 
 

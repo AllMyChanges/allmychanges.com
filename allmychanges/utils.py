@@ -209,6 +209,30 @@ def dt_in_window(tz, system_time, hour):
     return local.hour == hour
 
 
+def map_days(from_date, to_date, func):
+    from_date = arrow.get(from_date)
+    to_date = arrow.get(to_date).replace(days=-1)
+    for date in arrow.Arrow.range('day', from_date, to_date):
+        yield func(date.date())
+
+def map_pairs(a_list, func):
+    """For list [1,2,3,4]
+    returns: [func(1,2), func(2,3), func(3,4)]
+
+    Works only for lists.
+    """
+    result = []
+    if a_list:
+        head_item = a_list[0]
+        tail = a_list[1:]
+        while tail:
+            next_item = tail[0]
+            result.append(func(head_item, next_item))
+            head_item = next_item
+            tail = tail[1:]
+    return result
+
+
 def parse_ints(text):
     """Parses text with comma-separated list of integers
     and returns python list of itegers."""
