@@ -16,6 +16,7 @@
     var activity_heat_map = {{activity_heat_map|safe}};
     var year_ago = new Date();
     year_ago.setFullYear(year_ago.getFullYear() - 1);
+    year_ago.setMonth(year_ago.getMonth() + 1);
 
     cal.init({domain: 'month',
               subDomain: 'day',
