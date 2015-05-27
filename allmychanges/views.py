@@ -800,7 +800,7 @@ class UserHistoryView(SuperuserRequiredMixin,
             only_active=self.request.GET.get('all') is None)
 
         timestamp = lambda dt: arrow.get(dt).timestamp
-        grouped = dict((str(timestamp(date)), count) for date, count in heatmap)
+        grouped = dict((str(timestamp(date)), count) for date, count in heatmap.iteritems())
 
         result['activity_heat_map'] = grouped
 
