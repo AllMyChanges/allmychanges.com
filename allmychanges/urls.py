@@ -78,7 +78,7 @@ urlpatterns = patterns(
     url(r'^package-selector-versions/$', PackageSelectorVersionsView.as_view(), name='package-selector-versions'),
     url(r'^preview/(?P<pk>.*?)/$', PreviewView.as_view(), name='preview'),
 
-    url(r'^u/(?P<username>.*?)/history/', UserHistoryView.as_view(), name='user-history'),
+    url(r'^u/(?P<username>.*?)/', UserHistoryView.as_view(), name='user-history'),
 
     url(r'^issues/$', IssuesView.as_view(), name='issues'),
     url(r'^catalogue/$', CatalogueView.as_view(), name='catalogue'),
