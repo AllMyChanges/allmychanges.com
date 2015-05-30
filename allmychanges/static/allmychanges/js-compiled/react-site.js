@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
+	var PackageSelector = __webpack_require__(17)
 
 	module.exports = {
 	    render: function () {
@@ -102,11 +102,11 @@
 	    };
 
 	    UserStory.log(["setting idle timer"], ["intro.idle"]);
-	    window.intro_idle = new Idle({
-	        onAway : show_intro,
-	        awayTimeout : 15000
-	    });
-	    window.intro_idle.start();
+	    // window.intro_idle = new Idle({
+	    //     onAway : show_intro,
+	    //     awayTimeout : 15000
+	    // });
+	    // window.intro_idle.start();
 	});
 
 	module.exports = {
@@ -198,7 +198,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(17)
+	var Landing = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -789,7 +789,7 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PriorityQueue = __webpack_require__(21)
+	var PriorityQueue = __webpack_require__(22)
 	var _introjs_items = new PriorityQueue(function(a, b) {
 	    return a.priority - b.priority});
 
@@ -1025,27 +1025,6 @@
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
-	    }
-	});
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var Package = __webpack_require__(20)
 	var metrika = __webpack_require__(19)
 
@@ -1150,6 +1129,27 @@
 
 
 /***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PackageSelector = __webpack_require__(17)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
+	    }
+	});
+
+
+/***/ },
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1168,7 +1168,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	TrackButton = __webpack_require__(10)
-	SkipButton = __webpack_require__(22)
+	SkipButton = __webpack_require__(21)
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -1201,6 +1201,50 @@
 
 /***/ },
 /* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(19)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    perform_action: function(action) {
+	        UserStory.log(["performing action [action=", action, "]"], ["buttons.skip"]);
+	        $.ajax({
+	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
+	            method: 'POST',
+	            dataType: 'json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            success: function(data) {
+	                metrika.reach_goal(action.toUpperCase());
+
+	                if (this.props.on_skip !== undefined) {
+	                    this.props.on_skip();
+	                }
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    skip: function (e) {
+	        e.preventDefault();
+	        this.perform_action('skip', true);
+	    },
+	    handle_popup_click: function (e) {
+	        UserStory.log(["popup click"], ["buttons.report"]);
+	        e.nativeEvent.stopImmediatePropagation();
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "skip-button"}, 
+	                    React.createElement("button", {className: "button", 
+	                            onClick: this.skip, 
+	                            title: "Click me to show next package."}, "Show next")
+	                ));
+	    }
+	});
+
+
+/***/ },
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1375,50 +1419,6 @@
 	  this._elements[a] = this._elements[b];
 	  this._elements[b] = aux;
 	};
-
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var metrika = __webpack_require__(19)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    perform_action: function(action) {
-	        UserStory.log(["performing action [action=", action, "]"], ["buttons.skip"]);
-	        $.ajax({
-	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
-	            method: 'POST',
-	            dataType: 'json',
-	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
-	            success: function(data) {
-	                metrika.reach_goal(action.toUpperCase());
-
-	                if (this.props.on_skip !== undefined) {
-	                    this.props.on_skip();
-	                }
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    skip: function (e) {
-	        e.preventDefault();
-	        this.perform_action('skip', true);
-	    },
-	    handle_popup_click: function (e) {
-	        UserStory.log(["popup click"], ["buttons.report"]);
-	        e.nativeEvent.stopImmediatePropagation();
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "skip-button"}, 
-	                    React.createElement("button", {className: "button", 
-	                            onClick: this.skip, 
-	                            title: "Click me to show next package."}, "Show next")
-	                ));
-	    }
-	});
 
 
 /***/ }

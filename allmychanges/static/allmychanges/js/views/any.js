@@ -26,11 +26,11 @@ $(document).ready(function() {
     };
 
     // setting idle timer @intro.idle
-    window.intro_idle = new Idle({
-        onAway : show_intro,
-        awayTimeout : 15000
-    });
-    window.intro_idle.start();
+    // window.intro_idle = new Idle({
+    //     onAway : show_intro,
+    //     awayTimeout : 15000
+    // });
+    // window.intro_idle.start();
 });
 
 module.exports = {
