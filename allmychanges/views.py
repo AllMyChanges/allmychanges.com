@@ -707,7 +707,7 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
 
     def get_form_class(self):
         from django.forms.models import modelform_factory
-        return modelform_factory(User, fields=('email', 'timezone', 'send_digest', 'slack_url'))
+        return modelform_factory(User, fields=('email', 'timezone', 'send_digest', 'slack_url', 'webhook_url'))
 
     def get_context_data(self, **kwargs):
         result = super(ProfileView, self).get_context_data(**kwargs)

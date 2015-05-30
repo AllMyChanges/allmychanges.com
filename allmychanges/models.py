@@ -126,6 +126,9 @@ class User(AbstractBaseUser):
     slack_url = models.URLField(max_length=2000,
                                 default='',
                                 blank=True)
+    webhook_url = models.URLField(max_length=2000,
+                                  default='',
+                                  blank=True)
 
     objects = UserManager()
 

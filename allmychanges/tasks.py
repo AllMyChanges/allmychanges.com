@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import anyjson
+import requests
 import datetime
 
 from django.db import transaction
@@ -196,7 +198,7 @@ def notify_users_about_new_versions(changelog_id, version_ids):
         changelog = Changelog.objects.get(pk=changelog_id)
         trackers = changelog.trackers.all()
 
-        versions = Version.objects.filter(pk__in=version_ids)
+        versions = list(Version.objects.filter(pk__in=version_ids))
         slack_versions = u', '.join(
             '<https://allmychanges.com{0}|{1}>'.format(
                 version.get_absolute_url(),
@@ -211,9 +213,31 @@ def notify_users_about_new_versions(changelog_id, version_ids):
             versions_form='version' + (len(version_ids) > 1 and u's' or u''),
             was_form=(len(version_ids) > 1) and 'were' or 'was')
 
+        webhook_data = None
         for user in trackers:
             if user.slack_url:
                 slack.send(url=user.slack_url, text=slack_text)
+            if user.webhook_url:
+                if webhook_data is None:
+                    def format_date(dt):
+                        if dt is not None:
+                            return dt.isoformat()
+
+                    webhook_data = dict(
+                        namespace=changelog.namespace,
+                        name=changelog.name,
+                        versions=[dict(number=version.number,
+                                       web_url='https://allmychanges.com' + version.get_absolute_url(),
+                                       content=version.processed_text,
+                                       released_at=format_date(version.date),
+                                       discovered_at=format_date(version.discovered_at))
+                                  for version in versions])
+                    webhook_data = anyjson.serialize(webhook_data)
+                requests.post(user.webhook_url,
+                              data=webhook_data,
+                              headers={'User-Agent': 'AllMyChanges',
+                                       'Content-Type': 'application/json'})
+
 
 
 
