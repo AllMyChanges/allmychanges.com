@@ -83,9 +83,12 @@ def git_history_extractor(path, limit=None):
                 return path
             return checkout
 
-        tagged_versions = find_tagged_versions()
-        with log.fields(num_tagged_versions=len(tagged_versions)):
-            log.info('Found tagged versions')
+        if os.environ.get('IGNORE_TAGS'):
+            tagged_versions = []
+        else:
+            tagged_versions = find_tagged_versions()
+            with log.fields(num_tagged_versions=len(tagged_versions)):
+                log.info('Found tagged versions')
 
         r = do('git log --pretty=format:"%H%n{ins}%n%ai%n{ins}%n%B%n{ins}%n%P%n{splitter}"'.format(ins=ins, splitter=splitter))
 
