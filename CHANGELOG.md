@@ -1,3 +1,34 @@
+0.27.0 (2015-05-31)
+===================
+
+Development is impossible without hooks
+---------------------------------------
+
+![Image by NevilleNel from Flickr](https://farm9.staticflickr.com/8705/16981764768_ac1c5d9770_z.jpg)
+
+Did I say we implemented a generic web-hooks? Because we really did.
+And now you can be not only receive notifications in Slack, but
+do anything you want when a new version of a package is found.
+Read [more about web-hooks][web-hooks] in our documentation.
+
+To help you to automate your processes, we've prepared an
+[example script](https://github.com/AllMyChanges/allmychanges-to-slack/blob/master/process.py)
+which uses a python-processor to accept a web-hook and to post notification
+further into different Slack channels and email, depending on package's
+namespace.
+
+Other things
+------------
+
+* Also, now we or processor is fixing header levels in GitHub Releases by replace
+all `h1` headers with `h2` headers, all `h2` with `h3` and so on.
+* Now package name is added as a hashtag when our robot
+[@NewReleaseNotes][tw-new-release-notes] tweets about a new release.
+* Annoying popups with tips wer disabled while we are implementing
+a mechanism to remember which tips you already seen.
+* We started experimenting with cal-heatmap javascript plugin
+to show you your activity on the service. But it is not ready yet.
+
 0.26.0 (2015-05-24)
 ===================
 
@@ -936,3 +967,5 @@ There are plenty directions for approvement. Stay tuned.
 [tweet-us]: https://twitter.com/intent/tweet?text=@allmychanges hey, guys, 
 [tw-new-release-notes]: https://twitter.com/NewReleaseNotes
 [libsass]: https://allmychanges.com/p/c%2B%2B/libsass/
+[cal-heatmap]: https://github.com/kamisama/cal-heatmap
+[web-hooks]: https://allmychanges.com/help/webhooks
