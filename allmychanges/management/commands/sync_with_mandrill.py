@@ -36,13 +36,17 @@ class Command(LogMixin, BaseCommand):
                     message.save(update_fields=('payload',))
                 except MandrillMessage.DoesNotExist:
                     email = item['email']
-                    try:
-                        user = User.objects.get(email=email)
-                    except User.DoesNotExist:
+                    users = list(User.objects.filter(email=email))
+
+                    if len(users) > 0:
+                        user = users[0]
+                        if len(users) > 1:
+                            print 'Warning, there {0} users with email {1}'.format(len(users), email)
+                    else:
                         user = None
 
                     ts = item['ts']
-                    created_at = arrow.get(ts)
+                    created_at = arrow.get(ts).datetime
                     message = MandrillMessage.objects.create(
                         mid=mid,
                         email=email,
@@ -54,20 +58,25 @@ class Command(LogMixin, BaseCommand):
                         print 'This is a digest'
                         for click in item['clicks_detail']:
                             print 'Creating a click event'
-                            UserHistoryLog.write(
+                            uh = UserHistoryLog.write(
                                 user,
                                 '',
                                 'email-digest-click',
-                                'User clicked a link "{0}" in digest email'.format(click['url']),
-                                created_at=created_at)
+                                'User clicked a link "{0}" in digest email'.format(click['url']))
+
+                            uh.created_at = created_at
+                            uh.save(update_fields=('created_at',))
+
                         for open_detail in item['opens_detail']:
                             print 'Creating a open event'
-                            UserHistoryLog.write(
+                            uh = UserHistoryLog.write(
                                 user,
                                 '',
                                 'email-digest-open',
-                                'User opened digest email',
-                                created_at=created_at)
+                                'User opened digest email')
+
+                            uh.created_at = created_at
+                            uh.save(update_fields=('created_at',))
                     else:
                         print 'Found item {0} with tags "{1}"'.format(
                             mid, item['tags'])

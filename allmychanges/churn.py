@@ -64,7 +64,7 @@ def fill_churn_sequence(sequence, today=None):
 
 
 def get_user_actions_heatmap(user, only_active=True):
-    h = user.history_log.all()
+    h = user.history_log.all().order_by('created_at')
     if only_active:
         h = h.filter(action__in=ACTIVE_USER_ACTIONS)
 
