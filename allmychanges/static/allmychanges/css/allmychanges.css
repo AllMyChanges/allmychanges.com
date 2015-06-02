@@ -347,7 +347,8 @@ a:hover {
 .page-header {
   font-size: 27px;
   line-height: 30px;
-  margin-bottom: 27px;
+  margin-bottom: 30px;
+  margin-top: 30px;
   font-family: pragmatica-web-condensed, sans-serif;
 }
 .page-subheader {
@@ -377,19 +378,6 @@ a:hover {
   .header {
     padding-left: 100px;
   }
-}
-.logo__text {
-  font-size: 2em;
-  font-family: pragmatica-web-condensed, sans-serif;
-  color: #f4cb89;
-}
-.logo__link {
-  text-decoration: none;
-  color: #f4cb89;
-  transition: all ease 500ms;
-}
-.logo__link:hover {
-  color: #d9042b;
 }
 .login-plate {
   position: absolute;
@@ -1078,6 +1066,24 @@ a:hover {
 .login-menu__items > li > a:hover {
   background-color: #588c8c;
   color: #f4cb89;
+}
+.logo__text {
+  font-size: 2em;
+  font-family: pragmatica-web-condensed, sans-serif;
+  color: #f4cb89;
+}
+.logo__link {
+  text-decoration: none;
+  color: #f4cb89;
+  transition: all ease 500ms;
+}
+.logo__image {
+  position: relative;
+  top: -16px;
+  left: -6px;
+}
+.logo__link:hover {
+  color: #d9042b;
 }
 .modal-popup {
   position: fixed;

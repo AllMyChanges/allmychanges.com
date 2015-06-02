@@ -503,19 +503,6 @@ a:hover {
     padding-left: 100px;
   }
 }
-.logo__text {
-  font-size: 2em;
-  font-family: pragmatica-web-condensed, sans-serif;
-  color: #f4cb89;
-}
-.logo__link {
-  text-decoration: none;
-  color: #f4cb89;
-  transition: all ease 500ms;
-}
-.logo__link:hover {
-  color: #d9042b;
-}
 .login-plate {
   position: absolute;
   right: 20px;
