@@ -845,7 +845,8 @@ ACTIVE_USER_ACTIONS = (
     u'login', u'profile-update', u'digest-view',
     u'package-view', u'package-create', u'package-edit',
     u'edit-digest-view', u'index-view', u'track', u'untrack',
-    u'untrack-allmychanges', u'create-issue')
+    u'untrack-allmychanges', u'create-issue',
+    u'email-digest-open', u'email-digest-click')
 
 
 class UserHistoryLog(models.Model):
