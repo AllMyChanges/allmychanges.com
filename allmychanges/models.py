@@ -871,12 +871,13 @@ class UserHistoryLog(models.Model):
                 entries.update(user=user)
 
     @staticmethod
-    def write(user, light_user, action, description):
+    def write(user, light_user, action, description, created_at=None):
         user = user if user is not None and user.is_authenticated() else None
         UserHistoryLog.objects.create(user=user,
                                       light_user=light_user,
                                       action=action,
-                                      description=description)
+                                      description=description,
+                                      created_at=created_at)
 
 
 class UserStateHistory(models.Model):
@@ -1031,3 +1032,17 @@ class AppStoreUrl(models.Model):
 
     def __repr__(self):
         return '<AppStoreUrl: {0}>'.format(self.source.encode('utf-8'))
+
+
+class MandrillMessage(models.Model):
+    mid = models.CharField(max_length=32,
+                           help_text='Mandrills ID',
+                           db_index=True)
+    timestamp = models.IntegerField()
+    email = models.EmailField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             related_name='mandrill_messages',
+                             on_delete=models.SET_NULL,
+                             blank=True,
+                             null=True)
+    payload = models.TextField()
