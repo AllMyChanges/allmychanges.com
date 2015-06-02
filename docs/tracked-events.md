@@ -29,6 +29,8 @@ Here is a list of event which are tracked:
 * profile-update: 'User saved his profile settings'
 * digest-sent: 'We send user an email with digest'
   This event is created by management command send_digests.
+* email-digest-open:  'User opened digest email'
+* email-digest-click: 'User clicked a link "{0}" in digest email'
 
 
 To track new events
