@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import arrow
 from closeio_api import Client
 from django.conf import settings
 
@@ -59,13 +59,21 @@ def get(user):
 
 def update(user, crm_user):
     tracks = _get_user_tracks(user)
+    churn_date = None
+    latest_state = list(user.state_history.all().order_by('-id')[:1])
+    if latest_state and latest_state[0].state == 'churned':
+        non_churn_state = list(user.state_history.exclude(state='churned').order_by('-id')[:1])
+        if non_churn_state:
+            churn_date = arrow.get(non_churn_state[0].date).replace(days=1).date()
+
     data = {
-        'custom.Joined': _format_date(user.date_joined), # убрать после ручного запуска
         'custom.LastLogin': _format_date(user.last_login),
         'custom.Changelogs': u', '.join(tracks) or None,
         'custom.NumChangelogs': len(tracks),
         'custom.SendDigests': user.send_digest or 'not given',
+        'custom.Churned': _format_date(churn_date) if churn_date else None,
     }
+    
     api = Client(settings.CLOSEIO_KEY)
     api.put('lead/' + crm_user['id'], data=data)
 
