@@ -872,13 +872,12 @@ class UserHistoryLog(models.Model):
                 entries.update(user=user)
 
     @staticmethod
-    def write(user, light_user, action, description, created_at=None):
+    def write(user, light_user, action, description):
         user = user if user is not None and user.is_authenticated() else None
-        UserHistoryLog.objects.create(user=user,
-                                      light_user=light_user,
-                                      action=action,
-                                      description=description,
-                                      created_at=created_at)
+        return UserHistoryLog.objects.create(user=user,
+                                             light_user=light_user,
+                                             action=action,
+                                             description=description)
 
 
 class UserStateHistory(models.Model):
