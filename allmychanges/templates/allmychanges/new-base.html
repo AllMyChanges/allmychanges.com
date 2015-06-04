@@ -13,7 +13,10 @@
     <link id="favicon" rel="shortcut icon" href="{% static 'allmychanges/img/logo/32x32.png' %}" sizes="32x32" type="image/png" />
     <link id="favicon" rel="shortcut icon" href="{% static 'allmychanges/img/logo/48x48.png' %}" sizes="48x48" type="image/png" />
 
-    <link rel="icon" href="{% static 'allmychanges/img/logo/256x256.png' %}" sizes="256x256" type="image/png" />
+    <!-- Touch icons For Chrome for Android: -->
+    <link rel="icon" sizes="192x192" href="{% static 'allmychanges/img/logo/192x192.png' %}">
+    <!-- For iPhones -->
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="{% static 'allmychanges/img/logo/apple-touch-icon-precomposed.png' %}">
 
     {% compress css %}
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
