@@ -31,7 +31,6 @@ class Command(LogMixin, BaseCommand):
                 print 'Processing', mid
                 try:
                     message = MandrillMessage.objects.get(mid=mid)
-                    print 'New message created in db'
                     message.payload = anyjson.serialize(item)
                     message.save(update_fields=('payload',))
                 except MandrillMessage.DoesNotExist:
@@ -53,6 +52,7 @@ class Command(LogMixin, BaseCommand):
                         user=user,
                         timestamp=ts,
                         payload=anyjson.serialize(item))
+                    print 'New message created in db'
 
                     if 'digest' in item['tags']:
                         print 'This is a digest'
