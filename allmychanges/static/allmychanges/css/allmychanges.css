@@ -1067,10 +1067,25 @@ a:hover {
   background-color: #588c8c;
   color: #f4cb89;
 }
+.logo {
+  white-space: nowrap;
+}
 .logo__text {
-  font-size: 2em;
   font-family: pragmatica-web-condensed, sans-serif;
   color: #f4cb89;
+}
+@media (max-width: 640px) {
+  .logo__text {
+    font-size: 24px;
+    line-height: 24px;
+    margin-top: 24px;
+  }
+}
+@media (min-width: 640px) {
+  .logo__text {
+    font-size: 32px;
+    line-height: 32px;
+  }
 }
 .logo__link {
   text-decoration: none;
@@ -1081,6 +1096,12 @@ a:hover {
   position: relative;
   top: -16px;
   left: -6px;
+}
+@media (max-width: 640px) {
+  .logo__image {
+    width: 24px;
+    height: 24px;
+  }
 }
 .logo__link:hover {
   color: #d9042b;
