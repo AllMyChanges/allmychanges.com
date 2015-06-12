@@ -1,7 +1,12 @@
 #!/bin/bash
 
-if [ ! -e env/bin/python ]; then
-    virtualenv --python=/usr/bin/python --system-site-packages --distribute env
-    env/bin/pip install -e `pwd`
-    env/bin/pip install -r requirements.txt
-fi
+ENVDIR=env
+
+if [ ! -e $ENVDIR/bin/python ]; then
+#    env3/bin/virtualenv --python=/usr/bin/python --system-site-packages --distribute $ENVDIR
+    env3/bin/virtualenv --python=/usr/bin/python $ENVDIR
+    $ENVDIR/bin/pip install -U pip
+    $ENVDIR/bin/pip install -U -r requirements.txt
+    $ENVDIR/bin/pip install -e `pwd`
+
+    fi

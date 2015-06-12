@@ -226,7 +226,7 @@ from secure_settings import *  # nopep8
 
 def init_logging(filename, logstash=False):
     import logging
-    from twiggy import addEmitters, outputs, levels, formats
+    from twiggy import add_emitters, outputs, levels, formats
     from twiggy_goodies.std_logging import RedirectLoggingHandler
     from twiggy_goodies.json import JsonOutput
     from twiggy_goodies.logstash import LogstashOutput
@@ -235,18 +235,18 @@ def init_logging(filename, logstash=False):
     def is_stats(msg):
         return msg.name.startswith('stats')
 
-    addEmitters(('all',
+    add_emitters(('all',
                  levels.DEBUG,
                  lambda msg: not is_stats(msg),
                  JsonOutput(filename.format(user=CURRENT_USER))))
 
     if logstash:
-        addEmitters(('all-to-logstash',
+        add_emitters(('all-to-logstash',
                      levels.DEBUG,
                      lambda msg: not is_stats(msg),
                      LogstashOutput('salmon.svetlyak.ru', 6543)))
 
-    addEmitters(('stats',
+    add_emitters(('stats',
                  levels.DEBUG,
                  is_stats,
                  outputs.FileOutput(filename.format(user=CURRENT_USER).replace('django-', 'stats-'),
