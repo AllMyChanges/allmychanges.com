@@ -377,7 +377,8 @@ def github_releases_downloader(source,
                                                        name, re.I):
                                 name = None
 
-                            title =(tag, release['published_at'])
+                            title =(tag, release['created_at'])
+#                            title =(tag, release['published_at']) # может быть тут published надр использовать. Подожду пока support гитхаба ответит
                             title = filter(None, (item.strip() for item in title))
                             f.write(u' '.join(title))
                             f.write('\n===============\n\n')
