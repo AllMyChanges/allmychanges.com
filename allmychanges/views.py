@@ -22,6 +22,7 @@ from django.views.generic import (TemplateView,
                                   UpdateView,
                                   DetailView,
                                   View)
+from django.contrib import messages
 from django.db.models import Count
 from django.conf import settings
 from django.utils import timezone
@@ -736,6 +737,7 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
                              self.request.light_user,
                              'profile-update',
                              'User saved his profile settings')
+        messages.add_message(self.request, messages.INFO, 'Account settings were saved.')
         return super(ProfileView, self).post(*args, **kwargs)
 
 
