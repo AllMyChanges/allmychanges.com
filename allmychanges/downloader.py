@@ -363,7 +363,7 @@ def github_releases_downloader(source,
     with cd(path):
         try:
             with codecs.open(
-                    os.path.join(path, 'ChangeLog.md'),
+                    os.path.join(path, 'GitHubReleases.md'),
                     'w',
                     'utf-8') as f:
                 if releases:
