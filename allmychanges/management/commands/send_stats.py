@@ -32,14 +32,10 @@ def get_stats_from_file():
 def get_stats():
     stats = get_stats_from_file()
 
-    from rq.scripts.rqinfo import (setup_default_arguments,
-                                   parse_args,
-                                   setup_redis, Queue)
+    from rq import (use_connection,
+                    Queue)
 
-
-    args = parse_args()
-    setup_default_arguments(args, {})
-    setup_redis(args)
+    use_connection()
     for queue in Queue.all():
         stats['queue.{0}.jobs'.format(queue.name)] = queue.count
 
