@@ -39,6 +39,8 @@ django-oauth-toolkit
 django-markdown2
 django-sendmail-backend
 
+CommonMark
+
 #git+git://github.com/svetlyak40wt/django-oauth-toolkit
 #git+git://github.com/svetlyak40wt/logster.git@allmychanges
 #git+git://github.com/svetlyak40wt/django-sendmail-backend

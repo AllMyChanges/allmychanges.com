@@ -19,6 +19,7 @@ from django.utils.encoding import force_text
 from allmychanges.crawler import (
     _extract_version, _extract_date,
     _parse_item)
+from allmychanges.markdown import render_markdown
 from allmychanges.utils import (
     strip_long_text, is_not_http_url,
     is_http_url, is_attr_pattern,
@@ -206,8 +207,10 @@ def parse_file(env):
 
 
 def parse_markdown_file(obj):
-    import markdown2
-    html = markdown2.markdown(obj.content)
+    html = render_markdown(obj.content)
+    # import markdown2
+    # html = markdown2.markdown(obj.content)
+
     return parse_html_file(obj.push(content=html))
 
 
