@@ -221,6 +221,15 @@ MANDRILL_KEY = 'g3pUEIJTBEd6KGeWkKihgQ'
 # these are used to post tweets about new versions
 TWITTER_CREDS = None
 
+UNRELEASED_KEYWORDS = set([
+    'unreleased',
+    'under development',
+    'not released yet',
+    'not yet released',
+    'release date to be decided',
+    'release date to be determined',
+])
+
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 

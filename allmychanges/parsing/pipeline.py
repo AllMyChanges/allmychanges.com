@@ -610,11 +610,8 @@ def extract_metadata(version):
         # because if keyword is somewhere far from
         # the beginning, than probably it is unrelated
         # to the version itself
-        keywords = ('unreleased', 'under development',
-                    'not yet released',
-                    'release date to be decided')
         lowered = text.lower()
-        for keyword in keywords:
+        for keyword in settings.UNRELEASED_KEYWORDS:
             if keyword in lowered:
                 return True
 
