@@ -375,7 +375,8 @@ def github_releases_downloader(source,
                             # добавлять лишнего подзаголовка
                             if name == tag \
                                or re.match(ur'version {0}'.format(tag), name, re.I) \
-                               or re.match(ur'{0} release'.format(tag), name, re.I):
+                               or re.match(ur'{0} release'.format(tag), name, re.I) \
+                               or re.match(ur'{repo} v?{tag}'.format(repo=repo, tag=tag), name, re.I):
                                 name = None
 
                             title =(tag, release['created_at'])
