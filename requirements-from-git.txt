@@ -1,13 +1,17 @@
 # dev
 # для тестов
 git+git://github.com/nosedjango/nosedjango.git
-git+git://github.com/svetlyak40wt/unittest-asserts.git
+
+# уже стал ставить из PyPi
+# git+git://github.com/svetlyak40wt/unittest-asserts.git
 
 
 # prod
 # for accessing AllMyChanges's own API
-git+git://github.com/svetlyak40wt/django-oauth-toolkit
+# уже стал ставить из PyPi
+# git+git://github.com/svetlyak40wt/django-oauth-toolkit
 
 # markdown парсить
-git+git://github.com/svetlyak40wt/django-markdown2
-git+git://github.com/trentm/python-markdown2
+# уже стал ставить из PyPi
+# git+git://github.com/svetlyak40wt/django-markdown2
+# git+git://github.com/trentm/python-markdown2

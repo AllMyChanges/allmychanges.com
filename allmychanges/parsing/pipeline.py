@@ -24,6 +24,7 @@ from allmychanges.utils import (
     strip_long_text, is_not_http_url,
     is_http_url, is_attr_pattern,
     html_document_fromstring)
+from allmychanges.parsing.unreleased import mention_unreleased
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -604,19 +605,6 @@ def filter_version(section):
 def extract_metadata(version):
     """Tries to extract date and list items' type.
     """
-    def mention_unreleased(text):
-        # here we limit our scoupe of searching
-        # unreleased keywords
-        # because if keyword is somewhere far from
-        # the beginning, than probably it is unrelated
-        # to the version itself
-        lowered = text.lower()
-        for keyword in settings.UNRELEASED_KEYWORDS:
-            if keyword in lowered:
-                return True
-
-        return False
-
     first_lines = (line for line in version.content.split(u'\n', 10))
     first_lines = (line[:200] for line in first_lines)
     first_lines = (line.strip() for line in first_lines)

@@ -226,8 +226,8 @@ UNRELEASED_KEYWORDS = set([
     'under development',
     'not released yet',
     'not yet released',
-    'release date to be decided',
-    'release date to be determined',
+    'release date.*to be decided',
+    'release date.*to be determined',
 ])
 
 from .auth import *  # nopep8
