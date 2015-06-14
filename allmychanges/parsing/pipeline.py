@@ -685,7 +685,7 @@ def process_version_description(html):
                            u'a', u'abbr', u'acronym', u'b', u'blockquote',
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
                            u'p', # we allow paragraphs cause they are fine
-                           u'h1', u'h2', u'h3', u'h4', # headers are ok too
+                           u'h1', u'h2', u'h3', u'h4', u'h5', # headers are ok too
                            u'del', u'strike', u's',
                            u'tt', # monospace
                            u'div', # dont see why it should be prohibited
