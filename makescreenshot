@@ -13,6 +13,9 @@ To create a virtual frame buffer we execute:
 __author__ = 'Ben DeMott'
 __date__ = 'Aug 20, 2012'
 
+import sys
+sys.path.append('/usr/lib/python2.7/dist-packages/')
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtWebKit import *
