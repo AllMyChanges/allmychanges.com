@@ -384,7 +384,15 @@ source_suffix = '.rst'
                 f.write(obj.content)
 
             envoy.run('rm -fr {0}/output/index.html'.format(path))
-            envoy.run('sphinx-build -b html {0} {0}/output'.format(path))
+            command = 'sphinx-build -b html {0} {0}/output'.format(path)
+            response = envoy.run(command)
+
+            if os.environ.get('SET_TRACE'):
+                import pdb; pdb.set_trace()
+
+            if response.status_code != 0:
+                log.error('Bad status code from sphinx-build:\n{0}\n{1}'.format(
+                    command, response.std_err))
 
             output_filename = os.path.join(path, 'output', 'index.html')
             if os.path.exists(output_filename):
