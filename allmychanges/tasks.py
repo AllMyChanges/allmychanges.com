@@ -135,6 +135,8 @@ def schedule_updates(reschedule=False, packages=[]):
 @transaction.atomic
 @wait_chat_threads
 def update_preview_task(preview_id):
+    chat.send('Updating preview with id: {0}'.format(preview_id))
+
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
         try:
@@ -142,6 +144,7 @@ def update_preview_task(preview_id):
             preview = Preview.objects.get(pk=preview_id)
 
             chat.send('Updating preview with source: {0}'.format(preview.source))
+            log.info('Updating preview with source: {0}'.format(preview.source))
             update_preview_or_changelog(preview)
         finally:
             log.info('Task done')
