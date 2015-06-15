@@ -1,3 +1,5 @@
+source env/bin/activate
+
 function tmux () {
     env/bin/tmuxp load .tmuxp.yaml
 }
@@ -18,8 +20,14 @@ sudo service allmychanges-rqworker restart
 EOF
 }
 
+
 function manage () {
-    sudo -u www-data env/bin/python manage.py $@ --settings=allmychanges.settings.production
+    cat > /tmp/amch.command <<EOF
+source env/bin/activate
+env/bin/python manage.py $@ --settings=allmychanges.settings.production
+EOF
+
+    sudo -u www-data bash /tmp/amch.command
 }
 
 function shell () {

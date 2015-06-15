@@ -384,7 +384,15 @@ source_suffix = '.rst'
                 f.write(obj.content)
 
             envoy.run('rm -fr {0}/output/index.html'.format(path))
-            envoy.run('sphinx-build -b html {0} {0}/output'.format(path))
+            command = 'sphinx-build -b html {0} {0}/output'.format(path)
+            response = envoy.run(command)
+
+            if os.environ.get('SET_TRACE'):
+                import pdb; pdb.set_trace()
+
+            if response.status_code != 0:
+                log.error('Bad status code from sphinx-build:\n{0}\n{1}'.format(
+                    command, response.std_err))
 
             output_filename = os.path.join(path, 'output', 'index.html')
             if os.path.exists(output_filename):
@@ -677,7 +685,7 @@ def process_version_description(html):
                            u'a', u'abbr', u'acronym', u'b', u'blockquote',
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
                            u'p', # we allow paragraphs cause they are fine
-                           u'h1', u'h2', u'h3', u'h4', # headers are ok too
+                           u'h1', u'h2', u'h3', u'h4', u'h5', # headers are ok too
                            u'del', u'strike', u's',
                            u'tt', # monospace
                            u'div', # dont see why it should be prohibited
