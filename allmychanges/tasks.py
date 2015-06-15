@@ -140,6 +140,8 @@ def update_preview_task(preview_id):
         try:
             from .models import Preview
             preview = Preview.objects.get(pk=preview_id)
+
+            chat.send('Updating preview with source: {0}'.format(preview.source))
             update_preview_or_changelog(preview)
         finally:
             log.info('Task done')
@@ -158,6 +160,8 @@ def update_changelog_task(source):
 
         try:
             from .models import Changelog
+            chat.send('Updating changelog with source: {0}'.format(source))
+
             changelog = Changelog.objects.get(source=source)
             update_preview_or_changelog(changelog)
 
