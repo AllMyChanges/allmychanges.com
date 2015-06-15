@@ -1,3 +1,29 @@
+0.28.0 (2015-06-16)
+===================
+
+First of all, I want to say "thank you" to all russian
+developers who came from habrahabr to test our service.
+Thank you guys, you've helped to find many issues and
+to improve quality of the service.
+
+Because of you reports we now, for example, we now
+parse [OpenSSL's release notes][openssl] correctly.
+To do this we have had to add a special preprocessing
+engine which is like `sed` is able to prepare texts
+before our robot will try to find there release notes.
+
+Another changes
+---------------
+
+* We've fixed errors which prevented to parse
+[FreeBSD's release notes][freebsd].
+* Fixed an error in git commit messages parsing
+which prevented processing of [Laravel Framework][laravel]
+* Some other minor tweaks and fixes.
+
+Again, thank you guys! Keep adding new projects
+and reporting on issues!
+
 0.27.0 (2015-05-31)
 ===================
 
@@ -969,3 +995,6 @@ There are plenty directions for approvement. Stay tuned.
 [libsass]: https://allmychanges.com/p/c%2B%2B/libsass/
 [cal-heatmap]: https://github.com/kamisama/cal-heatmap
 [web-hooks]: https://allmychanges.com/help/webhooks
+[openssl]: https://allmychanges.com/p/security/openssl/
+[freebsd]: https://allmychanges.com/p/os/freebsd/
+[laravel]: https://allmychanges.com/p/php/laravel/
