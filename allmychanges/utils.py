@@ -318,11 +318,16 @@ def html_document_fromstring(text):
     to make sure lxml dont find charset encoding.
     """
     # the hack :)
-    match = re.search(ur'encoding=[\'"](?P<encoding>.*?)[\'"] ?\?>',
-                      text[:200],
-                      flags=re.IGNORECASE)
-    if match is not None:
-        text = text.encode(match.group('encoding'))
+    if isinstance(text, unicode):
+        match = re.search(ur'encoding=[\'"](?P<encoding>.*?)[\'"] ?\?>',
+                          text[:200],
+                          flags=re.IGNORECASE)
+        if match is not None:
+            # for some pages, like http://www.freebsd.org/releases/10.1R/relnotes.html
+            # we fail to encode text using given encoding, that is why we use
+            # errors='replace' here
+            text = text.encode(match.group('encoding'),
+                               errors='ignore')
 
     return lxml.html.document_fromstring(text)
 
