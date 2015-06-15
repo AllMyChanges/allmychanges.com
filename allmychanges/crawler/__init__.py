@@ -169,6 +169,12 @@ def _extract_version(line):
                 if len(tokens) > 6:
                     return None
 
+                # we ignore lines where too many numbers
+                has_numbers = lambda token: re.search(ur'\d', token) is not None
+                tokens_with_numbers = len(filter(None, map(has_numbers, tokens)))
+                if tokens_with_numbers > 3:
+                    return None
+
                 # also, we ignore versions ending with .x
                 # or with suffix -notes which sometimes used
                 # in filenames: https://github.com/numpy/numpy/tree/master/doc/release
