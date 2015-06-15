@@ -25,6 +25,7 @@ from allmychanges.utils import (
     is_http_url, is_attr_pattern,
     html_document_fromstring)
 from allmychanges.parsing.unreleased import mention_unreleased
+from allmychanges.parsing.postprocessors import sed
 from allmychanges.env import Environment
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -208,7 +209,14 @@ def parse_file(env):
 
 
 def parse_markdown_file(obj):
-    html = render_markdown(obj.content)
+    content = obj.content
+
+    postprocessor_template = getattr(obj, 'xslt', None)
+    if postprocessor_template:
+        transform = sed(postprocessor_template)
+        content = transform(content)
+
+    html = render_markdown(content)
     # import markdown2
     # html = markdown2.markdown(obj.content)
 
@@ -223,6 +231,7 @@ def parse_plain_file(obj):
     current_sections = []
     current_section = None
     current_ident = None
+    content = obj.content
 
     def format_section(section):
         if isinstance(section, list):
@@ -232,8 +241,12 @@ def parse_plain_file(obj):
     def format_content(sections):
         return u'\n'.join(map(format_section, sections))
 
+    postprocessor_template = getattr(obj, 'xslt', None)
+    if postprocessor_template:
+        transform = sed(postprocessor_template)
+        content = transform(content)
 
-    for line in obj.content.split('\n'):
+    for line in content.split('\n'):
         # skip lines like
         # ===================
         if line and line == line[0] * len(line):
@@ -380,8 +393,15 @@ source_suffix = '.rst'
             """Tries to generate HTML from reST with current config.
             If operation was successful, returns content of HTML file.
             """
+            content = obj.content
+
+            postprocessor_template = getattr(obj, 'xslt', None)
+            if postprocessor_template:
+                transform = sed(postprocessor_template)
+                content = transform(content)
+
             with codecs.open(os.path.join(path, 'index.rst'), 'w', 'utf-8') as f:
-                f.write(obj.content)
+                f.write(content)
 
             envoy.run('rm -fr {0}/output/index.html'.format(path))
             command = 'sphinx-build -b html {0} {0}/output'.format(path)

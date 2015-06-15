@@ -15,3 +15,4 @@ from .validators import *
 from .autocomplete import *
 from .churn import *
 from .unreleased import *
+from .postprocessors import *
