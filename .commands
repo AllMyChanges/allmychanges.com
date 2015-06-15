@@ -22,10 +22,12 @@ EOF
 
 
 function manage () {
-    sudo -u www-data bash <<EOF
+    cat > /tmp/amch.command <<EOF
 source env/bin/activate
 env/bin/python manage.py $@ --settings=allmychanges.settings.production
 EOF
+
+    sudo -u www-data bash /tmp/amch.command
 }
 
 function shell () {
