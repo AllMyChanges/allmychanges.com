@@ -94,7 +94,7 @@ def git_history_extractor(path, limit=None):
 
         # containse tuples (_hash, date, msg, parents)
 
-        response = r.std_out.decode('utf-8')
+        response = r.std_out.decode('utf-8', errors='replace')
         groups = (map(string.strip, group.strip().split(ins))
                   for group in response.split(splitter)[:-1])
 
