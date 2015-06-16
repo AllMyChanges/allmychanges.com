@@ -8,3 +8,4 @@ def test_bad_lines():
 
 def test_good_lines():
     eq_('0.9.2b', _extract_version('Version 0.9.2b  [22 Mar 1999]'))
+    eq_('1.0a3', _extract_version('Version 1.0a3'))
