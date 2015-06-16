@@ -87,6 +87,7 @@ def git_history_extractor(path, limit=None):
             tagged_versions = []
         else:
             tagged_versions = find_tagged_versions()
+
             with log.fields(num_tagged_versions=len(tagged_versions)):
                 log.info('Found tagged versions')
 
