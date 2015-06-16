@@ -213,7 +213,9 @@ EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 # http --auth svetlyak40wt https://api.github.com/authorizations scopes:='["public_repo"]' note="Background allmychanges process." client_id="f1106b299e606f5ae13c" client_secret="xxx"
 # copy client_secret from https://github.com/settings/applications/91994
 GITHUB_TOKEN = '6d7d8605f0d53f29b6e049267e8bcbc80577b27f'
-SLACK_URL = 'https://hooks.slack.com/services/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'
+SLACK_URLS = {
+    'default': 'https://hooks.slack.com/services/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'
+}
 KATO_URL = 'https://api.kato.im/rooms/1cade7d59009707e553d60bc9e0760f54dcb8d1f18544d5d2a4c4914998440c1/simple'
 CLOSEIO_KEY = '34c5992096c7f67bd5d22f24e4e87a5837f58af5f326f2cdfda932d4'
 MANDRILL_KEY = 'g3pUEIJTBEd6KGeWkKihgQ'

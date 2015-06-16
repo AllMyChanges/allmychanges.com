@@ -11,11 +11,12 @@ messages = []
 _threads = []
 _threads_lock = threading.Lock()
 
-def send(text):
+def send(text, channel=None):
     # may be refactor it using notifications some day
     def remote_send():
-        if settings.SLACK_URL:
-            requests.post(settings.SLACK_URL,
+        if settings.SLACK_URLS:
+            requests.post(settings.SLACK_URLS.get(channel,
+                                                  settings.SLACK_URLS['default']),
                           data=anyjson.serialize(dict(text=text)))
 
         if settings.KATO_URL:
@@ -30,7 +31,7 @@ def send(text):
     with _threads_lock:
         _threads.append(thread)
 
-    if not settings.KATO_URL and not settings.SLACK_URL:
+    if not settings.KATO_URL and not settings.SLACK_URLS:
         messages.append(text)
 
 

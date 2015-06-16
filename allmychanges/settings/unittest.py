@@ -28,5 +28,5 @@ for queue_options in RQ_QUEUES.itervalues():
 #TEMPLATE_DEBUG = False
 DEBUG_JOBS = True
 
-SLACK_URL = None
+SLACK_URLS = None
 KATO_URL = None
