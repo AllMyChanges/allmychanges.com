@@ -29,11 +29,13 @@
 
 
       {% block anjular-js %}
+        {% compress ang-js %}
         <!-- angular base path: https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/ -->
         <script src="{% static 'angular/angular.js' %}" type="text/javascript" charset="utf-8"></script>
         <script src="{% static 'angular/angular-cookies.min.js' %}" type="text/javascript" charset="utf-8"></script>
         <script src="{% static 'angular/angular-animate.min.js' %}" type="text/javascript" charset="utf-8"></script>
         <script src="{% static 'angular/angucomplete-alt.js' %}" type="text/javascript" charset="utf-8"></script>
+        {% endcompress %}
       {% endblock %}
 
 
