@@ -1,0 +1,16 @@
+{% extends "allmychanges/new-base.html" %}
+<!-- это старая версия лэндинга -->
+{% block ng-app %} ng-app="allMyChangesApp"{% endblock %}
+
+{% block content %}
+<div class="front-message">
+  <h1 class="front-header">Most developers track release notes</h1>
+  <p>Some of them do this manually and waste significant amount of time.</p>
+  <p>But smarter people are always looking a way to automate this process and<br/>finally they come to AllMyChanges.com – changelogs and release notes tracker.</p>
+  <p>AllMyChanges will track release notes for you and will send you a digest with information about new updates.</p>
+</div>
+
+<h1 class="front-header">Try to follow some projects now</h1>
+
+<div class="landing-page-container"></div>
+{% endblock content %}
