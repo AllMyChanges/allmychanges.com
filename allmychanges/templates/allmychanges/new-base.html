@@ -27,7 +27,6 @@
 
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
-    {% compress js %}
 
       {% block anjular-js %}
         <!-- angular base path: https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/ -->
@@ -38,6 +37,7 @@
       {% endblock %}
 
 
+    {% compress js %}
       <script src="/static/bower_components/ramda/dist/ramda.js" type="text/javascript" charset="utf-8"></script>
 
       <script src="/static/bower_components/react/react.js" type="text/javascript" charset="utf-8"></script>
