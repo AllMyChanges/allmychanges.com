@@ -349,6 +349,7 @@ class LandingPackageSuggestView(viewsets.ViewSet):
             scores[ns] -= 1
 
         changelog_ids = list(Changelog.objects.only_active() \
+                                      .exclude(name='allmychanges') \
                                       .annotate(num_trackers=Count('trackers')) \
                                       .values_list('id', 'namespace', 'num_trackers'))
         changelog_ids.sort(key=lambda item: item[2] + scores.get(item[1], 0),
