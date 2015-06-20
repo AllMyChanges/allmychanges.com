@@ -27,19 +27,20 @@
 
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 
-    {% block anjular-js %}
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.js" type="text/javascript" charset="utf-8">
-      </script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8">
-      </script>
-      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-animate.min.js" type="text/javascript" charset="utf-8">
-      </script>
-      <script src="{% static 'angular/angucomplete-alt.js' %}" type="text/javascript" charset="utf-8">
-      </script>
-    {% endblock %}
-
-
     {% compress js %}
+
+      {% block anjular-js %}
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.js" type="text/javascript" charset="utf-8">
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-cookies.min.js" type="text/javascript" charset="utf-8">
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular-animate.min.js" type="text/javascript" charset="utf-8">
+        </script>
+        <script src="{% static 'angular/angucomplete-alt.js' %}" type="text/javascript" charset="utf-8">
+        </script>
+      {% endblock %}
+
+
       <script src="/static/bower_components/ramda/dist/ramda.js" type="text/javascript" charset="utf-8"></script>
 
       <script src="/static/bower_components/react/react.js" type="text/javascript" charset="utf-8"></script>
