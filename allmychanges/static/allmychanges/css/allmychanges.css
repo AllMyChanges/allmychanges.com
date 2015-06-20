@@ -810,11 +810,27 @@ a:hover {
   font-size: 18px;
   line-height: 22px;
   margin-bottom: 2em;
-  margin-right: 2em;
-  width: 75%;
 }
 .front-message p {
   margin-bottom: 22px;
+}
+.front-message__box {
+  border: 5px solid #f4cb89;
+  border-radius: 5px;
+  padding: 20px;
+  padding-top: 0px;
+}
+@media (min-width: 600px) {
+  .front-message__box {
+    margin-left: -20px;
+    margin-right: -20px;
+  }
+}
+.front-message__carl {
+  font-size: 16px;
+  position: relative;
+  text-decoration: none;
+  top: -4px;
 }
 .front-header {
   font-family: Georgia, sans-serif;
@@ -832,6 +848,43 @@ a:hover {
   .front-header {
     font-size: 30px;
     line-height: 40px;
+  }
+}
+.front-subheader {
+  font-family: Georgia, sans-serif;
+  font-weight: 300;
+  margin-top: 37px;
+  margin-bottom: 18px;
+  margin-top: 30px;
+  margin-bottom: 14px;
+}
+@media (min-width: 600px) {
+  .front-subheader {
+    font-size: 48px;
+    line-height: 55px;
+  }
+}
+@media (max-width: 600px) {
+  .front-subheader {
+    font-size: 30px;
+    line-height: 40px;
+  }
+}
+@media (min-width: 600px) {
+  .front-subheader {
+    font-size: 32px;
+    line-height: 44px;
+  }
+}
+@media (max-width: 600px) {
+  .front-subheader {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+@media (min-width: 1150px) {
+  .front-subheader {
+    width: 50%;
   }
 }
 .front-steps__step {

@@ -2,11 +2,27 @@
     font-size: 18px;
     line-height: 22px;
     margin-bottom: 2em;
-    margin-right: 2em;
-    width: 75%;
     
     p {
       margin-bottom: 22px;
+    }
+
+    &__box {
+        border: 5px solid yellow-color;
+        border-radius: 5px;
+        padding: 20px;
+        padding-top: 0px;
+        @media (min-width: 600px) {
+            margin-left: -20px;
+            margin-right: -20px;
+        }
+    }
+
+    &__carl {
+        font-size: 16px;
+        position: relative;
+        text-decoration: none;
+        top: -4px;
     }
 }
 
@@ -28,8 +44,14 @@ level-1-header() {
 level-2-header() {
     level-1-header();
 
-    font-size: 32px;
-    line-height: 44px;
+    @media (min-width: 600px) {
+        font-size: 32px;
+        line-height: 44px;
+    }
+    @media (max-width: 600px) {
+        font-size: 24px;
+        line-height: 32px;
+    }
     margin-top: 30px;
     margin-bottom: 14px;
 }
@@ -54,6 +76,13 @@ level-4-header() {
 
 .front-header {
     level-1-header();
+}
+
+.front-subheader {
+    level-2-header();
+    @media (min-width: 1150px) {
+        width: 50%;
+    }
 }
 
 .front-steps__step {
