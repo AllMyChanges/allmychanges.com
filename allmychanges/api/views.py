@@ -2,14 +2,12 @@
 import re
 
 from django.utils import timezone
-from django.db.models import Max, Q
+from django.db.models import Q, Count
 from django import forms
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_str
-from django.http import HttpResponse
 from itertools import islice
-from twiggy_goodies.threading import log
 from urllib import urlencode
 from collections import defaultdict
 
@@ -319,6 +317,9 @@ class SearchAutocompleteView(viewsets.ViewSet):
 
 
 class LandingPackageSuggestView(viewsets.ViewSet):
+    """This view returns next changelog item for
+    landing page.
+    """
     def list(self, request, *args, **kwargs):
         def process_versions(versions):
             return [{'id': v.id,
@@ -348,8 +349,9 @@ class LandingPackageSuggestView(viewsets.ViewSet):
             scores[ns] -= 1
 
         changelog_ids = list(Changelog.objects.only_active() \
-                                      .values_list('id', 'namespace'))
-        changelog_ids.sort(key=lambda item: scores.get(item[1], 0),
+                                      .annotate(num_trackers=Count('trackers')) \
+                                      .values_list('id', 'namespace', 'num_trackers'))
+        changelog_ids.sort(key=lambda item: item[2] + scores.get(item[1], 0),
                            reverse=True)
         changelog_ids = (item for item in changelog_ids
                          if item[0] not in skip)
@@ -474,8 +476,9 @@ class ChangelogViewSet(HandleExceptionMixin,
             tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
             tracked_changelogs.add(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
-            chat.send(('Package <https://allmychanges.com{url}> was tracked by anonymous user.').format(
-                url=changelog.get_absolute_url()))
+            chat.send(('Package <https://allmychanges.com{url}> was tracked by {light_user}.').format(
+                url=changelog.get_absolute_url(),
+                light_user=request.light_user))
         return response
 
     @action()
@@ -497,8 +500,9 @@ class ChangelogViewSet(HandleExceptionMixin,
             tracked_changelogs.remove(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
 
-            chat.send(('Package <https://allmychanges.com{url}> was untracked by anonymous user.').format(
-                url=changelog.get_absolute_url()))
+            chat.send(('Package <https://allmychanges.com{url}> was untracked by {light_user}.').format(
+                url=changelog.get_absolute_url(),
+                light_user=request.light_user))
         return response
 
 
@@ -523,8 +527,9 @@ class ChangelogViewSet(HandleExceptionMixin,
             skipped_changelogs.add(pk)
             response.set_cookie('skipped-changelogs', join_ints(skipped_changelogs))
 
-            chat.send(('Package <https://allmychanges.com{url}> was skipped by anonymous user.').format(
-                url=changelog.get_absolute_url()))
+            chat.send(('Package <https://allmychanges.com{url}> was skipped by {light_user}.').format(
+                url=changelog.get_absolute_url(),
+                light_user=request.light_user))
         return response
 
 
