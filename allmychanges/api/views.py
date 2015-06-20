@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import random
 
 from django.utils import timezone
 from django.db.models import Q, Count
@@ -358,7 +359,9 @@ class LandingPackageSuggestView(viewsets.ViewSet):
                          if item[0] not in skip)
 
         changelog_ids = [item[0]
-                         for item in islice(changelog_ids, limit)]
+                         for item in islice(changelog_ids, limit * 3)]
+        # adding a little of chaos
+        changelog_ids = random.sample(changelog_ids, limit)
 
         changelogs = Changelog.objects.filter(pk__in=changelog_ids)
 
