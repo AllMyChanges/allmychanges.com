@@ -67,6 +67,7 @@ def send_digest_to(user, period='day'):
                        context=dict(current_user=user,
                                     today_changes=today_changes,
                                     second_period_name=second_period_name,
+                                    other_changes=other_changes,
                                     other_changes_count=len(other_changes)),
                        tags=['allmychanges', 'digest'])
 

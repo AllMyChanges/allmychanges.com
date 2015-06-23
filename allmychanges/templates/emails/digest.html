@@ -1,14 +1,7 @@
 {% extends "emails/base.html" %}
 
 {% block content %}
-    {% include "allmychanges/digest-partial.html" with changes=today_changes title="Last 24 hours" %}
-
-    {% if other_changes_count %}
-      <div class="email-note">
-       <p>Also, during this {{ second_period_name }} {{ other_changes_count }} packages were changed.</p>
-       <p>Read <a href="{% url "digest" %}">full digest</a>.</p>
-      </div>
-    {% endif %}
+    {% include "allmychanges/digest-partial.html" with changes=today_changes title="Last 24 hours" toc="1" %}
 
     <div class="email-note">
       <hr/>

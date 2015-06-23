@@ -1,6 +1,12 @@
 {% load cache md2 %}
   {% if changes %}
   <h2 class="grouped-changes-title">{{title}}</h2>
+    {% if toc %}
+    <p>These packages were changed during the period: {% for package in changes %}<a href="{% url 'package' namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}. See details below.</p>
+      {% if other_changes_count %}
+        <p>Also, during this {{ second_period_name }} these {{other_changes_count}} packages were changed: {% for package in other_changes %}<a href="{% url 'package' namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+      {% endif %}
+    {% endif %}
   <ul class="grouped-changes">
     {% for package in changes %}
     <li class="package-changes">
