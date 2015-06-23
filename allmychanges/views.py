@@ -324,6 +324,8 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         return result
 
     def get(self, *args, **kwargs):
+        chat.send('User {0} trying to view a digest'.format(user.username),
+                  channel='tasks')
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
                              'digest-view',
