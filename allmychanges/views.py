@@ -324,7 +324,7 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         return result
 
     def get(self, *args, **kwargs):
-        chat.send('User {0} trying to view a digest'.format(user.username),
+        chat.send('User {0} trying to view a digest'.format(self.request.user.username),
                   channel='tasks')
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
@@ -808,10 +808,11 @@ class UserHistoryView(SuperuserRequiredMixin,
 
         result['activity_heat_map'] = grouped
 
+        limit = int(self.request.GET.get('limit', '20'))
         result['log'] = UserHistoryLog.objects \
                                       .filter(user=user) \
                                       .prefetch_related('user') \
-                                      .order_by('-id')[:20]
+                                      .order_by('-id')[:limit]
 
         def get_changelog_url(match):
             try:
