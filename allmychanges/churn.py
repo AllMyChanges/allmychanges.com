@@ -81,7 +81,7 @@ def get_graph_data(from_date, to_date):
         cursor.execute('SELECT date, count(state) '
                        'FROM allmychanges_userstatehistory '
                        'WHERE state=%s GROUP BY date',
-                       state)
+                       (state,))
         data = dict(cursor.fetchall())
         data = list(map_days(from_date, to_date, data.get))
         if negative:
