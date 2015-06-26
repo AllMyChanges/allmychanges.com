@@ -27,6 +27,7 @@ nosetests.xml
 *.tar.gz
 /env
 /env2
+/envs-backup/
 /secure_settings.py
 /static
 /data
