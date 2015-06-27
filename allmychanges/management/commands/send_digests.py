@@ -8,11 +8,13 @@ from twiggy_goodies.django import LogMixin
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.core.urlresolvers import reverse
 
 from allmychanges.models import UserHistoryLog
 from allmychanges.views import get_digest_for
 from allmychanges.utils import dt_in_window
 from allmychanges.notifications.email import send_email
+
 
 
 def send_digest_to(user, period='day'):
@@ -46,6 +48,12 @@ def send_digest_to(user, period='day'):
                                        before_date=period_ago,
                                        after_date=second_period_ago,
                                        code_version='v2')
+
+        for changelog in other_changes:
+            changelog['url'] = reverse('package', kwargs=dict(
+                namespace=changelog['namespace'],
+                name=changelog['name']))
+
         def send_to(email):
             if user.username != 'svetlyak40wt' \
                and not email.startswith('svetlyak.40wt') \
@@ -67,8 +75,7 @@ def send_digest_to(user, period='day'):
                        context=dict(current_user=user,
                                     today_changes=today_changes,
                                     second_period_name=second_period_name,
-                                    other_changes=other_changes,
-                                    other_changes_count=len(other_changes)),
+                                    other_changes=other_changes),
                        tags=['allmychanges', 'digest'])
 
         send_to(user.email)
