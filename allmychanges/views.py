@@ -1494,7 +1494,7 @@ class RssFeedView(View):
 
             fe.id(version_url)
             fe.link(href=version_url, rel='alternate')
-            fe.pubdate(arrow.get(version.date or version.discovered_at).datetime())
+            fe.pubdate(arrow.get(version.date or version.discovered_at).datetime)
             fe.title(u'{0}/{1} {2}'.format(
                 ch.namespace, ch.name, version.number))
             fe.content(version.processed_text)
