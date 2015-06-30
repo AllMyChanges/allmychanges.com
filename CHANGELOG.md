@@ -2,6 +2,7 @@
 ===================
 
 Good news, everyone!
+--------------------
 
 We've added a new channel for reading your favorite release
 notes. Now you can subscribe add a feed into your favorite
@@ -12,7 +13,7 @@ RSS reader.
 To get you personal feed's URL, go to the [account settings][account-settings]
 page and discover it in the "integrations" section.
 
-Thank you to [Denis Gladkikh](https://github.com/outcoldman)
+Thanks to [Denis Gladkikh](https://github.com/outcoldman)
 for pushing us into this direction.
 
 0.28.0 (2015-06-16)
