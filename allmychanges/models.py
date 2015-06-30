@@ -129,6 +129,10 @@ class User(AbstractBaseUser):
     webhook_url = models.URLField(max_length=2000,
                                   default='',
                                   blank=True)
+    rss_hash = models.CharField(max_length=32,
+                                unique=True,
+                                blank=True,
+                                null=True)
 
     objects = UserManager()
 
@@ -185,6 +189,11 @@ class User(AbstractBaseUser):
             ChangelogSkip.objects.create(
                 user=self,
                 changelog=changelog)
+
+    def save(self, *args, **kwargs):
+        if self.rss_hash is None:
+            self.rss_hash = sha1(self.username + settings.SECRET_KEY).hexdigest()
+        return super(User, self).save(*args, **kwargs)
 
 
 class Subscription(models.Model):

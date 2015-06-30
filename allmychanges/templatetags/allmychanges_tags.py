@@ -43,7 +43,9 @@ def screenshot_url(request):
 
 @register.filter
 def site_url(request):
+    """Returns full site's url without a backslash at the end.
+    """
     if isinstance(request, basestring):
         # probably called from email sender
-        return 'https://allmychanges.com/'
-    return request.build_absolute_uri('/')
+        return 'https://allmychanges.com'
+    return request.build_absolute_uri('/').rstrip('/')

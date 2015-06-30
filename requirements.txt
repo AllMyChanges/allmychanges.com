@@ -74,6 +74,9 @@ times==0.7
 twiggy-goodies==0.6.0
 twiggy==0.4.7             # via twiggy-goodies
 
+feedgen==0.3.1
+dateutils==0.6.6          # via feedgen
+
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:
 # setuptools==17.1.1        # via cryptography

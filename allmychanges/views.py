@@ -1459,3 +1459,49 @@ class TrackListView(CommonContextMixin, TemplateView):
             namespaces = sorted(set(ch.namespace for ch in changelogs))
             context['suggest_namespaces'] = namespaces
         return context
+
+
+class RssFeedView(View):
+    def get(self, *args, **kwargs):
+        rss_hash = kwargs.get('feed_hash')
+        if rss_hash:
+            user = get_object_or_404(User, rss_hash=rss_hash)
+            versions = Version.objects \
+                              .filter(changelog__trackers=user) \
+                              .exclude(unreleased=True) \
+                              .order_by('-discovered_at')
+        else:
+            raise Http404
+
+        current_url = self.request.build_absolute_uri(self.request.get_full_path())
+
+        from feedgen.feed import FeedGenerator
+        fg = FeedGenerator()
+        fg.id(current_url)
+        fg.title('New Release Notes')
+        fg.author({'name':'AllMyChanges.com','email':'support@allmychanges.com'})
+        fg.link(href=self.request.build_absolute_uri('/'), rel='alternate' )
+        fg.logo('https://allmychanges.com/static/allmychanges/img/logo/48x48.png')
+        fg.subtitle('Fresh news from the opensource world')
+
+        fg.link(href=current_url, rel='self')
+        fg.language('en')
+
+        for version in versions[:20]:
+            ch = version.changelog
+            fe = fg.add_entry()
+            version_url = self.request.build_absolute_uri(ch.get_absolute_url()) + '#' + version.number
+
+            fe.id(version_url)
+            fe.link(href=version_url, rel='alternate')
+            fe.pubdate(arrow.get(version.date or version.discovered_at).datetime())
+            fe.title(u'{0}/{1} {2}'.format(
+                ch.namespace, ch.name, version.number))
+            fe.content(version.processed_text)
+
+
+        content = fg.rss_str(pretty=True)
+
+        response = HttpResponse(content, content_type='application/rss+xml;charset=utf-8')
+        response['Cache-Control'] = 'no-cache'
+        return response

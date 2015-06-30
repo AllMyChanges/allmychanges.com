@@ -41,6 +41,9 @@ django-sendmail-backend
 
 CommonMark
 
+# for building rss feeds
+feedgen
+
 #git+git://github.com/svetlyak40wt/django-oauth-toolkit
 #git+git://github.com/svetlyak40wt/logster.git@allmychanges
 #git+git://github.com/svetlyak40wt/django-sendmail-backend

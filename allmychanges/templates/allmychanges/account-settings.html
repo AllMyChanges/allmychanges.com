@@ -1,5 +1,5 @@
 {% extends "allmychanges/new-base.html" %}
-{% load widget_tweaks %}
+{% load widget_tweaks allmychanges_tags %}
 
 {% block content %}
   <h1 class="page-header">Account settings</h1>
@@ -43,6 +43,13 @@ publish all discovered versions in that channel. Need help? Read <a href="{% url
           {{ form.webhook_url|add_class:"text-input profile-form__webhook-url" }}
           <p class="form__layout__right-column form__help">Enter a webhook's URL here and we'll
 POST all discovered versions there. Need help? Read <a href="{% url 'help' topic='webhooks/' %}">more about using WebHooks</a> and about format of the posted data in our documentation.</p>
+        </td>
+      </tr>
+      <tr class="form__layout__row">
+        <td class="form__layout__left-column"><label class="label">RSS integration:</label></td>
+        <td class="form__layout__right-column">
+          <input type="text" class="text-input" disabled="disabled" value="{{request|site_url}}{% url 'rss-feed' feed_hash=user.rss_hash %}"/>
+          <p class="form__layout__right-column form__help">Copy this URL into you favorite RSS reader.</p>
         </td>
       </tr>
       <tr class="form__layout__row">
