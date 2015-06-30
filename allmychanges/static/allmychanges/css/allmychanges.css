@@ -226,7 +226,7 @@ select {
   background-image: linear-gradient(#ccc, #b8b8b8);
 }
 .button:disabled {
-  color: #333;
+  color: #999;
   background-color: #fff;
   border-color: #e6e6e6;
   background-image: linear-gradient(#fff, #e6e6e6);
@@ -653,6 +653,12 @@ a:hover {
 .new-package__button-cell {
   vertical-align: bottom;
   text-align: right;
+}
+.new-package__button-cell input {
+  margin-right: 20px;
+}
+.new-package__button-cell input:last-of-type {
+  margin-right: 0;
 }
 .new-package__save-tooltip {
   position: absolute;

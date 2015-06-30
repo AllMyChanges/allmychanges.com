@@ -1,6 +1,6 @@
 # dev
 # для тестов
-git+git://github.com/nosedjango/nosedjango.git
+# git+git://github.com/nosedjango/nosedjango.git
 
 # уже стал ставить из PyPi
 # git+git://github.com/svetlyak40wt/unittest-asserts.git

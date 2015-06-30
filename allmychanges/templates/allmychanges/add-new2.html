@@ -1,0 +1,56 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block content %}
+
+{% if title %}
+  <h1 class="page-header {% if step3 %}first-step__header{% endif %}">{{ title }}</h1>
+{% endif %}
+
+{% if changelog %}
+
+{% if can_edit %}
+<div class="add-new-container"
+     data-preview-id="{{ preview.id }}"
+     data-changelog-id="{{ changelog.id }}"
+     data-source="{{ changelog.source }}"
+{% if changelog.name %}
+     data-name="{{ changelog.name }}"{% endif %}
+{% if changelog.namespace %}
+     data-namespace="{{ changelog.namespace }}"{% endif %}
+{% if changelog.namespace %}
+     data-description="{{ changelog.description }}"{% endif %}
+     data-search-list="{{ changelog.search_list }}"
+     data-ignore-list="{{ changelog.ignore_list }}"
+     data-xslt="{{ changelog.xslt }}"
+     data-mode="{{ mode }}"
+     ></div>
+{% else %}
+  {% comment %}can_edit == False{% endcomment %}
+  <p class="plate plate_warning">You are not a moderator of this package. There is no way to become a moderator automatically.<br/>If you feel you need it, write an email to <a href="mailto:support@allmychanges.com">support@allmychanges.com</a> and we'll help you.</p>
+{% endif %}
+
+{% else %}{% comment %} changelog is None {% endcomment %}
+  <div class="add-page__container">
+    <p class="add-page__text">Please enter an URL pointing to a repository or direct link to a changelog file.</p>
+
+    <form method="GET" action="." class="add-page__form">
+      <input type="text" placeholder="Repository's URL or direct link" name="url" class="add-page__input"/>
+      <input type="submit" value="Add" class="button _large _bad add-page__submit-button"/>
+      <div class="clear-both"></div>
+    </form>
+
+    <p class="add-page__text">This could be something like that:</p>
+
+    <ul class="add-page__examples">
+      <li class="add-page__example"><a href="https://github.com/rust-lang/rust">https://github.com/rust-lang/rust</a></li>
+      <li class="add-page__example"><a href="https://bitbucket.org/runeh/anyjson">https://bitbucket.org/runeh/anyjson</a></li>
+      <li class="add-page__example"><a href="http://git.haproxy.org/git/haproxy.git/">http://git.haproxy.org/git/haproxy.git/</a></li>
+      <li class="add-page__example"><a href="https://www.virtualbox.org/wiki/Changelog">https://www.virtualbox.org/wiki/Changelog</a></li>
+    </ul>
+
+    <p class="add-page__text">You know, we are able to work with git and mercurial repositories and with direct links
+      to files, accessable via http. Just try it!</p>
+  </div>
+{% endif %}{% comment %} END changelog is None {% endcomment %}
+{% endblock content %}
+
