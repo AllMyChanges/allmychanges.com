@@ -977,6 +977,9 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
+class AddNewView2(AddNewView):
+    template_name = 'allmychanges/add-new2.html'
+
 
 class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/edit-package.html'
@@ -1003,6 +1006,11 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
             context['can_edit_xslt'] = True
 
         return context
+
+
+class EditPackageView2(EditPackageView):
+    template_name = 'allmychanges/edit-package2.html'
+
 
 
 class PreviewView(CachedMixin, CommonContextMixin, TemplateView):

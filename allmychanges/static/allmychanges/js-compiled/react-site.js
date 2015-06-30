@@ -83,9 +83,10 @@
 	var Share = __webpack_require__(12)
 	var Notifications = __webpack_require__(13)
 	var FeedbackForm = __webpack_require__(14)
+	var PackageSettings = __webpack_require__(15)
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(15)
+	window.intro = __webpack_require__(16)
 
 	$(document).ready(function() {
 	    window.intro.push({'element': $(".magic-prompt")[0],
@@ -157,6 +158,21 @@
 	                React.createElement(FeedbackForm, {page: element.dataset['page']}),
 	                element);
 	        });
+	        $('.add-new-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(PackageSettings, {
+	                     preview_id: element.dataset['previewId'], 
+	                     changelog_id: element.dataset['changelogId'], 
+	                     source: element.dataset['source'], 
+	                     name: element.dataset['name'], 
+	                     namespace: element.dataset['namespace'], 
+	                     description: element.dataset['description'], 
+	                     search_list: element.dataset['searchList'], 
+	                     ignore_list: element.dataset['ignoreList'], 
+	                     xslt: element.dataset['xslt'], 
+	                     mode: element.dataset['mode']}),
+	                element);
+	        });
 	    }
 	}
 
@@ -183,7 +199,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(16)
+	var Promo = __webpack_require__(17)
 
 	module.exports = {
 	    render: function () {
@@ -198,7 +214,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(17)
+	var Landing = __webpack_require__(19)
 
 	module.exports = {
 	    render: function () {
@@ -213,7 +229,7 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(19)
+	var metrika = __webpack_require__(20)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -252,7 +268,7 @@
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(19)
+	var metrika = __webpack_require__(20)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -418,7 +434,7 @@
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(19)
+	var metrika = __webpack_require__(20)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -720,7 +736,7 @@
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(19)
+	var metrika = __webpack_require__(20)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -789,7 +805,397 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 	var PriorityQueue = __webpack_require__(21)
+=======
+=======
+	// тодо:
+	// [X] сделать обработку ошибок namespace и name
+	// [X] поправить disabled стиль для белой кнопки
+	// [X] разобраться почему не отображается footer
+	// [X] доделать сохранение результатов
+	// [X] проверить как оно работает на редактировании пакета
+	// [ ] после нажатия Save&Track нужно дисейблить кнопку save
+	//     и наверное показывать popup.
+	// [ ] сделать отображение сообщений, чтобы они
+	//     приезжали в ответе на save
+
+>>>>>>> WIP
+	module.exports = React.createClass({displayName: 'exports',
+	    // this field keeps state for which preview was generated
+	    preview: {},
+	    validate_namespace_name_timeout: null,
+
+	    getInitialState: function () {
+	        UserStory.log(["init add new page"], ["add"]);
+	        return {tracked: false,
+	                saving: false,
+	                waiting: false,
+	                source: this.props.source,
+	                search_list: this.props.search_list || '',
+	                ignore_list: this.props.ignore_list || '',
+	                xslt: this.props.xslt || '',
+	                results: null,
+	                save_button_title: ((this.props.mode == 'edit') ? 'Save' : 'Save&Track'),
+	                namespace: this.props.namespace || '',
+	                namespace_error: !this.props.namespace && 'Please, fill this field' || '',
+	                name: this.props.name || '',
+	                description: this.props.description || '',
+	                name_error: !this.props.namespace && 'Please, fill this field' || '',
+	                problem: null};
+	    },
+	    componentDidMount: function() {
+	        this.save_preview_params();
+	        this.update_preview_callback();
+	    },
+	    save_preview_params: function () {
+	        this.preview = {
+	            source: this.state.source,
+	            search_list: this.state.search_list,
+	            ignore_list: this.state.ignore_list,
+	            xslt: this.state.xslt};
+	    },
+	    can_save: function() {
+	        var result = (this.state.saving == false
+	                   && this.is_apply_button_disabled()
+	                   && this.state.namespace_error == '' 
+	                   && this.state.name_error == '' 
+	                   && this.state.results);
+	        return result;
+	    },
+	    can_track: function() {
+	        var result = (this.can_save()
+	                   && this.state.tracked == false);
+	        return result;
+	    },
+	    update_preview: function() {
+	        UserStory.log(["updating preview"], ["update"]);
+
+	        // this field keeps state for which preview was generated
+	        this.save_preview_params();
+
+	        $.ajax({url: '/preview/' + this.props.preview_id + '/',
+	                method: 'POST',
+	                data: JSON.stringify(this.preview),
+	                contentType: 'application/json',
+	                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	            .success(this.update_preview_callback);
+	    },
+	    on_field_change: function(event) {
+	        var name = event.target.name;
+	        UserStory.log(["field [name=", name, "] was changed"], ["on"]);
+	        var params = {}
+	        params[name] = event.target.value;
+	        this.setState(params);
+
+	        if (name == 'namespace' || name == 'name') {
+	            this.schedule_validation();
+	        }
+	    },
+	    save: function() {
+	        UserStory.log(["Saving"], ["package"]);
+	        this.setState({saving: true,
+	                       save_button_title: 'Saving...'});
+	        var data = {
+	            'namespace': this.state.namespace,
+	            'description': this.state.description,
+	            'name': this.state.name,
+	            'source': this.state.source,
+	            'search_list': this.state.search_list,
+	            'ignore_list': this.state.ignore_list,
+	            'xslt': this.state.xslt}
+	        return $.ajax({
+	            url: '/v1/changelogs/' + this.props.changelog_id + '/',
+	            method: 'PUT',
+	            data: JSON.stringify(data),
+	            contentType: 'application/json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	            .success(
+	                function() {
+	                    this.setState({
+	                        saving: false,
+	                        save_button_title: 'Save'});
+	//                      check_and_show_messages();
+	                }.bind(this));
+	    },
+	    save_and_track: function() {
+	        UserStory.log(["Saving and tracking"], ["package"]);
+	        this.save().success(function() {
+	            $.ajax({
+	                url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
+	                method: 'POST',
+	                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	                .success(function() {
+	                    this.setState({
+	                        tracked: true,
+	                        package_url: (
+	                            '/p/' + this.state.namespace +
+	                              '/' + this.state.name + '/')});
+	                }.bind(this));
+	        });
+	    },
+	    is_name_or_namespace_were_changed: function() {
+	        return ((this.props.name && this.props.name != this.state.name) ||
+	                (this.props.namespace && this.props.namespace != this.state.namespace));
+	    },
+	    is_apply_button_disabled: function() {
+	        var result = (
+	            this.state.waiting == true
+	        || (this.preview.search_list == this.state.search_list
+	            && this.preview.ignore_list == this.state.ignore_list
+	            && this.preview.xslt == this.state.xslt
+	            && this.preview.source == this.state.source));
+	        return result;
+	    },
+	    schedule_validation: function () {
+	        UserStory.log(["scheduling namespace or name validation"], ["schedule"]);
+	        window.clearTimeout(this.validate_namespace_name_timeout);
+	        this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
+	    },
+	    validate_namespace_and_name: function () {
+	        UserStory.log(["validating namespace and name"], ["validate"]);
+	        $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace
+	              + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id)
+	            .success(function (data) {
+	                var namespace_error = '';
+	                var name_error = '';
+
+	                if (data.errors) {
+	                    if (data.errors.namespace) {
+	                        var namespace_error = data.errors.namespace[0];
+	                    }
+	                    if (data.errors.name) {
+	                        var name_error = data.errors.name[0];
+	                    }
+	                }
+	                this.setState({namespace_error: namespace_error,
+	                               name_error: name_error});
+	            }.bind(this));
+	    },
+	    draw_table: function() {
+	        var xslt_editing_fields = [
+	                React.createElement("tr", null, React.createElement("td", {className: "new-package__xslt-label"}, "XSLT mighty feature!")),
+	                React.createElement("tr", null, 
+	                  React.createElement("td", {className: "new-package__xslt-wrap"}, 
+	                    React.createElement("textarea", {placeholder: "Behold XSLT's mighty power!", 
+	                              className: "new-package__xslt-input", name: "xslt", 
+	                              onChange: this.on_field_change, 
+	                              disabled: this.state.waiting, value: this.state.xslt}))
+	                )];
+	        if (username != 'svetlyak40wt') {
+	            xslt_editing_fields = [];
+	        }
+
+	        var save_callback;
+	        var submit_button_disabled = !this.can_track();
+
+	        if (this.props.mode == 'edit') {
+	            save_callback = this.save;
+	        } else {
+	            save_callback = this.save_and_track;
+	        }
+	        var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save, disabled: submit_button_disabled});
+
+	        var save_tooltip;
+	        if (!this.is_apply_button_disabled()) {
+	            save_tooltip = React.createElement("span", {className: "new-package__save-tooltip"}, "Please, update preview to ensure that we able to get a changelog for this package.");
+	        }
+
+	        var broken_links_warning;
+	        if (this.is_name_or_namespace_were_changed()) {
+	                broken_links_warning = (
+	                        React.createElement("tr", null, 
+	                          React.createElement("td", {className: "new-package__rename-warning", colspan: "2"}, 
+	                            "Beware, renaming this package will broke all links to this package!"
+	                          )
+	                        ));
+	        }
+	        var namespace_error;
+	        if (this.state.namespace_error) {
+	            namespace_error = React.createElement("span", {className: "input__error"}, this.state.namespace_error);
+	        }
+	        var name_error;
+	        if(this.state.name_error) {
+	            name_error = React.createElement("span", {className: "input__error"}, this.state.name_error);
+	        }
+	        var description_error;
+	        if (this.state.description_error) {
+	            description_error = React.createElement("span", {className: "input__error"}, this.state.description_error);
+	        }
+
+	        var content = (React.createElement("table", {className: "new-package__fields-table"}, 
+	       React.createElement("tr", null, 
+	        React.createElement("td", {className: "new-package__namespace-name-cell"}, 
+	          React.createElement("table", {className: "namespace-name-cell__table"}, 
+	            React.createElement("tr", null, 
+	              React.createElement("td", {className: "namespace-name-cell__namespace-cell"}, 
+	                React.createElement("div", {className: "input"}, 
+	                  React.createElement("label", {className: "input__label"}, "Namespace:"), namespace_error, React.createElement("br", null), 
+	                  React.createElement("input", {name: "namespace", type: "text", 
+	                         placeholder: "Namespace (e.g. python, node)", 
+	                         onChange: this.on_field_change, 
+	                         className: "text-input", value: this.state.namespace})
+	                )
+	              )
+	           ), 
+	           React.createElement("tr", null, 
+	              React.createElement("td", {className: "namespace-name-cell__name-cell"}, 
+	                React.createElement("div", {className: "input"}, 
+	                  React.createElement("label", {className: "input__label"}, "Name:"), name_error, React.createElement("br", null), 
+	                  React.createElement("input", {name: "name", type: "text", 
+	                         placeholder: "Package name", 
+	                         onChange: this.on_field_change, 
+	                         className: "text-input", value: this.state.name})
+	                )
+	              )
+	            ), 
+	            broken_links_warning
+	          )
+	        ), 
+	        React.createElement("td", {className: "new-package__button-cell"}
+	        )
+	       ), 
+	       React.createElement("tr", null, 
+	         React.createElement("td", {className: "new-package__description-cell"}, 
+	           React.createElement("div", {className: "input"}, 
+	             React.createElement("label", {className: "input__label"}, "Description:"), description_error, React.createElement("br", null), 
+	             React.createElement("input", {name: "description", type: "text", 
+	                    placeholder: "Tell us what it does", 
+	                    onChange: this.on_field_change, 
+	                    className: "text-input", value: this.state.description})
+	           )
+	         )
+	       ), 
+	       React.createElement("tr", null, 
+	         React.createElement("td", {className: "new-package__search-label"}, "Search in these dirs and files:")
+	       ), 
+	       React.createElement("tr", null, 
+	         React.createElement("td", {className: "new-package__search-input-wrap"}, 
+	             React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
+	                       className: "new-package__search-input", name: "search_list", 
+	                       onChange: this.on_field_change, 
+	                       disabled: this.state.waiting, value: this.state.search_list}))
+	       ), 
+	       React.createElement("tr", null, 
+	         React.createElement("td", {className: "new-package__ignore-label"}, "Ignore these dirs and files:")
+	       ), 
+	       React.createElement("tr", null, 
+	         React.createElement("td", {className: "new-package__ignore-input-wrap"}, 
+	             React.createElement("textarea", {placeholder: "Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.", 
+	                       className: "new-package__ignore-input", name: "ignore_list", 
+	                       onChange: this.on_field_change, 
+	                       disabled: this.state.waiting, value: this.state.ignore_list}))
+	       ), 
+	       xslt_editing_fields, 
+	       React.createElement("tr", null, 
+	        React.createElement("td", {className: "new-package__button-cell"}, 
+	          React.createElement("input", {type: "submit", className: "button _large magic-prompt__apply", value: "Update Preview", onClick: this.update_preview, disabled: this.is_apply_button_disabled()}), 
+	          save_button, 
+	          save_tooltip
+	        )
+	       )
+	     ));
+
+	     return content;
+	    },
+	    wait_for_preview: function () {
+	        UserStory.log(["waiting for preview results"], ["wait"]);
+	        if (this.spinner === undefined) {
+	            UserStory.log(["creating a spinner"], ["wait"]);
+	            this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
+	        }
+
+	        UserStory.log(["checking if preview is ready"], ["wait"]);
+	        $.get('/preview/' + this.props.preview_id + '/')
+	            .success(function(data_orig) {
+	                UserStory.log(["received results about preview state"], ["wait"]);
+	                var data = $(data_orig);
+
+	                if (data.hasClass('please-wait')) {
+	                    UserStory.log(["data has class please-wait"], ["wait"]);
+	                    $('.progress-text').html(data);
+	                    setTimeout(this.wait_for_preview, 1000);
+	                } else {
+	                    UserStory.log(["preview data is ready"], ["wait"]);
+	                    this.setState({waiting: false});
+
+	                    if (data.hasClass('package-changes')) {
+	                        UserStory.log(["showing preview"], ["wait"]);
+	                        this.setState({results: data_orig});
+	                    } else {
+	                        UserStory.log(["showing a problem"], ["wait"]);
+	                        this.setState({problem: data_orig});
+	                    }
+	                }
+	        }.bind(this))
+	        .error(function(data) {
+	            UserStory.log(["some shit happened"], ["wait"]);
+	         });
+	    },
+	    update_preview_callback: function () {
+	        UserStory.log(["resetting state before waiting for preview results"], ["update"]);
+	        this.setState({waiting: true,
+	                       results: null,
+	                       problem: false})
+	        // $scope.orig_search_list = $scope.search_list;
+	        // $scope.orig_ignore_list = $scope.ignore_list;
+	        // $scope.orig_xslt = $scope.xslt;
+	        // $scope.orig_changelog_source = $scope.changelog_source;
+
+	        this.wait_for_preview();
+	    },
+	    render: function() {
+	        var content = [];
+	        if (this.props.mode == 'edit') {
+	            content.push(React.createElement("label", {for: "changelog_source"}, "Changelog's source:"));
+	            content.push(React.createElement("input", {name: "changelog_source", 
+	                                type: "text", 
+	                                placeholder: "Changelog's source URL", 
+	                                className: "text-input", 
+	                                value: this.state.source}));
+	        } else {
+	            if (this.state.tracked) {
+	              content.push(React.createElement("p", {className: "plate"}, "Horay! The package was added and is available ", React.createElement("a", {href: "/p/{this.props.namespace}}/{{this.props.name}}/"}, "on a separate page"), "."));
+	            } else {
+	              content.push(React.createElement("p", {className: "new-package__greeting"}, "There is no package with source url ", React.createElement("a", {className: "new-package__url", href: "{this.props.source}"}, this.props.source), " yet.", React.createElement("br", null), "Please, fill in a namespace and name to track it or return back and ", React.createElement("a", {href: "/p/new/"}, "add another"), " package."));
+	            }
+	            
+	           if (username == "" && this.state.tracked) {
+	               content.push(React.createElement("p", {className: "plate plate_warning"}, "To continue tracking of this package, please, login through ", React.createElement("a", {href: "{login_url_github}"}, "GitHub"), " or ", React.createElement("a", {href: "{login_url_twitter}"}, "Twitter"), "."));
+	           }
+	        }
+
+	        if (!this.state.tracked) {
+	            content = content.concat(this.draw_table());
+	        }
+
+	        if (this.state.waiting) {
+	            content.push(React.createElement("div", {'ng-show': "waiting"}, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
+	                         React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
+	                         ));
+	        }
+	        if (this.state.results && !this.state.tracked) {
+	            content.push(React.createElement("div", null, 
+	                         React.createElement("h1", null, "This is the latest versions for this package"), 
+	                         React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
+	                         ));
+	        }
+
+	        if (this.state.problem) {
+	            content.push(React.createElement("div", {className: "changelog-problem", dangerouslySetInnerHTML: {__html: this.state.problem}}));
+	        }
+	        return (React.createElement("div", {className: "package-settings"}, content));
+	    }
+	});
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PriorityQueue = __webpack_require__(22)
+>>>>>>> Added new add-new view based on react.
 	var _introjs_items = new PriorityQueue(function(a, b) {
 	    return a.priority - b.priority});
 
@@ -827,10 +1233,10 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(19)
+	var metrika = __webpack_require__(20)
 
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
@@ -1022,32 +1428,11 @@
 
 
 /***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var PackageSelector = __webpack_require__(18)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
-	    }
-	});
-
-
-/***/ },
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Package = __webpack_require__(20)
-	var metrika = __webpack_require__(19)
+	var Package = __webpack_require__(21)
+	var metrika = __webpack_require__(20)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -1153,6 +1538,27 @@
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var PackageSelector = __webpack_require__(18)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
+	    }
+	});
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
 	module.exports = {
 	    reach_goal: function(name) {
 	        if (window.yaCounter !== undefined) {
@@ -1164,11 +1570,15 @@
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	TrackButton = __webpack_require__(10)
+<<<<<<< HEAD
 	SkipButton = __webpack_require__(22)
+=======
+	SkipButton = __webpack_require__(23)
+>>>>>>> Added new add-new view based on react.
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -1200,7 +1610,11 @@
 
 
 /***/ },
+<<<<<<< HEAD
 /* 21 */
+=======
+/* 22 */
+>>>>>>> Added new add-new view based on react.
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1378,10 +1792,17 @@
 
 
 /***/ },
+<<<<<<< HEAD
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var metrika = __webpack_require__(19)
+=======
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(20)
+>>>>>>> Added new add-new view based on react.
 
 	module.exports = React.createClass({displayName: 'exports',
 	    perform_action: function(action) {
