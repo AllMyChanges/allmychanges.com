@@ -1,3 +1,20 @@
+0.29.0 (2015-06-30)
+===================
+
+Good news, everyone!
+
+We've added a new channel for reading your favorite release
+notes. Now you can subscribe add a feed into your favorite
+RSS reader.
+
+<img src="https://c2.staticflickr.com/4/3323/3612905889_8fd2868286.jpg" width="500" height="298" alt="Good news, everyone! Futurama returns! by Bill Toenjes, on Flickr: https://www.flickr.com/photos/toomuchdew/3612905889">
+
+To get you personal feed's URL, go to the [account settings][account-settings]
+page and discover it in the "integrations" section.
+
+Thank you to [Denis Gladkikh](https://github.com/outcoldman)
+for pushing us into this direction.
+
 0.28.0 (2015-06-16)
 ===================
 
@@ -998,3 +1015,4 @@ There are plenty directions for approvement. Stay tuned.
 [openssl]: https://allmychanges.com/p/security/openssl/
 [freebsd]: https://allmychanges.com/p/os/freebsd/
 [laravel]: https://allmychanges.com/p/php/laravel/
+[account-settings]: https://allmychanges.com/account/settings/
