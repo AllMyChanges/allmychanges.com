@@ -7,6 +7,7 @@ var MagicPrompt = require('../components/magic-prompt.js')
 var Share = require('../components/share.js')
 var Notifications = require('../components/notifications.js')
 var FeedbackForm = require('../components/feedback-form.js')
+var PackageSettings = require('../components/package-settings.js')
 
 /* make introjs globally available */
 window.intro = require('../components/intro.js')
@@ -79,6 +80,21 @@ module.exports = {
         $('.feedback-form-container').each(function (idx, element) {
             React.render(
                 <FeedbackForm page={element.dataset['page']}/>,
+                element);
+        });
+        $('.add-new-container').each(function (idx, element) {
+            React.render(
+                <PackageSettings
+                     preview_id={element.dataset['preview-id']}
+                     changelog_id={element.dataset['changelog-id']}
+                     source={element.dataset['source']}
+                     name={element.dataset['name']}
+                     namespace={element.dataset['namespace']}
+                     description={element.dataset['description']}
+                     search_list={element.dataset['search_list']}
+                     ignore_list={element.dataset['ignore-list']}
+                     xslt={element.dataset['xslt']}
+                     mode={element.dataset['mode']}/>,
                 element);
         });
     }

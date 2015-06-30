@@ -79,6 +79,8 @@
         // этот username может использоваться при инициализации различных
         // компонентов в views/*.js
         var username = "{{ request.user.username }}";
+        var login_url_github = "{% url "social:begin" "github" %}";
+        var login_url_twitter = "{% url "social:begin" "twitter" %}";
 
         UserStory.configure({
           on: ['*']
