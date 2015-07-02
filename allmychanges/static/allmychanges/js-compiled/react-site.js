@@ -808,14 +808,19 @@
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
 	        UserStory.log(["init add new page"], ["add"]);
-	        return {'tracked': false,
-	                'saving': false,
-	                'waiting': false,
-	                'results': null,
-	                'problem': null};
+	        return {source: this.props.source,
+	                search_list: this.props.search_list,
+	                ignore_list: this.props.ignore_list,
+	                xslt: this.props.xslt,
+	                tracked: false,
+	                saving: false,
+	                waiting: false,
+	                results: null,
+	                problem: null};
 	    },
 	    componentDidMount: function() {
 	        this.form_fields = {};
+	        this.update_preview_callback();
 	    },
 	    can_save: function() {
 	        return false;
@@ -946,6 +951,52 @@
 
 	     return content;
 	    },
+	    wait_for_preview: function () {
+	        if (this.spinner === undefined) {
+	            UserStory.log(["Creating a spinner"], ["package"]);
+	            this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
+	        }
+
+	        $.getJSON('/preview/' + this.props.preview_id + '/')
+	            .success(function(data) {
+	                var data = $(data);
+
+	                if (data.hasClass('please-wait')) {
+	                    $('.progress-text').html(data);
+	                    setTimeout(this.wait_for_preview, 1000);
+	                } else {
+	                    this.setState({waiting: false});
+
+	                    if (data.hasClass('package-changes')) {
+	//                        $('.changelog-preview').html(data);
+	                        this.setState({results: data});
+	                    } else {
+	//                        $('.changelog-problem').html(data);
+	                        this.setState({problem: data});
+	                    }
+	                }
+	        });
+	    },
+	    update_preview_callback: function () {
+	        this.setState({waiting: true,
+	//                       results_ready: false,
+	                       problem: false})
+	        // $scope.orig_search_list = $scope.search_list;
+	        // $scope.orig_ignore_list = $scope.ignore_list;
+	        // $scope.orig_xslt = $scope.xslt;
+	        // $scope.orig_changelog_source = $scope.changelog_source;
+
+	        this.wait_for_preview();
+	    },
+	    on_update_preview: function () {
+	        UserStory.log(["Updating preview"], ["package"]);
+	        $http.post('/preview/' + this.props.preview_id + '/',
+	                   {'source': this.state.source,
+	                    'search_list': this.state.search_list,
+	                    'ignore_list': this.state.ignore_list,
+	                    'xslt': this.state.xslt})
+	            .success(update_preview_callback);
+	    },
 	    render: function() {
 	        var content = [];
 	        if (this.props.mode == 'edit') {
@@ -970,20 +1021,20 @@
 	           }
 
 	           if (this.state.waiting) {
-	               content.push(React.createElement("div", {'ng-show': "waiting"}, React.createElement("div", {class: "progress-text"}, "Please, wait while we search and process its changelog."), 
-	                                React.createElement("div", {class: "results-spin"}, React.createElement("div", {class: "results-spin__wrapper"}))
+	               content.push(React.createElement("div", {'ng-show': "waiting"}, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
+	                                React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
 	                            ));
 	           }
 	           if (this.state.results && !this.state.tracked) {
 	               content.push(React.createElement("div", null, 
 	                              React.createElement("h1", null, "This is the latest versions for this package"), 
-	                              React.createElement("div", {class: "changelog-preview"}, this.state.results)
+	                              React.createElement("div", {className: "changelog-preview"}, this.state.results)
 	                            ));
 	           }
 
 	           if (this.state.problem) {
 	               content.push(React.createElement("div", null, 
-	                                React.createElement("div", {class: "changelog-problem"}, this.state.problem)
+	                                React.createElement("div", {className: "changelog-problem"}, this.state.problem)
 	                            ));
 	           }
 	        }
