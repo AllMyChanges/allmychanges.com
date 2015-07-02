@@ -20,7 +20,7 @@ class Command(LogMixin, BaseCommand):
         response = requests.post(
             'https://mandrillapp.com/api/1.0/messages/search.json',
             data=anyjson.serialize(data),
-            headers={'User-Agent': 'AllMyChanges.com Bot',
+            headers={'User-Agent': settings.HTTP_USER_AGENT,
                      'Content-Type': 'application/json'})
 
         if response.status_code == 200:

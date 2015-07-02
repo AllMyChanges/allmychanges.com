@@ -671,7 +671,7 @@ def rechttp_downloader(source,
             queue.append(url)
 
     def fetch_page(url):
-        response = requests.get(url)
+        response = requests.get(url, headers={'User-Agent': settings.HTTP_USER_AGENT})
         filename = filename_from(response)
 
         if os.environ.get('DEV_DOWNLOAD', None):

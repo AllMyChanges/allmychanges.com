@@ -241,7 +241,7 @@ def notify_users_about_new_versions(changelog_id, version_ids):
                     webhook_data = anyjson.serialize(webhook_data)
                 requests.post(user.webhook_url,
                               data=webhook_data,
-                              headers={'User-Agent': 'AllMyChanges',
+                              headers={'User-Agent': settings.HTTP_USER_AGENT,
                                        'Content-Type': 'application/json'})
 
 

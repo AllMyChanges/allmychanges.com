@@ -232,6 +232,8 @@ UNRELEASED_KEYWORDS = set([
     'release date.*to be determined',
 ])
 
+HTTP_USER_AGENT = 'AllMyChanges.com Bot'
+
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 
