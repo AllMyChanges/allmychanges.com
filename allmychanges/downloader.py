@@ -430,26 +430,24 @@ def http_downloader(source,
 def google_play_guesser(source):
     from allmychanges.models import DESCRIPTION_LENGTH
 
-    response = requests.get(source)
-    text = get_text_from_response(response)
-    tree = html_document_fromstring(text)
+    app_id = google_play_get_id(source)
+    api = google_play_get_api()
+    response = api.details(app_id)
 
-    def get_text(xpath, doc):
-        getter = lxml.html.etree.XPath(xpath)
-        items = getter(doc)
-        if items:
-            return items[0]
-
-    name = get_text('//node()[@itemprop="name"]/div/text()', tree)
+    name = response.docV2.title
     if name:
         name = name.split(' -', 1)[0]
 
-    description = get_text('//node()[@class="id-app-orig-desc"]/text()', tree)
+    description = response.docV2.descriptionHtml
     if description:
         description = first_sentences(description,
                                       DESCRIPTION_LENGTH)
 
-    icon = get_text('//node()[@class="cover-image"]/@src', tree)
+    images = response.docV2.image
+    if images:
+        icon = images[0].imageUrl
+    else:
+        icon = Nonen
     return dict(namespace='android',
                 name=name,
                 description=description,
@@ -498,33 +496,49 @@ def git_guesser(source):
 github_releases_guesser = git_guesser
 
 
+def google_play_get_id(source):
+    match = re.search(ur'id=(?P<app_id>.*)', source)
+    if match is None:
+        raise RuntimeError('Unable to extract app id from source URL')
+    return match.group('app_id')
+
+
+def google_play_get_api():
+    from googleplayapi.googleplay import GooglePlayAPI
+    api = GooglePlayAPI(settings.GOOGLE_PLAY_DEVICE_ID)
+    api.login(settings.GOOGLE_PLAY_USERNAME,
+              settings.GOOGLE_PLAY_PASSWORD)
+    return api
+
+
 def google_play_downloader(source,
                            search_list=[],
                            ignore_list=[]):
     """Downloads latest release note from Google Play.
     """
-    response = requests.get(source)
-    text = get_text_from_response(response)
-    tree = html_document_fromstring(text)
-    get_recent_changes = lxml.html.etree.XPath(
-        '//node()[@class="recent-change"]/text()')
-    get_version = lxml.html.etree.XPath(
-        '//node()[@itemprop="softwareVersion"]/text()')
-    changes = get_recent_changes(tree)
-    version = get_version(tree)
+    app_id = google_play_get_id(source)
+    api = google_play_get_api()
+    response = api.details(app_id)
 
-    content = u''
-    if version:
-        content += version[0].strip()
-        content += u'\n=======\n\n'
-        content += u'\n'.join(changes)
-        content += u'\n'
+    version = response.docV2.details.appDetails.versionString
+    changes = response.docV2.details.appDetails.recentChangesHtml
+    release_date = response.docV2.details.appDetails.uploadDate
+
+    content = u"""
+{version} ({date})
+====================
+
+{changes}
+""".format(version=version,
+           date=release_date,
+           changes=changes)
 
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    inner_path = os.path.join(path, 'GooglePlay')
+    os.mkdir(inner_path)
     try:
-        with cd(path):
-            with open('ChangeLog', 'w') as f:
-                f.write(content.encode('utf-8'))
+        with open(os.path.join(inner_path, 'ChangeLog'), 'w') as f:
+            f.write(content.encode('utf-8'))
 
     except Exception, e:
         if os.path.exists(path):

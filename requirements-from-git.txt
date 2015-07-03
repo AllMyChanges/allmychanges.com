@@ -15,3 +15,8 @@ git+git://github.com/nosedjango/nosedjango.git
 # уже стал ставить из PyPi
 # git+git://github.com/svetlyak40wt/django-markdown2
 # git+git://github.com/trentm/python-markdown2
+
+
+# чтобы в google play ходить
+git+git://github.com/kanzure/googleplay-api.git@develop
+protobuf

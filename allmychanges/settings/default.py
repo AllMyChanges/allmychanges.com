@@ -235,6 +235,10 @@ UNRELEASED_KEYWORDS = set([
 
 HTTP_USER_AGENT = 'AllMyChanges.com Bot'
 
+GOOGLE_PLAY_DEVICE_ID = '392B42751B25945B'
+GOOGLE_PLAY_USERNAME = None
+GOOGLE_PLAY_PASSWORD = None
+
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 
