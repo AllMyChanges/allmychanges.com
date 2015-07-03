@@ -230,6 +230,7 @@ UNRELEASED_KEYWORDS = set([
     'not yet released',
     'release date.*to be decided',
     'release date.*to be determined',
+    'in-progress',
 ])
 
 HTTP_USER_AGENT = 'AllMyChanges.com Bot'
