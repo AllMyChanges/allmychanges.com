@@ -295,3 +295,8 @@ ns['re.sub'] = sub
 def match(context, pattern, text):
     return re.match(pattern, text[0]) is not None
 ns['re.sub'] = sub
+
+
+SHELL_PLUS_PRE_IMPORTS = (
+    ('allmychanges.shell', '*'),
+)
