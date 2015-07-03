@@ -1,7 +1,7 @@
 {% extends "emails/base.html" %}
 
 {% block content %}
-    {% include "allmychanges/digest-partial.html" with changes=today_changes title="Last 24 hours" toc="1" %}
+    {% include "allmychanges/digest-partial.html" with changes=today_changes title="Recent releases" toc="1" %}
 
     <div class="email-note">
       <hr/>
