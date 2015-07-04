@@ -361,7 +361,7 @@ class LandingPackageSuggestView(viewsets.ViewSet):
         changelog_ids = [item[0]
                          for item in islice(changelog_ids, limit * 3)]
         # adding a little of chaos
-        if len(changelog_ids > limit):
+        if len(changelog_ids) > limit:
             changelog_ids = random.sample(changelog_ids, limit)
 
         changelogs = Changelog.objects.filter(pk__in=changelog_ids)
