@@ -199,7 +199,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(18)
+	var Promo = __webpack_require__(17)
 
 	module.exports = {
 	    render: function () {
@@ -214,7 +214,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(17)
+	var Landing = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -806,15 +806,16 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// тодо:
-	// сделать обработку ошибок namespace и name
-	// поправить disabled стиль для белой кнопки
-	// разобраться почему не отображается footer
-	// доделать сохранение результатов
-	// проверить как оно работает на редактировании пакета
+	// [X] сделать обработку ошибок namespace и name
+	// [X] поправить disabled стиль для белой кнопки
+	// [X] разобраться почему не отображается footer
+	// [ ] доделать сохранение результатов
+	// [ ] проверить как оно работает на редактировании пакета
 
 	module.exports = React.createClass({displayName: 'exports',
 	    // this field keeps state for which preview was generated
 	    preview: {},
+	    validate_namespace_name_timeout: null,
 
 	    getInitialState: function () {
 	        UserStory.log(["init add new page"], ["add"]);
@@ -826,9 +827,15 @@
 	                ignore_list: this.props.ignore_list || '',
 	                xslt: this.props.xslt || '',
 	                results: null,
-	                namespace_error: '',
-	                name_error: '',
+	                namespace: this.props.namespace || '',
+	                namespace_error: !this.props.namespace && 'Please, fill this field' || '',
+	                name: this.props.name || '',
+	                name_error: !this.props.namespace && 'Please, fill this field' || '',
 	                problem: null};
+	    },
+	    componentDidMount: function() {
+	        this.save_preview_params();
+	        this.update_preview_callback();
 	    },
 	    save_preview_params: function () {
 	        this.preview = {
@@ -836,10 +843,6 @@
 	            search_list: this.state.search_list,
 	            ignore_list: this.state.ignore_list,
 	            xslt: this.state.xslt};
-	    },
-	    componentDidMount: function() {
-	        this.save_preview_params();
-	        this.update_preview_callback();
 	    },
 	    can_save: function() {
 	        var result = (this.state.saving == false
@@ -867,12 +870,16 @@
 	               headers: {'X-CSRFToken': $.cookie('csrftoken')}})
 	            .success(this.update_preview_callback);
 	    },
-	    onFieldChange: function(event) {
+	    on_field_change: function(event) {
 	        var name = event.target.name;
 	        UserStory.log(["field [name=", name, "] was changed"], ["on"]);
 	        var params = {}
 	        params[name] = event.target.value;
 	        this.setState(params);
+
+	        if (name == 'namespace' || name == 'name') {
+	            this.schedule_validation();
+	        }
 	    },
 	    save: function() {
 	        UserStory.log(["Saving"], ["package"]);
@@ -881,7 +888,8 @@
 	        UserStory.log(["Saving and tracking"], ["package"]);
 	    },
 	    is_name_or_namespace_were_changed: function() {
-	        return false;
+	        return ((this.props.name && this.props.name != this.state.name) ||
+	                (this.props.namespace && this.props.namespace != this.state.namespace));
 	    },
 	    is_apply_button_disabled: function() {
 	        var result = (
@@ -892,11 +900,36 @@
 	            && this.preview.source == this.state.source));
 	        return result;
 	    },
+	    schedule_validation: function () {
+	        UserStory.log(["scheduling namespace or name validation"], ["schedule"]);
+	        window.clearTimeout(this.validate_namespace_name_timeout);
+	        this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
+	    },
+	    validate_namespace_and_name: function () {
+	        UserStory.log(["validating namespace and name"], ["validate"]);
+	        $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace
+	              + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id)
+	            .success(function (data) {
+	                var namespace_error = '';
+	                var name_error = '';
+
+	                if (data.errors) {
+	                    if (data.errors.namespace) {
+	                        var namespace_error = data.errors.namespace[0];
+	                    }
+	                    if (data.errors.name) {
+	                        var name_error = data.errors.name[0];
+	                    }
+	                }
+	                this.setState({namespace_error: namespace_error,
+	                               name_error: name_error});
+	            }.bind(this));
+	    },
 	    draw_table: function() {
 	        var xslt_editing_fields = [
 	                React.createElement("tr", null, React.createElement("td", {className: "new-package__xslt-label"}, "XSLT mighty feature!")),
 	                React.createElement("tr", null, 
-	                  React.createElement("td", {className: "new-package__xslt-wrap"}, React.createElement("textarea", {placeholder: "Behold XSLT\\'s mighty power!", className: "new-package__xslt-input", name: "xslt", onChange: this.onFieldChange, disabled: this.state.waiting}))
+	                  React.createElement("td", {className: "new-package__xslt-wrap"}, React.createElement("textarea", {placeholder: "Behold XSLT\\'s mighty power!", className: "new-package__xslt-input", name: "xslt", onChange: this.on_field_change, disabled: this.state.waiting}))
 	                )];
 	        if (username != 'svetlyak40wt') {
 	            xslt_editing_fields = [];
@@ -946,7 +979,7 @@
 	              React.createElement("td", {className: "namespace-name-cell__namespace-cell"}, 
 	                React.createElement("div", {className: "input"}, 
 	                  React.createElement("label", {className: "input__label"}, "Namespace:"), namespace_error, React.createElement("br", null), 
-	                  React.createElement("input", {name: "namespace", type: "text", placeholder: "Namespace (e.g. python, node)", onChange: this.onFieldChange, className: "text-input", value: this.props.namespace})
+	                  React.createElement("input", {name: "namespace", type: "text", placeholder: "Namespace (e.g. python, node)", onChange: this.on_field_change, className: "text-input", value: this.props.namespace})
 	                )
 	              )
 	           ), 
@@ -954,7 +987,7 @@
 	              React.createElement("td", {className: "namespace-name-cell__name-cell"}, 
 	                React.createElement("div", {className: "input"}, 
 	                  React.createElement("label", {className: "input__label"}, "Name:"), name_error, React.createElement("br", null), 
-	                  React.createElement("input", {name: "name", type: "text", placeholder: "Package name", onChange: this.onFieldChange, className: "text-input"})
+	                  React.createElement("input", {name: "name", type: "text", placeholder: "Package name", onChange: this.on_field_change, className: "text-input"})
 	                )
 	              )
 	            ), 
@@ -968,7 +1001,7 @@
 	         React.createElement("td", {className: "new-package__description-cell"}, 
 	           React.createElement("div", {className: "input"}, 
 	             React.createElement("label", {className: "input__label"}, "Description:"), description_error, React.createElement("br", null), 
-	             React.createElement("input", {name: "description", type: "text", placeholder: "Tell us what it does", onChange: this.onFieldChange, className: "text-input"})
+	             React.createElement("input", {name: "description", type: "text", placeholder: "Tell us what it does", onChange: this.on_field_change, className: "text-input"})
 	           )
 	         )
 	       ), 
@@ -976,13 +1009,13 @@
 	         React.createElement("td", {className: "new-package__search-label"}, "Search in these dirs and files:")
 	       ), 
 	       React.createElement("tr", null, 
-	         React.createElement("td", {className: "new-package__search-input-wrap"}, React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", className: "new-package__search-input", name: "search_list", onChange: this.onFieldChange, disabled: this.state.waiting}))
+	         React.createElement("td", {className: "new-package__search-input-wrap"}, React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", className: "new-package__search-input", name: "search_list", onChange: this.on_field_change, disabled: this.state.waiting}))
 	       ), 
 	       React.createElement("tr", null, 
 	         React.createElement("td", {className: "new-package__ignore-label"}, "Ignore these dirs and files:")
 	       ), 
 	       React.createElement("tr", null, 
-	         React.createElement("td", {className: "new-package__ignore-input-wrap"}, React.createElement("textarea", {placeholder: "Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.", className: "new-package__ignore-input", name: "ignore_list", onChange: this.onFieldChange, disabled: this.state.waiting}))
+	         React.createElement("td", {className: "new-package__ignore-input-wrap"}, React.createElement("textarea", {placeholder: "Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.", className: "new-package__ignore-input", name: "ignore_list", onChange: this.on_field_change, disabled: this.state.waiting}))
 	       ), 
 	       xslt_editing_fields, 
 	       React.createElement("tr", null, 
@@ -1129,27 +1162,6 @@
 
 /***/ },
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var PackageSelector = __webpack_require__(19)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
-	    }
-	});
-
-
-/***/ },
-/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var metrika = __webpack_require__(20)
@@ -1339,6 +1351,27 @@
 	                React.createElement("div", {className: "ios-promo__digest"})
 	            )
 	        );
+	    }
+	});
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PackageSelector = __webpack_require__(19)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
 	    }
 	});
 

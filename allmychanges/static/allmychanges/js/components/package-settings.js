@@ -1,13 +1,14 @@
 // тодо:
-// сделать обработку ошибок namespace и name
-// поправить disabled стиль для белой кнопки
-// разобраться почему не отображается footer
-// доделать сохранение результатов
-// проверить как оно работает на редактировании пакета
+// [X] сделать обработку ошибок namespace и name
+// [X] поправить disabled стиль для белой кнопки
+// [X] разобраться почему не отображается footer
+// [ ] доделать сохранение результатов
+// [ ] проверить как оно работает на редактировании пакета
 
 module.exports = React.createClass({
     // this field keeps state for which preview was generated
     preview: {},
+    validate_namespace_name_timeout: null,
 
     getInitialState: function () {
         // init add new page @add-new
@@ -19,9 +20,15 @@ module.exports = React.createClass({
                 ignore_list: this.props.ignore_list || '',
                 xslt: this.props.xslt || '',
                 results: null,
-                namespace_error: '',
-                name_error: '',
+                namespace: this.props.namespace || '',
+                namespace_error: !this.props.namespace && 'Please, fill this field' || '',
+                name: this.props.name || '',
+                name_error: !this.props.namespace && 'Please, fill this field' || '',
                 problem: null};
+    },
+    componentDidMount: function() {
+        this.save_preview_params();
+        this.update_preview_callback();
     },
     save_preview_params: function () {
         this.preview = {
@@ -29,10 +36,6 @@ module.exports = React.createClass({
             search_list: this.state.search_list,
             ignore_list: this.state.ignore_list,
             xslt: this.state.xslt};
-    },
-    componentDidMount: function() {
-        this.save_preview_params();
-        this.update_preview_callback();
     },
     can_save: function() {
         var result = (this.state.saving == false
@@ -60,12 +63,16 @@ module.exports = React.createClass({
                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
     },
-    onFieldChange: function(event) {
+    on_field_change: function(event) {
         var name = event.target.name;
         // field [name] was changed @on-field-change
         var params = {}
         params[name] = event.target.value;
         this.setState(params);
+
+        if (name == 'namespace' || name == 'name') {
+            this.schedule_validation();
+        }
     },
     save: function() {
         // Saving @package-settings
@@ -74,7 +81,8 @@ module.exports = React.createClass({
         // Saving and tracking @package-settings
     },
     is_name_or_namespace_were_changed: function() {
-        return false;
+        return ((this.props.name && this.props.name != this.state.name) ||
+                (this.props.namespace && this.props.namespace != this.state.namespace));
     },
     is_apply_button_disabled: function() {
         var result = (
@@ -85,11 +93,36 @@ module.exports = React.createClass({
             && this.preview.source == this.state.source));
         return result;
     },
+    schedule_validation: function () {
+        // scheduling namespace or name validation @schedule-validation
+        window.clearTimeout(this.validate_namespace_name_timeout);
+        this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
+    },
+    validate_namespace_and_name: function () {
+        // validating namespace and name @validate-namespace-and-name
+        $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace
+              + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id)
+            .success(function (data) {
+                var namespace_error = '';
+                var name_error = '';
+
+                if (data.errors) {
+                    if (data.errors.namespace) {
+                        var namespace_error = data.errors.namespace[0];
+                    }
+                    if (data.errors.name) {
+                        var name_error = data.errors.name[0];
+                    }
+                }
+                this.setState({namespace_error: namespace_error,
+                               name_error: name_error});
+            }.bind(this));
+    },
     draw_table: function() {
         var xslt_editing_fields = [
                 <tr><td className="new-package__xslt-label">XSLT mighty feature!</td></tr>,
                 <tr>
-                  <td className="new-package__xslt-wrap"><textarea placeholder="Behold XSLT\'s mighty power!" className="new-package__xslt-input" name="xslt" onChange={this.onFieldChange} disabled={this.state.waiting}></textarea></td>
+                  <td className="new-package__xslt-wrap"><textarea placeholder="Behold XSLT\'s mighty power!" className="new-package__xslt-input" name="xslt" onChange={this.on_field_change} disabled={this.state.waiting}></textarea></td>
                 </tr>];
         if (username != 'svetlyak40wt') {
             xslt_editing_fields = [];
@@ -139,7 +172,7 @@ module.exports = React.createClass({
               <td className="namespace-name-cell__namespace-cell">
                 <div className="input">
                   <label className="input__label">Namespace:</label>{namespace_error}<br/>
-                  <input name="namespace" type="text" placeholder="Namespace (e.g. python, node)" onChange={this.onFieldChange} className="text-input" value={this.props.namespace}/>
+                  <input name="namespace" type="text" placeholder="Namespace (e.g. python, node)" onChange={this.on_field_change} className="text-input" value={this.props.namespace}/>
                 </div>
               </td>
            </tr>
@@ -147,7 +180,7 @@ module.exports = React.createClass({
               <td className="namespace-name-cell__name-cell">
                 <div className="input">
                   <label className="input__label">Name:</label>{name_error}<br/>
-                  <input name="name" type="text" placeholder="Package name" onChange={this.onFieldChange} className="text-input"/>
+                  <input name="name" type="text" placeholder="Package name" onChange={this.on_field_change} className="text-input"/>
                 </div>
               </td>
             </tr>
@@ -161,7 +194,7 @@ module.exports = React.createClass({
          <td className="new-package__description-cell">
            <div className="input">
              <label className="input__label">Description:</label>{description_error}<br/>
-             <input name="description" type="text" placeholder="Tell us what it does" onChange={this.onFieldChange} className="text-input"/>
+             <input name="description" type="text" placeholder="Tell us what it does" onChange={this.on_field_change} className="text-input"/>
            </div>
          </td>
        </tr>
@@ -169,13 +202,13 @@ module.exports = React.createClass({
          <td className="new-package__search-label">Search in these dirs and files:</td>
        </tr>
        <tr>
-         <td className="new-package__search-input-wrap"><textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search." className="new-package__search-input" name="search_list" onChange={this.onFieldChange} disabled={this.state.waiting}></textarea></td>
+         <td className="new-package__search-input-wrap"><textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search." className="new-package__search-input" name="search_list" onChange={this.on_field_change} disabled={this.state.waiting}></textarea></td>
        </tr>
        <tr>
          <td className="new-package__ignore-label">Ignore these dirs and files:</td>
        </tr>
        <tr>
-         <td className="new-package__ignore-input-wrap"><textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places." className="new-package__ignore-input" name="ignore_list" onChange={this.onFieldChange} disabled={this.state.waiting}></textarea></td>
+         <td className="new-package__ignore-input-wrap"><textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places." className="new-package__ignore-input" name="ignore_list" onChange={this.on_field_change} disabled={this.state.waiting}></textarea></td>
        </tr>
        {xslt_editing_fields}
        <tr>
