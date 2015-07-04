@@ -85,8 +85,8 @@ module.exports = {
         $('.add-new-container').each(function (idx, element) {
             React.render(
                 <PackageSettings
-                     preview_id={element.dataset['preview-id']}
-                     changelog_id={element.dataset['changelog-id']}
+                     preview_id={element.dataset['previewId']}
+                     changelog_id={element.dataset['changelogId']}
                      source={element.dataset['source']}
                      name={element.dataset['name']}
                      namespace={element.dataset['namespace']}

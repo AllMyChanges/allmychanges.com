@@ -161,8 +161,8 @@
 	        $('.add-new-container').each(function (idx, element) {
 	            React.render(
 	                React.createElement(PackageSettings, {
-	                     preview_id: element.dataset['preview-id'], 
-	                     changelog_id: element.dataset['changelog-id'], 
+	                     preview_id: element.dataset['previewId'], 
+	                     changelog_id: element.dataset['changelogId'], 
 	                     source: element.dataset['source'], 
 	                     name: element.dataset['name'], 
 	                     namespace: element.dataset['namespace'], 
@@ -805,35 +805,74 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// тодо:
+	// сделать обработку ошибок namespace и name
+	// поправить disabled стиль для белой кнопки
+	// разобраться почему не отображается footer
+	// доделать сохранение результатов
+	// проверить как оно работает на редактировании пакета
+
 	module.exports = React.createClass({displayName: 'exports',
+	    // this field keeps state for which preview was generated
+	    preview: {},
+
 	    getInitialState: function () {
 	        UserStory.log(["init add new page"], ["add"]);
-	        return {source: this.props.source,
-	                search_list: this.props.search_list,
-	                ignore_list: this.props.ignore_list,
-	                xslt: this.props.xslt,
-	                tracked: false,
+	        return {tracked: false,
 	                saving: false,
 	                waiting: false,
+	                source: this.props.source,
+	                search_list: this.props.search_list || '',
+	                ignore_list: this.props.ignore_list || '',
+	                xslt: this.props.xslt || '',
 	                results: null,
+	                namespace_error: '',
+	                name_error: '',
 	                problem: null};
 	    },
+	    save_preview_params: function () {
+	        this.preview = {
+	            source: this.state.source,
+	            search_list: this.state.search_list,
+	            ignore_list: this.state.ignore_list,
+	            xslt: this.state.xslt};
+	    },
 	    componentDidMount: function() {
-	        this.form_fields = {};
+	        this.save_preview_params();
 	        this.update_preview_callback();
 	    },
 	    can_save: function() {
-	        return false;
+	        var result = (this.state.saving == false
+	                   && this.is_apply_button_disabled()
+	                   && this.state.namespace_error == '' 
+	                   && this.state.name_error == '' 
+	                   && this.state.results);
+	        return result;
 	    },
 	    can_track: function() {
-	        return false;
+	        var result = (this.can_save()
+	                   && this.state.tracked == false);
+	        return result;
 	    },
 	    update_preview: function() {
-	        UserStory.log(["Updating preview"], ["package"]);
+	        UserStory.log(["updating preview"], ["update"]);
+
+	        // this field keeps state for which preview was generated
+	        this.save_preview_params();
+
+	        $.ajax({url: '/preview/' + this.props.preview_id + '/',
+	                method: 'POST',
+	                data: JSON.stringify(this.preview),
+	                contentType: 'application/json',
+	               headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	            .success(this.update_preview_callback);
 	    },
 	    onFieldChange: function(event) {
-	        this.form_fields[event.target.name] = event.target.value;
-	        // ng-change="schedule_validation()"
+	        var name = event.target.name;
+	        UserStory.log(["field [name=", name, "] was changed"], ["on"]);
+	        var params = {}
+	        params[name] = event.target.value;
+	        this.setState(params);
 	    },
 	    save: function() {
 	        UserStory.log(["Saving"], ["package"]);
@@ -845,7 +884,13 @@
 	        return false;
 	    },
 	    is_apply_button_disabled: function() {
-	        return false;
+	        var result = (
+	            this.state.waiting == true
+	        || (this.preview.search_list == this.state.search_list
+	            && this.preview.ignore_list == this.state.ignore_list
+	            && this.preview.xslt == this.state.xslt
+	            && this.preview.source == this.state.source));
+	        return result;
 	    },
 	    draw_table: function() {
 	        var xslt_editing_fields = [
@@ -867,7 +912,7 @@
 	        }
 
 	        var save_tooltip;
-	        if (this.can_save() && !this.state.saving) {
+	        if (!this.is_apply_button_disabled()) {
 	            save_tooltip = React.createElement("span", {className: "new-package__save-tooltip"}, "Please, update preview to ensure that we able to get a changelog for this package.");
 	        }
 
@@ -952,34 +997,43 @@
 	     return content;
 	    },
 	    wait_for_preview: function () {
+	        UserStory.log(["waiting for preview results"], ["wait"]);
 	        if (this.spinner === undefined) {
-	            UserStory.log(["Creating a spinner"], ["package"]);
+	            UserStory.log(["creating a spinner"], ["wait"]);
 	            this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
 	        }
 
-	        $.getJSON('/preview/' + this.props.preview_id + '/')
-	            .success(function(data) {
-	                var data = $(data);
+	        UserStory.log(["checking if preview is ready"], ["wait"]);
+	        $.get('/preview/' + this.props.preview_id + '/')
+	            .success(function(data_orig) {
+	                UserStory.log(["received results about preview state"], ["wait"]);
+	                var data = $(data_orig);
 
 	                if (data.hasClass('please-wait')) {
+	                    UserStory.log(["data has class please-wait"], ["wait"]);
 	                    $('.progress-text').html(data);
 	                    setTimeout(this.wait_for_preview, 1000);
 	                } else {
+	                    UserStory.log(["preview data is ready"], ["wait"]);
 	                    this.setState({waiting: false});
 
 	                    if (data.hasClass('package-changes')) {
-	//                        $('.changelog-preview').html(data);
-	                        this.setState({results: data});
+	                        UserStory.log(["showing preview"], ["wait"]);
+	                        this.setState({results: data_orig});
 	                    } else {
-	//                        $('.changelog-problem').html(data);
-	                        this.setState({problem: data});
+	                        UserStory.log(["showing a problem"], ["wait"]);
+	                        this.setState({problem: data_orig});
 	                    }
 	                }
-	        });
+	        }.bind(this))
+	        .error(function(data) {
+	            UserStory.log(["some shit happened"], ["wait"]);
+	         });
 	    },
 	    update_preview_callback: function () {
+	        UserStory.log(["resetting state before waiting for preview results"], ["update"]);
 	        this.setState({waiting: true,
-	//                       results_ready: false,
+	                       results: null,
 	                       problem: false})
 	        // $scope.orig_search_list = $scope.search_list;
 	        // $scope.orig_ignore_list = $scope.ignore_list;
@@ -987,15 +1041,6 @@
 	        // $scope.orig_changelog_source = $scope.changelog_source;
 
 	        this.wait_for_preview();
-	    },
-	    on_update_preview: function () {
-	        UserStory.log(["Updating preview"], ["package"]);
-	        $http.post('/preview/' + this.props.preview_id + '/',
-	                   {'source': this.state.source,
-	                    'search_list': this.state.search_list,
-	                    'ignore_list': this.state.ignore_list,
-	                    'xslt': this.state.xslt})
-	            .success(update_preview_callback);
 	    },
 	    render: function() {
 	        var content = [];
@@ -1028,14 +1073,12 @@
 	           if (this.state.results && !this.state.tracked) {
 	               content.push(React.createElement("div", null, 
 	                              React.createElement("h1", null, "This is the latest versions for this package"), 
-	                              React.createElement("div", {className: "changelog-preview"}, this.state.results)
+	                              React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
 	                            ));
 	           }
 
 	           if (this.state.problem) {
-	               content.push(React.createElement("div", null, 
-	                                React.createElement("div", {className: "changelog-problem"}, this.state.problem)
-	                            ));
+	               content.push(React.createElement("div", {className: "changelog-problem", dangerouslySetInnerHTML: {__html: this.state.problem}}));
 	           }
 	        }
 	        return (React.createElement("div", {className: "package-settings"}, content));
