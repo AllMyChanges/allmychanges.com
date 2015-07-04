@@ -1008,6 +1008,11 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
+class EditPackageView2(EditPackageView):
+    template_name = 'allmychanges/edit-package2.html'
+
+
+
 class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
     """This view is used to preview how changelog will look like
     at "Add New" page.

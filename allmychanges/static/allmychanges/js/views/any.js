@@ -91,8 +91,8 @@ module.exports = {
                      name={element.dataset['name']}
                      namespace={element.dataset['namespace']}
                      description={element.dataset['description']}
-                     search_list={element.dataset['search_list']}
-                     ignore_list={element.dataset['ignore-list']}
+                     search_list={element.dataset['searchList']}
+                     ignore_list={element.dataset['ignoreList']}
                      xslt={element.dataset['xslt']}
                      mode={element.dataset['mode']}/>,
                 element);
