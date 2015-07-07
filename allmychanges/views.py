@@ -970,7 +970,7 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             context['preview'] = preview
             context['can_edit'] = True
 
-            if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
+            if self.request.user.is_authenticated() and self.request.user.username in settings.ADVANCED_EDITORS:
                 context['can_edit_xslt'] = True
 
         context['mode'] = 'add-new'
