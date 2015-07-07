@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
+	var PackageSelector = __webpack_require__(16)
 
 	module.exports = {
 	    render: function () {
@@ -183,7 +183,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(16)
+	var Promo = __webpack_require__(17)
 
 	module.exports = {
 	    render: function () {
@@ -198,7 +198,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(17)
+	var Landing = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -830,6 +830,113 @@
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var Package = __webpack_require__(20)
+	var metrika = __webpack_require__(19)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        return {packages: [],
+	                tracked: []};
+	    },
+	    load_package: function () {
+	        $.ajax({
+	            url: this.props.url,
+	            dataType: 'json',
+	            success: function(data) {
+	                var results = data.results;
+	                if (results.length > 0) {
+	                    this.setState({package: results[0]});
+	                } else {
+	                    // TODO: somethings
+	                }
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+
+	    },
+	    componentDidMount: function() {
+	        this.load_package();
+	    },
+	    render: function() {
+	        var track_handler = function (changelog) {
+	            var tracked = this.state.tracked;
+	            tracked[tracked.length] = changelog;
+
+	            if (tracked.length == 1) {
+	                metrika.reach_goal('LAND-TRACK-1');
+	            }
+	            if (tracked.length == 3) {
+	                metrika.reach_goal('LAND-TRACK-3');
+	            }
+	            if (tracked.length == 5) {
+	                metrika.reach_goal('LAND-TRACK-5');
+	            }
+
+	            this.setState({tracked: tracked});
+	            this.load_package();
+	        }.bind(this);
+
+	        var skip_handler = function () {
+	            this.load_package();
+	        }.bind(this);
+
+	        var pkg_obj;
+	        var pkg = this.state.package;
+	        if (pkg !== undefined) {
+	            pkg_obj = React.createElement(Package, {key: pkg.id, 
+	                           changelog_id: pkg.id, 
+	                           namespace: pkg.namespace, 
+	                           name: pkg.name, 
+	                           description: pkg.description, 
+	                           versions: pkg.versions, 
+	                           track_handler: track_handler, 
+	                           skip_handler: skip_handler});
+	        }
+
+	        var tracked = _.map(this.state.tracked,
+	                            function (changelog) {
+	                                return (
+	            React.createElement("li", {key: changelog.id}, changelog.namespace, "/", changelog.name));});
+
+	        var tracked_msg, login_msg;
+	        if (username == '') {
+	            login_msg = (React.createElement("p", null, "To see full release notes and to receive notifications on future updates, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter")));
+	        }
+	        
+	        if (tracked.length > 0) {
+	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
+	                React.createElement("p", null, "You've followed these packages:"), 
+	                React.createElement("ul", null, tracked), 
+	                login_msg
+	            ));
+
+	            // when first package is tracked, scroll down
+	            // to show the buttons
+	            if (login_msg && tracked.length == 1) {
+	                setTimeout(function() {
+	                    $('html, body').animate({
+	                        scrollTop: $("#package-selector__login-button-id").offset().top
+	                    }, 2000)
+	                }, 200);
+	            }
+	        }
+	                                        
+	        return (
+	            React.createElement("div", {className: "package-selector"}, 
+	                pkg_obj, 
+	                tracked_msg
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var metrika = __webpack_require__(19)
 
 	// uses jquery typeahead plugin:
@@ -1022,10 +1129,10 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
+	var PackageSelector = __webpack_require__(16)
 
 	module.exports = React.createClass({displayName: 'exports',
 	    getInitialState: function () {
@@ -1038,113 +1145,6 @@
 	        return (React.createElement("div", {className: "landing-page"}, 
 	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
 	                ));
-	    }
-	});
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Package = __webpack_require__(20)
-	var metrika = __webpack_require__(19)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {packages: [],
-	                tracked: []};
-	    },
-	    load_package: function () {
-	        $.ajax({
-	            url: this.props.url,
-	            dataType: 'json',
-	            success: function(data) {
-	                var results = data.results;
-	                if (results.length > 0) {
-	                    this.setState({package: results[0]});
-	                } else {
-	                    // TODO: somethings
-	                }
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error(this.props.url, status, err.toString());
-	            }.bind(this)
-	        });
-
-	    },
-	    componentDidMount: function() {
-	        this.load_package();
-	    },
-	    render: function() {
-	        var track_handler = function (changelog) {
-	            var tracked = this.state.tracked;
-	            tracked[tracked.length] = changelog;
-
-	            if (tracked.length == 1) {
-	                metrika.reach_goal('LAND-TRACK-1');
-	            }
-	            if (tracked.length == 3) {
-	                metrika.reach_goal('LAND-TRACK-3');
-	            }
-	            if (tracked.length == 5) {
-	                metrika.reach_goal('LAND-TRACK-5');
-	            }
-
-	            this.setState({tracked: tracked});
-	            this.load_package();
-	        }.bind(this);
-
-	        var skip_handler = function () {
-	            this.load_package();
-	        }.bind(this);
-
-	        var pkg_obj;
-	        var pkg = this.state.package;
-	        if (pkg !== undefined) {
-	            pkg_obj = React.createElement(Package, {key: pkg.id, 
-	                           changelog_id: pkg.id, 
-	                           namespace: pkg.namespace, 
-	                           name: pkg.name, 
-	                           description: pkg.description, 
-	                           versions: pkg.versions, 
-	                           track_handler: track_handler, 
-	                           skip_handler: skip_handler});
-	        }
-
-	        var tracked = _.map(this.state.tracked,
-	                            function (changelog) {
-	                                return (
-	            React.createElement("li", {key: changelog.id}, changelog.namespace, "/", changelog.name));});
-
-	        var tracked_msg, login_msg;
-	        if (username == '') {
-	            login_msg = (React.createElement("p", null, "To see full release notes and to receive notifications on future updates, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter")));
-	        }
-	        
-	        if (tracked.length > 0) {
-	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
-	                React.createElement("p", null, "You've followed these packages:"), 
-	                React.createElement("ul", null, tracked), 
-	                login_msg
-	            ));
-
-	            // when first package is tracked, scroll down
-	            // to show the buttons
-	            if (login_msg && tracked.length == 1) {
-	                setTimeout(function() {
-	                    $('html, body').animate({
-	                        scrollTop: $("#package-selector__login-button-id").offset().top
-	                    }, 2000)
-	                }, 200);
-	            }
-	        }
-	                                        
-	        return (
-	            React.createElement("div", {className: "package-selector"}, 
-	                pkg_obj, 
-	                tracked_msg
-	            )
-	        );
 	    }
 	});
 
