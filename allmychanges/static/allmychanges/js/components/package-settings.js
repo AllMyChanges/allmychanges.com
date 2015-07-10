@@ -1,71 +1,32 @@
-// тодо:
-// сделать обработку ошибок namespace и name
-// поправить disabled стиль для белой кнопки
-// разобраться почему не отображается footer
-// доделать сохранение результатов
-// проверить как оно работает на редактировании пакета
-
 module.exports = React.createClass({
-    // this field keeps state for which preview was generated
-    preview: {},
-
     getInitialState: function () {
         // init add new page @add-new
-        return {tracked: false,
+        return {source: this.props.source,
+                search_list: this.props.search_list,
+                ignore_list: this.props.ignore_list,
+                xslt: this.props.xslt,
+                tracked: false,
                 saving: false,
                 waiting: false,
-                source: this.props.source,
-                search_list: this.props.search_list || '',
-                ignore_list: this.props.ignore_list || '',
-                xslt: this.props.xslt || '',
                 results: null,
-                namespace_error: '',
-                name_error: '',
                 problem: null};
     },
-    save_preview_params: function () {
-        this.preview = {
-            source: this.state.source,
-            search_list: this.state.search_list,
-            ignore_list: this.state.ignore_list,
-            xslt: this.state.xslt};
-    },
     componentDidMount: function() {
-        this.save_preview_params();
+        this.form_fields = {};
         this.update_preview_callback();
     },
     can_save: function() {
-        var result = (this.state.saving == false
-                   && this.is_apply_button_disabled()
-                   && this.state.namespace_error == '' 
-                   && this.state.name_error == '' 
-                   && this.state.results);
-        return result;
+        return false;
     },
     can_track: function() {
-        var result = (this.can_save()
-                   && this.state.tracked == false);
-        return result;
+        return false;
     },
     update_preview: function() {
-        // updating preview @update-preview
-
-        // this field keeps state for which preview was generated
-        this.save_preview_params();
-
-        $.ajax({url: '/preview/' + this.props.preview_id + '/',
-                method: 'POST',
-                data: JSON.stringify(this.preview),
-                contentType: 'application/json',
-               headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-            .success(this.update_preview_callback);
+        // Updating preview @package-settings
     },
     onFieldChange: function(event) {
-        var name = event.target.name;
-        // field [name] was changed @on-field-change
-        var params = {}
-        params[name] = event.target.value;
-        this.setState(params);
+        this.form_fields[event.target.name] = event.target.value;
+        // ng-change="schedule_validation()"
     },
     save: function() {
         // Saving @package-settings
@@ -77,13 +38,7 @@ module.exports = React.createClass({
         return false;
     },
     is_apply_button_disabled: function() {
-        var result = (
-            this.state.waiting == true
-        || (this.preview.search_list == this.state.search_list
-            && this.preview.ignore_list == this.state.ignore_list
-            && this.preview.xslt == this.state.xslt
-            && this.preview.source == this.state.source));
-        return result;
+        return false;
     },
     draw_table: function() {
         var xslt_editing_fields = [
@@ -105,7 +60,7 @@ module.exports = React.createClass({
         }
 
         var save_tooltip;
-        if (!this.is_apply_button_disabled()) {
+        if (this.can_save() && !this.state.saving) {
             save_tooltip = <span className="new-package__save-tooltip">Please, update preview to ensure that we able to get a changelog for this package.</span>;
         }
 
@@ -190,43 +145,34 @@ module.exports = React.createClass({
      return content;
     },
     wait_for_preview: function () {
-        // waiting for preview results @wait-for-preview
         if (this.spinner === undefined) {
-            // creating a spinner @wait-for-preview
+            // Creating a spinner @package-settings
             this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
         }
 
-        // checking if preview is ready @wait-for-preview
-        $.get('/preview/' + this.props.preview_id + '/')
-            .success(function(data_orig) {
-                // received results about preview state @wait-for-preview
-                var data = $(data_orig);
+        $.getJSON('/preview/' + this.props.preview_id + '/')
+            .success(function(data) {
+                var data = $(data);
 
                 if (data.hasClass('please-wait')) {
-                    // data has class please-wait @wait-for-preview
                     $('.progress-text').html(data);
                     setTimeout(this.wait_for_preview, 1000);
                 } else {
-                    // preview data is ready @wait-for-preview
                     this.setState({waiting: false});
 
                     if (data.hasClass('package-changes')) {
-                        // showing preview @wait-for-preview
-                        this.setState({results: data_orig});
+//                        $('.changelog-preview').html(data);
+                        this.setState({results: data});
                     } else {
-                        // showing a problem @wait-for-preview
-                        this.setState({problem: data_orig});
+//                        $('.changelog-problem').html(data);
+                        this.setState({problem: data});
                     }
                 }
-        }.bind(this))
-        .error(function(data) {
-            // some shit happened @wait-for-preview
-         });
+        });
     },
     update_preview_callback: function () {
-        // resetting state before waiting for preview results @update-preview-callback
         this.setState({waiting: true,
-                       results: null,
+//                       results_ready: false,
                        problem: false})
         // $scope.orig_search_list = $scope.search_list;
         // $scope.orig_ignore_list = $scope.ignore_list;
@@ -234,6 +180,15 @@ module.exports = React.createClass({
         // $scope.orig_changelog_source = $scope.changelog_source;
 
         this.wait_for_preview();
+    },
+    on_update_preview: function () {
+        // Updating preview @package-settings
+        $http.post('/preview/' + this.props.preview_id + '/',
+                   {'source': this.state.source,
+                    'search_list': this.state.search_list,
+                    'ignore_list': this.state.ignore_list,
+                    'xslt': this.state.xslt})
+            .success(update_preview_callback);
     },
     render: function() {
         var content = [];
@@ -266,12 +221,14 @@ module.exports = React.createClass({
            if (this.state.results && !this.state.tracked) {
                content.push(<div>
                               <h1>This is the latest versions for this package</h1>
-                              <div className="changelog-preview" dangerouslySetInnerHTML={{__html: this.state.results}}></div>
+                              <div className="changelog-preview">{this.state.results}</div>
                             </div>);
            }
 
            if (this.state.problem) {
-               content.push(<div className="changelog-problem" dangerouslySetInnerHTML={{__html: this.state.problem}}></div>);
+               content.push(<div>
+                                <div className="changelog-problem">{this.state.problem}</div>
+                            </div>);
            }
         }
         return (<div className="package-settings">{content}</div>);
