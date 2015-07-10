@@ -977,9 +977,6 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
-class AddNewView2(AddNewView):
-    template_name = 'allmychanges/add-new2.html'
-
 
 class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/edit-package.html'
