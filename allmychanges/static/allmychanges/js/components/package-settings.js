@@ -1,19 +1,14 @@
 module.exports = React.createClass({
     getInitialState: function () {
         // init add new page @add-new
-        return {source: this.props.source,
-                search_list: this.props.search_list,
-                ignore_list: this.props.ignore_list,
-                xslt: this.props.xslt,
-                tracked: false,
-                saving: false,
-                waiting: false,
-                results: null,
-                problem: null};
+        return {'tracked': false,
+                'saving': false,
+                'waiting': false,
+                'results': null,
+                'problem': null};
     },
     componentDidMount: function() {
         this.form_fields = {};
-        this.update_preview_callback();
     },
     can_save: function() {
         return false;
@@ -144,52 +139,6 @@ module.exports = React.createClass({
 
      return content;
     },
-    wait_for_preview: function () {
-        if (this.spinner === undefined) {
-            // Creating a spinner @package-settings
-            this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
-        }
-
-        $.getJSON('/preview/' + this.props.preview_id + '/')
-            .success(function(data) {
-                var data = $(data);
-
-                if (data.hasClass('please-wait')) {
-                    $('.progress-text').html(data);
-                    setTimeout(this.wait_for_preview, 1000);
-                } else {
-                    this.setState({waiting: false});
-
-                    if (data.hasClass('package-changes')) {
-//                        $('.changelog-preview').html(data);
-                        this.setState({results: data});
-                    } else {
-//                        $('.changelog-problem').html(data);
-                        this.setState({problem: data});
-                    }
-                }
-        });
-    },
-    update_preview_callback: function () {
-        this.setState({waiting: true,
-//                       results_ready: false,
-                       problem: false})
-        // $scope.orig_search_list = $scope.search_list;
-        // $scope.orig_ignore_list = $scope.ignore_list;
-        // $scope.orig_xslt = $scope.xslt;
-        // $scope.orig_changelog_source = $scope.changelog_source;
-
-        this.wait_for_preview();
-    },
-    on_update_preview: function () {
-        // Updating preview @package-settings
-        $http.post('/preview/' + this.props.preview_id + '/',
-                   {'source': this.state.source,
-                    'search_list': this.state.search_list,
-                    'ignore_list': this.state.ignore_list,
-                    'xslt': this.state.xslt})
-            .success(update_preview_callback);
-    },
     render: function() {
         var content = [];
         if (this.props.mode == 'edit') {
@@ -214,20 +163,20 @@ module.exports = React.createClass({
            }
 
            if (this.state.waiting) {
-               content.push(<div ng-show="waiting"><div className="progress-text">Please, wait while we search and process its changelog.</div>
-                                <div className="results-spin"><div className="results-spin__wrapper"></div></div>
+               content.push(<div ng-show="waiting"><div class="progress-text">Please, wait while we search and process its changelog.</div>
+                                <div class="results-spin"><div class="results-spin__wrapper"></div></div>
                             </div>);
            }
            if (this.state.results && !this.state.tracked) {
                content.push(<div>
                               <h1>This is the latest versions for this package</h1>
-                              <div className="changelog-preview">{this.state.results}</div>
+                              <div class="changelog-preview">{this.state.results}</div>
                             </div>);
            }
 
            if (this.state.problem) {
                content.push(<div>
-                                <div className="changelog-problem">{this.state.problem}</div>
+                                <div class="changelog-problem">{this.state.problem}</div>
                             </div>);
            }
         }
