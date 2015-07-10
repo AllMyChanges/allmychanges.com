@@ -350,7 +350,7 @@ a {
   background-image: linear-gradient(#ccc, #b8b8b8);
 }
 .button:disabled {
-  color: #999;
+  color: #333;
   background-color: #fff;
   border-color: #e6e6e6;
   background-image: linear-gradient(#fff, #e6e6e6);
