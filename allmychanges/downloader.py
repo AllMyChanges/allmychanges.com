@@ -10,6 +10,7 @@ import envoy
 import requests
 import plistlib
 import lxml
+import feedparser
 
 from cgi import parse_header
 from django.conf import settings
@@ -417,6 +418,29 @@ def hg_downloader(source,
     return path
 
 
+def feed_downloader(source,
+                   search_list=[],
+                   ignore_list=[]):
+    source = source.replace('rss+', '').replace('atom+', '').replace('feed+', '')
+    feed = feedparser.parse(source)
+    path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+
+    try:
+        with open(os.path.join(path, 'feed.html'), 'w') as f:
+            f.write('<html><body>\n\n')
+
+            for entry in feed['entries']:
+                f.write((u'<h1>{title}</h1>\n'
+                         '<div style="display: none">'
+                         '{published}</div>\n\n{summary}\n\n').format(
+                             **entry).encode('utf-8'))
+            f.write('</body></html>')
+    except:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        raise
+    return path
+
 def http_downloader(source,
                     search_list=[],
                     ignore_list=[]):
@@ -778,6 +802,9 @@ def guess_downloader(url):
                  'rechttp+': 'rechttp',
                  'git+': 'git',
                  'http+': 'http',
+                 'rss+': 'feed',
+                 'atom+': 'feed',
+                 'feed+': 'feed',
                  'gh-releases+': 'github_releases',
                  'github-releases+': 'github_releases',
                  'github_releases+': 'github_releases'}
