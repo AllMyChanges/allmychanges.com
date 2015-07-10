@@ -88,11 +88,11 @@ urlpatterns = patterns(
 
     url(r'^help/(?P<topic>.*)$', HelpView.as_view(), name='help'),
 
-    url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
-    url(r'^p/new2/$', AddNewView2.as_view(), name='add-new2'),
+    url(r'^p/new-old/$', AddNewView.as_view(), name='add-new-old'),
+    url(r'^p/new/$', AddNewView2.as_view(), name='add-new'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView.as_view(), name='edit-package'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit2/$', EditPackageView2.as_view(), name='edit-package2'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit-old/$', EditPackageView.as_view(), name='edit-package-old'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView2.as_view(), name='edit-package'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
 
