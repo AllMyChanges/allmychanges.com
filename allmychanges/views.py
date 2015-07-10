@@ -999,7 +999,7 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         context['can_edit'] = changelog.editable_by(self.request.user,
                                                     self.request.light_user)
 
-        if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
+        if self.request.user.is_authenticated() and self.request.user.username in settings.ADVANCED_EDITORS:
             context['can_edit_xslt'] = True
 
         return context
