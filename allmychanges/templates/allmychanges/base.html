@@ -1,0 +1,147 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html ng-app="allMyChangesApp">
+<head>
+    <title>AllMyChanges.com</title>
+
+    <!-- Bootstrap from http://www.bootstrapcdn.com/ -->
+    <!--<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"-->
+          <!--rel="stylesheet">-->
+
+    <!-- jQuery -->
+    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>-->
+
+    <!-- Loading Bootstrap -->
+    <link href="{% static 'allmychanges/flat_ui/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="{% static 'allmychanges/flat_ui/css/flat-ui.css' %}" rel="stylesheet">
+
+    <!-- Angular from https://developers.google.com/speed/libraries/devguide#angularjs -->
+    {% block anjular-js %}
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular-cookies.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular-sanitize.min.js"></script>
+    {% endblock %}
+
+    <style type="text/css">
+        .container {
+            max-width: 970px !important;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 3px;
+            border-radius: 0 0 5px 5px;
+            background: #58d68d;
+            position: fixed;
+            z-index: 1000;
+            opacity: 0.7;
+        }
+
+        .headline {
+            padding: 2.5em 0 1em 0;
+        }
+        .headline-message {
+            text-align: center;
+            margin-bottom: 1.5em;
+        }
+        .headline-message-success {
+            color: #58d68d;
+        }
+        .headline-message-info {
+            color: #5dade2;
+        }
+        .headline-message-warning {
+            color: #f5d313;
+        }
+        .headline-message-danger {
+            color: #ec7063;
+        }
+
+        .change_container {
+            margin-bottom: 2em;
+            border-bottom: 1px solid #ECF0F1;
+            padding-bottom: 1em;
+        }
+        .change_container:last-child{
+            border-bottom: none;
+        }
+
+        .label{
+            padding: 0.4em 0.6em 0.3em;
+        }
+
+        .note {
+            color: #c0c1c2;
+        }
+
+        .changes-table td {
+            vertical-align: top;
+            padding-right: 0.5em;
+            padding-bottom: 0.7em;
+        }
+    </style>
+
+    {% block extra_head %}{% endblock extra_head %}
+</head>
+
+<body>
+    {% block content %}{% endblock content %}
+    <div class="footer">
+        <div class="container" style="padding-top: 0.5em; padding-bottom: 0.5em; text-align: center;">
+            <small>
+                &copy; <a href="http://djangodash.com/teams/c4/changers/">Changers team</a>,
+                specially for <a href="http://djangodash.com/">DjangoDash 2013</a>.
+                Follow us on <a href="https://twitter.com/allmychanges">Twitter</a>.
+                Report bugs to <a href="https://github.com/AllMyChanges/allmychanges.com/issues">GitHub</a>
+            </small>
+        </div>
+    </div>
+
+    <!-- Load JS here for greater good =============================-->
+    <script src="{% static 'allmychanges/flat_ui/js/jquery-1.8.3.min.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/jquery-ui-1.10.3.custom.min.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/jquery.ui.touch-punch.min.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/bootstrap-select.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/bootstrap-switch.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/flatui-checkbox.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/flatui-radio.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/jquery.tagsinput.js' %}"></script>
+    <script src="{% static 'allmychanges/flat_ui/js/jquery.placeholder.js' %}"></script>
+
+{% if settings.METRIKA_ID %}
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+(function (d, w, c) {
+    (w[c] = w[c] || []).push(function() {
+        try {
+            w.yaCounter = new Ya.Metrika({id:{{ settings.METRIKA_ID }},
+                    webvisor:true,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true});
+        } catch(e) { }
+    });
+
+    var n = d.getElementsByTagName("script")[0],
+        s = d.createElement("script"),
+        f = function () { n.parentNode.insertBefore(s, n); };
+    s.type = "text/javascript";
+    s.async = true;
+    s.src = (d.location.protocol == "https:" ? "https:" : "http:") +
+        "//mc.yandex.ru/metrika/watch.js";
+
+    if (w.opera == "[object Opera]") {
+        d.addEventListener("DOMContentLoaded", f, false);
+    } else { f(); }
+})(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="//mc.yandex.ru/watch/{{ settings.METRIKA_ID }}"
+                    style="position:absolute; left:-9999px;" alt=""
+                    /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+{% endif %}
+</body>
+</html>

@@ -1,0 +1,248 @@
+{% extends "allmychanges/base.html" %}
+
+
+{% block extra_head %}
+<script type="text/javascript">
+    angular.module('allMyChangesApp', ['ngCookies', 'ngSanitize']);
+
+    function MainCtrl($scope, $cookies, $http, $timeout, $location) {
+        $http.defaults.headers.post['X-CSRFToken'] = $cookies['csrftoken'];
+
+        $scope.current_repo = {};
+        $scope.message = {};
+        $scope.subscribe_message = 'Subscribe to project news';
+        $scope.subscribe_email = null;
+        $scope.subscription_enabled = true;
+        $scope.subscription_finished = false;
+
+        $scope.examples = [
+            {
+                'title': 'allmychanges.com',
+                'url': 'https://github.com/AllMyChanges/allmychanges.com'
+            },
+            {
+                'title': 'Requests',
+                'url': 'https://github.com/kennethreitz/requests'
+            },
+            {
+                'title': 'Sentry',
+                'url': 'https://github.com/getsentry/sentry/'
+            },
+            {
+                'title': 'Gevent',
+                'url': 'https://github.com/surfly/gevent/'
+            }
+        ];
+
+        $scope.do_subscribe = function(email) {
+            $scope.subscription_enabled = false;
+            $http({
+                method: 'POST',
+                data: {email: email},
+                url: '/v1/subscriptions/?format=json'
+            }).success(function(data){
+                $scope.subscription_finished = true;
+                $scope.subscribe_message = "Thanks. You've been subscribed!"
+            }).error(function(data){
+                $scope.subscription_enabled = true;
+                $scope.subscribe_message = $scope.create_message_from_dict(data, true);
+            });
+        };
+
+        $scope.create_message_from_dict = function(dict, without_keys) {
+            var messages = [];
+            $.each(dict, function(key, value){
+                var str = value.join(' ');
+                if (!without_keys) {
+                    str = key.toUpperCase() + ': ' + str;
+                }
+                messages.push(str);
+            });
+            return messages.join('; ');
+        };
+
+        $scope.create_changelog_for_url = function(url) {
+            $location.search({'url': url});
+            $scope.current_repo = {
+                url: url
+            };
+            $scope.show_message('Starting processing...');
+            $http({
+                method: 'POST',
+                data: {url: url},
+                url: '/v1/repos/create-changelog/?format=json'
+            }).success(function(data){
+                $scope.start_watching_for_changelog_processing(data.id);
+            }).error(function(data){
+                $scope.show_message($scope.create_message_from_dict(data.error_messages), 'danger');
+            });
+        };
+
+        $scope.start_watching_for_changelog_processing = function(repo_id) {
+            $http.get('/v1/repos/' + repo_id + '/').success(function(data){
+                $scope.current_repo = data;
+
+                $scope.show_message(
+                    $scope.current_repo.processing_status_message,
+                    $scope.get_message_type_for_repo($scope.current_repo)
+                );
+
+                if ($scope.current_repo.processing_state == 'in_progress' ||
+                    $scope.current_repo.processing_state == 'ready_for_job') {
+                    $timeout(function(){
+                        $scope.start_watching_for_changelog_processing(
+                            $scope.current_repo.id
+                        );
+                    }, 1000);
+                }
+            });
+        };
+
+        $scope.get_message_type_for_repo = function(repo) {
+            if (repo.processing_state == 'in_progress') {
+                return 'info';
+            }else if (repo.processing_state == 'finished') {
+                return 'success';
+            }else if (repo.processing_state == 'error') {
+                return 'danger';
+            }else{
+                return null;
+            }
+        };
+
+        $scope.show_message = function(text, type) {
+            var type = type || null;
+            $scope.message.type = type;
+            $scope.message.text = text;
+        };
+
+        var initial_url = 'https://github.com/AllMyChanges/allmychanges.com';
+        if (angular.isString($location.search()['url'])) {
+            initial_url = $location.search()['url'];
+        }
+        var url = initial_url;
+        $scope.current_repo.url = url;
+        $scope.create_changelog_for_url($scope.current_repo.url);
+    }
+</script>
+{% endblock extra_head %}
+
+
+{% block content %}
+    {% verbatim %}
+    <div ng-controller="MainCtrl">
+        <div class="progress-bar"
+             style="width: {{ current_repo.processing_progress }}%;">&nbsp;</div>
+        <div class="container">
+            <div class="headline">
+                <div class="headline-message headline-message-{{ message.type }}" >
+                    <span ng-bind="message.text"></span>&nbsp;
+                </div>
+
+                <form ng-submit="create_changelog_for_url(current_repo.url)">
+                    <div class="input-group">
+                        <input type="text" value="" placeholder="GitHub repo url" class="form-control" ng-model="current_repo.url">
+                        <span class="input-group-btn">
+                            <input type="submit"
+                                   value="Show changelog"
+                                   class="btn btn-primary input-group-addon"
+                                   style="width: 9em; border-radius: 0px 5px 5px 0px;"/>
+                        </span>
+                    </div>
+                </form>
+
+                <div style="text-align: right;">
+                    <small>Examples:</small>
+                    <small ng-repeat="example in examples">
+                        <a href="javascript: false"
+                           style="border-bottom: 1px dotted"
+                           ng-click="create_changelog_for_url(example.url)"
+                           ng-bind="example.title">
+                        </a>
+                        <span ng-hide="$last">, </span>
+                    </small>.
+                    <small>
+                        Save it to your favorites with
+                        <a href="javascript:location.href='https://allmychanges.com/#?url=' + encodeURIComponent(location.href)"
+                           style="border-bottom: 1px dotted"
+                           onclick="return false">
+                            bookmarklet
+                        </a>
+                    </small>
+                </div>
+            </div>
+
+            <div>
+                <div class="clearfix">
+                    <h6 ng-show="current_repo.title" style="margin-bottom: 1.5em; float: left;">
+                        "<a href="{{ current_repo.url }}" target="_blank" ng-bind="current_repo.title"></a>" changelog
+                    </h6>
+                    <div ng-show="current_repo.url=='https://github.com/AllMyChanges/allmychanges.com' && current_repo.processing_state=='finished'"
+                         style="text-align: right; float: right">
+                        <form ng-submit="do_subscribe(subscribe_email)">
+                            <table style="margin-top: 0.4em">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding-right: 1em;">
+                                            <label for="subscribe"
+                                                   style="color: #95A5A6; font-size: 1.3em; margin-top: 0.3em"
+                                                   ng-bind="subscribe_message"></label>
+                                        </td>
+                                        <td>
+                                            <input type="text"
+                                                   value=""
+                                                   placeholder="Your email"
+                                                   class="form-control"
+                                                   id="subscribe"
+                                                   style="width: 11em;"
+                                                   ng-model="subscribe_email"
+                                                   ng-disabled="!subscription_enabled"
+                                                   ng-show="!subscription_finished">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <div>
+                    <div ng-repeat="version in current_repo.versions" class="change_container">
+                        <div style="margin-bottom: 1em; font-size: 1.3em;">
+                            <span style="font-weight: bold;" ng-cloak>Version {{ version.name }}</span>
+                            <span ng-show="version.date"
+                                  class="note"
+                                  ng-cloak>
+                                &nbsp;({{ version.date }})
+                            </span>
+                        </div>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="item in version.items">
+                                <span ng-show="!$first">&nbsp;</span>
+                                <p ng-show="item.text_clean" ng-bind-html="item.text_clean"></p>
+                                <table class="changes-table">
+                                    <tbody>
+                                        <tr ng-repeat="change in item.changes">
+                                            <td>
+                                                <div class="label"
+                                                      ng-class="{
+                                                          'label-info': change.type == 'new',
+                                                          'label-success': change.type == 'fix'
+                                                      }"
+                                                      style="width: 100%; display: block">
+                                                    <b>{{ change.type | uppercase }}</b>
+                                                </div>
+                                            </td>
+                                            <td ng-bind="change.text"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endverbatim %}
+
+{% endblock content %}
