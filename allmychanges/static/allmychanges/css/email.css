@@ -736,12 +736,6 @@ a:hover {
   vertical-align: bottom;
   text-align: right;
 }
-.new-package__button-cell input {
-  margin-right: 20px;
-}
-.new-package__button-cell input:last-of-type {
-  margin-right: 0;
-}
 .new-package__save-tooltip {
   position: absolute;
   width: 200px;

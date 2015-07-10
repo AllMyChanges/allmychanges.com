@@ -39,7 +39,6 @@ from .views import (OldIndexView,
                     ProfileView,
                     TokenView,
                     PackageView,
-                    EditPackageView2,
                     EditPackageView)
 from .sitemaps import PackagesSitemap
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -93,7 +92,6 @@ urlpatterns = patterns(
     url(r'^p/new2/$', AddNewView2.as_view(), name='add-new2'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView.as_view(), name='edit-package'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit2/$', EditPackageView2.as_view(), name='edit-package2'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
 
 
