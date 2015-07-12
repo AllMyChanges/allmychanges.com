@@ -77,7 +77,7 @@ twiggy==0.4.7             # via twiggy-goodies
 feedgen==0.3.1
 dateutils==0.6.6          # via feedgen
 
-feedparser=5.2.0
+feedparser==5.2.0
 
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:
