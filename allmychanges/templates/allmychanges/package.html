@@ -12,12 +12,12 @@
 {% block content %}
   <h1 class="page-header">
     <div class="page-header__package-title" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-      <a href="/catalogue/" itemprop="url">
+      <a href="{% url 'categories' %}" itemprop="url">
         <span itemprop="title">All</span>
       </a>
       → 
       <div itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
-        <a href="/catalogue/#{{package.namespace}}" itemprop="url">
+        <a href="{% url 'category' category=package.namespace %}" itemprop="url">
           <span itemprop="title">{{package.namespace}}</span>
         </a>
         →

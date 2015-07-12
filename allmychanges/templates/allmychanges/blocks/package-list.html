@@ -1,0 +1,10 @@
+  <ul class="packages-list">
+    {% for ch in changelogs %}
+      {% with latest_version=ch.latest_version %}
+      <li>
+        <a class="packages-list__title" href="{{ ch.get_absolute_url }}">{% if show_namespace %}{{ch.namespace}}/{% endif %}{{ ch.name }}</a>{% if latest_version %} ({{latest_version.number }}){% endif %}
+        <p class="packages-list__description">{% if ch.description %}{{ ch.description }}{% else %}No description{% endif %}</p>
+      </li>
+      {% endwith %}
+    {% endfor %}
+  </ul>

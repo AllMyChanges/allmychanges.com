@@ -1,0 +1,28 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block html-title %}{{ title }} – {{ block.super }}{% endblock %}
+
+{% block content %}
+  <h1 class="page-header">
+    <div class="page-header__package-title" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">
+      <a href="{% url 'categories'%}" itemprop="url">
+        <span itemprop="title">All</span>
+      </a>
+    </div>
+  </h1>
+
+  {% for letter, names in categories %}
+    <ul class="categories__group">
+      <h1 class="categories__group-title">{{ letter }}</h1>
+      {% for name in names %}
+        <li class="categories__item">
+          <a href="{% url 'category' category=name %}">{{ name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+  <br style="clear: both"/>
+  <script>
+    $('.categories__group').tile()
+  </script>
+{% endblock content %}

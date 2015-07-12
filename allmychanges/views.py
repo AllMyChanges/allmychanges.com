@@ -1181,38 +1181,6 @@ class IssueDetailView(CommonContextMixin, DetailView):
     model = Issue
 
 
-class CatalogueView(CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/catalogue.html'
-
-    def get_context_data(self, **kwargs):
-        result = super(CatalogueView, self).get_context_data(**kwargs)
-        result['menu_catalogue'] = True
-
-        namespaces = Changelog.objects.exclude(name=None).values_list('namespace', flat=True).distinct()
-        namespaces = list(enumerate(sorted(namespaces)))
-        namespace_to_id = dict((namespace, key)
-                               for key, namespace in namespaces)
-        changelogs = Changelog.objects.exclude(name=None).values_list('namespace', 'name').distinct()
-        changelogs = [(namespace_to_id.get(namespace),
-                       name,
-                       reverse('package', kwargs=dict(
-                           namespace=namespace,
-                           name=name)))
-                      for namespace, name in changelogs]
-        changelogs.sort()
-        changelogs = groupby(changelogs, itemgetter(0))
-
-        result['namespaces'] = namespaces
-        result['changelogs'] = [(idx, list(sorted(items, key=itemgetter(1))))
-                                for idx, items in changelogs]
-
-        if 'step3' in self.request.GET:
-            result['title'] = 'Step 3 of 3'
-        else:
-            result['title'] = 'Namespaces and Packages'
-        return result
-
-
 import arrow
 #import tablib
 
@@ -1365,6 +1333,7 @@ class VerifyEmail(CommonContextMixin, TemplateView):
                              'User has verified his email')
         return result
 
+
 class SecondStepView(CommonContextMixin, TemplateView):
     template_name = 'allmychanges/first-steps/second.html'
 
@@ -1505,3 +1474,43 @@ class RssFeedView(View):
         response = HttpResponse(content, content_type='application/rss+xml;charset=utf-8')
         response['Cache-Control'] = 'no-cache'
         return response
+
+
+class CategoryView(CachedMixin, CommonContextMixin, TemplateView):
+    """List packages in selected categories.
+    """
+    template_name = 'allmychanges/category.html'
+
+    def get_cache_params(self, *args, **kwargs):
+        return 'category-view1-' + kwargs.get('category'), 0
+
+    def get_context_data(self, *args, **kwargs):
+        category = kwargs['category']
+        changelogs = Changelog.objects.only_active().filter(namespace=category)
+        return {'changelogs': changelogs,
+                'menu_catalogue': True,
+                'category': category}
+
+
+class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
+    """View all categories as a sorted list
+    """
+    template_name = 'allmychanges/categories.html'
+
+    def get_cache_params(self, *args, **kwargs):
+        return 'categories-view', 0
+
+    def get_context_data(self, *args, **kwargs):
+        categories = sorted(set(Changelog.objects.only_active().values_list('namespace', flat=True)))
+        categories = groupby(categories, lambda item: item[0])
+        categories = [(letter, list(names))
+                      for letter, names in categories]
+
+        result = {'categories': categories,
+                  'menu_catalogue': True}
+
+        if 'step3' in self.request.GET:
+            result['title'] = 'Step 3 of 3'
+        else:
+            result['title'] = 'All Categories'
+        return result

@@ -128,9 +128,11 @@ class SearchAutocomplete1View(viewsets.ViewSet):
             namespaces = Changelog.objects.exclude(namespace=None).exclude(name=None).values_list('namespace', flat=True).distinct()
             for namespace in namespaces:
                 if q in namespace:
-                    results.append(dict(type='namespace',
-                                         namespace=namespace,
-                                         url='/catalogue/#' + namespace))
+                    results.append(dict(
+                        type='namespace',
+                        namespace=namespace,
+                        url=reverse('category',
+                                    kwargs=dict(category=namespace))))
 
 
             namespace, name = None, q
@@ -186,9 +188,11 @@ class SearchAutocomplete2View(viewsets.ViewSet):
             namespaces = Changelog.objects.exclude(namespace=None).exclude(name=None).values_list('namespace', flat=True).distinct()
             for namespace in namespaces:
                 if name in namespace:
-                    results.append(dict(type='namespace',
-                                         namespace=namespace,
-                                         url='/catalogue/#' + namespace))
+                    results.append(
+                        dict(type='namespace',
+                             namespace=namespace,
+                             url=reverse('category',
+                                         kwargs=dict(category=namespace))))
 
 
             add_changelogs(Changelog.objects.filter(name__icontains=name)
@@ -251,9 +255,11 @@ class SearchAutocompleteView(viewsets.ViewSet):
             namespaces = Changelog.objects.exclude(namespace=None).exclude(name=None).values_list('namespace', flat=True).distinct()
             for namespace in namespaces:
                 if name in namespace:
-                    results.append(dict(type='namespace',
-                                         namespace=namespace,
-                                         url='/catalogue/#' + namespace))
+                    results.append(
+                        dict(type='namespace',
+                             namespace=namespace,
+                             url=reverse('category',
+                                         kwargs=dict(category=namespace))))
 
 
             add_changelogs(Changelog.objects.filter(name__icontains=name)

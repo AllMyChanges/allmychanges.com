@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /p/
-Allow: /catalogue/
 Allow: /$
 Allow: /sitemap.xml
 Disallow: /

@@ -765,61 +765,13 @@ a:hover {
 .namespace-name-cell__namespace-cell {
   vertical-align: bottom;
 }
-.catalogue-namespaces {
-  width: 100%;
-  transition: width 500ms;
-  background: #f4cb89;
-}
-.catalogue-namespaces_transition {
-  width: 200px;
-}
-.catalogue-namespaces_selected {
-  display: table-cell;
-  width: 200px;
-}
-.catalogue-namespace {
-  font-size: 20px;
-  line-height: 20px;
-  list-style: none;
-  transition: all ease 500ms;
-}
-.catalogue-namespace a {
-  display: block;
-  padding: 10px;
-  transition: all ease 500ms;
-}
-.catalogue-namespace:hover {
-  background: #588c8c;
-}
-.catalogue-namespace:hover a {
-  color: #fff;
-}
-.catalogue-namespace_selected {
-  background: #588c8c;
-}
-.catalogue-namespace_selected a {
-  color: #fff;
-  text-decoration: none;
-}
-.catalogue-namespace_selected a:before {
-  content: "+";
-  float: right;
-  transform: rotate(45deg);
-}
-.catalogue-packages {
-  display: none;
+.categories__group {
   list-style: outside none none;
-  padding-left: 20px;
-  border: 2px solid #f4cb89;
-}
-.catalogue-packages li {
-  display: inline-block;
-  white-space: nowrap;
-  min-width: 200px;
-  line-height: 40px;
-}
-.catalogue-packages_visible {
-  display: table-cell;
+  float: left;
+  width: 100px;
+  overflow: hidden;
+  margin-right: 30px;
+  margin-bottom: 40px;
 }
 .first-step__container {
   max-width: 800px;

@@ -56,6 +56,9 @@
 
       <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
 
+      <!-- для того, чтобы колонки в каталоге рисовать -->
+      <script src="/static/jquery.tile.js" type="text/javascript" charset="utf-8"></script>
+
       <!-- этот pubsub используется в реактовских компонентах -->
       <script src="/static/bower_components/pubsub-js/src/pubsub.js" type="text/javascript" charset="utf-8"></script>
 
@@ -114,7 +117,7 @@
 
         <ul class="site-menu">
           <li class="site-menu__item{% if menu_add_new %} site-menu__selected-item{% endif %}"><a href="{% url 'add-new' %}">Add New</a></li>
-          <li class="site-menu__item{% if menu_catalogue %} site-menu__selected-item{% endif %}"><a href="{% url 'catalogue' %}">Catalogue</a></li>
+          <li class="site-menu__item{% if menu_catalogue %} site-menu__selected-item{% endif %}"><a href="{% url 'categories' %}">Catalogue</a></li>
           <li class="site-menu__item{% if menu_digest %} site-menu__selected-item{% endif %}"><a href="{% url 'digest' %}">Digest</a></li>
           <li class="site-menu__item{% if menu_faq %} site-menu__selected-item{% endif %}"><a href="/help/faq/">FAQ</a></li>
           <li class="site-menu__item{% if menu_help %} site-menu__selected-item{% endif %}"><a href="/help/">Help</a></li>
