@@ -7,7 +7,7 @@ class URLValidator(validators.URLValidator):
     """Custom url validator to include git urls and urls with http+ like prefixes
     """
     regex = re.compile(
-        r'^(?:(?:(?:(?:http|git|hg|rechttp)\+)?'    # optional http+ or git+ or hg+
+        r'^(?:(?:(?:(?:http|git|hg|rechttp|feed|rss|atom)\+)?'    # optional http+ or git+ or hg+
         r'(?:http|ftp|)s?|git)://|git@)'  # http:// or https:// or git:// or git@
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
         r'localhost|'  # localhost...
