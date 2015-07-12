@@ -1,3 +1,24 @@
+0.30.0 (2015-07-12)
+===================
+
+This release includes several important improvements:
+
+* Better google play integration. Now it works even for apps
+  which have different versions for different devices.
+* Support for RSS/Atom feeds as a datasources was added.
+  This allows to parse blogs' feed and now we are
+  able to process [Ruby's][Ruby] and [Dropbox's][Dropbox]
+  changelogs correctly.
+* Javascript version of our packages catalogue was replaced
+  with oldschool one. And now it show be more usable. Go and
+  [check it yourself][catalogue].
+
+By the way, if you were confused by "Add New" page's complexity,
+than I have good news – next release will include a redesign
+of this page. We are continually improve the service thanks to
+your reports. Don't forget to sending us yor suggestions
+[via email][support-email] or [gitter chat][gitter-chat].
+
 0.29.0 (2015-06-30)
 ===================
 
@@ -177,7 +198,7 @@ Hey, are you still reading this? Go and test these new features!
 Go Google Go!
 -------------
 
-Them main feature of this release is support for [Google Play](https://allmychanges.com/catalogue/#android) URLs.
+Them main feature of this release is support for [Google Play](https://allmychanges.com/p/android/) URLs.
 Find your favorite Android apps on Google Play, paste their URLs
 right into the AllMyChanges's search bar and subscribe on the
 release notes.
@@ -494,7 +515,7 @@ In other words, search become much more convinient now. Just go and
 Packages catalogue
 ------------------
 
-[Packages catalogue](http://allmychanges.com/catalogue/) is a browsable
+[Packages catalogue][catalogue] is a browsable
 directory of namespaces and packages known to the service.
 This way you could discover interesting packages and track their changelogs.
 
@@ -1008,6 +1029,7 @@ There are plenty directions for approvement. Stay tuned.
 [Unity]: http://allmychanges.com/p/sdk/unity/
 [Chrome]: http://allmychanges.com/p/soft/chrome/
 [support-email]: mailto:support@allmychanges.com
+[gitter-chat]: https://gitter.im/AllMyChanges/allmychanges.com
 [tweet-us]: https://twitter.com/intent/tweet?text=@allmychanges hey, guys, 
 [tw-new-release-notes]: https://twitter.com/NewReleaseNotes
 [libsass]: https://allmychanges.com/p/c%2B%2B/libsass/
@@ -1017,3 +1039,6 @@ There are plenty directions for approvement. Stay tuned.
 [freebsd]: https://allmychanges.com/p/os/freebsd/
 [laravel]: https://allmychanges.com/p/php/laravel/
 [account-settings]: https://allmychanges.com/account/settings/
+[Ruby]: https://allmychanges.com/p/ruby/ruby/
+[Dropbox]: https://allmychanges.com/p/soft/dropbox/
+[catalogue]: http://allmychanges.com/p/
