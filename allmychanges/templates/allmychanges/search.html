@@ -2,7 +2,7 @@
 
 {% block content %}
 {% if changelogs %}
-  {{ changelogs }}
+  {% include "allmychanges/blocks/package-list.html" with show_namespace=1 %}
 {% else %}
 Nothing found. Try another query.
 {% endif %}
