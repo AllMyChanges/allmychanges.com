@@ -452,6 +452,13 @@ a {
 .form-buttons__back {
   width: 100%;
 }
+.buttons-row {
+  text-align: right;
+}
+.vlink {
+  text-decoration: none;
+  border-bottom: 1px dashed;
+}
 .box {
   background-color: #fff;
   padding: 0.5em;
@@ -770,6 +777,24 @@ a:hover {
 }
 .namespace-name-cell__namespace-cell {
   vertical-align: bottom;
+}
+.changelog-preview-container {
+  margin-top: 40px;
+}
+.changelog-preview-container > h1 {
+  font-size: 30px;
+  font-height: 30px;
+}
+.tune-options {
+  margin-left: 20px;
+  margin-top: 20px;
+}
+.tune-options > li {
+  margin-bottom: 10px;
+}
+.tune-options > li > a {
+  margin-bottom: 10px;
+  display: inline-block;
 }
 .categories__group {
   list-style: outside none none;

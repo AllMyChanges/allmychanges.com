@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
+	var PackageSelector = __webpack_require__(19)
 
 	module.exports = {
 	    render: function () {
@@ -214,7 +214,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(19)
+	var Landing = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -805,11 +805,6 @@
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-	var PriorityQueue = __webpack_require__(21)
-=======
-=======
 	// тодо:
 	// [X] сделать обработку ошибок namespace и name
 	// [X] поправить disabled стиль для белой кнопки
@@ -821,7 +816,7 @@
 	// [ ] сделать отображение сообщений, чтобы они
 	//     приезжали в ответе на save
 
->>>>>>> WIP
+
 	module.exports = React.createClass({displayName: 'exports',
 	    // this field keeps state for which preview was generated
 	    preview: {},
@@ -1147,38 +1142,128 @@
 	    },
 	    render: function() {
 	        var content = [];
-	        if (this.props.mode == 'edit') {
-	            content.push(React.createElement("label", {for: "changelog_source"}, "Changelog's source:"));
-	            content.push(React.createElement("input", {name: "changelog_source", 
-	                                type: "text", 
-	                                placeholder: "Changelog's source URL", 
-	                                className: "text-input", 
-	                                value: this.state.source}));
-	        } else {
-	            if (this.state.tracked) {
-	              content.push(React.createElement("p", {className: "plate"}, "Horay! The package was added and is available ", React.createElement("a", {href: "/p/{this.props.namespace}}/{{this.props.name}}/"}, "on a separate page"), "."));
-	            } else {
-	              content.push(React.createElement("p", {className: "new-package__greeting"}, "There is no package with source url ", React.createElement("a", {className: "new-package__url", href: "{this.props.source}"}, this.props.source), " yet.", React.createElement("br", null), "Please, fill in a namespace and name to track it or return back and ", React.createElement("a", {href: "/p/new/"}, "add another"), " package."));
-	            }
-	            
-	           if (username == "" && this.state.tracked) {
-	               content.push(React.createElement("p", {className: "plate plate_warning"}, "To continue tracking of this package, please, login through ", React.createElement("a", {href: "{login_url_github}"}, "GitHub"), " or ", React.createElement("a", {href: "{login_url_twitter}"}, "Twitter"), "."));
-	           }
-	        }
+	//        if (this.props.mode == 'edit') {
+	        content.push(React.createElement("label", {for: "changelog_source"}, "Changelog's source:"));
+	        content.push(React.createElement("input", {name: "changelog_source", 
+	                     type: "text", 
+	                     placeholder: "Changelog's source URL", 
+	                     className: "text-input", 
+	                     value: this.state.source}));
+	        // } else {
+	        //     if (this.state.tracked) {
+	        //       content.push(<p className="plate">Horay! The package was added and is available <a href="/p/{this.props.namespace}}/{{this.props.name}}/">on a separate page</a>.</p>);
+	        //     } else {
 
-	        if (!this.state.tracked) {
-	            content = content.concat(this.draw_table());
-	        }
+	            
+	        //    if (username == "" && this.state.tracked) {
+	        //        content.push(<p className="plate plate_warning">To continue tracking of this package, please, login through <a href="{login_url_github}">GitHub</a> or <a href="{login_url_twitter}">Twitter</a>.</p>);
+	        //    }
+	        // }
+
+	        // if (!this.state.tracked) {
+	        //     content = content.concat(this.draw_table());
+	        // }
 
 	        if (this.state.waiting) {
-	            content.push(React.createElement("div", {'ng-show': "waiting"}, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
-	                         React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
+	            content.push(React.createElement("div", null, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
+	                              React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
 	                         ));
 	        }
 	        if (this.state.results && !this.state.tracked) {
-	            content.push(React.createElement("div", null, 
-	                         React.createElement("h1", null, "This is the latest versions for this package"), 
-	                         React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
+
+
+	        // показываем поля дл заполнения namespace и name
+	        var namespace_error;
+	        if (this.state.namespace_error) {
+	            namespace_error = React.createElement("span", {className: "input__error"}, this.state.namespace_error);
+	        }
+	        var name_error;
+	        if(this.state.name_error) {
+	            name_error = React.createElement("span", {className: "input__error"}, this.state.name_error);
+	        }
+	        var description_error;
+	        if (this.state.description_error) {
+	            description_error = React.createElement("span", {className: "input__error"}, this.state.description_error);
+	        }
+
+
+	        content.push(React.createElement("div", null, 
+	          React.createElement("div", {className: "input"}, 
+	            React.createElement("label", {className: "input__label"}, "Namespace:"), namespace_error, React.createElement("br", null), 
+	            React.createElement("input", {name: "namespace", 
+	                   type: "text", 
+	                   placeholder: "Namespace (e.g. python, node)", 
+	                   onChange: this.on_field_change, 
+	                   className: "text-input", 
+	                   value: this.state.namespace})
+	          ), 
+
+	          React.createElement("div", {className: "input"}, 
+	            React.createElement("label", {className: "input__label"}, "Name:"), name_error, React.createElement("br", null), 
+	            React.createElement("input", {name: "name", 
+	                   type: "text", 
+	                   placeholder: "Package name", 
+	                   onChange: this.on_field_change, 
+	                   className: "text-input", 
+	                   value: this.state.name})
+	           ), 
+	           React.createElement("div", {className: "input"}, 
+	             React.createElement("label", {className: "input__label"}, "Description:"), description_error, React.createElement("br", null), 
+	             React.createElement("input", {name: "description", 
+	                    type: "text", 
+	                    placeholder: "Tell us what it does", 
+	                    onChange: this.on_field_change, 
+	                    className: "text-input", 
+	                    value: this.state.description})
+	           )
+	         ));
+
+	               
+	            // спрашиваем, всё ли с логов впорядке и предлагаем затрекать
+	            var submit_button_disabled = !this.can_track();
+	            var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save, disabled: submit_button_disabled});
+
+	            content.push(React.createElement("p", {className: "buttons-row"}, save_button));
+	            content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
+
+	            var tune_options = [];
+
+	            var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
+	            var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
+	            if (this.state.show_change_downloader) {
+	                tune_options.push(React.createElement("li", null, 
+	                                    React.createElement("a", {className: "vlink", onClick: hide_change_downloader}, "Change downloader type:"), React.createElement("br", null), 
+	                                    React.createElement("select", {class: "downloader-selector"}, 
+	                                      React.createElement("option", {value: "feed"}, "Rss/Atom feed"), 
+	                                      React.createElement("option", {value: "http"}, "HTML page"), 
+	                                      React.createElement("option", {value: "rechttp"}, "Multiple HTML pages")
+	                                    )
+	                                  ));
+	            } else {
+	                tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_downloader}, "Change downloader type")));
+	            }
+
+	            var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
+	            var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
+	            if (this.state.show_change_search_list) {
+	                tune_options.push(React.createElement("li", null, 
+	                                    React.createElement("a", {className: "vlink", onClick: hide_change_search_list}, "Search in particular file or directory:"), React.createElement("br", null), 
+	                                    React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
+	                                      className: "new-package__search-input", 
+	                                      name: "search_list", 
+	                                      onChange: this.on_field_change, 
+	                                      disabled: this.state.waiting, 
+	                                      value: this.state.search_list})
+	                                  ));
+	            } else {
+	                tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_search_list}, "Search in particular file or directory")));
+	            }
+
+	            content.push(React.createElement("ul", {className: "tune-options"}, tune_options));
+
+	            content.push(React.createElement("div", {className: "changelog-preview-container"}, 
+	                           React.createElement("h1", null, "This is the latest versions for this package"), 
+	                           React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
 	                         ));
 	        }
 
@@ -1195,7 +1280,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var PriorityQueue = __webpack_require__(22)
->>>>>>> Added new add-new view based on react.
 	var _introjs_items = new PriorityQueue(function(a, b) {
 	    return a.priority - b.priority});
 
@@ -1431,6 +1515,27 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var PackageSelector = __webpack_require__(19)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
+	    }
+	});
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var Package = __webpack_require__(21)
 	var metrika = __webpack_require__(20)
 
@@ -1535,27 +1640,6 @@
 
 
 /***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var PackageSelector = __webpack_require__(18)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
-	    }
-	});
-
-
-/***/ },
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1574,11 +1658,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	TrackButton = __webpack_require__(10)
-<<<<<<< HEAD
-	SkipButton = __webpack_require__(22)
-=======
 	SkipButton = __webpack_require__(23)
->>>>>>> Added new add-new view based on react.
 
 	module.exports = React.createClass({displayName: 'exports',
 	  render: function() {
@@ -1610,11 +1690,7 @@
 
 
 /***/ },
-<<<<<<< HEAD
-/* 21 */
-=======
 /* 22 */
->>>>>>> Added new add-new view based on react.
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1792,17 +1868,10 @@
 
 
 /***/ },
-<<<<<<< HEAD
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var metrika = __webpack_require__(19)
-=======
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var metrika = __webpack_require__(20)
->>>>>>> Added new add-new view based on react.
 
 	module.exports = React.createClass({displayName: 'exports',
 	    perform_action: function(action) {
