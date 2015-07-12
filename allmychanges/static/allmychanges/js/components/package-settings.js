@@ -9,6 +9,7 @@
 // [ ] сделать отображение сообщений, чтобы они
 //     приезжали в ответе на save
 
+
 module.exports = React.createClass({
     // this field keeps state for which preview was generated
     preview: {},
@@ -334,38 +335,128 @@ module.exports = React.createClass({
     },
     render: function() {
         var content = [];
-        if (this.props.mode == 'edit') {
-            content.push(<label for="changelog_source">Changelog&#39;s source:</label>);
-            content.push(<input name="changelog_source"
-                                type="text"
-                                placeholder="Changelog&#39;s source URL"
-                                className="text-input"
-                                value={this.state.source}/>);
-        } else {
-            if (this.state.tracked) {
-              content.push(<p className="plate">Horay! The package was added and is available <a href="/p/{this.props.namespace}}/{{this.props.name}}/">on a separate page</a>.</p>);
-            } else {
-              content.push(<p className="new-package__greeting">There is no package with source url <a className="new-package__url" href="{this.props.source}">{this.props.source}</a> yet.<br/>Please, fill in a namespace and name to track it or return back and <a href="/p/new/">add another</a> package.</p>);
-            }
-            
-           if (username == "" && this.state.tracked) {
-               content.push(<p className="plate plate_warning">To continue tracking of this package, please, login through <a href="{login_url_github}">GitHub</a> or <a href="{login_url_twitter}">Twitter</a>.</p>);
-           }
-        }
+//        if (this.props.mode == 'edit') {
+        content.push(<label for="changelog_source">Changelog&#39;s source:</label>);
+        content.push(<input name="changelog_source"
+                     type="text"
+                     placeholder="Changelog&#39;s source URL"
+                     className="text-input"
+                     value={this.state.source}/>);
+        // } else {
+        //     if (this.state.tracked) {
+        //       content.push(<p className="plate">Horay! The package was added and is available <a href="/p/{this.props.namespace}}/{{this.props.name}}/">on a separate page</a>.</p>);
+        //     } else {
 
-        if (!this.state.tracked) {
-            content = content.concat(this.draw_table());
-        }
+            
+        //    if (username == "" && this.state.tracked) {
+        //        content.push(<p className="plate plate_warning">To continue tracking of this package, please, login through <a href="{login_url_github}">GitHub</a> or <a href="{login_url_twitter}">Twitter</a>.</p>);
+        //    }
+        // }
+
+        // if (!this.state.tracked) {
+        //     content = content.concat(this.draw_table());
+        // }
 
         if (this.state.waiting) {
-            content.push(<div ng-show="waiting"><div className="progress-text">Please, wait while we search and process its changelog.</div>
-                         <div className="results-spin"><div className="results-spin__wrapper"></div></div>
+            content.push(<div><div className="progress-text">Please, wait while we search and process its changelog.</div>
+                              <div className="results-spin"><div className="results-spin__wrapper"></div></div>
                          </div>);
         }
         if (this.state.results && !this.state.tracked) {
-            content.push(<div>
-                         <h1>This is the latest versions for this package</h1>
-                         <div className="changelog-preview" dangerouslySetInnerHTML={{__html: this.state.results}}></div>
+
+
+        // показываем поля дл заполнения namespace и name
+        var namespace_error;
+        if (this.state.namespace_error) {
+            namespace_error = <span className="input__error">{this.state.namespace_error}</span>;
+        }
+        var name_error;
+        if(this.state.name_error) {
+            name_error = <span className="input__error">{this.state.name_error}</span>;
+        }
+        var description_error;
+        if (this.state.description_error) {
+            description_error = <span className="input__error">{this.state.description_error}</span>;
+        }
+
+
+        content.push(<div>
+          <div className="input">
+            <label className="input__label">Namespace:</label>{namespace_error}<br/>
+            <input name="namespace"
+                   type="text"
+                   placeholder="Namespace (e.g. python, node)"
+                   onChange={this.on_field_change}
+                   className="text-input"
+                   value={this.state.namespace}/>
+          </div>
+
+          <div className="input">
+            <label className="input__label">Name:</label>{name_error}<br/>
+            <input name="name"
+                   type="text"
+                   placeholder="Package name"
+                   onChange={this.on_field_change}
+                   className="text-input"
+                   value={this.state.name}/>
+           </div>
+           <div className="input">
+             <label className="input__label">Description:</label>{description_error}<br/>
+             <input name="description"
+                    type="text"
+                    placeholder="Tell us what it does"
+                    onChange={this.on_field_change}
+                    className="text-input"
+                    value={this.state.description}/>
+           </div>
+         </div>);
+
+               
+            // спрашиваем, всё ли с логов впорядке и предлагаем затрекать
+            var submit_button_disabled = !this.can_track();
+            var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
+
+            content.push(<p className="buttons-row">{save_button}</p>);
+            content.push(<p>If everything is OK then save results. Otherwise, try to tune parser with these options:</p>);
+
+            var tune_options = [];
+
+            var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
+            var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
+            if (this.state.show_change_downloader) {
+                tune_options.push(<li>
+                                    <a className="vlink" onClick={hide_change_downloader}>Change downloader type:</a><br/>
+                                    <select class="downloader-selector">
+                                      <option value="feed">Rss/Atom feed</option>
+                                      <option value="http">HTML page</option>
+                                      <option value="rechttp">Multiple HTML pages</option>
+                                    </select>
+                                  </li>);
+            } else {
+                tune_options.push(<li><a className="vlink" onClick={show_change_downloader}>Change downloader type</a></li>);
+            }
+
+            var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
+            var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
+            if (this.state.show_change_search_list) {
+                tune_options.push(<li>
+                                    <a className="vlink" onClick={hide_change_search_list}>Search in particular file or directory:</a><br/>
+                                    <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
+                                      className="new-package__search-input"
+                                      name="search_list"
+                                      onChange={this.on_field_change}
+                                      disabled={this.state.waiting}
+                                      value={this.state.search_list}></textarea>
+                                  </li>);
+            } else {
+                tune_options.push(<li><a className="vlink" onClick={show_change_search_list}>Search in particular file or directory</a></li>);
+            }
+
+            content.push(<ul className="tune-options">{tune_options}</ul>);
+
+            content.push(<div className="changelog-preview-container">
+                           <h1>This is the latest versions for this package</h1>
+                           <div className="changelog-preview" dangerouslySetInnerHTML={{__html: this.state.results}}></div>
                          </div>);
         }
 
