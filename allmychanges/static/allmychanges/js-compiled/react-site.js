@@ -1017,6 +1017,8 @@
 	        var description_error;
 	        if (this.state.description_error) {
 	            description_error = React.createElement("span", {className: "input__error"}, this.state.description_error);
+	        } else {
+	            description_error = React.createElement("span", {className: "input__error"}, "Shit happened");
 	        }
 
 	        var content = (React.createElement("table", {className: "new-package__fields-table"}, 
@@ -1026,7 +1028,7 @@
 	            React.createElement("tr", null, 
 	              React.createElement("td", {className: "namespace-name-cell__namespace-cell"}, 
 	                React.createElement("div", {className: "input"}, 
-	                  React.createElement("label", {className: "input__label"}, "Namespace:"), namespace_error, React.createElement("br", null), 
+	                  namespace_error, React.createElement("br", null), 
 	                  React.createElement("input", {name: "namespace", type: "text", 
 	                         placeholder: "Namespace (e.g. python, node)", 
 	                         onChange: this.on_field_change, 
@@ -1037,7 +1039,7 @@
 	           React.createElement("tr", null, 
 	              React.createElement("td", {className: "namespace-name-cell__name-cell"}, 
 	                React.createElement("div", {className: "input"}, 
-	                  React.createElement("label", {className: "input__label"}, "Name:"), name_error, React.createElement("br", null), 
+	                  name_error, React.createElement("br", null), 
 	                  React.createElement("input", {name: "name", type: "text", 
 	                         placeholder: "Package name", 
 	                         onChange: this.on_field_change, 
@@ -1054,7 +1056,7 @@
 	       React.createElement("tr", null, 
 	         React.createElement("td", {className: "new-package__description-cell"}, 
 	           React.createElement("div", {className: "input"}, 
-	             React.createElement("label", {className: "input__label"}, "Description:"), description_error, React.createElement("br", null), 
+	             description_error, React.createElement("br", null), 
 	             React.createElement("input", {name: "description", type: "text", 
 	                    placeholder: "Tell us what it does", 
 	                    onChange: this.on_field_change, 
@@ -1143,7 +1145,6 @@
 	    render: function() {
 	        var content = [];
 	//        if (this.props.mode == 'edit') {
-	        content.push(React.createElement("label", {for: "changelog_source"}, "Changelog's source:"));
 	        content.push(React.createElement("input", {name: "changelog_source", 
 	                     type: "text", 
 	                     placeholder: "Changelog's source URL", 
@@ -1184,12 +1185,14 @@
 	        var description_error;
 	        if (this.state.description_error) {
 	            description_error = React.createElement("span", {className: "input__error"}, this.state.description_error);
+	        } else {
+	            description_error = React.createElement("span", {className: "input__error"}, "Shit happened");
 	        }
 
 
 	        content.push(React.createElement("div", null, 
 	          React.createElement("div", {className: "input"}, 
-	            React.createElement("label", {className: "input__label"}, "Namespace:"), namespace_error, React.createElement("br", null), 
+	            namespace_error, React.createElement("br", null), 
 	            React.createElement("input", {name: "namespace", 
 	                   type: "text", 
 	                   placeholder: "Namespace (e.g. python, node)", 
@@ -1199,7 +1202,7 @@
 	          ), 
 
 	          React.createElement("div", {className: "input"}, 
-	            React.createElement("label", {className: "input__label"}, "Name:"), name_error, React.createElement("br", null), 
+	            name_error, React.createElement("br", null), 
 	            React.createElement("input", {name: "name", 
 	                   type: "text", 
 	                   placeholder: "Package name", 
@@ -1208,10 +1211,10 @@
 	                   value: this.state.name})
 	           ), 
 	           React.createElement("div", {className: "input"}, 
-	             React.createElement("label", {className: "input__label"}, "Description:"), description_error, React.createElement("br", null), 
+	             description_error, 
 	             React.createElement("input", {name: "description", 
 	                    type: "text", 
-	                    placeholder: "Tell us what it does", 
+	                    placeholder: "Describe what it does.", 
 	                    onChange: this.on_field_change, 
 	                    className: "text-input", 
 	                    value: this.state.description})

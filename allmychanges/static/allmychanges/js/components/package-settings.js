@@ -210,6 +210,8 @@ module.exports = React.createClass({
         var description_error;
         if (this.state.description_error) {
             description_error = <span className="input__error">{this.state.description_error}</span>;
+        } else {
+            description_error = <span className="input__error">Shit happened</span>;
         }
 
         var content = (<table className="new-package__fields-table">
@@ -219,7 +221,7 @@ module.exports = React.createClass({
             <tr>
               <td className="namespace-name-cell__namespace-cell">
                 <div className="input">
-                  <label className="input__label">Namespace:</label>{namespace_error}<br/>
+                  {namespace_error}<br/>
                   <input name="namespace" type="text"
                          placeholder="Namespace (e.g. python, node)"
                          onChange={this.on_field_change}
@@ -230,7 +232,7 @@ module.exports = React.createClass({
            <tr>
               <td className="namespace-name-cell__name-cell">
                 <div className="input">
-                  <label className="input__label">Name:</label>{name_error}<br/>
+                  {name_error}<br/>
                   <input name="name" type="text"
                          placeholder="Package name"
                          onChange={this.on_field_change}
@@ -247,7 +249,7 @@ module.exports = React.createClass({
        <tr>
          <td className="new-package__description-cell">
            <div className="input">
-             <label className="input__label">Description:</label>{description_error}<br/>
+             {description_error}<br/>
              <input name="description" type="text"
                     placeholder="Tell us what it does"
                     onChange={this.on_field_change}
@@ -336,7 +338,6 @@ module.exports = React.createClass({
     render: function() {
         var content = [];
 //        if (this.props.mode == 'edit') {
-        content.push(<label for="changelog_source">Changelog&#39;s source:</label>);
         content.push(<input name="changelog_source"
                      type="text"
                      placeholder="Changelog&#39;s source URL"
@@ -377,12 +378,14 @@ module.exports = React.createClass({
         var description_error;
         if (this.state.description_error) {
             description_error = <span className="input__error">{this.state.description_error}</span>;
+        } else {
+            description_error = <span className="input__error">Shit happened</span>;
         }
 
 
         content.push(<div>
           <div className="input">
-            <label className="input__label">Namespace:</label>{namespace_error}<br/>
+            {namespace_error}<br/>
             <input name="namespace"
                    type="text"
                    placeholder="Namespace (e.g. python, node)"
@@ -392,7 +395,7 @@ module.exports = React.createClass({
           </div>
 
           <div className="input">
-            <label className="input__label">Name:</label>{name_error}<br/>
+            {name_error}<br/>
             <input name="name"
                    type="text"
                    placeholder="Package name"
@@ -401,10 +404,10 @@ module.exports = React.createClass({
                    value={this.state.name}/>
            </div>
            <div className="input">
-             <label className="input__label">Description:</label>{description_error}<br/>
+             {description_error}
              <input name="description"
                     type="text"
-                    placeholder="Tell us what it does"
+                    placeholder="Describe what it does."
                     onChange={this.on_field_change}
                     className="text-input"
                     value={this.state.description}/>
