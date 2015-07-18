@@ -318,12 +318,12 @@ select {
   font-size: 30px;
   line-height: 30px;
 }
-.input {
-  margin-top: 16px;
-}
 .input__error {
   margin-left: 10px;
   color: #f00;
+}
+.input__error:first-child {
+  margin-left: 0px;
 }
 .form-buttons__back {
   width: 100%;
