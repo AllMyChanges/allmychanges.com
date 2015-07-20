@@ -15,6 +15,9 @@ from django.conf import settings
 from twiggy_goodies.threading import log
 from itertools import izip_longest
 
+# Documentation:
+# https://core.telegram.org/bots
+
 # TODO:
 # + обрабатывать /start
 # - запоминать чаты, чтобы иметь возможность постить туда новости.
@@ -148,13 +151,15 @@ class Command(LogMixin, BaseCommand):
             for message in messages:
                 max_update_id = max(max_update_id, message['update_id'])
                 message = message['message']
-                query = message['text']
-                with log.fields(query=query,
-                                     from_username=message['chat']['username'],
-                                     chat_id=message['chat']['id']):
-                    log.info(u'Message received')
+                query = message.get('text')
 
-                    for matcher, handler in HANDLERS:
-                        if matcher.match(query) is not None:
-                            handler(message, query)
-                            break
+                if query:
+                    with log.fields(query=query,
+                                         from_username=message['chat']['username'],
+                                         chat_id=message['chat']['id']):
+                        log.info(u'Message received')
+
+                        for matcher, handler in HANDLERS:
+                            if matcher.match(query) is not None:
+                                handler(message, query)
+                                break
