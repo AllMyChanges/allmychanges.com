@@ -143,7 +143,7 @@ class Command(LogMixin, BaseCommand):
     def handle(self, *args, **options):
         max_update_id = 0
         while True:
-            response = get('getUpdates', timeout=10, offset=max_update_id + 1)
+            response = get('getUpdates', timeout=60, offset=max_update_id + 1)
             messages = response['result']
             for message in messages:
                 max_update_id = max(max_update_id, message['update_id'])
