@@ -219,6 +219,9 @@ SLACK_URLS = {
 KATO_URL = 'https://api.kato.im/rooms/1cade7d59009707e553d60bc9e0760f54dcb8d1f18544d5d2a4c4914998440c1/simple'
 CLOSEIO_KEY = '34c5992096c7f67bd5d22f24e4e87a5837f58af5f326f2cdfda932d4'
 MANDRILL_KEY = 'g3pUEIJTBEd6KGeWkKihgQ'
+# AllMyChangesBot
+TELEGRAM_BOT_BASE_URL = 'https://api.telegram.org/bot99002009:AAF2epqrBGImWKPANN1GWTnUsI0fxIUpTI0/'
+
 
 # these are used to post tweets about new versions
 TWITTER_CREDS = None
