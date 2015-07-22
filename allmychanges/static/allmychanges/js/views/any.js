@@ -88,6 +88,7 @@ module.exports = {
                      preview_id={element.dataset['previewId']}
                      changelog_id={element.dataset['changelogId']}
                      source={element.dataset['source']}
+                     downloader={element.dataset['downloader']}
                      name={element.dataset['name']}
                      namespace={element.dataset['namespace']}
                      description={element.dataset['description']}

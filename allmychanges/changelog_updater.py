@@ -163,7 +163,7 @@ def update_preview_or_changelog(obj):
         problem = u', '.join(e.args)
         log.trace().error('Unable to update changelog')
     except Exception as e:
-        problem = unicode(e)
+        problem = str(e).decode('utf-8')
         log.trace().error('Unable to update changelog')
 
     if path:

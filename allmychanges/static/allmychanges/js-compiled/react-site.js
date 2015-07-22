@@ -164,6 +164,7 @@
 	                     preview_id: element.dataset['previewId'], 
 	                     changelog_id: element.dataset['changelogId'], 
 	                     source: element.dataset['source'], 
+	                     downloader: element.dataset['downloader'], 
 	                     name: element.dataset['name'], 
 	                     namespace: element.dataset['namespace'], 
 	                     description: element.dataset['description'], 
@@ -806,7 +807,11 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// тодо:
-	// [ ] сделать, чтобы вработал выбор даунлоадера
+	// [+] сделать, чтобы вработал выбор даунлоадера
+	// [+] после выбора downloader нужно триггерить обновлнеиен changelog
+	// [+] не скрывать поля во время работы downloader, а если в результате работы downloader произошла ошибка, то давать поправить настройки
+	// [ ] разобраться, почему ошибка для google play не показывается, а для hg или git показывается
+	// [ ] выяснить почему для Google play не показывается статус процесса обработки
 	// [ ] проверить, как работает search in
 	// [ ] добавить exclude
 	// [ ] добавить XSLT
@@ -832,6 +837,7 @@
 	                xslt: this.props.xslt || '',
 	                results: null,
 	                save_button_title: ((this.props.mode == 'edit') ? 'Save' : 'Save&Track'),
+	                downloader: this.props.downloader,
 	                namespace: this.props.namespace || '',
 	                namespace_error: !this.props.namespace && 'Please, fill this field' || '',
 	                name: this.props.name || '',
@@ -846,6 +852,7 @@
 	    save_preview_params: function () {
 	        this.preview = {
 	            source: this.state.source,
+	            downloader: this.state.downloader,
 	            search_list: this.state.search_list,
 	            ignore_list: this.state.ignore_list,
 	            xslt: this.state.xslt};
@@ -876,16 +883,25 @@
 	                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
 	            .success(this.update_preview_callback);
 	    },
-	    on_field_change: function(event) {
+	    on_field_change: function(event, on_state_change) {
+	        // on_state_change could be a function to be called
+	        // when field changes will be applied to the state
+
 	        var name = event.target.name;
 	        UserStory.log(["field [name=", name, "] was changed"], ["on"]);
 	        var params = {}
 	        params[name] = event.target.value;
-	        this.setState(params);
 
-	        if (name == 'namespace' || name == 'name') {
-	            this.schedule_validation();
-	        }
+	        var callback = function () {
+	            if (name == 'namespace' || name == 'name') {
+	                this.schedule_validation();
+	            }
+	            if (on_state_change !== undefined) {
+	                on_state_change();
+	            }
+	        }.bind(this);
+
+	        this.setState(params, callback);
 	    },
 	    save: function() {
 	        UserStory.log(["Saving"], ["package"]);
@@ -1162,15 +1178,8 @@
 	        //     content = content.concat(this.draw_table());
 	        // }
 
-	        if (this.state.waiting) {
-	            content.push(React.createElement("div", null, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
-	                              React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
-	                         ));
-	        }
-	        if (this.state.results && !this.state.tracked) {
 
-
-	        // показываем поля дл заполнения namespace и name
+	        // показываем поля для заполнения namespace и name
 	        var namespace_error;
 	        if (this.state.namespace_error) {
 	            namespace_error = React.createElement("span", {className: "input__error"}, this.state.namespace_error);
@@ -1185,84 +1194,110 @@
 	        }
 
 	        content.push(React.createElement("div", null, 
-	          React.createElement("div", {className: "input"}, 
-	            namespace_error, React.createElement("br", null), 
-	            React.createElement("input", {name: "namespace", 
-	                   type: "text", 
-	                   placeholder: "Namespace (e.g. python, node)", 
-	                   onChange: this.on_field_change, 
-	                   className: "text-input", 
-	                   value: this.state.namespace})
-	          ), 
+	                     React.createElement("div", {className: "input"}, 
+	                     namespace_error, React.createElement("br", null), 
+	                     React.createElement("input", {name: "namespace", 
+	                     type: "text", 
+	                     placeholder: "Namespace (e.g. python, node)", 
+	                     onChange: this.on_field_change, 
+	                     className: "text-input", 
+	                     value: this.state.namespace})
+	                     ), 
 
-	          React.createElement("div", {className: "input"}, 
-	            name_error, React.createElement("br", null), 
-	            React.createElement("input", {name: "name", 
-	                   type: "text", 
-	                   placeholder: "Package name", 
-	                   onChange: this.on_field_change, 
-	                   className: "text-input", 
-	                   value: this.state.name})
-	           ), 
-	           React.createElement("div", {className: "input"}, 
-	             description_error, React.createElement("br", null), 
-	             React.createElement("input", {name: "description", 
-	                    type: "text", 
-	                    placeholder: "Describe what it does.", 
-	                    onChange: this.on_field_change, 
-	                    className: "text-input", 
-	                    value: this.state.description})
-	           )
-	         ));
+	                     React.createElement("div", {className: "input"}, 
+	                     name_error, React.createElement("br", null), 
+	                     React.createElement("input", {name: "name", 
+	                     type: "text", 
+	                     placeholder: "Package name", 
+	                     onChange: this.on_field_change, 
+	                     className: "text-input", 
+	                     value: this.state.name})
+	                     ), 
+	                     React.createElement("div", {className: "input"}, 
+	                     description_error, React.createElement("br", null), 
+	                     React.createElement("input", {name: "description", 
+	                     type: "text", 
+	                     placeholder: "Describe what it does.", 
+	                     onChange: this.on_field_change, 
+	                     className: "text-input", 
+	                     value: this.state.description})
+	                     )
+	                     ));
 
-	               
-	            // спрашиваем, всё ли с логов впорядке и предлагаем затрекать
-	            var submit_button_disabled = !this.can_track();
-	            var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save, disabled: submit_button_disabled});
+	        
+	        // спрашиваем, всё ли с логов впорядке и предлагаем затрекать
+	        var submit_button_disabled = !this.can_track();
+	        var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save, disabled: submit_button_disabled});
 
-	            content.push(React.createElement("p", {className: "buttons-row"}, save_button));
-	            content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
+	        content.push(React.createElement("p", {className: "buttons-row"}, save_button));
+	        content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
 
 
-	            var tune_options = [];
+	        var tune_options = [];
 
-	            var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
-	            var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
-	            if (this.state.show_change_downloader) {
-	                tune_options.push(React.createElement("li", null, 
-	                                    React.createElement("a", {className: "vlink", onClick: hide_change_downloader}, "Change downloader type:"), React.createElement("br", null), 
-	                                    React.createElement("select", {class: "downloader-selector"}, 
-	                                      React.createElement("option", {value: "feed"}, "Rss/Atom feed"), 
-	                                      React.createElement("option", {value: "http"}, "HTML page"), 
-	                                      React.createElement("option", {value: "rechttp"}, "Multiple HTML pages")
-	                                    )
-	                                  ));
-	            } else {
-	                tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_downloader}, "Change downloader type")));
-	            }
+	        var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
+	        var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
+	        if (this.state.show_change_downloader) {
+	            var available_downloaders = [["feed", "Rss/Atom Feed"],
+	                                         ["http", "Single HTML Page"],
+	                                         ["rechttp", "Multiple HTML Pages"],
+	                                         ["google_play", "Google Play"],
+	                                         ["itunes", "Apple AppStore"],
+	                                         ["git", "Git Repository"],
+	                                         ["hg", "Mercurial Repository"],
+	                                         ["github_releases", "GitHub Releases"]];
+	            var render_option = function (item) {
+	                return React.createElement("option", {value: item[0], key: item[0]}, item[1]);
+	            };
+	            var options = R.map(render_option, available_downloaders);
+	            var on_downloader_change = function(event) {
+	                this.on_field_change(
+	                    event,
+	                    this.update_preview);
+	            }.bind(this);
+	            tune_options.push(React.createElement("li", null, 
+	                              React.createElement("a", {className: "vlink", onClick: hide_change_downloader}, "Change downloader type:"), React.createElement("br", null), 
+	                              React.createElement("select", {className: "downloader-selector", 
+	                              name: "downloader", 
+	                              value: this.state.downloader, 
+	                              onChange: on_downloader_change, 
+	                              disabled: this.state.waiting}, 
+	                              options
+	                              )
+	                              ));
+	        } else {
+	            tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_downloader}, "Change downloader type")));
+	        }
 
-	            var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
-	            var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
-	            if (this.state.show_change_search_list) {
-	                tune_options.push(React.createElement("li", null, 
-	                                    React.createElement("a", {className: "vlink", onClick: hide_change_search_list}, "Search in particular file or directory:"), React.createElement("br", null), 
-	                                    React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
-	                                      className: "new-package__search-input", 
-	                                      name: "search_list", 
-	                                      onChange: this.on_field_change, 
-	                                      disabled: this.state.waiting, 
-	                                      value: this.state.search_list})
-	                                  ));
-	            } else {
-	                tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_search_list}, "Search in particular file or directory")));
-	            }
+	        var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
+	        var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
+	        if (this.state.show_change_search_list) {
+	            tune_options.push(React.createElement("li", null, 
+	                              React.createElement("a", {className: "vlink", onClick: hide_change_search_list}, "Search in particular file or directory:"), React.createElement("br", null), 
+	                              React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
+	                              className: "new-package__search-input", 
+	                              name: "search_list", 
+	                              onChange: this.on_field_change, 
+	                              disabled: this.state.waiting, 
+	                              value: this.state.search_list})
+	                              ));
+	        } else {
+	            tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_search_list}, "Search in particular file or directory")));
+	        }
 
-	            content.push(React.createElement("ul", {className: "tune-options"}, tune_options));
+	        content.push(React.createElement("ul", {className: "tune-options"}, tune_options));
 
-	            content.push(React.createElement("div", {className: "changelog-preview-container"}, 
-	                           React.createElement("h1", null, "This is the latest versions for this package"), 
-	                           React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
+	        if (this.state.waiting) {
+	            content.push(React.createElement("div", null, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
+	                              React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
 	                         ));
+	        } else {
+	            if (this.state.results && !this.state.tracked) {
+	                content.push(React.createElement("div", {className: "changelog-preview-container"}, 
+	                             React.createElement("h1", null, "This is the latest versions for this package"), 
+	                             React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
+	                             ));
+	            }
 	        }
 
 	        if (this.state.problem) {
