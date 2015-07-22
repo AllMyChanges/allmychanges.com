@@ -398,13 +398,14 @@ class Changelog(Downloadable, models.Model):
     def resolve_issues(self, type):
         self.issues.filter(type=type, resolved_at=None).update(resolved_at=timezone.now())
 
-    def create_preview(self, user, light_user):
-        preview = self.previews.create(
-            source=self.source,
-            ignore_list=self.ignore_list,
-            search_list=self.search_list,
-            user=user,
-            light_user=light_user)
+    def create_preview(self, user, light_user, **params):
+        params.setdefault('downloader', self.downloader)
+        params.setdefault('source', self.source)
+        params.setdefault('search_list', self.search_list)
+        params.setdefault('ignore_list', self.ignore_list)
+        params.setdefault('xslt', self.xslt)
+
+        preview = self.previews.create(user=user, light_user=light_user, **params)
         return preview
 
     def set_status(self, status, **kwargs):

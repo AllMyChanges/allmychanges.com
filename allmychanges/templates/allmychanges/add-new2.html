@@ -12,16 +12,17 @@
 <div class="add-new-container"
      data-preview-id="{{ preview.id }}"
      data-changelog-id="{{ changelog.id }}"
-     data-source="{{ changelog.source }}"
+     data-source="{{ preview.source }}"
+     data-downloader="{{ preview.downloader }}"
 {% if changelog.name %}
-     data-name="{{ changelog.name }}"{% endif %}
+     data-name="{{ preview.name }}"{% endif %}
 {% if changelog.namespace %}
-     data-namespace="{{ changelog.namespace }}"{% endif %}
+     data-namespace="{{ preview.namespace }}"{% endif %}
 {% if changelog.namespace %}
-     data-description="{{ changelog.description }}"{% endif %}
-     data-search-list="{{ changelog.search_list }}"
-     data-ignore-list="{{ changelog.ignore_list }}"
-     data-xslt="{{ changelog.xslt }}"
+     data-description="{{ preview.description }}"{% endif %}
+     data-search-list="{{ preview.search_list }}"
+     data-ignore-list="{{ preview.ignore_list }}"
+     data-xslt="{{ preview.xslt }}"
      data-mode="{{ mode }}"
      ></div>
 {% else %}

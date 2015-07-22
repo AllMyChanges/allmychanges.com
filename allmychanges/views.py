@@ -914,6 +914,30 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         else:
             normalized_url, _, _ = normalize_url(url, for_checkout=False)
 
+            # first, we'll get params from query, if they were given
+            params = dict(name=self.request.GET.get('name'),
+                          namespace=self.request.GET.get('namespace'),
+                          description=self.request.GET.get('description', ''),
+                          icon=self.request.GET.get('icon', ''))
+
+            # and finally, we'll try to guess downloader
+            if not params.get('downloader'):
+                params['downloader'] = guess_downloader(normalized_url)
+
+
+            # if name was not given, then we'll try to guess it
+            if not params['name']:
+                guesser = get_namespace_guesser(params['downloader'])
+                guessed = guesser(normalized_url)
+                guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
+                                                             guessed['name'])
+                for key, value in guessed.items():
+                    if value:
+                        params[key] = value
+
+            # icon don't saved into the preview yet
+            icon = params.pop('icon')
+
             try:
                 changelog = Changelog.objects.get(source=normalized_url)
                 if changelog.name is not None:
@@ -926,23 +950,9 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                                      'package-create',
                                      u'User created changelog:{0}'.format(changelog.pk))
             except Changelog.DoesNotExist:
-                params = dict(name=self.request.GET.get('name'),
-                              namespace=self.request.GET.get('namespace'),
-                              description=self.request.GET.get('description', ''),
-                              icon=self.request.GET.get('icon', ''))
-
-                if not params['name']:
-                    downloader = guess_downloader(normalized_url)
-                    guesser = get_namespace_guesser(downloader)
-                    guessed = guesser(normalized_url)
-                    guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
-                                                                 guessed['name'])
-                    for key, value in guessed.items():
-                        if value:
-                            params[key] = value
-
                 changelog = Changelog.objects.create(
-                    source=normalized_url, **params)
+                    source=normalized_url,
+                    icon=icon)
 
                 if user:
                     chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
@@ -959,10 +969,10 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             changelog.problem = None
             changelog.save()
 
-
             preview = changelog.create_preview(
                 user=user,
-                light_user=self.request.light_user)
+                light_user=self.request.light_user,
+                **params)
 
             preview.schedule_update()
 
@@ -1107,6 +1117,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
                 preview.downloader = None
 
             preview.source = data.get('source')
+            preview.downloader = data.get('downloader')
             preview.set_status('processing')
             preview.save()
             preview.schedule_update()
