@@ -579,14 +579,16 @@ class NamespaceAndNameForm(forms.Form):
         namespace = cleaned_data.get('namespace')
         name = cleaned_data.get('name')
 
-        try:
-            changelog = Changelog.objects.get(namespace=namespace,
-                                              name=name)
+        if namespace and name:
+            try:
+                already_taken = Changelog.objects \
+                    .filter(namespace=namespace, name=name) \
+                    .exclude(pk=changelog_id).count()
 
-            if changelog.pk != changelog_id:
-                self._errors['name'] = ['These namespace/name pair already taken.']
-        except Changelog.DoesNotExist:
-            pass
+                if already_taken:
+                    self._errors['name'] = ['These namespace/name pair already taken.']
+            except Changelog.DoesNotExist:
+                pass
 
         return cleaned_data
 

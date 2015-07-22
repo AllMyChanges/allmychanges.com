@@ -1,9 +1,8 @@
 // тодо:
-// [X] сделать обработку ошибок namespace и name
-// [X] поправить disabled стиль для белой кнопки
-// [X] разобраться почему не отображается footer
-// [X] доделать сохранение результатов
-// [X] проверить как оно работает на редактировании пакета
+// [ ] сделать, чтобы вработал выбор даунлоадера
+// [ ] проверить, как работает search in
+// [ ] добавить exclude
+// [ ] добавить XSLT
 // [ ] после нажатия Save&Track нужно дисейблить кнопку save
 //     и наверное показывать popup.
 // [ ] сделать отображение сообщений, чтобы они
@@ -161,134 +160,132 @@ module.exports = React.createClass({
                                name_error: name_error});
             }.bind(this));
     },
-    draw_table: function() {
-        var xslt_editing_fields = [
-                <tr><td className="new-package__xslt-label">XSLT mighty feature!</td></tr>,
-                <tr>
-                  <td className="new-package__xslt-wrap">
-                    <textarea placeholder="Behold XSLT's mighty power!"
-                              className="new-package__xslt-input" name="xslt"
-                              onChange={this.on_field_change}
-                              disabled={this.state.waiting} value={this.state.xslt}></textarea></td>
-                </tr>];
-        if (username != 'svetlyak40wt') {
-            xslt_editing_fields = [];
-        }
+    // draw_table: function() {
+    //     var xslt_editing_fields = [
+    //             <tr><td className="new-package__xslt-label">XSLT mighty feature!</td></tr>,
+    //             <tr>
+    //               <td className="new-package__xslt-wrap">
+    //                 <textarea placeholder="Behold XSLT's mighty power!"
+    //                           className="new-package__xslt-input" name="xslt"
+    //                           onChange={this.on_field_change}
+    //                           disabled={this.state.waiting} value={this.state.xslt}></textarea></td>
+    //             </tr>];
+    //     if (username != 'svetlyak40wt') {
+    //         xslt_editing_fields = [];
+    //     }
 
-        var save_callback;
-        var submit_button_disabled = !this.can_track();
+    //     var save_callback;
+    //     var submit_button_disabled = !this.can_track();
 
-        if (this.props.mode == 'edit') {
-            save_callback = this.save;
-        } else {
-            save_callback = this.save_and_track;
-        }
-        var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
+    //     if (this.props.mode == 'edit') {
+    //         save_callback = this.save;
+    //     } else {
+    //         save_callback = this.save_and_track;
+    //     }
+    //     var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
 
-        var save_tooltip;
-        if (!this.is_apply_button_disabled()) {
-            save_tooltip = <span className="new-package__save-tooltip">Please, update preview to ensure that we able to get a changelog for this package.</span>;
-        }
+    //     var save_tooltip;
+    //     if (!this.is_apply_button_disabled()) {
+    //         save_tooltip = <span className="new-package__save-tooltip">Please, update preview to ensure that we able to get a changelog for this package.</span>;
+    //     }
 
-        var broken_links_warning;
-        if (this.is_name_or_namespace_were_changed()) {
-                broken_links_warning = (
-                        <tr>
-                          <td className="new-package__rename-warning" colspan="2">
-                            Beware, renaming this package will broke all links to this package!
-                          </td>
-                        </tr>);
-        }
-        var namespace_error;
-        if (this.state.namespace_error) {
-            namespace_error = <span className="input__error">{this.state.namespace_error}</span>;
-        }
-        var name_error;
-        if(this.state.name_error) {
-            name_error = <span className="input__error">{this.state.name_error}</span>;
-        }
-        var description_error;
-        if (this.state.description_error) {
-            description_error = <span className="input__error">{this.state.description_error}</span>;
-        } else {
-            description_error = <span className="input__error">Shit happened</span>;
-        }
+    //     var broken_links_warning;
+    //     if (this.is_name_or_namespace_were_changed()) {
+    //             broken_links_warning = (
+    //                     <tr>
+    //                       <td className="new-package__rename-warning" colspan="2">
+    //                         Beware, renaming this package will broke all links to this package!
+    //                       </td>
+    //                     </tr>);
+    //     }
+    //     var namespace_error;
+    //     if (this.state.namespace_error) {
+    //         namespace_error = <span className="input__error">{this.state.namespace_error}</span>;
+    //     }
+    //     var name_error;
+    //     if(this.state.name_error) {
+    //         name_error = <span className="input__error">{this.state.name_error}</span>;
+    //     }
+    //     var description_error;
+    //     if (this.state.description_error) {
+    //         description_error = <span className="input__error">{this.state.description_error}</span>;
+    //     }
 
-        var content = (<table className="new-package__fields-table">
-       <tr>
-        <td className="new-package__namespace-name-cell">
-          <table className="namespace-name-cell__table">
-            <tr>
-              <td className="namespace-name-cell__namespace-cell">
-                <div className="input">
-                  {namespace_error}<br/>
-                  <input name="namespace" type="text"
-                         placeholder="Namespace (e.g. python, node)"
-                         onChange={this.on_field_change}
-                         className="text-input" value={this.state.namespace}/>
-                </div>
-              </td>
-           </tr>
-           <tr>
-              <td className="namespace-name-cell__name-cell">
-                <div className="input">
-                  {name_error}<br/>
-                  <input name="name" type="text"
-                         placeholder="Package name"
-                         onChange={this.on_field_change}
-                         className="text-input" value={this.state.name}/>
-                </div>
-              </td>
-            </tr>
-            {broken_links_warning}
-          </table>
-        </td>
-        <td className="new-package__button-cell">
-        </td>
-       </tr>
-       <tr>
-         <td className="new-package__description-cell">
-           <div className="input">
-             {description_error}<br/>
-             <input name="description" type="text"
-                    placeholder="Tell us what it does"
-                    onChange={this.on_field_change}
-                    className="text-input" value={this.state.description}/>
-           </div>
-         </td>
-       </tr>
-       <tr>
-         <td className="new-package__search-label">Search in these dirs and files:</td>
-       </tr>
-       <tr>
-         <td className="new-package__search-input-wrap">
-             <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
-                       className="new-package__search-input" name="search_list"
-                       onChange={this.on_field_change}
-                       disabled={this.state.waiting} value={this.state.search_list}></textarea></td>
-       </tr>
-       <tr>
-         <td className="new-package__ignore-label">Ignore these dirs and files:</td>
-       </tr>
-       <tr>
-         <td className="new-package__ignore-input-wrap">
-             <textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places."
-                       className="new-package__ignore-input" name="ignore_list"
-                       onChange={this.on_field_change}
-                       disabled={this.state.waiting} value={this.state.ignore_list}></textarea></td>
-       </tr>
-       {xslt_editing_fields}
-       <tr>
-        <td className="new-package__button-cell">
-          <input type="submit" className="button _large magic-prompt__apply" value="Update Preview" onClick={this.update_preview} disabled={this.is_apply_button_disabled()}/>
-          {save_button}
-          {save_tooltip}
-        </td>
-       </tr>
-     </table>);
+    //     var content = (<table className="new-package__fields-table">
+    //    <tr>
+    //     <td className="new-package__namespace-name-cell">
+    //       <table className="namespace-name-cell__table">
+    //         <tr>
+    //           <td className="namespace-name-cell__namespace-cell">
+    //             <div className="input">
+    //               {namespace_error}<br/>
+    //               <input name="namespace" type="text"
+    //                      placeholder="Namespace (e.g. python, node)"
+    //                      onChange={this.on_field_change}
+    //                      className="text-input" value={this.state.namespace}/>
+    //             </div>
+    //           </td>
+    //        </tr>
+    //        <tr>
+    //           <td className="namespace-name-cell__name-cell">
+    //             <div className="input">
+    //               {name_error}<br/>
+    //               <input name="name" type="text"
+    //                      placeholder="Package name"
+    //                      onChange={this.on_field_change}
+    //                      className="text-input" value={this.state.name}/>
+    //             </div>
+    //           </td>
+    //         </tr>
+    //         {broken_links_warning}
+    //       </table>
+    //     </td>
+    //     <td className="new-package__button-cell">
+    //     </td>
+    //    </tr>
+    //    <tr>
+    //      <td className="new-package__description-cell">
+    //        <div className="input">
+    //          {description_error}<br/>
+    //          <input name="description" type="text"
+    //                 placeholder="Tell us what it does"
+    //                 onChange={this.on_field_change}
+    //                 className="text-input" value={this.state.description}/>
+    //        </div>
+    //      </td>
+    //    </tr>
+    //    <tr>
+    //      <td className="new-package__search-label">Search in these dirs and files:</td>
+    //    </tr>
+    //    <tr>
+    //      <td className="new-package__search-input-wrap">
+    //          <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
+    //                    className="new-package__search-input" name="search_list"
+    //                    onChange={this.on_field_change}
+    //                    disabled={this.state.waiting} value={this.state.search_list}></textarea></td>
+    //    </tr>
+    //    <tr>
+    //      <td className="new-package__ignore-label">Ignore these dirs and files:</td>
+    //    </tr>
+    //    <tr>
+    //      <td className="new-package__ignore-input-wrap">
+    //          <textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places."
+    //                    className="new-package__ignore-input" name="ignore_list"
+    //                    onChange={this.on_field_change}
+    //                    disabled={this.state.waiting} value={this.state.ignore_list}></textarea></td>
+    //    </tr>
+    //    {xslt_editing_fields}
+    //    <tr>
+    //     <td className="new-package__button-cell">
+    //       <input type="submit" className="button _large magic-prompt__apply" value="Update Preview" onClick={this.update_preview} disabled={this.is_apply_button_disabled()}/>
+    //       {save_button}
+    //       {save_tooltip}
+    //     </td>
+    //    </tr>
+    //  </table>);
 
-     return content;
-    },
+    //  return content;
+    // },
     wait_for_preview: function () {
         // waiting for preview results @wait-for-preview
         if (this.spinner === undefined) {
@@ -376,12 +373,9 @@ module.exports = React.createClass({
             name_error = <span className="input__error">{this.state.name_error}</span>;
         }
         var description_error;
-        if (this.state.description_error) {
-            description_error = <span className="input__error">{this.state.description_error}</span>;
-        } else {
-            description_error = <span className="input__error">Shit happened</span>;
+        if (this.state.description.length > 255) {
+            description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
         }
-
 
         content.push(<div>
           <div className="input">
@@ -404,7 +398,7 @@ module.exports = React.createClass({
                    value={this.state.name}/>
            </div>
            <div className="input">
-             {description_error}
+             {description_error}<br/>
              <input name="description"
                     type="text"
                     placeholder="Describe what it does."
@@ -421,6 +415,7 @@ module.exports = React.createClass({
 
             content.push(<p className="buttons-row">{save_button}</p>);
             content.push(<p>If everything is OK then save results. Otherwise, try to tune parser with these options:</p>);
+
 
             var tune_options = [];
 
