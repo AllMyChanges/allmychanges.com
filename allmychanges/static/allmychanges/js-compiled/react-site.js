@@ -828,6 +828,7 @@
 
 	    getInitialState: function () {
 	        UserStory.log(["init add new page"], ["add"]);
+	        UserStory.log(["downloader [this.props.downloader=", this.props.downloader, "]"], ["add"]);
 	        return {tracked: false,
 	                saving: false,
 	                waiting: false,

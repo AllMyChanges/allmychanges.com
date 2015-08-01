@@ -20,6 +20,7 @@ module.exports = React.createClass({
 
     getInitialState: function () {
         // init add new page @add-new
+        // downloader [this.props.downloader] @add-new
         return {tracked: false,
                 saving: false,
                 waiting: false,

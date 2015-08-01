@@ -166,7 +166,10 @@ def update_preview_or_changelog(obj):
         problem = str(e).decode('utf-8')
         log.trace().error('Unable to update changelog')
 
-    if path:
+    if not path:
+        log.trace().error('Unable to update changelog')
+        problem = 'Unable to download changelog'
+    else:
         try:
             try:
                 from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
