@@ -20,7 +20,9 @@ _months = _months \
 
 # вот эти штуки (?:[^.0-9]|$) в начале и конце,
 # нужны, чтобы мы не пытались искать даты в составе номеров версий
-RE_DATE_STR = r"""(?:[^.0-9]|^)(?P<date>(
+RE_DATE_STR = r"""
+              # date shouldn't start with dot or alfanumeric or 'v' character
+              (?:[^.0-9v]|^)(?P<date>(
               # 2009-05-23, 2009.05.23, 2009/05/23 but not 2009.05-23
               \num_year(?P<delimiter1>[./-])\d{1,2}(?P=delimiter1)\d{1,2} |
 

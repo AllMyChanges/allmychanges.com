@@ -11,3 +11,4 @@ def test_good_lines():
     eq_('1.0a3', _extract_version('Version 1.0a3'))
     eq_('1.0a', _extract_version('Version 1.0a'))
     eq_('1.0.1k', _extract_version('Version 1.0.1k'))
+    eq_('2015.1.21', _extract_version('v2015.1.21 (released 2015-1-21)'))
