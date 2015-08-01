@@ -20,9 +20,9 @@ def test_update_package_using_full_pipeline():
 
     versions = list(changelog.versions.filter(code_version='v2'))
     eq_(2, len(versions))
-    eq_('<ul><li>Some bugfix.</li>\n</ul>',
+    eq_('<ul>\n<li>Some bugfix.</li>\n</ul>',
         versions[0].raw_text)
-    eq_('<ul><li>Initial release.</li>\n</ul>',
+    eq_('<ul>\n<li>Initial release.</li>\n</ul>',
         versions[1].raw_text)
 
     # TODO: uncomment when I add text processing
@@ -79,7 +79,7 @@ def test_html_parser():
          u'Apr. 23, 2012 \u2014 Docs'],
         [s.title for s in sections])
 
-    eq_('<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#8212; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>\n\n<ul class="task-list"><li>Initial release</li>\n</ul>',
+    eq_('<h4>\n<a id="user-content-apr-23-2012--docs" class="anchor" href="#apr-23-2012--docs" aria-hidden="true"><span class="octicon octicon-link"></span></a><em>Apr. 23, 2012</em> &#8212; <a href="https://github.com/lodash/lodash/blob/0.1.0/doc/README.md">Docs</a>\n</h4>\n\n<ul class="task-list">\n<li>Initial release</li>\n</ul>',
         sections[3].content)
 
 

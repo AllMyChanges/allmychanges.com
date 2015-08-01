@@ -73,8 +73,10 @@ Final word.
     sc = v3.content
 
     eq_("""<h1>Minor changes</h1>\n<p>This release has small importance.</p>
-<ul><li>Test case was introduced</li>
-</ul><p>Final word.</p>""",
+<ul>
+<li>Test case was introduced</li>
+</ul>
+<p>Final word.</p>""",
         sc)
 
 
