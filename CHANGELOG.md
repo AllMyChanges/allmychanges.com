@@ -1,3 +1,13 @@
+0.30.1 (2015-08-04)
+===================
+
+* Use 'updated' date of atom feed if there is no 'published' date.
+  This allowed us to process [Spring Boot's][spring-boot] and
+  [Spring Framework's][spring-framework] changelogs.
+* RSS integraion's field is 'readonly' now instead of 'disabled'. Thanks to @Splurov.
+* Fixed Google Play's URLs processing when there are parameters other than 'id'.
+  Thank again to @Splurov.
+
 0.30.0 (2015-07-12)
 ===================
 
@@ -1042,3 +1052,5 @@ There are plenty directions for approvement. Stay tuned.
 [Ruby]: https://allmychanges.com/p/ruby/ruby/
 [Dropbox]: https://allmychanges.com/p/soft/dropbox/
 [catalogue]: http://allmychanges.com/p/
+[spring-boot]: https://allmychanges.com/p/java/spring-boot/
+[spring-framework]: https://allmychanges.com/p/java/spring-framework/
