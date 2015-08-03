@@ -48,7 +48,7 @@ POST all discovered versions there. Need help? Read <a href="{% url 'help' topic
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">RSS integration:</label></td>
         <td class="form__layout__right-column">
-          <input type="text" class="text-input" disabled="disabled" value="{{request|site_url}}{% url 'rss-feed' feed_hash=user.rss_hash %}"/>
+          <input type="text" class="text-input" readonly="readonly" value="{{request|site_url}}{% url 'rss-feed' feed_hash=user.rss_hash %}"/>
           <p class="form__layout__right-column form__help">Copy this URL into you favorite RSS reader.</p>
         </td>
       </tr>
