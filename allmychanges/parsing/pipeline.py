@@ -532,11 +532,13 @@ def parse_html_file(obj):
                 el.text_content().strip(),
                 el.itersiblings())
                for el in headers]
+
     body = parsed.find('body')
-    headers.insert(0, (header_level(body),
-                       body,
-                       obj.filename,
-                       body.iterchildren()))
+    if body is not None:
+        headers.insert(0, (header_level(body),
+                           body,
+                           obj.filename,
+                           body.iterchildren()))
 
     def process_header(parent, level, elem, title, all_children):
         def not_same_level_H(ch):
@@ -706,6 +708,7 @@ def process_version_description(html):
                      tags=[u'table', 'colgroup', 'col', 'tr', 'td', 'th', 'tbody', 'thead',
                            u'a', u'abbr', u'acronym', u'b', u'blockquote',
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
+                           u'dl', u'dt', u'dd', # allow definition lists
                            u'p', # we allow paragraphs cause they are fine
                            u'h1', u'h2', u'h3', u'h4', u'h5', # headers are ok too
                            u'del', u'strike', u's',
