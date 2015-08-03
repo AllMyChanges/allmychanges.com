@@ -473,7 +473,7 @@ def google_play_guesser(source):
     if images:
         icon = images[0].imageUrl
     else:
-        icon = Nonen
+        icon = None
     return dict(namespace='android',
                 name=name,
                 description=description,
@@ -523,7 +523,7 @@ github_releases_guesser = git_guesser
 
 
 def google_play_get_id(source):
-    match = re.search(ur'id=(?P<app_id>.*)', source)
+    match = re.search(ur'id=(?P<app_id>[^&]+)', source)
     if match is None:
         raise RuntimeError('Unable to extract app id from source URL')
     return match.group('app_id')

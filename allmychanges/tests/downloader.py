@@ -1,7 +1,9 @@
 import shutil
 import time
 
-from allmychanges.downloader import guess_downloader
+from allmychanges.downloader import (
+    guess_downloader,
+    google_play_get_id)
 from allmychanges.models import Changelog
 from allmychanges.tests.utils import refresh
 from nose.tools import eq_
@@ -44,3 +46,9 @@ def test_guesser_called_during_the_changelog_download():
 
     ch = refresh(ch)
     eq_('git', ch.downloader)
+
+
+def test_google_play_get_id():
+    url = 'https://play.google.com/store/apps/details?id=com.runtastic.android.pro2&hl=en%27'
+    google_play_id = 'com.runtastic.android.pro2'
+    eq_(google_play_id, google_play_get_id(url))
