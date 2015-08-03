@@ -433,7 +433,9 @@ def feed_downloader(source,
                 f.write((u'<h1>{title}</h1>\n'
                          '<div style="display: none">'
                          '{published}</div>\n\n{summary}\n\n').format(
-                             **entry).encode('utf-8'))
+                             title=entry.title,
+                             published=getattr(entry, 'published', entry.updated),
+                             summary=entry.summary).encode('utf-8'))
             f.write('</body></html>')
     except:
         if os.path.exists(path):
