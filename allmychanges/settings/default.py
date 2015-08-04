@@ -301,13 +301,13 @@ ns.prefix = 'amch'
 def sub(context, pattern, replacement, text):
     if isinstance(text, (list, tuple)):
         text = text[0]
-    return re.sub(pattern, replacement, text[0])
+    return re.sub(pattern, replacement, text)
 ns['re.sub'] = sub
 
 def match(context, pattern, text):
     if isinstance(text, (list, tuple)):
         text = text[0]
-    return re.match(pattern, text[0]) is not None
+    return re.match(pattern, text) is not None
 ns['re.sub'] = sub
 
 
