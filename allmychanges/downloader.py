@@ -632,6 +632,7 @@ def rechttp_downloader(source,
         'rechttp+http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
         'rechttp+https://enterprise.github.com/releases': 1000,
         'rechttp+https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
+        'rechttp+https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
     }
     upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
