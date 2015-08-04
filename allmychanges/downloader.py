@@ -20,6 +20,7 @@ from allmychanges.utils import (
     first_sentences,
     html_document_fromstring)
 from allmychanges.exceptions import DownloaderWarning, AppStoreAppNotFound
+from allmychanges.markdown import render_markdown
 from twiggy_goodies.threading import log
 
 
@@ -364,7 +365,7 @@ def github_releases_downloader(source,
     with cd(path):
         try:
             with codecs.open(
-                    os.path.join(path, 'GitHubReleases.md'),
+                    os.path.join(path, 'GitHubReleases.html'),
                     'w',
                     'utf-8') as f:
                 if releases:
@@ -383,15 +384,15 @@ def github_releases_downloader(source,
                             title =(tag, release['created_at'])
 #                            title =(tag, release['published_at']) # может быть тут published надр использовать. Подожду пока support гитхаба ответит
                             title = filter(None, (item.strip() for item in title))
-                            f.write(u' '.join(title))
-                            f.write('\n===============\n\n')
+                            f.write(u'<h1>{0}</h1>\n\n'.format(u' '.join(title)))
 
                             if name:
-                                f.write(name)
-                                f.write('\n-----------\n\n')
+                                f.write(u'<h2>{0}</h2>\n\n'.format(name))
 
-                            body = re.sub(ur'^# ', u'## ', release['body'])
-                            f.write(body)
+                            body = release['body'].replace('\r\n', '\n')
+                            html_body = render_markdown(body)
+                            html_body = u'<article>\n\n{0}\n\n</article>'.format(html_body)
+                            f.write(html_body)
                             f.write('\n\n')
         except:
             shutil.rmtree(path)
