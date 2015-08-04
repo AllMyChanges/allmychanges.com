@@ -381,13 +381,23 @@ def github_releases_downloader(source,
                                or re.match(ur'{repo} v?{tag}'.format(repo=repo, tag=tag), name, re.I):
                                 name = None
 
-                            title =(tag, release['created_at'])
-#                            title =(tag, release['published_at']) # может быть тут published надр использовать. Подожду пока support гитхаба ответит
-                            title = filter(None, (item.strip() for item in title))
-                            f.write(u'<h1>{0}</h1>\n\n'.format(u' '.join(title)))
+                            # вот что ответили ребята из github:
+                            # The `created_at` timestamp is for the GitHub Release itself.
+                            # The `published_at` timestamp represents the time that the Tag
+                            # was created. This can be in the past if an annotated tag's date is
+                            # in the past, or the tag's commit date is in the past.
+
+                            title = tag.strip()
+                            if title:
+                                f.write(u'<h1>{0}</h1>\n'.format(title))
 
                             if name:
-                                f.write(u'<h2>{0}</h2>\n\n'.format(name))
+                                f.write(u'<h2>{0}</h2>\n'.format(name))
+
+                            date = release.get('created_at')
+                            if date:
+                                f.write(u'<div style="display: none">{0}></div>\n\n'.format(
+                                    date))
 
                             body = release['body'].replace('\r\n', '\n')
                             html_body = render_markdown(body)
