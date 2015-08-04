@@ -710,6 +710,7 @@ def process_version_description(html):
                            u'code', u'em', u'i', u'li', u'ol', u'strong', u'ul', # these are default
                            u'dl', u'dt', u'dd', # allow definition lists
                            u'p', # we allow paragraphs cause they are fine
+                           u'article', # эти теги добавляются github release даунлоадером
                            u'h1', u'h2', u'h3', u'h4', u'h5', # headers are ok too
                            u'del', u'strike', u's',
                            u'tt', # monospace
