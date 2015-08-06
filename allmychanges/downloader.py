@@ -399,6 +399,7 @@ def github_releases_downloader(source,
                                 f.write(u'<div style="display: none">{0}</div>\n\n'.format(
                                     date))
 
+
                             body = release['body'].replace('\r\n', '\n')
                             html_body = render_markdown(body)
                             html_body = u'<article>\n\n{0}\n\n</article>'.format(html_body)
