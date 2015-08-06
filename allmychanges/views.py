@@ -1485,11 +1485,14 @@ class CategoryView(CachedMixin, CommonContextMixin, TemplateView):
         return 'category-view1-' + kwargs.get('category'), 0
 
     def get_context_data(self, *args, **kwargs):
+        result = super(CategoryView, self).get_context_data(**kwargs)
         category = kwargs['category']
         changelogs = Changelog.objects.only_active().filter(namespace=category)
-        return {'changelogs': changelogs,
-                'menu_catalogue': True,
-                'category': category}
+        result.update({
+            'changelogs': changelogs,
+            'menu_catalogue': True,
+            'category': category})
+        return result
 
 
 class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
@@ -1501,13 +1504,14 @@ class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
         return 'categories-view', 0
 
     def get_context_data(self, *args, **kwargs):
+        result = super(CategoriesView, self).get_context_data(**kwargs)
         categories = sorted(set(Changelog.objects.only_active().values_list('namespace', flat=True)))
         categories = groupby(categories, lambda item: item[0])
         categories = [(letter, list(names))
                       for letter, names in categories]
 
-        result = {'categories': categories,
-                  'menu_catalogue': True}
+        result['categories'] = categories
+        result['menu_catalogue'] = True
 
         if 'step3' in self.request.GET:
             result['title'] = 'Step 3 of 3'
