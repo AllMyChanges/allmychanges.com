@@ -396,7 +396,7 @@ def github_releases_downloader(source,
 
                             date = release.get('created_at')
                             if date:
-                                f.write(u'<div style="display: none">{0}></div>\n\n'.format(
+                                f.write(u'<div style="display: none">{0}</div>\n\n'.format(
                                     date))
 
                             body = release['body'].replace('\r\n', '\n')
