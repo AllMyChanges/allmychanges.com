@@ -7,7 +7,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 from allmychanges.utils import count, first_sentences
 from allmychanges.notifications import slack
 from allmychanges.changelog_updater import update_preview_or_changelog

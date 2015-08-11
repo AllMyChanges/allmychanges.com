@@ -17,14 +17,14 @@ from south.modelsinspector import add_introspection_rules
 from twiggy_goodies.threading import log
 
 from allmychanges.validators import URLValidator
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 from allmychanges.utils import (
     split_filenames,
     parse_search_list,
 )
 from allmychanges import chat
-from allmychanges.downloader import (
-    guess_downloader,
+from allmychanges.downloaders import (
+    guess_downloaders,
     get_downloader)
 
 from allmychanges.tasks import update_preview_task, update_changelog_task
@@ -215,13 +215,15 @@ class Downloadable(object):
         and returns path to this directory.
         """
         if self.downloader is None:
-            self.downloader = guess_downloader(self.source)
+            downloaders = guess_downloader(self.source)
+            if downloaders:
+                self.downloader = downloaders[0]['name']
             self.save(update_fields=('downloader',))
 
-        download = get_downloader(self.downloader)
-        return download(self.source,
-                        search_list=self.get_search_list(),
-                        ignore_list=self.get_ignore_list())
+            download = get_downloader(self.downloader)
+            return download(self.source,
+                            search_list=self.get_search_list(),
+                            ignore_list=self.get_ignore_list())
 
 
     # A mixin to get/set ignore and check lists on a model.
