@@ -147,12 +147,12 @@ class Command(LogMixin, BaseCommand):
         max_update_id = 0
         while True:
             try:
-                self.process_messages()
+                max_update_id = self.process_messages(max_update_id)
             except Exception:
                 log.trace().error('Unhandled exeption')
 
 
-    def process_messages(self):
+    def process_messages(self, max_update_id):
         response = get('getUpdates', timeout=60, offset=max_update_id + 1)
         messages = response['result']
         for message in messages:
@@ -170,3 +170,4 @@ class Command(LogMixin, BaseCommand):
                         if matcher.match(query) is not None:
                             handler(message, query)
                             break
+        return max_update_id
