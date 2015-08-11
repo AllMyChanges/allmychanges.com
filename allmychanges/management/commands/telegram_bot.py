@@ -146,20 +146,27 @@ class Command(LogMixin, BaseCommand):
     def handle(self, *args, **options):
         max_update_id = 0
         while True:
-            response = get('getUpdates', timeout=60, offset=max_update_id + 1)
-            messages = response['result']
-            for message in messages:
-                max_update_id = max(max_update_id, message['update_id'])
-                message = message['message']
-                query = message.get('text')
+            try:
+                self.process_messages()
+            except Exception:
+                self.log.trace().error('Unhandled exeption')
 
-                if query:
-                    with log.fields(query=query,
-                                         from_username=message['chat']['username'],
-                                         chat_id=message['chat']['id']):
-                        log.info(u'Message received')
 
-                        for matcher, handler in HANDLERS:
-                            if matcher.match(query) is not None:
-                                handler(message, query)
-                                break
+    def process_messages(self):
+        response = get('getUpdates', timeout=60, offset=max_update_id + 1)
+        messages = response['result']
+        for message in messages:
+            max_update_id = max(max_update_id, message['update_id'])
+            message = message['message']
+            query = message.get('text')
+
+            if query:
+                with log.fields(query=query,
+                                     from_username=message['chat']['username'],
+                                     chat_id=message['chat']['id']):
+                    log.info(u'Message received')
+
+                    for matcher, handler in HANDLERS:
+                        if matcher.match(query) is not None:
+                            handler(message, query)
+                            break
