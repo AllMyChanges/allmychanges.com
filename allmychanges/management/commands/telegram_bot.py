@@ -149,7 +149,7 @@ class Command(LogMixin, BaseCommand):
             try:
                 self.process_messages()
             except Exception:
-                self.log.trace().error('Unhandled exeption')
+                log.trace().error('Unhandled exeption')
 
 
     def process_messages(self):
