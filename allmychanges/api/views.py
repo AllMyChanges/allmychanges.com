@@ -380,6 +380,11 @@ class LandingPackageSuggestView(viewsets.ViewSet):
                                      for ch in changelogs]})
 
 
+class AuthenticationRequired(object):
+    def has_permission(self, request, view, obj=None):
+        return request.user.is_authenticated()
+
+
 class OnlyOwnerCouldModify(object):
     def has_permission(self, request, view, obj=None):
         return True
@@ -396,7 +401,7 @@ class ChangelogViewSet(HandleExceptionMixin,
                        viewsets.ModelViewSet):
     serializer_class = ChangelogSerializer
     serializer_detail_class = ChangelogSerializer
-    permission_classes = [OnlyOwnerCouldModify]
+    permission_classes = [AuthenticationRequired, OnlyOwnerCouldModify]
     paginate_by = None
     model = Changelog
 
