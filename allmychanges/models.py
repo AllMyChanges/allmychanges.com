@@ -223,7 +223,6 @@ class Downloadable(object):
                         search_list=self.get_search_list(),
                         ignore_list=self.get_ignore_list())
 
-
     # A mixin to get/set ignore and check lists on a model.
     def get_ignore_list(self):
         """Returns a list with all filenames and directories to ignore
