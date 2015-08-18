@@ -51,10 +51,8 @@ from oauth2_provider.models import Application, AccessToken
 from allmychanges.utils import (HOUR,
                                 parse_ints,
                                 join_ints)
-from allmychanges.downloader import (
-    normalize_url,
-    guess_downloader,
-    get_namespace_guesser)
+from allmychanges.downloaders.utils import normalize_url
+from allmychanges.downloaders import guess_downloaders
 
 
 
@@ -922,18 +920,24 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
 
             # and finally, we'll try to guess downloader
             if not params.get('downloader'):
-                params['downloader'] = guess_downloader(normalized_url)
+                downloaders = guess_downloaders(normalized_url)
+
+                params['downloader'] = ','.join(
+                    d['name'] for d in downloaders)
+            else:
+                downloaders = []
 
 
+            # TODO: replace with code inside of downloaders
             # if name was not given, then we'll try to guess it
-            if not params['name']:
-                guesser = get_namespace_guesser(params['downloader'])
-                guessed = guesser(normalized_url)
-                guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
-                                                             guessed['name'])
-                for key, value in guessed.items():
-                    if value:
-                        params[key] = value
+            # if not params['name']:
+            #     guesser = get_namespace_guesser(params['downloader'])
+            #     guessed = guesser(normalized_url)
+            #     guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
+            #                                                  guessed['name'])
+            #     for key, value in guessed.items():
+            #         if value:
+            #             params[key] = value
 
             # icon don't saved into the preview yet
             icon = params.pop('icon')
@@ -979,6 +983,7 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             context['changelog'] = changelog
             context['preview'] = preview
             context['can_edit'] = True
+            context['downloaders'] = downloaders
 
             if self.request.user.is_authenticated() and self.request.user.username in settings.ADVANCED_EDITORS:
                 context['can_edit_xslt'] = True
