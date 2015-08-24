@@ -938,7 +938,6 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             #     for key, value in guessed.items():
             #         if value:
             #             params[key] = value
-
             # icon don't saved into the preview yet
             icon = params.pop('icon')
 
