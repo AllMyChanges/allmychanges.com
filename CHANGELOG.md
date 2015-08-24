@@ -1,3 +1,8 @@
+0.30.2 (2015-08-24)
+===================
+
+* Some face lifting was made. Thanks to @vovanbo for css diff!
+
 0.30.1 (2015-08-04)
 ===================
 
