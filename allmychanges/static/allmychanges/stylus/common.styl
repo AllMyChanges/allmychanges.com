@@ -64,7 +64,7 @@ content-margins() {
 
 .grouped-changes-title {
     font-size: 1.5em;
-    font-family: header-font;
+    font-family: header-font2;
     font-weight: 300;
     margin-top: 1em;
 }
@@ -76,7 +76,7 @@ content-margins() {
 
     &__package-title {
         font-size: 1.2em;
-        font-family: header-font;
+        font-family: header-font2;
         > a {
             black-link()
         }
@@ -89,7 +89,7 @@ content-margins() {
     &__number {
         display: inline-block;
         margin-top: 1em;
-        font-family: header-font
+        font-family: header-font2
         > a {
           black-link()
         }
@@ -97,7 +97,7 @@ content-margins() {
     &__date {
         display: inline;
         color: gray;
-        font-family: header-font
+        font-family: header-font2
     }
 
     &__description {
@@ -126,7 +126,7 @@ content-margins() {
 
         h1 {
            font-size: 26px;
-           font-family: header-font;
+           font-family: header-font2;
            line-height: 40px;
            margin-top: 16px;
            margin-bottom: 6px;
@@ -134,24 +134,23 @@ content-margins() {
 
         h2 {
            font-size: 22px;
-           font-family: header-font;
+           font-family: header-font2;
            line-height: 22px;
            margin-top: 16px;
            margin-bottom: 6px;
         }
         h3 {
            font-size: 16px;
-           font-family: header-font;
+           font-family: header-font2;
            line-height: 22px;
-           font-variant: small-caps;
            margin-top: 16px;
            margin-bottom: 6px;
+           text-transform: uppercase;
         }
         h4 {
            font-size: 16px;
-           font-family: header-font;
+           font-family: header-font2;
            line-height: 22px;
-           font-variant: small-caps;
            margin-top: 16px;
            margin-bottom: 6px;
            color: gray;
@@ -238,17 +237,20 @@ content-margins() {
 
 // leave only this after migration to a single blob versions
 .changelog-highlight {
+    display: inline-block;
+    line-height: 0.95;
+
     &-fix {
-        border-bottom: 4px solid #ee883d;
+        border-bottom: 3px solid #ee883d;
     }
     &-inc {
-        border-bottom: 4px solid #ff3b16;
+        border-bottom: 3px solid #ff3b16;
     }
     &-dep {
-        border-bottom: 4px solid #ff3b16;
+        border-bottom: 3px solid #ff3b16;
     }
     &-sec {
-        border-bottom: 4px solid #ff3b16;
+        border-bottom: 3px solid #ff3b16;
     }
 }
 

@@ -33,29 +33,33 @@
 .site-menu {
   display: block;
   margin: 0;
-  padding: 20px 0px 10px 0px;
+  padding: 15px 0px 15px 0px;
 }
 .site-menu__item {
   display: inline-block;
+  line-height: 0.95;
 }
 .site-menu__item a {
   display: block;
+  font-family: header-font2;
   font-size: 20px;
   margin-right: 30px;
   color: yellow-color;
   text-decoration: none;
-  border-bottom: 5px solid light-blue-color;
+  border-bottom: 4px solid light-blue-color;
   transition: 0.2s;
   &:hover {
       color: light-red-color;
-      border-bottom: 5px solid dark-red-color;
+      border-bottom: 4px solid dark-red-color;
+      display: inline-block;
+      line-height: 0.95;
   }
 }
 .site-menu__selected-item a {
-  border-bottom: 5px solid light-red-color;
+  border-bottom: 4px solid light-red-color;
   &:hover {
       color: light-red-color;
-      border-bottom: 5px solid dark-red-color;
+      border-bottom: 4px solid dark-red-color;
       cursor: default;
   }
 }
