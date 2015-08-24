@@ -6,7 +6,7 @@ from allmychanges.crawler import (
     _extract_version, _parse_item,
     _extract_date)
 from allmychanges.utils import get_markup_type, get_change_type
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 
 
 def test_changelog_finder():

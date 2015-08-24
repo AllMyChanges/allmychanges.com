@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from twiggy_goodies.threading import log
 from allmychanges.models import AutocompleteData, AutocompleteWord2
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 from multiprocessing.dummy import Pool
 
 

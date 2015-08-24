@@ -18,7 +18,7 @@ from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
 from rest_framework.response import Response
 
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 from allmychanges.models import (Subscription,
                                  Issue,
                                  Version,
