@@ -4,6 +4,7 @@ def get_modules():
     from allmychanges.downloaders.vcs import git
     from allmychanges.downloaders.vcs import hg
     from allmychanges.downloaders import (
+        fake,
         github_releases,
         feed,
         appstore,
@@ -11,6 +12,7 @@ def get_modules():
         http)
 
     return [
+        fake,
         appstore,
         google_play,
         git,

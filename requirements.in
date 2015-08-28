@@ -47,6 +47,9 @@ feedgen
 # for downloading rss/atom feeds
 feedparser
 
+# for storing rich data about preview and changelog settings
+jsonfield
+
 
 #git+git://github.com/svetlyak40wt/django-oauth-toolkit
 #git+git://github.com/svetlyak40wt/logster.git@allmychanges

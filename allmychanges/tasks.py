@@ -143,6 +143,7 @@ def update_preview_task(preview_id):
 
             chat.send('Updating preview with source: {0}'.format(preview.source),
                       channel='tasks')
+
             update_preview_or_changelog(preview)
         finally:
             log.info('Task done')

@@ -1,6 +1,18 @@
-def fake_downloader(source,
-                    search_list=[],
-                    ignore_list=[]):
+import tempfile
+import os
+import shutil
+
+from django.conf import settings
+
+
+def guess(source, discovered):
+    if source.startswith('test+'):
+        return {'source': source}
+
+
+def download(source,
+             search_list=[],
+             ignore_list=[]):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
 
     source = source.replace('test+', '')

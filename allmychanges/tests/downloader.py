@@ -1,9 +1,8 @@
 import shutil
 import time
 
-from allmychanges.downloader import (
-    guess_downloader,
-    google_play_get_id)
+from allmychanges.downloaders import guess_downloaders
+from allmychanges.downloaders.google_play import google_play_get_id
 from allmychanges.models import Changelog
 from allmychanges.tests.utils import refresh
 from nose.tools import eq_

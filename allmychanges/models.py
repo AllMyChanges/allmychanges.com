@@ -214,16 +214,17 @@ class Downloadable(object):
         """This method fetches repository into a temporary directory
         and returns path to this directory.
         """
-        if self.downloader is None:
-            downloaders = guess_downloader(self.source)
+
+        if not self.downloader:
+            downloaders = list(guess_downloaders(self.source))
             if downloaders:
                 self.downloader = downloaders[0]['name']
             self.save(update_fields=('downloader',))
 
-            download = get_downloader(self.downloader)
-            return download(self.source,
-                            search_list=self.get_search_list(),
-                            ignore_list=self.get_ignore_list())
+        download = get_downloader(self.downloader)
+        return download(self.source,
+                        search_list=self.get_search_list(),
+                        ignore_list=self.get_ignore_list())
 
 
     # A mixin to get/set ignore and check lists on a model.
@@ -697,6 +698,9 @@ class Preview(Downloadable, models.Model):
     done = models.BooleanField(default=False)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
+    log = models.TextField(default='[]',
+                           help_text=('JSON with log of all operation applied during preview processing.'),
+                           blank=True)
 
     @property
     def namespace(self):

@@ -4,81 +4,81 @@
 #
 #    pip-compile requirements.in
 #
-alabaster==0.7.4          # via sphinx
+alabaster==0.7.6          # via sphinx
 anyjson==0.3.3
-arrow==0.5.4              # via times
-babel==1.3                # via sphinx
+argparse==1.3.0           # via dateutils
+arrow==0.6.0              # via times
+babel==2.0                # via sphinx
 bleach==1.4.1
-cffi==1.1.2               # via cryptography
+cffi==1.2.1               # via cryptography
 chaussette==1.3.0
-click==4.0                # via rq
+click==5.1                # via rq
 closeio==0.1
 commonmark==0.5.4
-cryptography==0.9.1       # via pyopenssl
+cryptography==1.0         # via pyopenssl
 cssselect==0.9.1          # via premailer
 cssutils==1.0             # via premailer
+dateutils==0.6.6          # via feedgen
 django-appconf==1.0.1     # via django-compressor
-django-braces==1.8.0
+django-braces==1.8.1
 django-compressor==1.5
-django-debug-toolbar==1.3.0
-django-extensions==1.5.5
+django-debug-toolbar==1.3.2
+django-extensions==1.5.6
 django-markdown2==0.2.1
-django-oauth-toolkit==0.8.1
+django-oauth-toolkit==0.9.0
 django-rq==0.8.0
 django-sendmail-backend==0.1.2
-django-widget-tweaks==1.3
+django-widget-tweaks==1.4.1
 django==1.6.11
-djangorestframework==2.4.5
+djangorestframework==2.4.8
 docutils==0.12
 drf-extensions==0.2.7
 enum34==1.0.4             # via cryptography
 envoy==0.0.3
+feedgen==0.3.1
+feedparser==5.2.1
 graphitesend==0.3.4
 gunicorn==19.3.0
-html2text==2015.6.12
-html5lib==0.99999         # via bleach
+html2text==2015.6.21
+html5lib==0.999999        # via bleach
 idna==2.0                 # via cryptography
-ipaddress==1.0.7          # via cryptography
-jinja2==2.7.3             # via sphinx
+ipaddress==1.0.14         # via cryptography
+jinja2==2.8               # via sphinx
+jsonfield==1.0.3
 lxml==3.4.4
 markdown2==2.3.0          # via django-markdown2
 markdown==2.6.2
 markupsafe==0.23          # via jinja2
 mysql-python==1.2.5
 ndg-httpsclient==0.4.0
-oauthlib==0.7.2           # via django-oauth-toolkit, python-social-auth, requests-oauthlib
+oauthlib==1.0.1           # via django-oauth-toolkit, python-social-auth, requests-oauthlib
 orderedset==1.1.2
-plumbum==1.4.2
-premailer==2.9.2
-pyasn1==0.1.7             # via cryptography
+plumbum==1.5.0
+premailer==2.9.3
+pyasn1==0.1.8             # via cryptography
 pycparser==2.14           # via cffi
 pygments==2.0.2           # via sphinx
 pyopenssl==0.15.1
-python-dateutil==2.4.2    # via arrow
-python-memcached==1.54
+python-dateutil==2.4.2    # via arrow, dateutils
+python-memcached==1.57
 python-openid==2.2.5      # via python-social-auth
 python-social-auth==0.1.26
-pytz==2015.4              # via babel, twiggy-goodies
+pytz==2015.4              # via babel, dateutils, twiggy-goodies
 redis==2.10.3             # via rq
 requests-oauthlib==0.5.0  # via python-social-auth
 requests==2.7.0
-rq==0.5.3
-six==1.9.0                # via bleach, chaussette, cryptography, django-appconf, django-braces, django-extensions, django-oauth-toolkit, html5lib, pyopenssl, python-dateutil, python-memcached, python-social-auth, sphinx, twiggy-goodies
+rq==0.5.5
+six==1.9.0                # via bleach, chaussette, cryptography, django-appconf, django-braces, django-extensions, django-oauth-toolkit, feedgen, html5lib, pyopenssl, python-dateutil, python-memcached, python-social-auth, sphinx, twiggy-goodies
 snowballstemmer==1.2.0    # via sphinx
-sortedcontainers==0.9.5
+sortedcontainers==0.9.6
 south==1.0.2
 sphinx-rtd-theme==0.1.8   # via sphinx
 sphinx==1.3.1
-sqlparse==0.1.15          # via django-debug-toolbar
+sqlparse==0.1.16          # via django-debug-toolbar
 times==0.7
 twiggy-goodies==0.6.0
 twiggy==0.4.7             # via twiggy-goodies
 
-feedgen==0.3.1
-dateutils==0.6.6          # via feedgen
-
-feedparser==5.2.0
-
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:
-# setuptools==17.1.1        # via cryptography
+# setuptools==18.2          # via cryptography

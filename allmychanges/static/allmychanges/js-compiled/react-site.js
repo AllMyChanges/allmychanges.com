@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(19)
+	var PackageSelector = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -215,7 +215,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(18)
+	var Landing = __webpack_require__(19)
 
 	module.exports = {
 	    render: function () {
@@ -1549,27 +1549,6 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(19)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
-	    }
-	});
-
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var Package = __webpack_require__(21)
 	var metrika = __webpack_require__(20)
 
@@ -1669,6 +1648,27 @@
 	                tracked_msg
 	            )
 	        );
+	    }
+	});
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PackageSelector = __webpack_require__(18)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
 	    }
 	});
 
