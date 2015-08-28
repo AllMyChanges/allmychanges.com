@@ -5,6 +5,7 @@ import time
 import math
 import datetime
 import subprocess
+import jsonfield
 
 from hashlib import md5, sha1
 from django.db import models
@@ -698,9 +699,9 @@ class Preview(Downloadable, models.Model):
     done = models.BooleanField(default=False)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
-    log = models.TextField(default='[]',
-                           help_text=('JSON with log of all operation applied during preview processing.'),
-                           blank=True)
+    log = jsonfield.JSONField(default=[],
+                              help_text=('JSON with log of all operation applied during preview processing.'),
+                              blank=True)
 
     @property
     def namespace(self):

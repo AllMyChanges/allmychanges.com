@@ -40,6 +40,9 @@ def test_preview():
     eq_(0, changelog.versions.count())
     eq_(2, preview.versions.count())
 
+    # проверим, что у preview есть поле log, и оно список
+    preview = refresh(preview)
+    eq_(0, len(preview.log))
 
     # теперь обновим preview на несуществующий источник
     response = cl.post(preview_url,
