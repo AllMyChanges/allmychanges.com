@@ -28,7 +28,10 @@ from allmychanges.downloaders import (
     guess_downloaders,
     get_downloader)
 
-from allmychanges.tasks import update_preview_task, update_changelog_task
+from allmychanges.tasks import (
+    update_preview_task,
+    preview_test_task,
+    update_changelog_task)
 
 
 MARKUP_CHOICES = (
@@ -410,6 +413,16 @@ class Changelog(Downloadable, models.Model):
         params.setdefault('xslt', self.xslt)
 
         preview = self.previews.create(user=user, light_user=light_user, **params)
+        preview_test_task.delay(
+            preview.id,
+            ['Guessing downloders',
+             'Downloading using git',
+             'Searching versions',
+             'Nothing found',
+             'Downloading from GitHub Review',
+             'Searching versions',
+             'Some results were found'])
+
         return preview
 
     def set_status(self, status, **kwargs):

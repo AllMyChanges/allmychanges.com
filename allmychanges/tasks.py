@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import anyjson
 import requests
 import datetime
@@ -145,6 +146,30 @@ def update_preview_task(preview_id):
                       channel='tasks')
 
             update_preview_or_changelog(preview)
+        finally:
+            log.info('Task done')
+
+
+@singletone('preview')
+@job('preview', timeout=600)
+@transaction.atomic
+def preview_test_task(preview_id, items):
+    with log.fields(preview_id=preview_id):
+        log.info('Starting task')
+        try:
+            from .models import Preview
+            preview = Preview.objects.get(pk=preview_id)
+
+            text = items[0]
+            tail = items[1:]
+
+            preview.log.append({'text': items[0]})
+            preview.save(update_fields=('log',))
+
+            if tail:
+                time.sleep(5)
+                preview_test_task.delay(preview_id, tail)
+
         finally:
             log.info('Task done')
 
