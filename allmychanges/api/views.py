@@ -16,6 +16,7 @@ from rest_framework import viewsets, mixins, permissions
 from rest_framework.exceptions import ParseError
 from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
+from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
 from allmychanges.downloader import normalize_url
@@ -404,13 +405,16 @@ class ChangelogViewSet(HandleExceptionMixin,
                        viewsets.ModelViewSet):
     serializer_class = ChangelogSerializer
     serializer_detail_class = ChangelogSerializer
-    permission_classes = [AuthenticationRequired, OnlyOwnerCouldModify]
+    permission_classes = [OnlyOwnerCouldModify]
     paginate_by = None
     model = Changelog
 
     def get_queryset(self, *args, **kwargs):
         if self.request.GET.get('tracked', 'False') == 'True':
-            return self.request.user.changelogs.all()
+            if self.request.user.is_authenticated():
+                return self.request.user.changelogs.all()
+            else:
+                return []
         else:
             queryset = super(ChangelogViewSet, self).get_queryset(*args, **kwargs)
             namespace = self.request.GET.get('namespace')
@@ -477,7 +481,7 @@ class ChangelogViewSet(HandleExceptionMixin,
                                  u'User edited changelog:{0}'.format(self.object.pk))
         return response
 
-    @action()
+    @detail_route(methods=['post'], permission_classes=[])
     def track(self, request, pk=None):
         user = self.request.user
         changelog = Changelog.objects.get(pk=pk)
@@ -500,7 +504,7 @@ class ChangelogViewSet(HandleExceptionMixin,
                 light_user=request.light_user))
         return response
 
-    @action()
+    @detail_route(methods=['post'], permission_classes=[])
     def untrack(self, request, pk=None):
         user = self.request.user
         changelog = Changelog.objects.get(pk=pk)
@@ -525,7 +529,7 @@ class ChangelogViewSet(HandleExceptionMixin,
         return response
 
 
-    @action()
+    @detail_route(methods=['post'], permission_classes=[])
     def skip(self, request, pk=None):
         """Saves user's intent to not recommend him that package anymore.
         """
