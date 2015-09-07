@@ -7,7 +7,11 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from allmychanges.tasks import _task_log
 from .utils import (refresh, check_status_code,
-                    create_user, put_json)
+                    create_user, put_json, json)
+from hamcrest import (
+    assert_that,
+    has_entries)
+
 
 def test_preview():
     cl = Client()
@@ -132,3 +136,19 @@ def test_when_preview_saved_versions_are_copied_to_changelog():
     # versions now moved to the changelog
     eq_(3, changelog.versions.count())
     eq_(0, preview.versions.count())
+
+
+def test_get_preview_details_via_api():
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test+samples/markdown-release-notes')
+    preview = changelog.previews.create(light_user='anonymous',
+                                        source=changelog.source)
+    cl = Client()
+    response  = cl.get(reverse('preview-detail', kwargs=dict(pk=preview.pk)))
+    check_status_code(200, response)
+    data = json(response)
+    assert_that(data,
+                has_entries(
+                    status='created',
+                    processing_status='',
+                    log=[]))

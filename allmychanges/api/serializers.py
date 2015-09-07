@@ -3,6 +3,7 @@ from rest_framework import serializers, fields
 from rest_framework_extensions.fields import ResourceUriField
 
 from allmychanges.models import (
+    Preview,
     Subscription,
     Version,
     Changelog,
@@ -76,6 +77,19 @@ class ChangelogSerializer(ModelSerializer):
             'ignore_list',
             'search_list',
             'xslt',
+        )
+
+
+class PreviewSerializer(ModelSerializer):
+    resource_uri = ResourceUriField(view_name='preview-detail')
+
+    class Meta:
+        model = Preview
+        fields = (
+            'resource_uri',
+            'status',
+            'processing_status',
+            'log',
         )
 
 

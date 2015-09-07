@@ -20,13 +20,16 @@ from rest_framework.response import Response
 
 from allmychanges.downloaders.utils import normalize_url
 from allmychanges.models import (Subscription,
+                                 Preview,
                                  Issue,
                                  Version,
                                  AutocompleteData,
-                                 Changelog, UserHistoryLog)
+                                 Changelog,
+                                 UserHistoryLog)
 from allmychanges import chat
 from allmychanges.api.serializers import (
     SubscriptionSerializer,
+    PreviewSerializer,
     ChangelogSerializer,
     IssueSerializer,
     VersionSerializer,
@@ -542,6 +545,14 @@ class ChangelogViewSet(HandleExceptionMixin,
                 url=changelog.get_absolute_url(),
                 light_user=request.light_user))
         return response
+
+
+class PreviewViewSet(HandleExceptionMixin,
+                     DetailSerializerMixin,
+                     viewsets.ModelViewSet):
+    serializer_class = PreviewSerializer
+    serializer_detail_class = PreviewSerializer
+    model = Preview
 
 
 # это пока нигде не используется, надо дорабатывать

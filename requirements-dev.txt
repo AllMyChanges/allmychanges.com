@@ -107,6 +107,8 @@ unittest-asserts==0.1.0
 werkzeug==0.10.4
 wmctrl==0.2               # via pdbpp
 
+PyHamcrest==1.8.5
+
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:
 # setuptools==18.2          # via cryptography
