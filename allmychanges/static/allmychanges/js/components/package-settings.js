@@ -37,7 +37,8 @@ module.exports = React.createClass({
                 name: this.props.name || '',
                 description: this.props.description || '',
                 name_error: !this.props.namespace && 'Please, fill this field' || '',
-                problem: null};
+                problem: null,
+                log: []};
     },
     componentDidMount: function() {
         this.save_preview_params();
@@ -311,26 +312,26 @@ module.exports = React.createClass({
         }
 
         // checking if preview is ready @wait-for-preview
-        $.get('/preview/' + this.props.preview_id + '/')
-            .success(function(data_orig) {
+        $.get('/v1/previews/' + this.props.preview_id + '/')
+            .success(function(data) {
                 // received results about preview state @wait-for-preview
-                var data = $(data_orig);
+                this.setState({'log': data.log});
 
-                if (data.hasClass('please-wait')) {
-                    // data has class please-wait @wait-for-preview
-                    $('.progress-text').html(data);
+                if (data.status == 'processing') {
+                    // preview is still in processing status @wait-for-preview
                     setTimeout(this.wait_for_preview, 1000);
                 } else {
+                    debugger
                     // preview data is ready @wait-for-preview
                     this.setState({waiting: false});
 
-                    if (data.hasClass('package-changes')) {
-                        // showing preview @wait-for-preview
-                        this.setState({results: data_orig});
-                    } else {
-                        // showing a problem @wait-for-preview
-                        this.setState({problem: data_orig});
-                    }
+                    // if (data.hasClass('package-changes')) {
+                    //     // showing preview @wait-for-preview
+                    //     this.setState({results: data_orig});
+                    // } else {
+                    //     // showing a problem @wait-for-preview
+                    //     this.setState({problem: data_orig});
+                    // }
                 }
         }.bind(this))
         .error(function(data) {
@@ -424,6 +425,14 @@ module.exports = React.createClass({
         var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
 
         content.push(<p className="buttons-row">{save_button}</p>);
+
+        var log_items = [];
+        for (i=0; i< this.state.log.length; i++) {
+            log_items.push(<li key={i}>{this.state.log[i]}</li>);
+        }
+        content.push(<ul class="preview-processing-log">{log_items}</ul>);
+
+
         content.push(<p>If everything is OK then save results. Otherwise, try to tune parser with these options:</p>);
 
 

@@ -90,6 +90,7 @@ class PreviewSerializer(ModelSerializer):
             'status',
             'processing_status',
             'log',
+            'problem',
         )
 
 

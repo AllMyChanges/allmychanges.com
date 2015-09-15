@@ -55,7 +55,7 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(18)
+	var PackageSelector = __webpack_require__(19)
 
 	module.exports = {
 	    render: function () {
@@ -215,7 +215,7 @@
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(19)
+	var Landing = __webpack_require__(18)
 
 	module.exports = {
 	    render: function () {
@@ -807,6 +807,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// тодо:
+	// [+] выяснил, что нужно добавить ручку, отдающую статус превью и лог
 	// [+] сделать, чтобы вработал выбор даунлоадера
 	// [+] после выбора downloader нужно триггерить обновлнеиен changelog
 	// [+] не скрывать поля во время работы downloader, а если в результате работы downloader произошла ошибка, то давать поправить настройки
@@ -844,7 +845,8 @@
 	                name: this.props.name || '',
 	                description: this.props.description || '',
 	                name_error: !this.props.namespace && 'Please, fill this field' || '',
-	                problem: null};
+	                problem: null,
+	                log: []};
 	    },
 	    componentDidMount: function() {
 	        this.save_preview_params();
@@ -1118,26 +1120,26 @@
 	        }
 
 	        UserStory.log(["checking if preview is ready"], ["wait"]);
-	        $.get('/preview/' + this.props.preview_id + '/')
-	            .success(function(data_orig) {
+	        $.get('/v1/previews/' + this.props.preview_id + '/')
+	            .success(function(data) {
 	                UserStory.log(["received results about preview state"], ["wait"]);
-	                var data = $(data_orig);
+	                this.setState({'log': data.log});
 
-	                if (data.hasClass('please-wait')) {
-	                    UserStory.log(["data has class please-wait"], ["wait"]);
-	                    $('.progress-text').html(data);
+	                if (data.status == 'processing') {
+	                    UserStory.log(["preview is still in processing status"], ["wait"]);
 	                    setTimeout(this.wait_for_preview, 1000);
 	                } else {
+	                    debugger
 	                    UserStory.log(["preview data is ready"], ["wait"]);
 	                    this.setState({waiting: false});
 
-	                    if (data.hasClass('package-changes')) {
-	                        UserStory.log(["showing preview"], ["wait"]);
-	                        this.setState({results: data_orig});
-	                    } else {
-	                        UserStory.log(["showing a problem"], ["wait"]);
-	                        this.setState({problem: data_orig});
-	                    }
+	                    // if (data.hasClass('package-changes')) {
+	                    //     UserStory.log(["showing preview"], ["wait"]);
+	                    //     this.setState({results: data_orig});
+	                    // } else {
+	                    //     UserStory.log(["showing a problem"], ["wait"]);
+	                    //     this.setState({problem: data_orig});
+	                    // }
 	                }
 	        }.bind(this))
 	        .error(function(data) {
@@ -1231,6 +1233,14 @@
 	        var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save, disabled: submit_button_disabled});
 
 	        content.push(React.createElement("p", {className: "buttons-row"}, save_button));
+
+	        var log_items = [];
+	        for (i=0; i< this.state.log.length; i++) {
+	            log_items.push(React.createElement("li", {key: i}, this.state.log[i]));
+	        }
+	        content.push(React.createElement("ul", {class: "preview-processing-log"}, log_items));
+
+
 	        content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
 
 
@@ -1549,6 +1559,27 @@
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var PackageSelector = __webpack_require__(19)
+
+	module.exports = React.createClass({displayName: 'exports',
+	    getInitialState: function () {
+	        UserStory.log(["init landing page"], ["landing"]);
+	        return {num_tracked: 0};
+	    },
+	    componentDidMount: function() {
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "landing-page"}, 
+	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
+	                ));
+	    }
+	});
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var Package = __webpack_require__(21)
 	var metrika = __webpack_require__(20)
 
@@ -1648,27 +1679,6 @@
 	                tracked_msg
 	            )
 	        );
-	    }
-	});
-
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var PackageSelector = __webpack_require__(18)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init landing page"], ["landing"]);
-	        return {num_tracked: 0};
-	    },
-	    componentDidMount: function() {
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "landing-page"}, 
-	                  React.createElement(PackageSelector, {url: "/v1/landing-package-suggest/?limit=1&versions_limit=5"})
-	                ));
 	    }
 	});
 
