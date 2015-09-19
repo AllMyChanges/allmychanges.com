@@ -1,41 +1,41 @@
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
@@ -45,17 +45,17 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1).render()
-	__webpack_require__(2).render()
-	__webpack_require__(3).render()
-	__webpack_require__(4).render()
-	__webpack_require__(5).render()
+	__webpack_require__(7).render()
+	__webpack_require__(19).render()
+	__webpack_require__(20).render()
+	__webpack_require__(22).render()
 
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(19)
+	var PackageSelector = __webpack_require__(2)
 
 	module.exports = {
 	    render: function () {
@@ -74,19 +74,319 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var LoginMenu = __webpack_require__(6)
-	var ReportButton = __webpack_require__(7)
-	var ResolveButton = __webpack_require__(8)
-	var DeleteButton = __webpack_require__(9)
-	var TrackButton = __webpack_require__(10)
-	var MagicPrompt = __webpack_require__(11)
-	var Share = __webpack_require__(12)
-	var Notifications = __webpack_require__(13)
-	var FeedbackForm = __webpack_require__(14)
-	var PackageSettings = __webpack_require__(15)
+	var Package = __webpack_require__(3)
+	var metrika = __webpack_require__(5)
+
+	module.exports = React.createClass({displayName: "exports",
+	    getInitialState: function () {
+	        return {packages: [],
+	                tracked: []};
+	    },
+	    load_package: function () {
+	        $.ajax({
+	            url: this.props.url,
+	            dataType: 'json',
+	            success: function(data) {
+	                var results = data.results;
+	                if (results.length > 0) {
+	                    this.setState({package: results[0]});
+	                } else {
+	                    // TODO: somethings
+	                }
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error(this.props.url, status, err.toString());
+	            }.bind(this)
+	        });
+
+	    },
+	    componentDidMount: function() {
+	        this.load_package();
+	    },
+	    render: function() {
+	        var track_handler = function (changelog) {
+	            var tracked = this.state.tracked;
+	            tracked[tracked.length] = changelog;
+
+	            if (tracked.length == 1) {
+	                metrika.reach_goal('LAND-TRACK-1');
+	            }
+	            if (tracked.length == 3) {
+	                metrika.reach_goal('LAND-TRACK-3');
+	            }
+	            if (tracked.length == 5) {
+	                metrika.reach_goal('LAND-TRACK-5');
+	            }
+
+	            this.setState({tracked: tracked});
+	            this.load_package();
+	        }.bind(this);
+
+	        var skip_handler = function () {
+	            this.load_package();
+	        }.bind(this);
+
+	        var pkg_obj;
+	        var pkg = this.state.package;
+	        if (pkg !== undefined) {
+	            pkg_obj = React.createElement(Package, {key: pkg.id, 
+	                           changelog_id: pkg.id, 
+	                           namespace: pkg.namespace, 
+	                           name: pkg.name, 
+	                           description: pkg.description, 
+	                           versions: pkg.versions, 
+	                           track_handler: track_handler, 
+	                           skip_handler: skip_handler});
+	        }
+
+	        var tracked = _.map(this.state.tracked,
+	                            function (changelog) {
+	                                return (
+	            React.createElement("li", {key: changelog.id}, changelog.namespace, "/", changelog.name));});
+
+	        var tracked_msg, login_msg;
+	        if (username == '') {
+	            login_msg = (React.createElement("p", null, "To see full release notes and to receive notifications on future updates, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter")));
+	        }
+	        
+	        if (tracked.length > 0) {
+	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
+	                React.createElement("p", null, "You've followed these packages:"), 
+	                React.createElement("ul", null, tracked), 
+	                login_msg
+	            ));
+
+	            // when first package is tracked, scroll down
+	            // to show the buttons
+	            if (login_msg && tracked.length == 1) {
+	                setTimeout(function() {
+	                    $('html, body').animate({
+	                        scrollTop: $("#package-selector__login-button-id").offset().top
+	                    }, 2000)
+	                }, 200);
+	            }
+	        }
+	                                        
+	        return (
+	            React.createElement("div", {className: "package-selector"}, 
+	                pkg_obj, 
+	                tracked_msg
+	            )
+	        );
+	    }
+	});
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	TrackButton = __webpack_require__(4)
+	SkipButton = __webpack_require__(6)
+
+	module.exports = React.createClass({displayName: "exports",
+	  render: function() {
+	    var changelog_id = this.props.changelog_id;
+
+	    var on_track = function () {
+	        this.props.track_handler({id: this.props.changelog_id,
+	                                  namespace: this.props.namespace,
+	                                  name: this.props.name});
+	    }.bind(this);
+
+	    var url = '/p/' + this.props.namespace + '/' + this.props.name + '/';
+	    return (
+	    React.createElement("div", {className: "package-selector__package"}, 
+	      React.createElement("h1", {className: "package-selector__title"}, React.createElement("a", {href: url}, this.props.namespace, "/", this.props.name)), 
+	      React.createElement("h2", {className: "package-selector__description"}, this.props.description), 
+	      React.createElement("div", {className: "package-selector__versions-wrapper"}, 
+	        React.createElement("div", {className: "package-selector__versions-grad"}), 
+	        React.createElement("iframe", {className: "package-selector__versions", scrolling: "no", src: "/package-selector-versions/?changelog=" + this.props.changelog_id})
+	      ), 
+	      React.createElement("div", {className: "package-selector__buttons"}, 
+	        React.createElement(TrackButton, {changelog_id: this.props.changelog_id, num_trackers: false, on_track: on_track}), 
+	        React.createElement(SkipButton, {changelog_id: this.props.changelog_id, on_skip: this.props.skip_handler})
+	      )
+	    )
+	    );
+	  }
+	});
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(5)
+
+	module.exports = React.createClass({displayName: "exports",
+	    getInitialState: function () {
+	        UserStory.log(["init track button for [this.props.username=", this.props.username, "]"], ["buttons.track"]);
+	        return {tracked: (this.props.tracked == 'true'),
+	                show_popup: false};
+	    },
+	    perform_action: function(action, state_after) {
+	        UserStory.log(["performing action [action=", action, "]"], ["buttons.track"]);
+	        $.ajax({
+	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
+	            method: 'POST',
+	            dataType: 'json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            success: function(data) {
+	                metrika.reach_goal(action.toUpperCase());
+
+	                if (this.props.on_track !== undefined) {
+	                    this.props.on_track();
+	                }
+
+	                this.setState({tracked: state_after});
+
+	                if (this.props.username == '') {
+	                    UserStory.log(["if user is anonymous, then show him a fullscreen popup"], ["buttons.track"]);
+	                    this.setState({show_popup: true});
+	                }
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    track: function (e) {
+	        e.preventDefault();
+	        this.perform_action('track', true);
+	    },
+	    untrack: function (e) {
+	        e.preventDefault();
+	        this.perform_action('untrack', false);
+	    },
+	    handle_popup_click: function (e) {
+	        UserStory.log(["popup click"], ["buttons.report"]);
+	        e.nativeEvent.stopImmediatePropagation();
+	    },
+	    render: function() {
+	        var num_trackers = this.props.num_trackers;
+	        var popup;
+
+	        if (this.state.show_popup) {
+	            popup = (
+	                React.createElement("div", {className: "modal-popup", onClick: this.handle_popup_click}, 
+	                    React.createElement("div", {className: "modal-popup__content modal-popup__please-login"}, 
+	                      React.createElement("p", null, "Good job! You have made the first step, tracking this package."), 
+	                      React.createElement("p", null, "Now, to receive notifications about future updates, you need to login via:"), 
+	                      React.createElement("p", null, React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/github/"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"))
+	                    )
+	                ));
+	        }
+
+
+	        var trackers_msg;
+	        if (num_trackers) {
+	            var msg;
+	            if (num_trackers && num_trackers != '0') {
+	                msg = num_trackers + ' followers';
+	                if (num_trackers == '1') {
+	                    msg = 'one follower';
+	                }
+	            } else {
+	                msg = 'nobody follows it, be the first!';
+	            }
+	            trackers_msg = React.createElement("div", {className: "track-button__message"}, msg);
+	        }
+
+	        if (this.state.tracked) {
+	            return (React.createElement("div", {className: "track-button"}, 
+	                      React.createElement("button", {className: "button _bad", 
+	                              onClick: this.untrack, 
+	                              title: "Click to unsubscribe from this package."}, "Unfollow"), 
+	                      popup
+	                    ));
+	        } else {
+	            return (React.createElement("div", {className: "track-button"}, 
+	                      React.createElement("button", {className: "button _good", 
+	                              onClick: this.track, 
+	                              title: "Click to receive notifications about new versions."}, "Follow"), 
+	                      trackers_msg
+	                    ));
+	        }
+	    }
+	});
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    reach_goal: function(name) {
+	        if (window.yaCounter !== undefined) {
+	            UserStory.log(["registering goal [name=", name, "]"], ["metrika.reach_goal"]);
+	            window.yaCounter.reachGoal(name);
+	        }
+	    }
+	}
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(5)
+
+	module.exports = React.createClass({displayName: "exports",
+	    perform_action: function(action) {
+	        UserStory.log(["performing action [action=", action, "]"], ["buttons.skip"]);
+	        $.ajax({
+	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
+	            method: 'POST',
+	            dataType: 'json',
+	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
+	            success: function(data) {
+	                metrika.reach_goal(action.toUpperCase());
+
+	                if (this.props.on_skip !== undefined) {
+	                    this.props.on_skip();
+	                }
+	            }.bind(this),
+	            error: function(xhr, status, err) {
+	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
+	            }.bind(this)
+	        });
+	    },
+	    skip: function (e) {
+	        e.preventDefault();
+	        this.perform_action('skip', true);
+	    },
+	    handle_popup_click: function (e) {
+	        UserStory.log(["popup click"], ["buttons.report"]);
+	        e.nativeEvent.stopImmediatePropagation();
+	    },
+	    render: function() {
+	        return (React.createElement("div", {className: "skip-button"}, 
+	                    React.createElement("button", {className: "button", 
+	                            onClick: this.skip, 
+	                            title: "Click me to show next package."}, "Show next")
+	                ));
+	    }
+	});
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var LoginMenu = __webpack_require__(8)
+	var ReportButton = __webpack_require__(9)
+	var ResolveButton = __webpack_require__(10)
+	var DeleteButton = __webpack_require__(11)
+	var TrackButton = __webpack_require__(4)
+	var MagicPrompt = __webpack_require__(12)
+	var Share = __webpack_require__(13)
+	var Notifications = __webpack_require__(14)
+	var FeedbackForm = __webpack_require__(15)
+	var PackageSettings = __webpack_require__(16)
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(16)
+	window.intro = __webpack_require__(17)
 
 	$(document).ready(function() {
 	    window.intro.push({'element': $(".magic-prompt")[0],
@@ -179,60 +479,12 @@
 
 
 /***/ },
-/* 3 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Share = __webpack_require__(12)
+	var metrika = __webpack_require__(5)
 
-	module.exports = {
-	    render: function () {
-	        $('.share-badge-container').each(function (idx, element) {
-	            React.render(
-	                React.createElement(Share, {namespace: element.dataset['namespace'], 
-	                       name: element.dataset['name']}),
-	                element);
-	        });
-	    }
-	}
-
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Promo = __webpack_require__(17)
-
-	module.exports = {
-	    render: function () {
-	        $('.ios-promo-container').each(function (idx, element) {
-	            React.render(React.createElement(Promo, null), element);
-	        });
-	    }
-	}
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Landing = __webpack_require__(18)
-
-	module.exports = {
-	    render: function () {
-	        $('.landing-page-container').each(function (idx, element) {
-	            React.render(React.createElement(Landing, null), element);
-	        });
-	    }
-	}
-
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var metrika = __webpack_require__(20)
-
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {opened: (this.props.opened == 'true')};
 	    },
@@ -266,12 +518,12 @@
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(20)
+	var metrika = __webpack_require__(5)
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {show_popup: false,
 	                body_callback_installed: false};
@@ -366,10 +618,10 @@
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/* 10 */
+/***/ function(module, exports) {
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {resolved: false};
 	    },
@@ -399,10 +651,10 @@
 
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/* 11 */
+/***/ function(module, exports) {
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {deleted: false};
 	    },
@@ -432,112 +684,13 @@
 
 
 /***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var metrika = __webpack_require__(20)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        UserStory.log(["init track button for [this.props.username=", this.props.username, "]"], ["buttons.track"]);
-	        return {tracked: (this.props.tracked == 'true'),
-	                show_popup: false};
-	    },
-	    perform_action: function(action, state_after) {
-	        UserStory.log(["performing action [action=", action, "]"], ["buttons.track"]);
-	        $.ajax({
-	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
-	            method: 'POST',
-	            dataType: 'json',
-	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
-	            success: function(data) {
-	                metrika.reach_goal(action.toUpperCase());
-
-	                if (this.props.on_track !== undefined) {
-	                    this.props.on_track();
-	                }
-
-	                this.setState({tracked: state_after});
-
-	                if (this.props.username == '') {
-	                    UserStory.log(["if user is anonymous, then show him a fullscreen popup"], ["buttons.track"]);
-	                    this.setState({show_popup: true});
-	                }
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    track: function (e) {
-	        e.preventDefault();
-	        this.perform_action('track', true);
-	    },
-	    untrack: function (e) {
-	        e.preventDefault();
-	        this.perform_action('untrack', false);
-	    },
-	    handle_popup_click: function (e) {
-	        UserStory.log(["popup click"], ["buttons.report"]);
-	        e.nativeEvent.stopImmediatePropagation();
-	    },
-	    render: function() {
-	        var num_trackers = this.props.num_trackers;
-	        var popup;
-
-	        if (this.state.show_popup) {
-	            popup = (
-	                React.createElement("div", {className: "modal-popup", onClick: this.handle_popup_click}, 
-	                    React.createElement("div", {className: "modal-popup__content modal-popup__please-login"}, 
-	                      React.createElement("p", null, "Good job! You have made the first step, tracking this package."), 
-	                      React.createElement("p", null, "Now, to receive notifications about future updates, you need to login via:"), 
-	                      React.createElement("p", null, React.createElement("a", {className: "button _good _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter"), " or ", React.createElement("a", {className: "button _good _large", href: "/login/github/"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"))
-	                    )
-	                ));
-	        }
-
-
-	        var trackers_msg;
-	        if (num_trackers) {
-	            var msg;
-	            if (num_trackers && num_trackers != '0') {
-	                msg = num_trackers + ' followers';
-	                if (num_trackers == '1') {
-	                    msg = 'one follower';
-	                }
-	            } else {
-	                msg = 'nobody follows it, be the first!';
-	            }
-	            trackers_msg = React.createElement("div", {className: "track-button__message"}, msg);
-	        }
-
-	        if (this.state.tracked) {
-	            return (React.createElement("div", {className: "track-button"}, 
-	                      React.createElement("button", {className: "button _bad", 
-	                              onClick: this.untrack, 
-	                              title: "Click to unsubscribe from this package."}, "Unfollow"), 
-	                      popup
-	                    ));
-	        } else {
-	            return (React.createElement("div", {className: "track-button"}, 
-	                      React.createElement("button", {className: "button _good", 
-	                              onClick: this.track, 
-	                              title: "Click to receive notifications about new versions."}, "Follow"), 
-	                      trackers_msg
-	                    ));
-	        }
-	    }
-	});
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/* 12 */
+/***/ function(module, exports) {
 
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    componentDidMount: function(){
 	        var element = this.getDOMNode();
 	        var input_spinner = new Spinner({left: '50%', top: '20px'}); 
@@ -619,10 +772,10 @@
 
 
 /***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/* 13 */
+/***/ function(module, exports) {
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {active_tab: 'markdown'};
 	    },
@@ -680,13 +833,13 @@
 
 
 /***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/* 14 */
+/***/ function(module, exports) {
 
 	// пример использования нотификаций:
 	// PubSub.publish('show-info', 'Привет мир!');
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    componentDidMount: function() {
 	        PubSub.subscribe('show-info', this.newItem);
 	        PubSub.subscribe('show-warning', this.newItem);
@@ -734,12 +887,12 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(20)
+	var metrika = __webpack_require__(5)
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {enable_submit: false};
 	    },
@@ -803,8 +956,8 @@
 
 
 /***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/* 16 */
+/***/ function(module, exports) {
 
 	// тодо:
 	// [+] выяснил, что нужно добавить ручку, отдающую статус превью и лог
@@ -822,7 +975,7 @@
 	//     приезжали в ответе на save
 
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    // this field keeps state for which preview was generated
 	    preview: {},
 	    validate_namespace_name_timeout: null,
@@ -1112,6 +1265,22 @@
 
 	    //  return content;
 	    // },
+	    fetch_rendered_preview: function() {
+	        var promice = $.get('/preview/' + this.props.preview_id + '/')
+	        promice.success(function(data) {
+	            this.setState({waiting: false,
+	                           results: data});
+	        }.bind(this));
+	        promice.error(function(response) {
+	            // TODO: тут надо в случае продакшена выводить более простое сообщение
+	            // вместо того, что ответил сервер. Ибо зачем пользователям видеть трейсбэк?
+	            var problem = '<pre>' + response.responseText + '</pre>';
+	            
+	            this.setState({waiting: false,
+	                           problem: problem});
+	        }.bind(this));
+	        
+	    },
 	    wait_for_preview: function () {
 	        UserStory.log(["waiting for preview results"], ["wait"]);
 	        if (this.spinner === undefined) {
@@ -1129,9 +1298,8 @@
 	                    UserStory.log(["preview is still in processing status"], ["wait"]);
 	                    setTimeout(this.wait_for_preview, 1000);
 	                } else {
-	                    debugger
 	                    UserStory.log(["preview data is ready"], ["wait"]);
-	                    this.setState({waiting: false});
+	                    this.fetch_rendered_preview();
 
 	                    // if (data.hasClass('package-changes')) {
 	                    //     UserStory.log(["showing preview"], ["wait"]);
@@ -1141,10 +1309,10 @@
 	                    //     this.setState({problem: data_orig});
 	                    // }
 	                }
-	        }.bind(this))
-	        .error(function(data) {
-	            UserStory.log(["some shit happened"], ["wait"]);
-	         });
+	            }.bind(this))
+	            .error(function(data) {
+	                UserStory.log(["some shit happened"], ["wait"]);
+	            });
 	    },
 	    update_preview_callback: function () {
 	        UserStory.log(["resetting state before waiting for preview results"], ["update"]);
@@ -1228,91 +1396,101 @@
 	                     ));
 
 	        
-	        // спрашиваем, всё ли с логов впорядке и предлагаем затрекать
+	        // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
 	        var submit_button_disabled = !this.can_track();
 	        var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save, disabled: submit_button_disabled});
 
 	        content.push(React.createElement("p", {className: "buttons-row"}, save_button));
 
-	        var log_items = [];
-	        for (i=0; i< this.state.log.length; i++) {
-	            log_items.push(React.createElement("li", {key: i}, this.state.log[i]));
-	        }
-	        content.push(React.createElement("ul", {class: "preview-processing-log"}, log_items));
-
-
-	        content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
-
-
-	        var tune_options = [];
-
-	        var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
-	        var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
-	        if (this.state.show_change_downloader) {
-	            var available_downloaders = [["feed", "Rss/Atom Feed"],
-	                                         ["http", "Single HTML Page"],
-	                                         ["rechttp", "Multiple HTML Pages"],
-	                                         ["google_play", "Google Play"],
-	                                         ["itunes", "Apple AppStore"],
-	                                         ["git", "Git Repository"],
-	                                         ["hg", "Mercurial Repository"],
-	                                         ["github_releases", "GitHub Releases"]];
-	            var render_option = function (item) {
-	                return React.createElement("option", {value: item[0], key: item[0]}, item[1]);
-	            };
-	            var options = R.map(render_option, available_downloaders);
-	            var on_downloader_change = function(event) {
-	                this.on_field_change(
-	                    event,
-	                    this.update_preview);
-	            }.bind(this);
-	            tune_options.push(React.createElement("li", null, 
-	                              React.createElement("a", {className: "vlink", onClick: hide_change_downloader}, "Change downloader type:"), React.createElement("br", null), 
-	                              React.createElement("select", {className: "downloader-selector", 
-	                              name: "downloader", 
-	                              value: this.state.downloader, 
-	                              onChange: on_downloader_change, 
-	                              disabled: this.state.waiting}, 
-	                              options
-	                              )
-	                              ));
-	        } else {
-	            tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_downloader}, "Change downloader type")));
-	        }
-
-	        var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
-	        var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
-	        if (this.state.show_change_search_list) {
-	            tune_options.push(React.createElement("li", null, 
-	                              React.createElement("a", {className: "vlink", onClick: hide_change_search_list}, "Search in particular file or directory:"), React.createElement("br", null), 
-	                              React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
-	                              className: "new-package__search-input", 
-	                              name: "search_list", 
-	                              onChange: this.on_field_change, 
-	                              disabled: this.state.waiting, 
-	                              value: this.state.search_list})
-	                              ));
-	        } else {
-	            tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_search_list}, "Search in particular file or directory")));
-	        }
-
-	        content.push(React.createElement("ul", {className: "tune-options"}, tune_options));
-
 	        if (this.state.waiting) {
-	            content.push(React.createElement("div", null, React.createElement("div", {className: "progress-text"}, "Please, wait while we search and process its changelog."), 
-	                              React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
+	            // показываем предложение подождать пока обработка закончится
+	            content.push(React.createElement("div", null, 
+	                             React.createElement("div", {className: "progress-text"}, "Please, wait while we search a changelog."), 
+	                             React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
 	                         ));
+	            
+	            // показываем лог
+	            var log_items = [];
+	            for (i=0; i< this.state.log.length; i++) {
+	                log_items.push(React.createElement("li", {key: i}, this.state.log[i]));
+	            }
+	            content.push(React.createElement("ul", {class: "preview-processing-log"}, log_items));
+
 	        } else {
 	            if (this.state.results && !this.state.tracked) {
+	                // сами результаты
 	                content.push(React.createElement("div", {className: "changelog-preview-container"}, 
-	                             React.createElement("h1", null, "This is the latest versions for this package"), 
-	                             React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
+	                                 React.createElement("h1", null, "This is the latest versions for this package"), 
+	                                 React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
 	                             ));
+
+	                // дальнейшие шаги
+	                content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
+
+
+	                var tune_options = [];
+
+	                var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
+	                var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
+	                if (this.state.show_change_downloader) {
+	                    var available_downloaders = [["feed", "Rss/Atom Feed"],
+	                                                 ["http", "Single HTML Page"],
+	                                                 ["rechttp", "Multiple HTML Pages"],
+	                                                 ["google_play", "Google Play"],
+	                                                 ["itunes", "Apple AppStore"],
+	                                                 ["git", "Git Repository"],
+	                                                 ["hg", "Mercurial Repository"],
+	                                                 ["github_releases", "GitHub Releases"]];
+	                    var render_option = function (item) {
+	                        return React.createElement("option", {value: item[0], key: item[0]}, item[1]);
+	                    };
+	                    var options = R.map(render_option, available_downloaders);
+	                    var on_downloader_change = function(event) {
+	                        this.on_field_change(
+	                            event,
+	                            this.update_preview);
+	                    }.bind(this);
+	                    tune_options.push(React.createElement("li", null, 
+	                                      React.createElement("a", {className: "vlink", onClick: hide_change_downloader}, "Change downloader type:"), React.createElement("br", null), 
+	                                      React.createElement("select", {className: "downloader-selector", 
+	                                      name: "downloader", 
+	                                      value: this.state.downloader, 
+	                                      onChange: on_downloader_change, 
+	                                      disabled: this.state.waiting}, 
+	                                      options
+	                                      )
+	                                      ));
+	                } else {
+	                    tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_downloader}, "Change downloader type")));
+	                }
+
+	                var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
+	                var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
+	                if (this.state.show_change_search_list) {
+	                    tune_options.push(React.createElement("li", null, 
+	                                      React.createElement("a", {className: "vlink", onClick: hide_change_search_list}, "Search in particular file or directory:"), React.createElement("br", null), 
+	                                      React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
+	                                      className: "new-package__search-input", 
+	                                      name: "search_list", 
+	                                      onChange: this.on_field_change, 
+	                                      disabled: this.state.waiting, 
+	                                      value: this.state.search_list})
+	                                      ));
+	                } else {
+	                    tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_search_list}, "Search in particular file or directory")));
+	                }
+
+	                content.push(React.createElement("ul", {className: "tune-options"}, tune_options));
 	            }
 	        }
 
 	        if (this.state.problem) {
-	            content.push(React.createElement("div", {className: "changelog-problem", dangerouslySetInnerHTML: {__html: this.state.problem}}));
+	            var before = 'BEFORE';
+	            var after = 'AFTER';
+	            
+	            content.push(React.createElement("div", {key: "before", className: "changelog-problem", dangerouslySetInnerHTML: {__html: before}}));
+	            content.push(React.createElement("div", {key: "problem", className: "changelog-problem", dangerouslySetInnerHTML: {__html: this.state.problem}}));
+	            content.push(React.createElement("div", {key: "after", className: "changelog-problem", dangerouslySetInnerHTML: {__html: after}}));
 	        }
 	        return (React.createElement("div", {className: "package-settings"}, content));
 	    }
@@ -1320,10 +1498,10 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PriorityQueue = __webpack_require__(22)
+	var PriorityQueue = __webpack_require__(18)
 	var _introjs_items = new PriorityQueue(function(a, b) {
 	    return a.priority - b.priority});
 
@@ -1361,15 +1539,226 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
+/***/ function(module, exports) {
+
+	/**
+	 * Expose `PriorityQueue`.
+	 */
+	module.exports = PriorityQueue;
+
+	/**
+	 * Initializes a new empty `PriorityQueue` with the given `comparator(a, b)`
+	 * function, uses `.DEFAULT_COMPARATOR()` when no function is provided.
+	 *
+	 * The comparator function must return a positive number when `a > b`, 0 when
+	 * `a == b` and a negative number when `a < b`.
+	 *
+	 * @param {Function}
+	 * @return {PriorityQueue}
+	 * @api public
+	 */
+	function PriorityQueue(comparator) {
+	  this._comparator = comparator || PriorityQueue.DEFAULT_COMPARATOR;
+	  this._elements = [];
+	}
+
+	/**
+	 * Compares `a` and `b`, when `a > b` it returns a positive number, when
+	 * it returns 0 and when `a < b` it returns a negative number.
+	 *
+	 * @param {String|Number} a
+	 * @param {String|Number} b
+	 * @return {Number}
+	 * @api public
+	 */
+	PriorityQueue.DEFAULT_COMPARATOR = function(a, b) {
+	  if (typeof a === 'number' && typeof b === 'number') {
+	    return a - b;
+	  } else {
+	    a = a.toString();
+	    b = b.toString();
+
+	    if (a == b) return 0;
+
+	    return (a > b) ? 1 : -1;
+	  }
+	};
+
+	/**
+	 * Returns whether the priority queue is empty or not.
+	 *
+	 * @return {Boolean}
+	 * @api public
+	 */
+	PriorityQueue.prototype.isEmpty = function() {
+	  return this.size() === 0;
+	};
+
+	/**
+	 * Peeks at the top element of the priority queue.
+	 *
+	 * @return {Object}
+	 * @throws {Error} when the queue is empty.
+	 * @api public
+	 */
+	PriorityQueue.prototype.peek = function() {
+	  if (this.isEmpty()) throw new Error('PriorityQueue is empty');
+
+	  return this._elements[0];
+	};
+
+	/**
+	 * Dequeues the top element of the priority queue.
+	 *
+	 * @return {Object}
+	 * @throws {Error} when the queue is empty.
+	 * @api public
+	 */
+	PriorityQueue.prototype.deq = function() {
+	  var first = this.peek();
+	  var last = this._elements.pop();
+	  var size = this.size();
+
+	  if (size === 0) return first;
+
+	  this._elements[0] = last;
+	  var current = 0;
+
+	  while (current < size) {
+	    var largest = current;
+	    var left = (2 * current) + 1;
+	    var right = (2 * current) + 2;
+
+	    if (left < size && this._compare(left, largest) >= 0) {
+	      largest = left;
+	    }
+
+	    if (right < size && this._compare(right, largest) >= 0) {
+	      largest = right;
+	    }
+
+	    if (largest === current) break;
+
+	    this._swap(largest, current);
+	    current = largest;
+	  }
+
+	  return first;
+	};
+
+	/**
+	 * Enqueues the `element` at the priority queue and returns its new size.
+	 *
+	 * @param {Object} element
+	 * @return {Number}
+	 * @api public
+	 */
+	PriorityQueue.prototype.enq = function(element) {
+	  var size = this._elements.push(element);
+	  var current = size - 1;
+
+	  while (current > 0) {
+	    var parent = Math.floor((current - 1) / 2);
+
+	    if (this._compare(current, parent) <= 0) break;
+
+	    this._swap(parent, current);
+	    current = parent;
+	  }
+
+	  return size;
+	};
+
+	/**
+	 * Returns the size of the priority queue.
+	 *
+	 * @return {Number}
+	 * @api public
+	 */
+	PriorityQueue.prototype.size = function() {
+	  return this._elements.length;
+	};
+
+	/**
+	 *  Iterates over queue elements
+	 *
+	 *  @param {Function} fn
+	 */
+	PriorityQueue.prototype.forEach = function(fn) {
+	  return this._elements.forEach(fn);
+	};
+
+	/**
+	 * Compares the values at position `a` and `b` in the priority queue using its
+	 * comparator function.
+	 *
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @return {Number}
+	 * @api private
+	 */
+	PriorityQueue.prototype._compare = function(a, b) {
+	  return this._comparator(this._elements[a], this._elements[b]);
+	};
+
+	/**
+	 * Swaps the values at position `a` and `b` in the priority queue.
+	 *
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @api private
+	 */
+	PriorityQueue.prototype._swap = function(a, b) {
+	  var aux = this._elements[a];
+	  this._elements[a] = this._elements[b];
+	  this._elements[b] = aux;
+	};
+
+
+/***/ },
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var metrika = __webpack_require__(20)
+	var Share = __webpack_require__(13)
+
+	module.exports = {
+	    render: function () {
+	        $('.share-badge-container').each(function (idx, element) {
+	            React.render(
+	                React.createElement(Share, {namespace: element.dataset['namespace'], 
+	                       name: element.dataset['name']}),
+	                element);
+	        });
+	    }
+	}
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Promo = __webpack_require__(21)
+
+	module.exports = {
+	    render: function () {
+	        $('.ios-promo-container').each(function (idx, element) {
+	            React.render(React.createElement(Promo, null), element);
+	        });
+	    }
+	}
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var metrika = __webpack_require__(5)
 
 	// uses jquery typeahead plugin:
 	// http://twitter.github.io/typeahead.js/
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        return {selected_apps: [],
 	                digest_loaded: false};
@@ -1556,12 +1945,27 @@
 
 
 /***/ },
-/* 18 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PackageSelector = __webpack_require__(19)
+	var Landing = __webpack_require__(23)
 
-	module.exports = React.createClass({displayName: 'exports',
+	module.exports = {
+	    render: function () {
+	        $('.landing-page-container').each(function (idx, element) {
+	            React.render(React.createElement(Landing, null), element);
+	        });
+	    }
+	}
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var PackageSelector = __webpack_require__(2)
+
+	module.exports = React.createClass({displayName: "exports",
 	    getInitialState: function () {
 	        UserStory.log(["init landing page"], ["landing"]);
 	        return {num_tracked: 0};
@@ -1576,384 +1980,5 @@
 	});
 
 
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Package = __webpack_require__(21)
-	var metrika = __webpack_require__(20)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    getInitialState: function () {
-	        return {packages: [],
-	                tracked: []};
-	    },
-	    load_package: function () {
-	        $.ajax({
-	            url: this.props.url,
-	            dataType: 'json',
-	            success: function(data) {
-	                var results = data.results;
-	                if (results.length > 0) {
-	                    this.setState({package: results[0]});
-	                } else {
-	                    // TODO: somethings
-	                }
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error(this.props.url, status, err.toString());
-	            }.bind(this)
-	        });
-
-	    },
-	    componentDidMount: function() {
-	        this.load_package();
-	    },
-	    render: function() {
-	        var track_handler = function (changelog) {
-	            var tracked = this.state.tracked;
-	            tracked[tracked.length] = changelog;
-
-	            if (tracked.length == 1) {
-	                metrika.reach_goal('LAND-TRACK-1');
-	            }
-	            if (tracked.length == 3) {
-	                metrika.reach_goal('LAND-TRACK-3');
-	            }
-	            if (tracked.length == 5) {
-	                metrika.reach_goal('LAND-TRACK-5');
-	            }
-
-	            this.setState({tracked: tracked});
-	            this.load_package();
-	        }.bind(this);
-
-	        var skip_handler = function () {
-	            this.load_package();
-	        }.bind(this);
-
-	        var pkg_obj;
-	        var pkg = this.state.package;
-	        if (pkg !== undefined) {
-	            pkg_obj = React.createElement(Package, {key: pkg.id, 
-	                           changelog_id: pkg.id, 
-	                           namespace: pkg.namespace, 
-	                           name: pkg.name, 
-	                           description: pkg.description, 
-	                           versions: pkg.versions, 
-	                           track_handler: track_handler, 
-	                           skip_handler: skip_handler});
-	        }
-
-	        var tracked = _.map(this.state.tracked,
-	                            function (changelog) {
-	                                return (
-	            React.createElement("li", {key: changelog.id}, changelog.namespace, "/", changelog.name));});
-
-	        var tracked_msg, login_msg;
-	        if (username == '') {
-	            login_msg = (React.createElement("p", null, "To see full release notes and to receive notifications on future updates, please, ", React.createElement("br", null), "login with ", React.createElement("a", {className: "button _green _large", href: "/login/github/", id: "package-selector__login-button-id"}, React.createElement("i", {className: "fa fa-github fa-lg"}), " GitHub"), " or ", React.createElement("a", {className: "button _blue _large", href: "/login/twitter/"}, React.createElement("i", {className: "fa fa-twitter fa-lg"}), " Twitter")));
-	        }
-	        
-	        if (tracked.length > 0) {
-	            tracked_msg = (React.createElement("div", {className: "package-selector__tracked-msg"}, 
-	                React.createElement("p", null, "You've followed these packages:"), 
-	                React.createElement("ul", null, tracked), 
-	                login_msg
-	            ));
-
-	            // when first package is tracked, scroll down
-	            // to show the buttons
-	            if (login_msg && tracked.length == 1) {
-	                setTimeout(function() {
-	                    $('html, body').animate({
-	                        scrollTop: $("#package-selector__login-button-id").offset().top
-	                    }, 2000)
-	                }, 200);
-	            }
-	        }
-	                                        
-	        return (
-	            React.createElement("div", {className: "package-selector"}, 
-	                pkg_obj, 
-	                tracked_msg
-	            )
-	        );
-	    }
-	});
-
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = {
-	    reach_goal: function(name) {
-	        if (window.yaCounter !== undefined) {
-	            UserStory.log(["registering goal [name=", name, "]"], ["metrika.reach_goal"]);
-	            window.yaCounter.reachGoal(name);
-	        }
-	    }
-	}
-
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	TrackButton = __webpack_require__(10)
-	SkipButton = __webpack_require__(23)
-
-	module.exports = React.createClass({displayName: 'exports',
-	  render: function() {
-	    var changelog_id = this.props.changelog_id;
-
-	    var on_track = function () {
-	        this.props.track_handler({id: this.props.changelog_id,
-	                                  namespace: this.props.namespace,
-	                                  name: this.props.name});
-	    }.bind(this);
-
-	    var url = '/p/' + this.props.namespace + '/' + this.props.name + '/';
-	    return (
-	    React.createElement("div", {className: "package-selector__package"}, 
-	      React.createElement("h1", {className: "package-selector__title"}, React.createElement("a", {href: url}, this.props.namespace, "/", this.props.name)), 
-	      React.createElement("h2", {className: "package-selector__description"}, this.props.description), 
-	      React.createElement("div", {className: "package-selector__versions-wrapper"}, 
-	        React.createElement("div", {className: "package-selector__versions-grad"}), 
-	        React.createElement("iframe", {className: "package-selector__versions", scrolling: "no", src: "/package-selector-versions/?changelog=" + this.props.changelog_id})
-	      ), 
-	      React.createElement("div", {className: "package-selector__buttons"}, 
-	        React.createElement(TrackButton, {changelog_id: this.props.changelog_id, num_trackers: false, on_track: on_track}), 
-	        React.createElement(SkipButton, {changelog_id: this.props.changelog_id, on_skip: this.props.skip_handler})
-	      )
-	    )
-	    );
-	  }
-	});
-
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Expose `PriorityQueue`.
-	 */
-	module.exports = PriorityQueue;
-
-	/**
-	 * Initializes a new empty `PriorityQueue` with the given `comparator(a, b)`
-	 * function, uses `.DEFAULT_COMPARATOR()` when no function is provided.
-	 *
-	 * The comparator function must return a positive number when `a > b`, 0 when
-	 * `a == b` and a negative number when `a < b`.
-	 *
-	 * @param {Function}
-	 * @return {PriorityQueue}
-	 * @api public
-	 */
-	function PriorityQueue(comparator) {
-	  this._comparator = comparator || PriorityQueue.DEFAULT_COMPARATOR;
-	  this._elements = [];
-	}
-
-	/**
-	 * Compares `a` and `b`, when `a > b` it returns a positive number, when
-	 * it returns 0 and when `a < b` it returns a negative number.
-	 *
-	 * @param {String|Number} a
-	 * @param {String|Number} b
-	 * @return {Number}
-	 * @api public
-	 */
-	PriorityQueue.DEFAULT_COMPARATOR = function(a, b) {
-	  if (typeof a === 'number' && typeof b === 'number') {
-	    return a - b;
-	  } else {
-	    a = a.toString();
-	    b = b.toString();
-
-	    if (a == b) return 0;
-
-	    return (a > b) ? 1 : -1;
-	  }
-	};
-
-	/**
-	 * Returns whether the priority queue is empty or not.
-	 *
-	 * @return {Boolean}
-	 * @api public
-	 */
-	PriorityQueue.prototype.isEmpty = function() {
-	  return this.size() === 0;
-	};
-
-	/**
-	 * Peeks at the top element of the priority queue.
-	 *
-	 * @return {Object}
-	 * @throws {Error} when the queue is empty.
-	 * @api public
-	 */
-	PriorityQueue.prototype.peek = function() {
-	  if (this.isEmpty()) throw new Error('PriorityQueue is empty');
-
-	  return this._elements[0];
-	};
-
-	/**
-	 * Dequeues the top element of the priority queue.
-	 *
-	 * @return {Object}
-	 * @throws {Error} when the queue is empty.
-	 * @api public
-	 */
-	PriorityQueue.prototype.deq = function() {
-	  var first = this.peek();
-	  var last = this._elements.pop();
-	  var size = this.size();
-
-	  if (size === 0) return first;
-
-	  this._elements[0] = last;
-	  var current = 0;
-
-	  while (current < size) {
-	    var largest = current;
-	    var left = (2 * current) + 1;
-	    var right = (2 * current) + 2;
-
-	    if (left < size && this._compare(left, largest) >= 0) {
-	      largest = left;
-	    }
-
-	    if (right < size && this._compare(right, largest) >= 0) {
-	      largest = right;
-	    }
-
-	    if (largest === current) break;
-
-	    this._swap(largest, current);
-	    current = largest;
-	  }
-
-	  return first;
-	};
-
-	/**
-	 * Enqueues the `element` at the priority queue and returns its new size.
-	 *
-	 * @param {Object} element
-	 * @return {Number}
-	 * @api public
-	 */
-	PriorityQueue.prototype.enq = function(element) {
-	  var size = this._elements.push(element);
-	  var current = size - 1;
-
-	  while (current > 0) {
-	    var parent = Math.floor((current - 1) / 2);
-
-	    if (this._compare(current, parent) <= 0) break;
-
-	    this._swap(parent, current);
-	    current = parent;
-	  }
-
-	  return size;
-	};
-
-	/**
-	 * Returns the size of the priority queue.
-	 *
-	 * @return {Number}
-	 * @api public
-	 */
-	PriorityQueue.prototype.size = function() {
-	  return this._elements.length;
-	};
-
-	/**
-	 *  Iterates over queue elements
-	 *
-	 *  @param {Function} fn
-	 */
-	PriorityQueue.prototype.forEach = function(fn) {
-	  return this._elements.forEach(fn);
-	};
-
-	/**
-	 * Compares the values at position `a` and `b` in the priority queue using its
-	 * comparator function.
-	 *
-	 * @param {Number} a
-	 * @param {Number} b
-	 * @return {Number}
-	 * @api private
-	 */
-	PriorityQueue.prototype._compare = function(a, b) {
-	  return this._comparator(this._elements[a], this._elements[b]);
-	};
-
-	/**
-	 * Swaps the values at position `a` and `b` in the priority queue.
-	 *
-	 * @param {Number} a
-	 * @param {Number} b
-	 * @api private
-	 */
-	PriorityQueue.prototype._swap = function(a, b) {
-	  var aux = this._elements[a];
-	  this._elements[a] = this._elements[b];
-	  this._elements[b] = aux;
-	};
-
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var metrika = __webpack_require__(20)
-
-	module.exports = React.createClass({displayName: 'exports',
-	    perform_action: function(action) {
-	        UserStory.log(["performing action [action=", action, "]"], ["buttons.skip"]);
-	        $.ajax({
-	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
-	            method: 'POST',
-	            dataType: 'json',
-	            headers: {'X-CSRFToken': $.cookie('csrftoken')},
-	            success: function(data) {
-	                metrika.reach_goal(action.toUpperCase());
-
-	                if (this.props.on_skip !== undefined) {
-	                    this.props.on_skip();
-	                }
-	            }.bind(this),
-	            error: function(xhr, status, err) {
-	                console.error('Unable to perform action ' + action + ' on changelog', status, err.toString());
-	            }.bind(this)
-	        });
-	    },
-	    skip: function (e) {
-	        e.preventDefault();
-	        this.perform_action('skip', true);
-	    },
-	    handle_popup_click: function (e) {
-	        UserStory.log(["popup click"], ["buttons.report"]);
-	        e.nativeEvent.stopImmediatePropagation();
-	    },
-	    render: function() {
-	        return (React.createElement("div", {className: "skip-button"}, 
-	                    React.createElement("button", {className: "button", 
-	                            onClick: this.skip, 
-	                            title: "Click me to show next package."}, "Show next")
-	                ));
-	    }
-	});
-
-
 /***/ }
-/******/ ])
+/******/ ]);

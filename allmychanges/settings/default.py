@@ -185,17 +185,19 @@ REST_FRAMEWORK = {
 
 REPO_ROOT = root('data')
 
+REDIS_HOST = os.environ.get('REDIS.ALLMYCHANGES.COM_PORT_6379_TCP_ADDR', 'local')
+REDIS_PORT = int(os.environ.get('REDIS.ALLMYCHANGES.COM_PORT_6379_TCP_PORT', 6379))
 
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 0,
         'PASSWORD': '',
     },
     'preview': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 0,
         'PASSWORD': '',
     }

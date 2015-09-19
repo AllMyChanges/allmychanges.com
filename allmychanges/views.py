@@ -919,13 +919,13 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                           icon=self.request.GET.get('icon', ''))
 
             # and finally, we'll try to guess downloader
-            if not params.get('downloader'):
-                downloaders = guess_downloaders(normalized_url)
+            # if not params.get('downloader'):
+            #     downloaders = guess_downloaders(normalized_url)
 
-                params['downloader'] = ','.join(
-                    d['name'] for d in downloaders)
-            else:
-                downloaders = []
+            #     params['downloader'] = ','.join(
+            #         d['name'] for d in downloaders)
+            # else:
+            downloaders = []
 
 
             # TODO: replace with code inside of downloaders
@@ -1038,12 +1038,11 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         preview_id = kwargs['pk']
         self.preview = Preview.objects.get(pk=preview_id)
 
-        cache_key = 'changelog-preview-{0}:{1}:{2}'.format(
+        cache_key = 'changelog-preview-{0}:{1}'.format(
             self.preview.id,
             int(time.mktime(self.preview.updated_at.timetuple()))
-            if self.preview.updated_at is not None
-            else 'missing',
-            self.preview.get_processing_status())
+               if self.preview.updated_at is not None
+               else 'missing')
 #        print 'Cache key:', cache_key
         return cache_key, 4 * HOUR
 
@@ -1088,6 +1087,8 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result['problem'] = problem
         result['show_sources'] = True
 
+        # TODO: вот это всё надо будет убрать и оставить
+        # только рендеринг changelog
         HUMANIZED = {
             'waiting-in-the-queue': 'Waiting in the queue.',
             'downloading': 'Downloading sources.',

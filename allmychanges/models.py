@@ -214,18 +214,25 @@ class Downloadable(object):
     to update attribute `downloader` if needed and then to
     download repository into a temporary directory.
     """
-    def download(self):
+    def download(self, downloader=None):
         """This method fetches repository into a temporary directory
         and returns path to this directory.
         """
 
-        if not self.downloader:
+        downloader = downloader or self.downloader
+
+        # TODO: убрать отсюда guess. Для всех Changelog
+        # downloader должен быть проставлен, я для
+        # Preview guess вызывается в другом месте
+
+        if not downloader:
             downloaders = list(guess_downloaders(self.source))
             if downloaders:
-                self.downloader = downloaders[0]['name']
-            self.save(update_fields=('downloader',))
+                downloader = downloaders[0]['name']
+                self.downloader = downloader
+                self.save(update_fields=('downloader',))
 
-        download = get_downloader(self.downloader)
+        download = get_downloader(downloader)
         return download(self.source,
                         search_list=self.get_search_list(),
                         ignore_list=self.get_ignore_list())
@@ -413,15 +420,15 @@ class Changelog(Downloadable, models.Model):
         params.setdefault('xslt', self.xslt)
 
         preview = self.previews.create(user=user, light_user=light_user, **params)
-        preview_test_task.delay(
-            preview.id,
-            ['Guessing downloders',
-             'Downloading using git',
-             'Searching versions',
-             'Nothing found',
-             'Downloading from GitHub Review',
-             'Searching versions',
-             'Some results were found'])
+        # preview_test_task.delay(
+        #     preview.id,
+        #     ['Guessing downloders',
+        #      'Downloading using git',
+        #      'Searching versions',
+        #      'Nothing found',
+        #      'Downloading from GitHub Review',
+        #      'Searching versions',
+        #      'Some results were found'])
 
         return preview
 
@@ -476,7 +483,7 @@ class Changelog(Downloadable, models.Model):
             log.info('Scheduling changelog update')
 
             self.set_status('processing')
-            self.set_processing_status('waiting-in-the-queue')
+            self.set_processing_status('Waiting in the queue')
 
             self.problem = None
             self.save()
@@ -745,10 +752,12 @@ class Preview(Downloadable, models.Model):
 
 
     def set_processing_status(self, status):
+        self.log.append(status)
         self.processing_status = status
         self.updated_at = timezone.now()
         self.save(update_fields=('processing_status',
-                                 'updated_at'))
+                                 'updated_at',
+                                 'log'))
         key = 'preview-processing-status:{0}'.format(self.id)
         cache.set(key, status, 10 * 60)
 
@@ -759,7 +768,7 @@ class Preview(Downloadable, models.Model):
 
     def schedule_update(self):
         self.set_status('processing')
-        self.set_processing_status('waiting-in-the-queue')
+        self.set_processing_status('Waiting in the queue')
         self.versions.all().delete()
         update_preview_task.delay(self.pk)
 

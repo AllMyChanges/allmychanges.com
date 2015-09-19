@@ -26,7 +26,7 @@ if DEBUG:
     )
 
     DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': 'allmychanges.utils.show_debug_toolbar'
+        #'SHOW_TOOLBAR_CALLBACK': 'allmychanges.utils.show_debug_toolbar'
     }
 
 
@@ -48,4 +48,7 @@ if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR)
 
 
-ALLOWED_HOSTS = ['localhost', 'art.dev.allmychanges.com', 'skate.svetlyak.ru']
+ALLOWED_HOSTS = ['localhost',
+                 'art.dev.allmychanges.com',
+                 'skate.svetlyak.ru',
+                 'dev.allmychanges.com']

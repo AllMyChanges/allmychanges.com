@@ -8,14 +8,18 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'User'
-        db.delete_table(u'auth_user')
+        pass
+        # закомментировано, потому что если накатывать миграцию с нуля,
+        # то уже нет такой таблички auth_user
 
-        # Removing M2M table for field groups on 'User'
-        db.delete_table(db.shorten_name(u'auth_user_groups'))
+        # # Deleting model 'User'
+        # db.delete_table(u'auth_user')
 
-        # Removing M2M table for field user_permissions on 'User'
-        db.delete_table(db.shorten_name(u'auth_user_user_permissions'))
+        # # Removing M2M table for field groups on 'User'
+        # db.delete_table(db.shorten_name(u'auth_user_groups'))
+
+        # # Removing M2M table for field user_permissions on 'User'
+        # db.delete_table(db.shorten_name(u'auth_user_user_permissions'))
 
 
     def backwards(self, orm):

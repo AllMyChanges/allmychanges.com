@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from allmychanges.downloaders.utils import normalize_url
+from allmychanges.downloaders import guess_downloaders
 from allmychanges.utils import count, first_sentences
 from allmychanges.notifications import slack
 from allmychanges.changelog_updater import update_preview_or_changelog
@@ -145,7 +146,17 @@ def update_preview_task(preview_id):
             chat.send('Updating preview with source: {0}'.format(preview.source),
                       channel='tasks')
 
-            update_preview_or_changelog(preview)
+            if not preview.downloader:
+                preview.set_processing_status('Guessing downloaders')
+                downloaders = list(guess_downloaders(preview.source))
+            else:
+                downloaders = [{'name': preview.downloader}]
+
+            if downloaders:
+                for downloader in downloaders:
+                    update_preview_or_changelog(preview, downloader['name'])
+            else:
+                preview.set_processing_status('Unable to find downloader for this URL')
         finally:
             log.info('Task done')
 

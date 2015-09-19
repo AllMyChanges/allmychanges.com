@@ -33,6 +33,10 @@ def guess_downloaders(source):
     # downloaders to use information from other downloaders
     # this way, we can disable http downloader, if feed
     # downloader was discovered before
+    yield {
+        'name': 'hg',
+    }
+    return
     discovered = {}
 
     for module in get_modules():
@@ -47,6 +51,7 @@ def guess_downloaders(source):
             if 'stop' in result:
                 break
             discovered[name] = result
+
 
 def get_downloader(name):
     return get_modules_map().get(name).download

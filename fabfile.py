@@ -4,9 +4,48 @@ def update_requirements():
     local('pip-compile --annotate requirements.in')
     local('pip-compile --annotate requirements-dev.in')
 
-def shell():
-    local('./manage.py shell_plus')
+def _get_docker_command(name, ports=[]):
+    return ('docker run '
+            '--rm '
+            '-t -i '
+            '-v `pwd`:/app '
+            '-v `pwd`/logs:/var/log/allmychanges '
+            '-v `pwd`/tmp:/tmp/allmychanges '
+            '--link mysql.allmychanges.com '
+            '--link redis.allmychanges.com '
+            '{ports} '
+            '-e DEBUG=yes '
+            '--name {name} '
+            'allmychanges.com ').format(
+                name=name,
+                ports=' '.join('-p ' + p for p in ports))
 
+def shell():
+    local(_get_docker_command('shell.command.allmychanges.com') + (
+        '/env/bin/python /app/manage.py '
+        ' shell_plus'))
+
+def runserver():
+    local(_get_docker_command('runserver.command.allmychanges.com',
+                              ports=['8000:8000']) + (
+          '/env/bin/python /app/manage.py '
+          'runserver 0.0.0.0:8000'))
+
+def rqworker():
+    local(_get_docker_command('rqworker.command.allmychanges.com') + (
+        '/env/bin/python /app/manage.py '
+        'rqworker '
+        'default '
+        'preview '))
+
+def bash():
+    local(_get_docker_command('bash.command.allmychanges.com') + 'bash')
+
+def tail_errors():
+    local("tail -f logs/django-root.log | jq 'if (.[\"@fields\"].level == \"WARNING\" or .[\"@fields\"].level == \"ERROR\") then . else 0 end | objects'")
+
+def watch_on_static():
+    local('node_modules/.bin/gulp')
 
 def test(args=''):
     local('nosetests --with-progressive ' + args)

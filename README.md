@@ -1,6 +1,30 @@
 allmychanges.com
 ================
 
+Как запустить всё под Docker
+----------------------------
+
+
+```
+docker run --name mysql.allmychanges.com -e MYSQL_ROOT_PASSWORD=password -d mysql
+или
+docker start mysql.allmychanges.com
+если контейнер уже запускался
+
+docker run --name redis.allmychanges.com -d redis
+или
+docker start redis.allmychanges.com
+
+docker exec -i -t mysql.allmychanges.com mysqladmin drop   -ppassword allmychanges
+docker exec -i -t mysql.allmychanges.com mysqladmin create -ppassword allmychanges
+
+docker run --rm -t -i -v `pwd`:/app --link mysql.allmychanges.com allmychanges.com /env/bin/python /app/manage.py syncdb
+
+fab runserver
+
+```
+
+
 A project for Django Dash 2013
 
 How to setup

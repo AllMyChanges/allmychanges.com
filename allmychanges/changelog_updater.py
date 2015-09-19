@@ -152,13 +152,13 @@ def update_changelog_from_raw_data3(obj, raw_data):
             changelog_id=obj.id)
 
 
-def update_preview_or_changelog(obj):
+def update_preview_or_changelog(obj, downloader=None):
     problem = None
     path = None
 
     try:
-        obj.set_processing_status('downloading')
-        path = obj.download()
+        obj.set_processing_status('Downloading data using "{0}" downloader'.format(downloader))
+        path = obj.download(downloader)
     except UpdateError as e:
         problem = u', '.join(e.args)
         log.trace().error('Unable to update changelog')
@@ -172,27 +172,28 @@ def update_preview_or_changelog(obj):
     else:
         try:
             try:
-                from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
-                obj.set_processing_status('searching-versions')
+                from allmychanges.parsing.pipeline import processing_pipe
+                obj.set_processing_status('Searching versions')
                 versions = processing_pipe(path,
                                            obj.get_ignore_list(),
                                            obj.get_search_list(),
                                            obj.xslt)
                 #print 'Num versions from pipeline:', len(versions)
 
-                if not versions:
-                    log.debug('updating v2 from vcs')
-                    obj.set_processing_status('processing-vcs-history')
-                    versions = vcs_processing_pipe(path,
-                                                   obj.get_ignore_list(),
-                                                   obj.get_search_list())
+                # if not versions:
+                #     log.debug('updating v2 from vcs')
+                #     obj.set_processing_status('processing-vcs-history')
+                #     versions = vcs_processing_pipe(path,
+                #                                    obj.get_ignore_list(),
+                #                                    obj.get_search_list())
 
                     #print 'Num versions from VCS:', len(raw_data)
 
                 if versions:
-                    obj.set_processing_status('updating-database')
+                    obj.set_processing_status('Updating database')
                     update_changelog_from_raw_data3(obj, versions)
                 else:
+                    print 'raising Update Error'
                     raise UpdateError('Changelog not found')
 
             except UpdateError as e:
@@ -206,10 +207,10 @@ def update_preview_or_changelog(obj):
             shutil.rmtree(path)
 
     if problem is not None:
+        obj.set_processing_status(problem)
         obj.set_status('error', problem=problem)
     else:
         obj.set_status('success')
 
-    obj.set_processing_status('')
     obj.updated_at = timezone.now()
     obj.save()
