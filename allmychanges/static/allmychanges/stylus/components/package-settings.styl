@@ -1,0 +1,46 @@
+.changelog-settings {
+    &__tune {
+        position: fixed;
+        bottom: 0;
+        background: dark-blue-color;
+        width: 100%;
+        left: 0;
+        min-height: 100px;
+        padding-left: 100px;
+        padding-top: 10px;
+        padding-right: 100px;
+        padding-bottom: 10px;
+    }
+    &__tune-content {
+        background: white;
+        padding: 10px;
+        margin-right: 200px;
+        border-radius: 5px;
+        min-height: 80px;
+    }
+    &__tabs {
+        list-style: none;
+        margin-left: 10px;
+    }
+    &__tab {
+        display: inline-block;
+        margin-right: 20px;
+        padding: 5px 10px;
+    }
+    &__active-tab {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        border-bottom: none;
+        color: dark-blue-color;
+        background: white;
+    }
+    &__tab-link {
+        border-bottom: 1px dashed;
+        line-height: 0.95em;
+        color: yellow-color;
+        text-decoration: none;
+    }
+    &__active-tab &__tab-link {
+        border-bottom: none;
+    }
+}

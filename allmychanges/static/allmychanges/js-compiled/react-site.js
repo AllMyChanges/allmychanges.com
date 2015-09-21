@@ -1328,6 +1328,7 @@
 	    },
 	    render: function() {
 	        var content = [];
+	        var next_actions = [];
 	//        if (this.props.mode == 'edit') {
 	        content.push(React.createElement("input", {name: "changelog_source", 
 	                     type: "text", 
@@ -1460,7 +1461,7 @@
 	                                      options
 	                                      )
 	                                      ));
-	                } else {
+	                 } else {
 	                    tune_options.push(React.createElement("li", null, React.createElement("a", {className: "vlink", onClick: show_change_downloader}, "Change downloader type")));
 	                }
 
@@ -1485,13 +1486,22 @@
 	        }
 
 	        if (this.state.problem) {
-	            var before = 'BEFORE';
-	            var after = 'AFTER';
-	            
-	            content.push(React.createElement("div", {key: "before", className: "changelog-problem", dangerouslySetInnerHTML: {__html: before}}));
 	            content.push(React.createElement("div", {key: "problem", className: "changelog-problem", dangerouslySetInnerHTML: {__html: this.state.problem}}));
-	            content.push(React.createElement("div", {key: "after", className: "changelog-problem", dangerouslySetInnerHTML: {__html: after}}));
 	        }
+	        content.push(React.createElement("div", {className: "changelog-settings__tune"}, 
+	                       React.createElement("ul", {className: "changelog-settings__tabs"}, 
+	                         React.createElement("li", {className: "changelog-settings__tab changelog-settings__active-tab"}, 
+	                             React.createElement("span", {className: "changelog-settings__tab-link", href: ""}, "Tune downloader")
+	                         ), 
+	                         React.createElement("li", {className: "changelog-settings__tab"}, 
+	                             React.createElement("a", {className: "changelog-settings__tab-link", href: ""}, "Tune parser")
+	                         )
+	                       ), 
+	                       React.createElement("div", {className: "changelog-settings__tune-content"}, 
+	                         "Some content"
+	                       )
+	                     ));
+	        
 	        return (React.createElement("div", {className: "package-settings"}, content));
 	    }
 	});

@@ -367,6 +367,7 @@ module.exports = React.createClass({
     },
     render: function() {
         var content = [];
+        var next_actions = [];
 //        if (this.props.mode == 'edit') {
         content.push(<input name="changelog_source"
                      type="text"
@@ -499,7 +500,7 @@ module.exports = React.createClass({
                                       {options}
                                       </select>
                                       </li>);
-                } else {
+                 } else {
                     tune_options.push(<li><a className="vlink" onClick={show_change_downloader}>Change downloader type</a></li>);
                 }
 
@@ -524,13 +525,22 @@ module.exports = React.createClass({
         }
 
         if (this.state.problem) {
-            var before = 'BEFORE';
-            var after = 'AFTER';
-            
-            content.push(<div key="before" className="changelog-problem" dangerouslySetInnerHTML={{__html: before}}></div>);
             content.push(<div key="problem" className="changelog-problem" dangerouslySetInnerHTML={{__html: this.state.problem}}></div>);
-            content.push(<div key="after" className="changelog-problem" dangerouslySetInnerHTML={{__html: after}}></div>);
         }
+        content.push(<div className="changelog-settings__tune">
+                       <ul className="changelog-settings__tabs">
+                         <li className="changelog-settings__tab changelog-settings__active-tab">
+                             <span className="changelog-settings__tab-link" href="">Tune downloader</span>
+                         </li>
+                         <li className="changelog-settings__tab">
+                             <a className="changelog-settings__tab-link" href="">Tune parser</a>
+                         </li>
+                       </ul>
+                       <div className="changelog-settings__tune-content">
+                         Some content
+                       </div>
+                     </div>);
+        
         return (<div className="package-settings">{content}</div>);
     }
 });
