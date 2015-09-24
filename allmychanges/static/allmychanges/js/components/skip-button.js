@@ -1,8 +1,8 @@
-var metrika = require('./metrika.js')
+var React = require('react');
+var metrika = require('./metrika.js');
 
 module.exports = React.createClass({
-    perform_action: function(action) {
-        // performing action [action] @buttons.skip
+    perform_action: function(action) {        // performing action [action] @buttons.skip
         $.ajax({
             url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
             method: 'POST',

@@ -1,3 +1,4 @@
+var React = require('react');
 var metrika = require('./metrika.js')
 
 module.exports = React.createClass({

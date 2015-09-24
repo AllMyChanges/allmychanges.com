@@ -29,4 +29,3 @@ for queue_options in RQ_QUEUES.itervalues():
 DEBUG_JOBS = True
 
 SLACK_URLS = None
-KATO_URL = None

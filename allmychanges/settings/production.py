@@ -30,7 +30,6 @@ SLACK_URLS = {
     'default': 'https://hooks.slack.com/services/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',
     'tasks': 'https://hooks.slack.com/services/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',
 }
-KATO_URL = 'https://api.kato.im/rooms/fc6183a8a19599ff6a148a35870878414fcc5a573515c043d07b6529281dd630/simple'
 
 TWITTER_CREDS = ('WjfgjgXOwgj2vjUrDYvebI91x',
                  'iyIGDiLzfFGDr0Kg0yF5x4gAt4zzgi3IjHEpTvoxs6pSeRSgSn',

@@ -52,3 +52,6 @@ ALLOWED_HOSTS = ['localhost',
                  'art.dev.allmychanges.com',
                  'skate.svetlyak.ru',
                  'dev.allmychanges.com']
+
+
+SLACK_URLS = {}

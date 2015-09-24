@@ -13,6 +13,13 @@
 // [ ] сделать отображение сообщений, чтобы они
 //     приезжали в ответе на save
 
+var React = require('react');
+var ReactTabs = require('react-tabs');
+var Tab = ReactTabs.Tab;
+var Tabs = ReactTabs.Tabs;
+var TabList = ReactTabs.TabList;
+var TabPanel = ReactTabs.TabPanel;
+
 
 module.exports = React.createClass({
     // this field keeps state for which preview was generated
@@ -366,6 +373,7 @@ module.exports = React.createClass({
         this.wait_for_preview();
     },
     render: function() {
+
         var content = [];
         var next_actions = [];
 //        if (this.props.mode == 'edit') {
@@ -404,7 +412,10 @@ module.exports = React.createClass({
             description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
         }
 
-        content.push(<div>
+        var submit_button_disabled = !this.can_track();
+        var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
+
+        var save_panel = (<div>
                      <div className="input">
                      {namespace_error}<br/>
                      <input name="namespace"
@@ -432,16 +443,15 @@ module.exports = React.createClass({
                      onChange={this.on_field_change}
                      className="text-input"
                      value={this.state.description}/>
-                     </div>
+                          </div>
+
+                          <p className="buttons-row">{save_button}</p>
+
+
                      </div>);
 
         
         // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
-        var submit_button_disabled = !this.can_track();
-        var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
-
-        content.push(<p className="buttons-row">{save_button}</p>);
-
         if (this.state.waiting) {
             // показываем предложение подождать пока обработка закончится
             content.push(<div>
@@ -467,79 +477,78 @@ module.exports = React.createClass({
                 // дальнейшие шаги
                 content.push(<p>If everything is OK then save results. Otherwise, try to tune parser with these options:</p>);
 
+                var available_downloaders = [["feed", "Rss/Atom Feed"],
+                                             ["http", "Single HTML Page"],
+                                             ["rechttp", "Multiple HTML Pages"],
+                                             ["google_play", "Google Play"],
+                                             ["itunes", "Apple AppStore"],
+                                             ["git", "Git Repository"],
+                                             ["hg", "Mercurial Repository"],
+                                             ["github_releases", "GitHub Releases"]];
+                var render_option = function (item) {
+                    return <option value={item[0]} key={item[0]}>{item[1]}</option>;
+                };
+                var options = R.map(render_option, available_downloaders);
+                var on_downloader_change = function(event) {
+                    this.on_field_change(
+                        event,
+                        this.update_preview);
+                }.bind(this);
+                
 
-                var tune_options = [];
+                var change_downloader_panel = (
+<div>
+  <p>Please, select which downloader to use:</p>
+  <select className="downloader-selector"
+          name="downloader"
+          value={this.state.downloader}
+          onChange={on_downloader_change}
+          disabled={this.state.waiting}>
+    {options}
+  </select>
+</div>);
 
-                var show_change_downloader = function() {this.setState({show_change_downloader: true})}.bind(this);
-                var hide_change_downloader = function() {this.setState({show_change_downloader: false})}.bind(this);
-                if (this.state.show_change_downloader) {
-                    var available_downloaders = [["feed", "Rss/Atom Feed"],
-                                                 ["http", "Single HTML Page"],
-                                                 ["rechttp", "Multiple HTML Pages"],
-                                                 ["google_play", "Google Play"],
-                                                 ["itunes", "Apple AppStore"],
-                                                 ["git", "Git Repository"],
-                                                 ["hg", "Mercurial Repository"],
-                                                 ["github_releases", "GitHub Releases"]];
-                    var render_option = function (item) {
-                        return <option value={item[0]} key={item[0]}>{item[1]}</option>;
-                    };
-                    var options = R.map(render_option, available_downloaders);
-                    var on_downloader_change = function(event) {
-                        this.on_field_change(
-                            event,
-                            this.update_preview);
-                    }.bind(this);
-                    tune_options.push(<li>
-                                      <a className="vlink" onClick={hide_change_downloader}>Change downloader type:</a><br/>
-                                      <select className="downloader-selector"
-                                      name="downloader"
-                                      value={this.state.downloader}
-                                      onChange={on_downloader_change}
-                                      disabled={this.state.waiting}>
-                                      {options}
-                                      </select>
-                                      </li>);
-                 } else {
-                    tune_options.push(<li><a className="vlink" onClick={show_change_downloader}>Change downloader type</a></li>);
-                }
+                var tune_parser_panel = (
+<div>
+  <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
+            className="new-package__search-input"
+            name="search_list"
+            onChange={this.on_field_change}
+            disabled={this.state.waiting}
+            value={this.state.search_list}></textarea>
+</div>);
 
-                var show_change_search_list = function() {this.setState({show_change_search_list: true})}.bind(this);
-                var hide_change_search_list = function() {this.setState({show_change_search_list: false})}.bind(this);
-                if (this.state.show_change_search_list) {
-                    tune_options.push(<li>
-                                      <a className="vlink" onClick={hide_change_search_list}>Search in particular file or directory:</a><br/>
-                                      <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
-                                      className="new-package__search-input"
-                                      name="search_list"
-                                      onChange={this.on_field_change}
-                                      disabled={this.state.waiting}
-                                      value={this.state.search_list}></textarea>
-                                      </li>);
-                } else {
-                    tune_options.push(<li><a className="vlink" onClick={show_change_search_list}>Search in particular file or directory</a></li>);
-                }
-
-                content.push(<ul className="tune-options">{tune_options}</ul>);
             }
         }
 
         if (this.state.problem) {
             content.push(<div key="problem" className="changelog-problem" dangerouslySetInnerHTML={{__html: this.state.problem}}></div>);
         }
-        content.push(<div className="changelog-settings__tune">
-                       <ul className="changelog-settings__tabs">
-                         <li className="changelog-settings__tab changelog-settings__active-tab">
-                             <span className="changelog-settings__tab-link" href="">Tune downloader</span>
-                         </li>
-                         <li className="changelog-settings__tab">
-                             <a className="changelog-settings__tab-link" href="">Tune parser</a>
-                         </li>
-                       </ul>
-                       <div className="changelog-settings__tune-content">
-                         Some content
-                       </div>
+
+        if (this.state.results && !this.state.tracked) {
+            content.push(<div className="changelog-settings__tune">
+                     <Tabs>
+                       <TabList>
+                         <Tab>Save</Tab>
+                         <Tab>Change downloader</Tab>
+                         <Tab>Tune parser</Tab>
+                       </TabList>
+
+                     <TabPanel>
+                        {{ save_panel }}
+                     </TabPanel>
+                     
+                       <TabPanel>
+                         {{ change_downloader_panel }}
+                       </TabPanel>
+                       
+                       <TabPanel>
+                         {{ tune_parser_panel }}
+                       </TabPanel>
+                     </Tabs>
                      </div>);
+        }
+                  
         
         return (<div className="package-settings">{content}</div>);
     }

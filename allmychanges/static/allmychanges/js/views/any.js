@@ -1,3 +1,5 @@
+var React = require('react');
+
 var LoginMenu = require('../components/login-menu.js')
 var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')

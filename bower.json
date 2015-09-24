@@ -18,14 +18,13 @@
     "jquery.cookie": "~1.4.1"
   },
   "devDependencies": {
-    "typehead.js": "~0.10.5",
-    "sticky": "~1.0.1",
-    "waypoints": "~3.1.1",
-    "react": "~0.13.2",
-    "pubsub-js": "~1.5.2",
-    "intro.js": "~1.0.0",
+    "cal-heatmap": "~3.5.2",
     "idle.js": "~1.0.0",
+    "intro.js": "~1.0.0",
+    "pubsub-js": "~1.5.2",
     "ramda": "~0.14.0",
-    "cal-heatmap": "~3.5.2"
+    "sticky": "~1.0.1",
+    "typehead.js": "~0.10.5",
+    "waypoints": "~3.1.1"
   }
 }

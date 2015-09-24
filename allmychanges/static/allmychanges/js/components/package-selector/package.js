@@ -1,3 +1,5 @@
+var React = require('react');
+
 TrackButton = require('../track-button.js')
 SkipButton = require('../skip-button.js')
 

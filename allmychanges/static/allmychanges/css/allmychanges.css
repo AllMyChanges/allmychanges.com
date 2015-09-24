@@ -1328,46 +1328,16 @@ a:hover {
 .changelog-settings__tune {
   position: fixed;
   bottom: 0;
-  background: #011c26;
   width: 100%;
   left: 0;
-  min-height: 100px;
+  min-height: 200px;
   padding-left: 100px;
-  padding-top: 10px;
   padding-right: 100px;
+  padding-top: 10px;
   padding-bottom: 10px;
-}
-.changelog-settings__tune-content {
   background: #fff;
-  padding: 10px;
-  margin-right: 200px;
-  border-radius: 5px;
-  min-height: 80px;
-}
-.changelog-settings__tabs {
-  list-style: none;
-  margin-left: 10px;
-}
-.changelog-settings__tab {
-  display: inline-block;
-  margin-right: 20px;
-  padding: 5px 10px;
-}
-.changelog-settings__active-tab {
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  border-bottom: none;
-  color: #011c26;
-  background: #fff;
-}
-.changelog-settings__tab-link {
-  border-bottom: 1px dashed;
-  line-height: 0.95em;
-  color: #f4cb89;
-  text-decoration: none;
-}
-.changelog-settings__active-tab .changelog-settings__tab-link {
-  border-bottom: none;
+  box-sizing: border-box;
+  box-shadow: 0px 0px 20px #808080;
 }
 .packages-list {
   list-style: outside none none;

@@ -1,4 +1,5 @@
-var metrika = require('./metrika.js')
+var React = require('react');
+var metrika = require('./metrika.js');
 
 module.exports = React.createClass({
     getInitialState: function () {

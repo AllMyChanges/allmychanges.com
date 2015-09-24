@@ -1,3 +1,5 @@
+var React = require('react');
+
 // пример использования нотификаций:
 // PubSub.publish('show-info', 'Привет мир!');
 
