@@ -1,15 +1,21 @@
-// тодо:
-// [+] выяснил, что нужно добавить ручку, отдающую статус превью и лог
-// [+] сделать, чтобы вработал выбор даунлоадера
-// [+] после выбора downloader нужно триггерить обновлнеиен changelog
-// [+] не скрывать поля во время работы downloader, а если в результате работы downloader произошла ошибка, то давать поправить настройки
+// новое TODO:
+// [+] после нажатия Save нужно редиректить на страницу пакета
+// [ ] когда меняется namespace или name, надо мгновенно дисейблить кнопку save до окончания валидации
+// на странице changedownloader:
+// [ ] надо показывать только список тех даунлоадеров, что выдал guess
+// [ ] и в выпадушке должен быть выбран текущий downloader
+// [ ] надо добавить кнопку Apply
+// [ ] и по ней запускать обновление ченьджлога и скрывать панель настроек до окончания.
+//
+// Хорошо бы так же сделать:
+// [ ] Анимацию, чтобы панель настроек выезжала снизу
+
+// старое тодо, оставленное для размышлений:
 // [ ] разобраться, почему ошибка для google play не показывается, а для hg или git показывается
 // [ ] выяснить почему для Google play не показывается статус процесса обработки
 // [ ] проверить, как работает search in
 // [ ] добавить exclude
 // [ ] добавить XSLT
-// [ ] после нажатия Save&Track нужно дисейблить кнопку save
-//     и наверное показывать popup.
 // [ ] сделать отображение сообщений, чтобы они
 //     приезжали в ответе на save
 
@@ -31,6 +37,7 @@ module.exports = React.createClass({
         // downloader [this.props.downloader] @add-new
         return {tracked: false,
                 saving: false,
+                validating: false, // выставляется, когда мы ждем проверки namespace и name
                 waiting: false,
                 source: this.props.source,
                 search_list: this.props.search_list || '',
@@ -61,15 +68,11 @@ module.exports = React.createClass({
     },
     can_save: function() {
         var result = (this.state.saving == false
-                   && this.is_apply_button_disabled()
-                   && this.state.namespace_error == '' 
-                   && this.state.name_error == '' 
-                   && this.state.results);
-        return result;
-    },
-    can_track: function() {
-        var result = (this.can_save()
-                   && this.state.tracked == false);
+                      && this.state.validating == false
+                      && this.is_apply_button_disabled()
+                      && this.state.namespace_error == '' 
+                      && this.state.name_error == '' 
+                      && this.state.results);
         return result;
     },
     update_preview: function() {
@@ -131,6 +134,9 @@ module.exports = React.createClass({
 //                      check_and_show_messages();
                 }.bind(this));
     },
+    save_and_redirect: function() {
+        this.save().success(this.redirect);
+    },
     save_and_track: function() {
         // Saving and tracking @package-settings
         this.save().success(function() {
@@ -138,14 +144,12 @@ module.exports = React.createClass({
                 url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
                 method: 'POST',
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-                .success(function() {
-                    this.setState({
-                        tracked: true,
-                        package_url: (
-                            '/p/' + this.state.namespace +
-                              '/' + this.state.name + '/')});
-                }.bind(this));
+                .success(this.redirect);
         });
+    },
+    redirect: function(data) {
+        // Redirecting to package's page @package-settings
+        window.location = data['absolute_uri'];
     },
     is_name_or_namespace_were_changed: function() {
         return ((this.props.name && this.props.name != this.state.name) ||
@@ -163,6 +167,7 @@ module.exports = React.createClass({
     schedule_validation: function () {
         // scheduling namespace or name validation @schedule-validation
         window.clearTimeout(this.validate_namespace_name_timeout);
+        this.setState({validating: true});
         this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
     },
     validate_namespace_and_name: function () {
@@ -182,7 +187,8 @@ module.exports = React.createClass({
                     }
                 }
                 this.setState({namespace_error: namespace_error,
-                               name_error: name_error});
+                               name_error: name_error,
+                               validating: false});
             }.bind(this));
     },
     // draw_table: function() {
@@ -412,8 +418,8 @@ module.exports = React.createClass({
             description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
         }
 
-        var submit_button_disabled = !this.can_track();
-        var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
+        var save_button_disabled = !this.can_save();
+        var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save_and_redirect} disabled={save_button_disabled}/>;
 
         var save_panel = (<div>
                      <div className="input">
