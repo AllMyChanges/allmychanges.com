@@ -47,8 +47,14 @@ def tail_errors():
 def watch_on_static():
     local('node_modules/.bin/gulp')
 
+
+def manage(args=''):
+    local(_get_docker_command('tests.command.allmychanges.com') +
+        '/env/bin/python /app/manage.py ' + args)
+
 def test(args=''):
-    local('nosetests --with-progressive ' + args)
+    local(_get_docker_command('tests.command.allmychanges.com') + (
+        '/env/bin/nosetests ') + args)
 
 def test2(args=''):
     local('nosetests ' + args)

@@ -1,5 +1,3 @@
-var React = require('react');
-
 (function() {
   var CommentList, CommentBox;
   CommentList = React.createClass({

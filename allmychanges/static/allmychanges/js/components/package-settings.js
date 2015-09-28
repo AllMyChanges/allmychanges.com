@@ -1,9 +1,24 @@
 // новое TODO:
+
+// В целом
+// [ ] невозможно сменить URL существующего пакета
+// [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
+// [ ] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
+
+// На табе описания:
 // [+] после нажатия Save нужно редиректить на страницу пакета
-// [ ] когда меняется namespace или name, надо мгновенно дисейблить кнопку save до окончания валидации
+// [+] когда меняется namespace или name, надо мгновенно дисейблить кнопку save до окончания валидации
+// [ ] сохранение по Ctrl-Enter и Cmd+Enter.
+
 // на странице changedownloader:
-// [ ] надо показывать только список тех даунлоадеров, что выдал guess
-// [ ] и в выпадушке должен быть выбран текущий downloader
+// [+] надо показывать только список тех даунлоадеров, что выдал guess
+//     для существующего пакета guess не запускается и превью показывается
+//     сразу, потому что данные копируются из ченьджлога
+//     - поэтому надо для ченьджлога и превью сделать отдельное поле downloaders
+//       со списком guessed downloaders
+//     - и копировать его содержимое в Preview
+//     - а затем использовать для показа списка доступных
+// [+] и в выпадушке должен быть выбран текущий downloader
 // [ ] надо добавить кнопку Apply
 // [ ] и по ней запускать обновление ченьджлога и скрывать панель настроек до окончания.
 //
@@ -344,7 +359,9 @@ module.exports = React.createClass({
         $.get('/v1/previews/' + this.props.preview_id + '/')
             .success(function(data) {
                 // received results about preview state @wait-for-preview
-                this.setState({'log': data.log});
+                this.setState({'log': data.log,
+                               'downloaders': data.downloaders,
+                               'downloader': data.downloader});
 
                 if (data.status == 'processing') {
                     // preview is still in processing status @wait-for-preview
@@ -483,18 +500,24 @@ module.exports = React.createClass({
                 // дальнейшие шаги
                 content.push(<p>If everything is OK then save results. Otherwise, try to tune parser with these options:</p>);
 
-                var available_downloaders = [["feed", "Rss/Atom Feed"],
-                                             ["http", "Single HTML Page"],
-                                             ["rechttp", "Multiple HTML Pages"],
-                                             ["google_play", "Google Play"],
-                                             ["itunes", "Apple AppStore"],
-                                             ["git", "Git Repository"],
-                                             ["hg", "Mercurial Repository"],
-                                             ["github_releases", "GitHub Releases"]];
+                var available_downloaders = {'feed': 'Rss/Atom Feed',
+                                             'http': 'Single HTML Page',
+                                             'rechttp': 'Multiple HTML Pages',
+                                             'google_play': 'Google Play',
+                                             'itunes': 'Apple AppStore',
+                                             'git': 'Git Repository',
+                                             'hg': 'Mercurial Repository',
+                                             'github_releases': 'GitHub Releases'};
                 var render_option = function (item) {
-                    return <option value={item[0]} key={item[0]}>{item[1]}</option>;
-                };
-                var options = R.map(render_option, available_downloaders);
+                    var name = item.name;
+                    if (name == this.state.downloader) {
+                        return <option value={name} key={name} selected>{available_downloaders[name]}</option>;
+                    } else {
+                        return <option value={name} key={name}>{available_downloaders[name]}</option>;
+                    }
+                }.bind(this);
+                
+                var options = R.map(render_option, this.state.downloaders);
                 var on_downloader_change = function(event) {
                     this.on_field_change(
                         event,

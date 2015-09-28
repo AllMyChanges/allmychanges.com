@@ -137,6 +137,7 @@ def schedule_updates(reschedule=False, packages=[]):
 @transaction.atomic
 @wait_chat_threads
 def update_preview_task(preview_id):
+    print 'Update preview task'
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
         try:
@@ -165,6 +166,7 @@ def update_preview_task(preview_id):
 @job('preview', timeout=600)
 @transaction.atomic
 def preview_test_task(preview_id, items):
+    print 'Previwe test task'
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
         try:

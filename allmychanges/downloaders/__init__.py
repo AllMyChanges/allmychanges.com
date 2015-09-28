@@ -33,9 +33,8 @@ def guess_downloaders(source):
     # downloaders to use information from other downloaders
     # this way, we can disable http downloader, if feed
     # downloader was discovered before
-    yield {
-        'name': 'hg',
-    }
+    print 'Guessing downloaders'
+    yield {'name': 'hg'}
     return
     discovered = {}
 

@@ -315,6 +315,11 @@ class Changelog(Downloadable, models.Model):
                                    blank=True,
                                    default='')
     downloader = models.CharField(max_length=20, blank=True, null=True)
+    downloaders = jsonfield.JSONField(
+        default=[],
+        help_text=('JSON with guessed downloaders and their additional meta information.'),
+        blank=True)
+
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
     icon = models.CharField(max_length=1000,
@@ -414,6 +419,7 @@ class Changelog(Downloadable, models.Model):
 
     def create_preview(self, user, light_user, **params):
         params.setdefault('downloader', self.downloader)
+        params.setdefault('downloaders', self.downloaders)
         params.setdefault('source', self.source)
         params.setdefault('search_list', self.search_list)
         params.setdefault('ignore_list', self.ignore_list)
@@ -716,6 +722,10 @@ class Preview(Downloadable, models.Model):
                                help_text='Latest error message',
                                blank=True, null=True)
     downloader = models.CharField(max_length=255, blank=True, null=True)
+    downloaders = jsonfield.JSONField(
+        default=[],
+        help_text=('JSON with guessed downloaders and their additional meta information.'),
+        blank=True)
     done = models.BooleanField(default=False)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)

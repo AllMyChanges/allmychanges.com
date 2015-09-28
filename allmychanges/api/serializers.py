@@ -86,6 +86,8 @@ class PreviewSerializer(ModelSerializer):
     class Meta:
         model = Preview
         fields = (
+            'downloader',
+            'downloaders',
             'resource_uri',
             'status',
             'processing_status',
