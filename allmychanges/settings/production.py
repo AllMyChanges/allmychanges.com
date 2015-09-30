@@ -45,3 +45,5 @@ except OSError:
 
 if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR)
+
+make_db_aliases()

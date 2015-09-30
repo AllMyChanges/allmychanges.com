@@ -134,7 +134,7 @@ def schedule_updates(reschedule=False, packages=[]):
 
 @singletone('preview')
 @job('preview', timeout=600)
-@transaction.atomic
+#@transaction.atomic
 @wait_chat_threads
 def update_preview_task(preview_id):
     print 'Update preview task'
@@ -153,9 +153,16 @@ def update_preview_task(preview_id):
             else:
                 downloaders = [{'name': preview.downloader}]
 
+            preview.downloaders = downloaders
+            print downloaders
+            preview.save(update_fields=('downloaders',))
+
             if downloaders:
                 for downloader in downloaders:
-                    update_preview_or_changelog(preview, downloader['name'])
+                    print 'trying', downloader
+                    found = update_preview_or_changelog(preview, downloader['name'])
+                    if found:
+                        break
             else:
                 preview.set_processing_status('Unable to find downloader for this URL')
         finally:

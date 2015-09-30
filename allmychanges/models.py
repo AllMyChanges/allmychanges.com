@@ -30,7 +30,6 @@ from allmychanges.downloaders import (
 
 from allmychanges.tasks import (
     update_preview_task,
-    preview_test_task,
     update_changelog_task)
 
 
@@ -765,6 +764,7 @@ class Preview(Downloadable, models.Model):
         self.log.append(status)
         self.processing_status = status
         self.updated_at = timezone.now()
+
         self.save(update_fields=('processing_status',
                                  'updated_at',
                                  'log'))

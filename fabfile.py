@@ -4,7 +4,7 @@ def update_requirements():
     local('pip-compile --annotate requirements.in')
     local('pip-compile --annotate requirements-dev.in')
 
-def _get_docker_command(name, ports=[]):
+def _get_docker_command(name, ports=[], image='allmychanges.com:pdb'):
     return ('docker run '
             '--rm '
             '-t -i '
@@ -16,14 +16,18 @@ def _get_docker_command(name, ports=[]):
             '{ports} '
             '-e DEBUG=yes '
             '--name {name} '
-            'allmychanges.com ').format(
+            '{image} ').format(
                 name=name,
+                image=image,
                 ports=' '.join('-p ' + p for p in ports))
 
 def shell():
     local(_get_docker_command('shell.command.allmychanges.com') + (
         '/env/bin/python /app/manage.py '
         ' shell_plus'))
+
+def dbshell():
+    local('docker exec -it mysql.allmychanges.com mysql -ppassword allmychanges')
 
 def runserver():
     local(_get_docker_command('runserver.command.allmychanges.com',
@@ -71,6 +75,10 @@ def coverage():
     local('nosetests --with-coverage --cover-package=allmychanges --cover-html --cover-erase --cover-inclusive --cover-html-dir=static/coverage')
     local('ssh back open http://art.dev.allmychanges.com:8000/static/coverage/index.html')
 
+def start():
+    local('docker start mysql.allmychanges.com')
+    local('docker start redis.allmychanges.com')
 
-def kill_server():
-    local('pkill -f runserver_plus')
+def stop():
+    local('docker rm --force -v rqworker.command.allmychanges.com')
+    local('docker rm --force -v runserver.command.allmychanges.com')

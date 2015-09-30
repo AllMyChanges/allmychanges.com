@@ -34,9 +34,11 @@ from allmychanges.api.serializers import (
     IssueSerializer,
     VersionSerializer,
 )
-from allmychanges.utils import (count,
-                                parse_ints,
-                                join_ints)
+from allmychanges.utils import (
+    count,
+    parse_ints,
+    join_ints,
+    update_fields)
 from allmychanges.source_guesser import guess_source
 
 
@@ -441,8 +443,7 @@ class ChangelogViewSet(HandleExceptionMixin,
         response = super(ChangelogViewSet, self).update(*args, **kwargs)
 
         if self.original_source != self.object.source:
-            self.object.downloader = None
-            self.object.save(update_fields=('downloader',))
+            update_fields(self.object, downloader=None)
 
         if self.object.versions.count() == 0:
             # try to move preview's versions
@@ -554,6 +555,17 @@ class PreviewViewSet(HandleExceptionMixin,
     serializer_detail_class = PreviewSerializer
     model = Preview
 
+    def partial_update(self, *args, **kwargs):
+        super(PreviewViewSet, self).partial_update(*args, **kwargs)
+
+        data = self.request.DATA
+        if 'downloader' in data:
+            update_fields(self.object,
+                          log=[],
+                          downloader=data['downloader'])
+            self.object.schedule_update()
+
+        return Response({'result': 'scheduled'})
 
 # это пока нигде не используется, надо дорабатывать
 # и возможно переносить ручку в changelog/:id/versions

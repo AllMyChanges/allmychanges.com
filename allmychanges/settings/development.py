@@ -55,3 +55,5 @@ ALLOWED_HOSTS = ['localhost',
 
 
 SLACK_URLS = {}
+
+make_db_aliases()

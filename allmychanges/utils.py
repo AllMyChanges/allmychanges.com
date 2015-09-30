@@ -403,3 +403,11 @@ def first_sentences(text, max_length=1000):
         sum_len += sentence_len
 
     raise RuntimeError('Should never go here.')
+
+
+def update_fields(obj, **kwargs):
+    """Updates only fields given in kwargs.
+    """
+    for key, value in kwargs.items():
+        setattr(obj, key, value)
+    obj.save(update_fields=kwargs.keys())

@@ -1,9 +1,20 @@
 // новое TODO:
 
+// На чем закончил:
+// Когда переключаюсь на http downloader, он таймаутится и происходит ошибка
+// при этом в процессе скачивания, downloader ничего не пишет в лог,
+// когда случается ошибка, надо скрывать таб Save
+// но и список даунлоадеров почему-то сбрасывается и остается один только http
+// сброс происходит при установке обишки, видимо
+
 // В целом
 // [ ] невозможно сменить URL существующего пакета
 // [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
 // [ ] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
+// [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
+//     например, если прервать worker.
+// [ ] неудобно - теперь из emacs невозможно почитать или иизменить исходники библиотек, потому что они
+//     внутри env в докере
 
 // На табе описания:
 // [+] после нажатия Save нужно редиректить на страницу пакета
@@ -19,7 +30,10 @@
 //     - и копировать его содержимое в Preview
 //     - а затем использовать для показа списка доступных
 // [+] и в выпадушке должен быть выбран текущий downloader
-// [ ] надо добавить кнопку Apply
+// [+] надо добавить кнопку Apply
+// -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
+// [ ] сделать так, чтобы не сбрасывался список downloaders
+// [ ] если в случае когда changelog не найден скрывался таб Save
 // [ ] и по ней запускать обновление ченьджлога и скрывать панель настроек до окончания.
 //
 // Хорошо бы так же сделать:
@@ -99,6 +113,19 @@ module.exports = React.createClass({
         $.ajax({url: '/preview/' + this.props.preview_id + '/',
                 method: 'POST',
                 data: JSON.stringify(this.preview),
+                contentType: 'application/json',
+                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+            .success(this.update_preview_callback);
+    },
+    apply_downloader_settings: function() {
+        // applying downloader-sttings @apply-downloader-settings
+        this.save_preview_params();
+
+        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
+                method: 'PATCH',
+                data: JSON.stringify({
+                    downloader: this.state.downloader
+                }),
                 contentType: 'application/json',
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
@@ -518,11 +545,12 @@ module.exports = React.createClass({
                 }.bind(this);
                 
                 var options = R.map(render_option, this.state.downloaders);
-                var on_downloader_change = function(event) {
-                    this.on_field_change(
-                        event,
-                        this.update_preview);
-                }.bind(this);
+                // заменено на on_field_change
+                // var on_downloader_change = function(event) {
+                //     this.on_field_change(
+                //         event,
+                //         this.update_preview);
+                // }.bind(this);
                 
 
                 var change_downloader_panel = (
@@ -531,10 +559,11 @@ module.exports = React.createClass({
   <select className="downloader-selector"
           name="downloader"
           value={this.state.downloader}
-          onChange={on_downloader_change}
+          onChange={this.on_field_change}
           disabled={this.state.waiting}>
     {options}
   </select>
+  <input type="submit" className="button _good _large magic-prompt__apply" value="Apply" onClick={this.apply_downloader_settings}/>;
 </div>);
 
                 var tune_parser_panel = (

@@ -1530,6 +1530,9 @@ class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         result = super(CategoriesView, self).get_context_data(**kwargs)
         categories = sorted(set(Changelog.objects.only_active().values_list('namespace', flat=True)))
+
+        categories = filter(None, categories)
+        categories = sorted(categories)
         categories = groupby(categories, lambda item: item[0])
         categories = [(letter, list(names))
                       for letter, names in categories]

@@ -29,12 +29,18 @@ DATABASES = {
         'PORT': '',
     }
 }
-# To keep one connection for reading from server-side corsor
-# and to write to the second
-if not os.environ.get('MIGRATIONS'):
-    DATABASES['server-side'] = DATABASES['default'].copy()
-    DATABASES['server-side']['OPTIONS'] = {
-        'cursorclass': MySQLdb.cursors.SSCursor}
+
+def make_db_aliases():
+    # To keep one connection for reading from server-side corsor
+    # and to write to the second
+    if not os.environ.get('MIGRATIONS'):
+        DATABASES['server-side'] = DATABASES['default'].copy()
+        DATABASES['server-side']['OPTIONS'] = {
+            'cursorclass': MySQLdb.cursors.SSCursor}
+
+        # for parallel transactions
+        DATABASES['parallel'] = DATABASES['default'].copy()
+
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
