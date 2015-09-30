@@ -33,8 +33,9 @@
 // [+] надо добавить кнопку Apply
 // -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
 // [+] сделать так, чтобы не сбрасывался список downloaders
-// [ ] если в случае когда changelog не найден скрывался таб Save
-// [ ] и по ней запускать обновление ченьджлога и скрывать панель настроек до окончания.
+// [+] если в случае когда changelog не найден скрывался таб Save
+// [ ] если changelog не найден, не показывать текст This is the latest versions
+// [ ] если changelog не найден, показывать полный лог, а не только problem
 //
 // Хорошо бы так же сделать:
 // [ ] Анимацию, чтобы панель настроек выезжала снизу
@@ -80,6 +81,7 @@ module.exports = React.createClass({
                 name: this.props.name || '',
                 description: this.props.description || '',
                 name_error: !this.props.namespace && 'Please, fill this field' || '',
+                status: null, // here we store preview's status as it returned by API
                 problem: null,
                 log: []};
     },
@@ -371,6 +373,7 @@ module.exports = React.createClass({
             var problem = '<pre>' + response.responseText + '</pre>';
             
             this.setState({waiting: false,
+                           results: null,
                            problem: problem});
         }.bind(this));
         
@@ -387,6 +390,7 @@ module.exports = React.createClass({
             .success(function(data) {
                 // received results about preview state @wait-for-preview
                 this.setState({'log': data.log,
+                               'status': data.status,
                                'downloaders': data.downloaders,
                                'downloader': data.downloader});
 
@@ -462,6 +466,14 @@ module.exports = React.createClass({
             description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
         }
 
+        var tabs = [];
+        var tab_panels = [];
+
+        var add_tab = function (text, content) {
+            tabs.push(<Tab>{{ text }}</Tab>);
+            tab_panels.push(<TabPanel>{{ content }}</TabPanel>);
+        }
+
         var save_button_disabled = !this.can_save();
         var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save_and_redirect} disabled={save_button_disabled}/>;
 
@@ -500,6 +512,9 @@ module.exports = React.createClass({
 
                      </div>);
 
+        if (this.state.status == 'success') {
+            add_tab('Save', save_panel);
+        }
         
         // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
         if (this.state.waiting) {
@@ -545,13 +560,6 @@ module.exports = React.createClass({
                 }.bind(this);
                 
                 var options = R.map(render_option, this.state.downloaders);
-                // заменено на on_field_change
-                // var on_downloader_change = function(event) {
-                //     this.on_field_change(
-                //         event,
-                //         this.update_preview);
-                // }.bind(this);
-                
 
                 var change_downloader_panel = (
 <div>
@@ -564,7 +572,8 @@ module.exports = React.createClass({
     {options}
   </select>
   <input type="submit" className="button _good _large magic-prompt__apply" value="Apply" onClick={this.apply_downloader_settings}/>;
-</div>);
+                    </div>);
+                add_tab('Change downloader', change_downloader_panel);
 
                 var tune_parser_panel = (
 <div>
@@ -574,7 +583,8 @@ module.exports = React.createClass({
             onChange={this.on_field_change}
             disabled={this.state.waiting}
             value={this.state.search_list}></textarea>
-</div>);
+                        </div>);
+                add_tab('Tune parser', tune_parser_panel);
 
             }
         }
@@ -582,27 +592,13 @@ module.exports = React.createClass({
         if (this.state.problem) {
             content.push(<div key="problem" className="changelog-problem" dangerouslySetInnerHTML={{__html: this.state.problem}}></div>);
         }
-
-        if (this.state.results && !this.state.tracked) {
+        
+        if (this.state.status != 'processing') {
+            // results are [this.state.results] @debug
             content.push(<div className="changelog-settings__tune">
                      <Tabs>
-                       <TabList>
-                         <Tab>Save</Tab>
-                         <Tab>Change downloader</Tab>
-                         <Tab>Tune parser</Tab>
-                       </TabList>
-
-                     <TabPanel>
-                        {{ save_panel }}
-                     </TabPanel>
-                     
-                       <TabPanel>
-                         {{ change_downloader_panel }}
-                       </TabPanel>
-                       
-                       <TabPanel>
-                         {{ tune_parser_panel }}
-                       </TabPanel>
+                       <TabList>{{ tabs }}</TabList>
+                       {{ tab_panels }}
                      </Tabs>
                      </div>);
         }

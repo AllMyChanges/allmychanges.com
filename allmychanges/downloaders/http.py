@@ -64,6 +64,8 @@ def download(source,
     upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
     base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+    # временно, для ускорения отладки
+    return base_path
     base_url = source.replace('rechttp+', '')
     queue = [base_url]
     already_seen = set()

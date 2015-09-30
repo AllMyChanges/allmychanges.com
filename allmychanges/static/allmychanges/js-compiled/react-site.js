@@ -21387,10 +21387,11 @@
 	//     - а затем использовать для показа списка доступных
 	// [+] и в выпадушке должен быть выбран текущий downloader
 	// [+] надо добавить кнопку Apply
-	// -> [ ] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
-	// [ ] если в результате случалась ошибка, то скрывать таб Save
-	// [ ] сделать так, чтобы в случае ошибки не сбрасывался список downloaders
-	// [ ] и по ней запускать обновление ченьджлога и скрывать панель настроек до окончания.
+	// -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
+	// [+] сделать так, чтобы не сбрасывался список downloaders
+	// [+] если в случае когда changelog не найден скрывался таб Save
+	// [ ] если changelog не найден, не показывать текст This is the latest versions
+	// [ ] если changelog не найден, показывать полный лог, а не только problem
 	//
 	// Хорошо бы так же сделать:
 	// [ ] Анимацию, чтобы панель настроек выезжала снизу
@@ -21436,6 +21437,7 @@
 	                name: this.props.name || '',
 	                description: this.props.description || '',
 	                name_error: !this.props.namespace && 'Please, fill this field' || '',
+	                status: null, // here we store preview's status as it returned by API
 	                problem: null,
 	                log: []};
 	    },
@@ -21727,6 +21729,7 @@
 	            var problem = '<pre>' + response.responseText + '</pre>';
 	            
 	            this.setState({waiting: false,
+	                           results: null,
 	                           problem: problem});
 	        }.bind(this));
 	        
@@ -21743,6 +21746,7 @@
 	            .success(function(data) {
 	                UserStory.log(["received results about preview state"], ["wait"]);
 	                this.setState({'log': data.log,
+	                               'status': data.status,
 	                               'downloaders': data.downloaders,
 	                               'downloader': data.downloader});
 
@@ -21818,6 +21822,14 @@
 	            description_error = React.createElement("span", {className: "input__error"}, "Description should be no more than 255 symbols.");
 	        }
 
+	        var tabs = [];
+	        var tab_panels = [];
+
+	        var add_tab = function (text, content) {
+	            tabs.push(React.createElement(Tab, null, { text}));
+	            tab_panels.push(React.createElement(TabPanel, null, { content}));
+	        }
+
 	        var save_button_disabled = !this.can_save();
 	        var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: this.state.save_button_title, onClick: this.save_and_redirect, disabled: save_button_disabled});
 
@@ -21856,6 +21868,9 @@
 
 	                     ));
 
+	        if (this.state.status == 'success') {
+	            add_tab('Save', save_panel);
+	        }
 	        
 	        // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
 	        if (this.state.waiting) {
@@ -21901,13 +21916,6 @@
 	                }.bind(this);
 	                
 	                var options = R.map(render_option, this.state.downloaders);
-	                // заменено на on_field_change
-	                // var on_downloader_change = function(event) {
-	                //     this.on_field_change(
-	                //         event,
-	                //         this.update_preview);
-	                // }.bind(this);
-	                
 
 	                var change_downloader_panel = (
 	React.createElement("div", null, 
@@ -21920,7 +21928,8 @@
 	    options
 	  ), 
 	  React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: "Apply", onClick: this.apply_downloader_settings}), ";"
-	));
+	                    ));
+	                add_tab('Change downloader', change_downloader_panel);
 
 	                var tune_parser_panel = (
 	React.createElement("div", null, 
@@ -21930,7 +21939,8 @@
 	            onChange: this.on_field_change, 
 	            disabled: this.state.waiting, 
 	            value: this.state.search_list})
-	));
+	                        ));
+	                add_tab('Tune parser', tune_parser_panel);
 
 	            }
 	        }
@@ -21938,27 +21948,13 @@
 	        if (this.state.problem) {
 	            content.push(React.createElement("div", {key: "problem", className: "changelog-problem", dangerouslySetInnerHTML: {__html: this.state.problem}}));
 	        }
-
-	        if (this.state.results && !this.state.tracked) {
+	        
+	        if (this.state.status != 'processing') {
+	            UserStory.log(["results are [this.state.results=", this.state.results, "]"], ["debug"]);
 	            content.push(React.createElement("div", {className: "changelog-settings__tune"}, 
 	                     React.createElement(Tabs, null, 
-	                       React.createElement(TabList, null, 
-	                         React.createElement(Tab, null, "Save"), 
-	                         React.createElement(Tab, null, "Change downloader"), 
-	                         React.createElement(Tab, null, "Tune parser")
-	                       ), 
-
-	                     React.createElement(TabPanel, null, 
-	                        { save_panel}
-	                     ), 
-	                     
-	                       React.createElement(TabPanel, null, 
-	                         { change_downloader_panel}
-	                       ), 
-	                       
-	                       React.createElement(TabPanel, null, 
-	                         { tune_parser_panel}
-	                       )
+	                       React.createElement(TabList, null, { tabs}), 
+	                       { tab_panels}
 	                     )
 	                     ));
 	        }
