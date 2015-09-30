@@ -10,7 +10,10 @@ from django.conf import settings
 
 from allmychanges.downloaders.utils import normalize_url
 from allmychanges.downloaders import guess_downloaders
-from allmychanges.utils import count, first_sentences
+from allmychanges.utils import (
+    count,
+    update_fields,
+    first_sentences)
 from allmychanges.notifications import slack
 from allmychanges.changelog_updater import update_preview_or_changelog
 from allmychanges import chat
@@ -150,12 +153,10 @@ def update_preview_task(preview_id):
             if not preview.downloader:
                 preview.set_processing_status('Guessing downloaders')
                 downloaders = list(guess_downloaders(preview.source))
+                update_fields(preview, downloaders=downloaders)
             else:
                 downloaders = [{'name': preview.downloader}]
 
-            preview.downloaders = downloaders
-            print downloaders
-            preview.save(update_fields=('downloaders',))
 
             if downloaders:
                 for downloader in downloaders:

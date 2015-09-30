@@ -224,12 +224,12 @@ class Downloadable(object):
         # downloader должен быть проставлен, я для
         # Preview guess вызывается в другом месте
 
-        if not downloader:
-            downloaders = list(guess_downloaders(self.source))
-            if downloaders:
-                downloader = downloaders[0]['name']
-                self.downloader = downloader
-                self.save(update_fields=('downloader',))
+        # if not downloader:
+        #     downloaders = list(guess_downloaders(self.source))
+        #     if downloaders:
+        #         downloader = downloaders[0]['name']
+        #         self.downloader = downloader
+        #         self.save(update_fields=('downloader',))
 
         download = get_downloader(downloader)
         return download(self.source,
