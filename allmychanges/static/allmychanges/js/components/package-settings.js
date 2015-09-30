@@ -1,11 +1,17 @@
 // новое TODO:
 
 // На чем закончил:
-// Когда переключаюсь на http downloader, он таймаутится и происходит ошибка
-// при этом в процессе скачивания, downloader ничего не пишет в лог,
-// когда случается ошибка, надо скрывать таб Save
-// но и список даунлоадеров почему-то сбрасывается и остается один только http
-// сброс происходит при установке обишки, видимо
+// Вынес куски рендеринга в отдельные функции
+// теперь надо поправить логику
+// она должна быть такая:
+// если status == processing, то показывае лог и всё
+// если status != processing, то
+//   если status == success, то
+//     показываем результаты обработки ченьджлога
+//     показываем таб Save
+//   если status == error
+//     показываем лог
+//   показываем панель с табами
 
 // В целом
 // [ ] невозможно сменить URL существующего пакета
@@ -57,6 +63,149 @@ var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 
 
+var render_tabs = function(tabs, tab_panels) {
+    return (
+        <div className="changelog-settings__tune">
+        <Tabs>
+        <TabList>{{ tabs }}</TabList>
+        {{ tab_panels }}
+        </Tabs>
+        </div>
+   );
+}
+
+var render_problem = function(problem) {
+    return <div key="problem" className="changelog-problem" dangerouslySetInnerHTML={{__html: problem}}></div>
+}
+
+var render_we_are_waiting = function() {
+    // показываем предложение подождать пока обработка закончится
+    return (
+        <div>
+            <div className="progress-text">Please, wait while we search a changelog.</div>
+            <div className="results-spin"><div className="results-spin__wrapper"></div></div>
+        </div>);
+}
+
+var render_log = function(log) {
+    // показываем лог
+    var log_items = [];
+    for (i=0; i< log.length; i++) {
+        log_items.push(<li key={i}>{log[i]}</li>);
+    }
+    return (<ul className="preview-processing-log">{log_items}</ul>);
+}
+
+var render_results = function (results) {
+    // сами результаты
+    return(<div className="changelog-preview-container">
+        <h1>This is the latest versions for this package</h1>
+        <div className="changelog-preview" dangerouslySetInnerHTML={{__html: results}}></div>
+        </div>);
+}
+
+var render_save_panel = function (opts) {
+    // показываем поля для заполнения namespace и name
+    var namespace_error;
+    if (opts.namespace_error) {
+        namespace_error = <span className="input__error">{opts.namespace_error}</span>;
+    }
+    var name_error;
+    if(opts.name_error) {
+        name_error = <span className="input__error">{opts.name_error}</span>;
+    }
+    var description_error;
+    if (opts.description.length > 255) {
+        description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
+    }
+
+    var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={opts.button_title} onClick={opts.on_submit} disabled={opts.disabled}/>;
+
+    var save_panel = (<div>
+        <div className="input">
+        {namespace_error}<br/>
+        <input name="namespace"
+        type="text"
+        placeholder="Namespace (e.g. python, node)"
+        onChange={opts.on_field_change}
+        className="text-input"
+        value={opts.namespace}/>
+        </div>
+
+        <div className="input">
+        {name_error}<br/>
+        <input name="name"
+        type="text"
+        placeholder="Package name"
+        onChange={opts.on_field_change}
+        className="text-input"
+        value={opts.name}/>
+        </div>
+        
+        <div className="input">
+        {description_error}<br/>
+        <input name="description"
+        type="text"
+        placeholder="Describe what it does."
+        onChange={opts.on_field_change}
+        className="text-input"
+        value={opts.description}/>
+        </div>
+
+        <p className="buttons-row">{save_button}</p>
+        </div>);
+    return save_panel;
+}
+
+var render_change_downloader_panel = function (opts) {
+    var available_downloaders = {'feed': 'Rss/Atom Feed',
+                                 'http': 'Single HTML Page',
+                                 'rechttp': 'Multiple HTML Pages',
+                                 'google_play': 'Google Play',
+                                 'itunes': 'Apple AppStore',
+                                 'git': 'Git Repository',
+                                 'hg': 'Mercurial Repository',
+                                 'github_releases': 'GitHub Releases'};
+    var render_option = function (item) {
+        var name = item.name;
+        if (name == opts.downloader) {
+            return <option value={name} key={name} selected>{available_downloaders[name]}</option>;
+        } else {
+            return <option value={name} key={name}>{available_downloaders[name]}</option>;
+        }
+    };
+    
+    var options = R.map(render_option, opts.downloaders);
+    
+    var change_downloader_panel = (
+        <div>
+        <p>Please, select which downloader to use:</p>
+        <select className="downloader-selector"
+        name="downloader"
+        value={opts.downloader}
+        onChange={opts.on_field_change}
+        disabled={opts.disabled}>
+        {options}
+        </select>
+        <input type="submit" className="button _good _large magic-prompt__apply" value="Apply" onClick={opts.on_submit}/>;
+        </div>);
+
+    return change_downloader_panel;
+}
+
+var render_tune_parser_panel = function(opts) {
+    return (
+        <div>
+        <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
+            className="new-package__search-input"
+        name="search_list"
+        onChange={opts.on_field_change}
+        disabled={opts.disabled}
+        value={opts.value}></textarea>
+        </div>);
+}
+
+
 module.exports = React.createClass({
     // this field keeps state for which preview was generated
     preview: {},
@@ -76,6 +225,7 @@ module.exports = React.createClass({
                 results: null,
                 save_button_title: ((this.props.mode == 'edit') ? 'Save' : 'Save&Track'),
                 downloader: this.props.downloader,
+                downloaders: [],
                 namespace: this.props.namespace || '',
                 namespace_error: !this.props.namespace && 'Please, fill this field' || '',
                 name: this.props.name || '',
@@ -235,132 +385,6 @@ module.exports = React.createClass({
                                validating: false});
             }.bind(this));
     },
-    // draw_table: function() {
-    //     var xslt_editing_fields = [
-    //             <tr><td className="new-package__xslt-label">XSLT mighty feature!</td></tr>,
-    //             <tr>
-    //               <td className="new-package__xslt-wrap">
-    //                 <textarea placeholder="Behold XSLT's mighty power!"
-    //                           className="new-package__xslt-input" name="xslt"
-    //                           onChange={this.on_field_change}
-    //                           disabled={this.state.waiting} value={this.state.xslt}></textarea></td>
-    //             </tr>];
-    //     if (username != 'svetlyak40wt') {
-    //         xslt_editing_fields = [];
-    //     }
-
-    //     var save_callback;
-    //     var submit_button_disabled = !this.can_track();
-
-    //     if (this.props.mode == 'edit') {
-    //         save_callback = this.save;
-    //     } else {
-    //         save_callback = this.save_and_track;
-    //     }
-    //     var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save} disabled={submit_button_disabled}/>;
-
-    //     var save_tooltip;
-    //     if (!this.is_apply_button_disabled()) {
-    //         save_tooltip = <span className="new-package__save-tooltip">Please, update preview to ensure that we able to get a changelog for this package.</span>;
-    //     }
-
-    //     var broken_links_warning;
-    //     if (this.is_name_or_namespace_were_changed()) {
-    //             broken_links_warning = (
-    //                     <tr>
-    //                       <td className="new-package__rename-warning" colspan="2">
-    //                         Beware, renaming this package will broke all links to this package!
-    //                       </td>
-    //                     </tr>);
-    //     }
-    //     var namespace_error;
-    //     if (this.state.namespace_error) {
-    //         namespace_error = <span className="input__error">{this.state.namespace_error}</span>;
-    //     }
-    //     var name_error;
-    //     if(this.state.name_error) {
-    //         name_error = <span className="input__error">{this.state.name_error}</span>;
-    //     }
-    //     var description_error;
-    //     if (this.state.description_error) {
-    //         description_error = <span className="input__error">{this.state.description_error}</span>;
-    //     }
-
-    //     var content = (<table className="new-package__fields-table">
-    //    <tr>
-    //     <td className="new-package__namespace-name-cell">
-    //       <table className="namespace-name-cell__table">
-    //         <tr>
-    //           <td className="namespace-name-cell__namespace-cell">
-    //             <div className="input">
-    //               {namespace_error}<br/>
-    //               <input name="namespace" type="text"
-    //                      placeholder="Namespace (e.g. python, node)"
-    //                      onChange={this.on_field_change}
-    //                      className="text-input" value={this.state.namespace}/>
-    //             </div>
-    //           </td>
-    //        </tr>
-    //        <tr>
-    //           <td className="namespace-name-cell__name-cell">
-    //             <div className="input">
-    //               {name_error}<br/>
-    //               <input name="name" type="text"
-    //                      placeholder="Package name"
-    //                      onChange={this.on_field_change}
-    //                      className="text-input" value={this.state.name}/>
-    //             </div>
-    //           </td>
-    //         </tr>
-    //         {broken_links_warning}
-    //       </table>
-    //     </td>
-    //     <td className="new-package__button-cell">
-    //     </td>
-    //    </tr>
-    //    <tr>
-    //      <td className="new-package__description-cell">
-    //        <div className="input">
-    //          {description_error}<br/>
-    //          <input name="description" type="text"
-    //                 placeholder="Tell us what it does"
-    //                 onChange={this.on_field_change}
-    //                 className="text-input" value={this.state.description}/>
-    //        </div>
-    //      </td>
-    //    </tr>
-    //    <tr>
-    //      <td className="new-package__search-label">Search in these dirs and files:</td>
-    //    </tr>
-    //    <tr>
-    //      <td className="new-package__search-input-wrap">
-    //          <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
-    //                    className="new-package__search-input" name="search_list"
-    //                    onChange={this.on_field_change}
-    //                    disabled={this.state.waiting} value={this.state.search_list}></textarea></td>
-    //    </tr>
-    //    <tr>
-    //      <td className="new-package__ignore-label">Ignore these dirs and files:</td>
-    //    </tr>
-    //    <tr>
-    //      <td className="new-package__ignore-input-wrap">
-    //          <textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places."
-    //                    className="new-package__ignore-input" name="ignore_list"
-    //                    onChange={this.on_field_change}
-    //                    disabled={this.state.waiting} value={this.state.ignore_list}></textarea></td>
-    //    </tr>
-    //    {xslt_editing_fields}
-    //    <tr>
-    //     <td className="new-package__button-cell">
-    //       <input type="submit" className="button _large magic-prompt__apply" value="Update Preview" onClick={this.update_preview} disabled={this.is_apply_button_disabled()}/>
-    //       {save_button}
-    //       {save_tooltip}
-    //     </td>
-    //    </tr>
-    //  </table>);
-
-    //  return content;
-    // },
     fetch_rendered_preview: function() {
         var promice = $.get('/preview/' + this.props.preview_id + '/')
         promice.success(function(data) {
@@ -419,11 +443,6 @@ module.exports = React.createClass({
         this.setState({waiting: true,
                        results: null,
                        problem: false})
-        // $scope.orig_search_list = $scope.search_list;
-        // $scope.orig_ignore_list = $scope.ignore_list;
-        // $scope.orig_xslt = $scope.xslt;
-        // $scope.orig_changelog_source = $scope.changelog_source;
-
         this.wait_for_preview();
     },
     render: function() {
@@ -452,151 +471,59 @@ module.exports = React.createClass({
         // }
 
 
-        // показываем поля для заполнения namespace и name
-        var namespace_error;
-        if (this.state.namespace_error) {
-            namespace_error = <span className="input__error">{this.state.namespace_error}</span>;
-        }
-        var name_error;
-        if(this.state.name_error) {
-            name_error = <span className="input__error">{this.state.name_error}</span>;
-        }
-        var description_error;
-        if (this.state.description.length > 255) {
-            description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
-        }
-
         var tabs = [];
         var tab_panels = [];
 
         var add_tab = function (text, content) {
-            tabs.push(<Tab>{{ text }}</Tab>);
-            tab_panels.push(<TabPanel>{{ content }}</TabPanel>);
+            tabs.push(<Tab>{ text }</Tab>);
+            tab_panels.push(<TabPanel>{ content }</TabPanel>);
         }
 
-        var save_button_disabled = !this.can_save();
-        var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={this.state.save_button_title} onClick={this.save_and_redirect} disabled={save_button_disabled}/>;
-
-        var save_panel = (<div>
-                     <div className="input">
-                     {namespace_error}<br/>
-                     <input name="namespace"
-                     type="text"
-                     placeholder="Namespace (e.g. python, node)"
-                     onChange={this.on_field_change}
-                     className="text-input"
-                     value={this.state.namespace}/>
-                     </div>
-
-                     <div className="input">
-                     {name_error}<br/>
-                     <input name="name"
-                     type="text"
-                     placeholder="Package name"
-                     onChange={this.on_field_change}
-                     className="text-input"
-                     value={this.state.name}/>
-                     </div>
-                     <div className="input">
-                     {description_error}<br/>
-                     <input name="description"
-                     type="text"
-                     placeholder="Describe what it does."
-                     onChange={this.on_field_change}
-                     className="text-input"
-                     value={this.state.description}/>
-                          </div>
-
-                          <p className="buttons-row">{save_button}</p>
-
-
-                     </div>);
-
         if (this.state.status == 'success') {
-            add_tab('Save', save_panel);
+            add_tab('Save', render_save_panel({
+                disabled: !this.can_save(),
+                button_title: this.state.save_button_title,
+                on_submit: this.save_and_redirect,
+                namespace_error: this.state.namespace_error,
+                name_error: this.state.name_error,
+                description: this.state.description,
+                on_field_change: this.on_field_change,
+                namespace: this.state.namespace,
+                name: this.state.name,
+            }));
         }
         
         // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
         if (this.state.waiting) {
-            // показываем предложение подождать пока обработка закончится
-            content.push(<div>
-                             <div className="progress-text">Please, wait while we search a changelog.</div>
-                             <div className="results-spin"><div className="results-spin__wrapper"></div></div>
-                         </div>);
-            
-            // показываем лог
-            var log_items = [];
-            for (i=0; i< this.state.log.length; i++) {
-                log_items.push(<li key={i}>{this.state.log[i]}</li>);
-            }
-            content.push(<ul class="preview-processing-log">{log_items}</ul>);
-
+            content.push(render_we_are_waiting());
+            content.push(render_log(this.state.log));
         } else {
             if (this.state.status == 'success') {
-                // сами результаты
-                content.push(<div className="changelog-preview-container">
-                                 <h1>This is the latest versions for this package</h1>
-                                 <div className="changelog-preview" dangerouslySetInnerHTML={{__html: this.state.results}}></div>
-                             </div>);
-
+                content.push(render_results(this.state.results));
             }
-            var available_downloaders = {'feed': 'Rss/Atom Feed',
-                                         'http': 'Single HTML Page',
-                                         'rechttp': 'Multiple HTML Pages',
-                                         'google_play': 'Google Play',
-                                         'itunes': 'Apple AppStore',
-                                         'git': 'Git Repository',
-                                         'hg': 'Mercurial Repository',
-                                         'github_releases': 'GitHub Releases'};
-            var render_option = function (item) {
-                var name = item.name;
-                if (name == this.state.downloader) {
-                    return <option value={name} key={name} selected>{available_downloaders[name]}</option>;
-                } else {
-                    return <option value={name} key={name}>{available_downloaders[name]}</option>;
-                }
-            }.bind(this);
-            
-            var options = R.map(render_option, this.state.downloaders);
-            
-            var change_downloader_panel = (
-<div>
-  <p>Please, select which downloader to use:</p>
-  <select className="downloader-selector"
-          name="downloader"
-          value={this.state.downloader}
-          onChange={this.on_field_change}
-          disabled={this.state.waiting}>
-    {options}
-  </select>
-  <input type="submit" className="button _good _large magic-prompt__apply" value="Apply" onClick={this.apply_downloader_settings}/>;
-                    </div>);
-            add_tab('Change downloader', change_downloader_panel);
+            add_tab('Change downloader',
+                    render_change_downloader_panel({
+                        downloader: this.state.downloader,
+                        downloaders: this.state.downloaders,
+                        on_field_change: this.on_field_change,
+                        on_submit: this.apply_downloader_settings,
+                        disabled: this.state.waiting
+                    }));
 
-            var tune_parser_panel = (
-<div>
-  <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
-            className="new-package__search-input"
-            name="search_list"
-            onChange={this.on_field_change}
-            disabled={this.state.waiting}
-            value={this.state.search_list}></textarea>
-                        </div>);
-            add_tab('Tune parser', tune_parser_panel);
+            add_tab('Tune parser',
+                    render_tune_parser_panel({
+                        on_field_change: this.on_field_change,
+                        disabled: this.state.waiting,
+                        value: this.state.search_list
+                    }));
         }
 
         if (this.state.problem) {
-            content.push(<div key="problem" className="changelog-problem" dangerouslySetInnerHTML={{__html: this.state.problem}}></div>);
+            content.push(render_problem(this.state.problem));
         }
         
         if (this.state.status != 'processing') {
-            // results are [this.state.results] @debug
-            content.push(<div className="changelog-settings__tune">
-                     <Tabs>
-                       <TabList>{{ tabs }}</TabList>
-                       {{ tab_panels }}
-                     </Tabs>
-                     </div>);
+            content.push(render_tabs(tabs, tab_panels));
         }
                   
         
