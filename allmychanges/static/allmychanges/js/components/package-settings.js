@@ -532,36 +532,34 @@ module.exports = React.createClass({
             content.push(<ul class="preview-processing-log">{log_items}</ul>);
 
         } else {
-            if (this.state.results && !this.state.tracked) {
+            if (this.state.status == 'success') {
                 // сами результаты
                 content.push(<div className="changelog-preview-container">
                                  <h1>This is the latest versions for this package</h1>
                                  <div className="changelog-preview" dangerouslySetInnerHTML={{__html: this.state.results}}></div>
                              </div>);
 
-                // дальнейшие шаги
-                content.push(<p>If everything is OK then save results. Otherwise, try to tune parser with these options:</p>);
-
-                var available_downloaders = {'feed': 'Rss/Atom Feed',
-                                             'http': 'Single HTML Page',
-                                             'rechttp': 'Multiple HTML Pages',
-                                             'google_play': 'Google Play',
-                                             'itunes': 'Apple AppStore',
-                                             'git': 'Git Repository',
-                                             'hg': 'Mercurial Repository',
-                                             'github_releases': 'GitHub Releases'};
-                var render_option = function (item) {
-                    var name = item.name;
-                    if (name == this.state.downloader) {
-                        return <option value={name} key={name} selected>{available_downloaders[name]}</option>;
-                    } else {
-                        return <option value={name} key={name}>{available_downloaders[name]}</option>;
-                    }
-                }.bind(this);
-                
-                var options = R.map(render_option, this.state.downloaders);
-
-                var change_downloader_panel = (
+            }
+            var available_downloaders = {'feed': 'Rss/Atom Feed',
+                                         'http': 'Single HTML Page',
+                                         'rechttp': 'Multiple HTML Pages',
+                                         'google_play': 'Google Play',
+                                         'itunes': 'Apple AppStore',
+                                         'git': 'Git Repository',
+                                         'hg': 'Mercurial Repository',
+                                         'github_releases': 'GitHub Releases'};
+            var render_option = function (item) {
+                var name = item.name;
+                if (name == this.state.downloader) {
+                    return <option value={name} key={name} selected>{available_downloaders[name]}</option>;
+                } else {
+                    return <option value={name} key={name}>{available_downloaders[name]}</option>;
+                }
+            }.bind(this);
+            
+            var options = R.map(render_option, this.state.downloaders);
+            
+            var change_downloader_panel = (
 <div>
   <p>Please, select which downloader to use:</p>
   <select className="downloader-selector"
@@ -573,9 +571,9 @@ module.exports = React.createClass({
   </select>
   <input type="submit" className="button _good _large magic-prompt__apply" value="Apply" onClick={this.apply_downloader_settings}/>;
                     </div>);
-                add_tab('Change downloader', change_downloader_panel);
+            add_tab('Change downloader', change_downloader_panel);
 
-                var tune_parser_panel = (
+            var tune_parser_panel = (
 <div>
   <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
             className="new-package__search-input"
@@ -584,9 +582,7 @@ module.exports = React.createClass({
             disabled={this.state.waiting}
             value={this.state.search_list}></textarea>
                         </div>);
-                add_tab('Tune parser', tune_parser_panel);
-
-            }
+            add_tab('Tune parser', tune_parser_panel);
         }
 
         if (this.state.problem) {

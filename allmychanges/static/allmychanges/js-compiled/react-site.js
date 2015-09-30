@@ -21888,36 +21888,34 @@
 	            content.push(React.createElement("ul", {class: "preview-processing-log"}, log_items));
 
 	        } else {
-	            if (this.state.results && !this.state.tracked) {
+	            if (this.state.status == 'success') {
 	                // сами результаты
 	                content.push(React.createElement("div", {className: "changelog-preview-container"}, 
 	                                 React.createElement("h1", null, "This is the latest versions for this package"), 
 	                                 React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: this.state.results}})
 	                             ));
 
-	                // дальнейшие шаги
-	                content.push(React.createElement("p", null, "If everything is OK then save results. Otherwise, try to tune parser with these options:"));
-
-	                var available_downloaders = {'feed': 'Rss/Atom Feed',
-	                                             'http': 'Single HTML Page',
-	                                             'rechttp': 'Multiple HTML Pages',
-	                                             'google_play': 'Google Play',
-	                                             'itunes': 'Apple AppStore',
-	                                             'git': 'Git Repository',
-	                                             'hg': 'Mercurial Repository',
-	                                             'github_releases': 'GitHub Releases'};
-	                var render_option = function (item) {
-	                    var name = item.name;
-	                    if (name == this.state.downloader) {
-	                        return React.createElement("option", {value: name, key: name, selected: true}, available_downloaders[name]);
-	                    } else {
-	                        return React.createElement("option", {value: name, key: name}, available_downloaders[name]);
-	                    }
-	                }.bind(this);
-	                
-	                var options = R.map(render_option, this.state.downloaders);
-
-	                var change_downloader_panel = (
+	            }
+	            var available_downloaders = {'feed': 'Rss/Atom Feed',
+	                                         'http': 'Single HTML Page',
+	                                         'rechttp': 'Multiple HTML Pages',
+	                                         'google_play': 'Google Play',
+	                                         'itunes': 'Apple AppStore',
+	                                         'git': 'Git Repository',
+	                                         'hg': 'Mercurial Repository',
+	                                         'github_releases': 'GitHub Releases'};
+	            var render_option = function (item) {
+	                var name = item.name;
+	                if (name == this.state.downloader) {
+	                    return React.createElement("option", {value: name, key: name, selected: true}, available_downloaders[name]);
+	                } else {
+	                    return React.createElement("option", {value: name, key: name}, available_downloaders[name]);
+	                }
+	            }.bind(this);
+	            
+	            var options = R.map(render_option, this.state.downloaders);
+	            
+	            var change_downloader_panel = (
 	React.createElement("div", null, 
 	  React.createElement("p", null, "Please, select which downloader to use:"), 
 	  React.createElement("select", {className: "downloader-selector", 
@@ -21929,9 +21927,9 @@
 	  ), 
 	  React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: "Apply", onClick: this.apply_downloader_settings}), ";"
 	                    ));
-	                add_tab('Change downloader', change_downloader_panel);
+	            add_tab('Change downloader', change_downloader_panel);
 
-	                var tune_parser_panel = (
+	            var tune_parser_panel = (
 	React.createElement("div", null, 
 	  React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
 	            className: "new-package__search-input", 
@@ -21940,9 +21938,7 @@
 	            disabled: this.state.waiting, 
 	            value: this.state.search_list})
 	                        ));
-	                add_tab('Tune parser', tune_parser_panel);
-
-	            }
+	            add_tab('Tune parser', tune_parser_panel);
 	        }
 
 	        if (this.state.problem) {
