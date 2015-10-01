@@ -1,13 +1,18 @@
 // новое TODO:
 
 // На чем закончил:
+// выписал, что надо сделать на странице настройки парсера
 
 // В целом
 // [ ] невозможно сменить URL существующего пакета
-// [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
 // [ ] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
 // [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 //     например, если прервать worker.
+// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
+// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
+
+// Не относящееся к странице
+// [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
 // [ ] неудобно - теперь из emacs невозможно почитать или иизменить исходники библиотек, потому что они
 //     внутри env в докере
 
@@ -15,6 +20,7 @@
 // [+] после нажатия Save нужно редиректить на страницу пакета
 // [+] когда меняется namespace или name, надо мгновенно дисейблить кнопку save до окончания валидации
 // [ ] сохранение по Ctrl-Enter и Cmd+Enter.
+// [ ] сделать так, чтобы таб был пониже, описания ошибок спрятать внутрь полей
 
 // на странице changedownloader:
 // [+] надо показывать только список тех даунлоадеров, что выдал guess
@@ -31,7 +37,16 @@
 // [+] если в случае когда changelog не найден скрывался таб Save
 // [+] если changelog не найден, не показывать текст This is the latest versions
 // [+] если changelog не найден, показывать полный лог, а не только problem
-//
+// [ ] надо сделать отбивку кнопки Apply
+
+// На табе Tune Parser:
+// Что показывать:
+// Search in
+// Exclude
+// XSLT потом надо сделать так, чтобы их можно было указывать много, и они применялись для файлов по маске
+// SED  то же самое
+
+
 // Хорошо бы так же сделать:
 // [ ] Анимацию, чтобы панель настроек выезжала снизу
 
@@ -172,7 +187,7 @@ var render_change_downloader_panel = function (opts) {
         disabled={opts.disabled}>
         {options}
         </select>
-        <input type="submit" className="button _good _large magic-prompt__apply" value="Apply" onClick={opts.on_submit}/>;
+        <input type="submit" className="button _good" value="Apply" onClick={opts.on_submit}/>
         </div>);
 
     return change_downloader_panel;
