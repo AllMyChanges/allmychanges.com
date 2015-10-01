@@ -1,17 +1,6 @@
 // новое TODO:
 
 // На чем закончил:
-// Вынес куски рендеринга в отдельные функции
-// теперь надо поправить логику
-// она должна быть такая:
-// если status == processing, то показывае лог и всё
-// если status != processing, то
-//   если status == success, то
-//     показываем результаты обработки ченьджлога
-//     показываем таб Save
-//   если status == error
-//     показываем лог
-//   показываем панель с табами
 
 // В целом
 // [ ] невозможно сменить URL существующего пакета
@@ -40,8 +29,8 @@
 // -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
 // [+] сделать так, чтобы не сбрасывался список downloaders
 // [+] если в случае когда changelog не найден скрывался таб Save
-// [ ] если changelog не найден, не показывать текст This is the latest versions
-// [ ] если changelog не найден, показывать полный лог, а не только problem
+// [+] если changelog не найден, не показывать текст This is the latest versions
+// [+] если changelog не найден, показывать полный лог, а не только problem
 //
 // Хорошо бы так же сделать:
 // [ ] Анимацию, чтобы панель настроек выезжала снизу
@@ -65,23 +54,19 @@ var TabPanel = ReactTabs.TabPanel;
 
 var render_tabs = function(tabs, tab_panels) {
     return (
-        <div className="changelog-settings__tune">
+        <div key="tune" className="changelog-settings__tune">
         <Tabs>
-        <TabList>{{ tabs }}</TabList>
-        {{ tab_panels }}
+        <TabList>{ tabs }</TabList>
+        { tab_panels }
         </Tabs>
         </div>
    );
 }
 
-var render_problem = function(problem) {
-    return <div key="problem" className="changelog-problem" dangerouslySetInnerHTML={{__html: problem}}></div>
-}
-
 var render_we_are_waiting = function() {
     // показываем предложение подождать пока обработка закончится
     return (
-        <div>
+        <div key="waiting">
             <div className="progress-text">Please, wait while we search a changelog.</div>
             <div className="results-spin"><div className="results-spin__wrapper"></div></div>
         </div>);
@@ -93,12 +78,12 @@ var render_log = function(log) {
     for (i=0; i< log.length; i++) {
         log_items.push(<li key={i}>{log[i]}</li>);
     }
-    return (<ul className="preview-processing-log">{log_items}</ul>);
+    return (<ul key="log" className="preview-processing-log">{log_items}</ul>);
 }
 
 var render_results = function (results) {
     // сами результаты
-    return(<div className="changelog-preview-container">
+    return(<div key="results" className="changelog-preview-container">
         <h1>This is the latest versions for this package</h1>
         <div className="changelog-preview" dangerouslySetInnerHTML={{__html: results}}></div>
         </div>);
@@ -121,7 +106,7 @@ var render_save_panel = function (opts) {
 
     var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={opts.button_title} onClick={opts.on_submit} disabled={opts.disabled}/>;
 
-    var save_panel = (<div>
+    var save_panel = (<div key="save-panel">
         <div className="input">
         {namespace_error}<br/>
         <input name="namespace"
@@ -178,7 +163,7 @@ var render_change_downloader_panel = function (opts) {
     var options = R.map(render_option, opts.downloaders);
     
     var change_downloader_panel = (
-        <div>
+        <div key="downloader-panel">
         <p>Please, select which downloader to use:</p>
         <select className="downloader-selector"
         name="downloader"
@@ -195,7 +180,7 @@ var render_change_downloader_panel = function (opts) {
 
 var render_tune_parser_panel = function(opts) {
     return (
-        <div>
+        <div key="parser-panel">
         <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
             className="new-package__search-input"
         name="search_list"
@@ -449,58 +434,48 @@ module.exports = React.createClass({
 
         var content = [];
         var next_actions = [];
-//        if (this.props.mode == 'edit') {
+
         content.push(<input name="changelog_source"
+                     key="source"
                      type="text"
                      placeholder="Changelog&#39;s source URL"
                      className="text-input"
-                     value={this.state.source}/>);
-        // } else {
-        //     if (this.state.tracked) {
-        //       content.push(<p className="plate">Horay! The package was added and is available <a href="/p/{this.props.namespace}}/{{this.props.name}}/">on a separate page</a>.</p>);
-        //     } else {
-
-            
-        //    if (username == "" && this.state.tracked) {
-        //        content.push(<p className="plate plate_warning">To continue tracking of this package, please, login through <a href="{login_url_github}">GitHub</a> or <a href="{login_url_twitter}">Twitter</a>.</p>);
-        //    }
-        // }
-
-        // if (!this.state.tracked) {
-        //     content = content.concat(this.draw_table());
-        // }
-
+                     value={this.state.source}
+                     onChange={this.on_field_change}/>);
 
         var tabs = [];
         var tab_panels = [];
 
         var add_tab = function (text, content) {
             tabs.push(<Tab>{ text }</Tab>);
-            tab_panels.push(<TabPanel>{ content }</TabPanel>);
+            tab_panels.push(<TabPanel key={ text }>{ content }</TabPanel>);
         }
 
-        if (this.state.status == 'success') {
-            add_tab('Save', render_save_panel({
-                disabled: !this.can_save(),
-                button_title: this.state.save_button_title,
-                on_submit: this.save_and_redirect,
-                namespace_error: this.state.namespace_error,
-                name_error: this.state.name_error,
-                description: this.state.description,
-                on_field_change: this.on_field_change,
-                namespace: this.state.namespace,
-                name: this.state.name,
-            }));
-        }
-        
-        // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
-        if (this.state.waiting) {
+        var status = this.state.status;
+
+        if (status == 'processing') {
             content.push(render_we_are_waiting());
             content.push(render_log(this.state.log));
         } else {
-            if (this.state.status == 'success') {
+            if (status == 'success') {
                 content.push(render_results(this.state.results));
+
+                add_tab('Save', render_save_panel({
+                    disabled: !this.can_save(),
+                    button_title: this.state.save_button_title,
+                    on_submit: this.save_and_redirect,
+                    namespace_error: this.state.namespace_error,
+                    name_error: this.state.name_error,
+                    description: this.state.description,
+                    on_field_change: this.on_field_change,
+                    namespace: this.state.namespace,
+                    name: this.state.name,
+                }));
             }
+            if (status == 'error') {
+                content.push(render_log(this.state.log));
+            }
+
             add_tab('Change downloader',
                     render_change_downloader_panel({
                         downloader: this.state.downloader,
@@ -516,16 +491,9 @@ module.exports = React.createClass({
                         disabled: this.state.waiting,
                         value: this.state.search_list
                     }));
-        }
 
-        if (this.state.problem) {
-            content.push(render_problem(this.state.problem));
-        }
-        
-        if (this.state.status != 'processing') {
             content.push(render_tabs(tabs, tab_panels));
         }
-                  
         
         return (<div className="package-settings">{content}</div>);
     }

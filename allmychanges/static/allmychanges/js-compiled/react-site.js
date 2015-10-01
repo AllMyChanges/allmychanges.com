@@ -21357,17 +21357,6 @@
 	// новое TODO:
 
 	// На чем закончил:
-	// Вынес куски рендеринга в отдельные функции
-	// теперь надо поправить логику
-	// она должна быть такая:
-	// если status == processing, то показывае лог и всё
-	// если status != processing, то
-	//   если status == success, то
-	//     показываем результаты обработки ченьджлога
-	//     показываем таб Save
-	//   если status == error
-	//     показываем лог
-	//   показываем панель с табами
 
 	// В целом
 	// [ ] невозможно сменить URL существующего пакета
@@ -21396,8 +21385,8 @@
 	// -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
 	// [+] сделать так, чтобы не сбрасывался список downloaders
 	// [+] если в случае когда changelog не найден скрывался таб Save
-	// [ ] если changelog не найден, не показывать текст This is the latest versions
-	// [ ] если changelog не найден, показывать полный лог, а не только problem
+	// [+] если changelog не найден, не показывать текст This is the latest versions
+	// [+] если changelog не найден, показывать полный лог, а не только problem
 	//
 	// Хорошо бы так же сделать:
 	// [ ] Анимацию, чтобы панель настроек выезжала снизу
@@ -21421,23 +21410,19 @@
 
 	var render_tabs = function(tabs, tab_panels) {
 	    return (
-	        React.createElement("div", {className: "changelog-settings__tune"}, 
+	        React.createElement("div", {key: "tune", className: "changelog-settings__tune"}, 
 	        React.createElement(Tabs, null, 
-	        React.createElement(TabList, null, { tabs}), 
-	        { tab_panels}
+	        React.createElement(TabList, null,  tabs ), 
+	         tab_panels 
 	        )
 	        )
 	   );
 	}
 
-	var render_problem = function(problem) {
-	    return React.createElement("div", {key: "problem", className: "changelog-problem", dangerouslySetInnerHTML: {__html: problem}})
-	}
-
 	var render_we_are_waiting = function() {
 	    // показываем предложение подождать пока обработка закончится
 	    return (
-	        React.createElement("div", null, 
+	        React.createElement("div", {key: "waiting"}, 
 	            React.createElement("div", {className: "progress-text"}, "Please, wait while we search a changelog."), 
 	            React.createElement("div", {className: "results-spin"}, React.createElement("div", {className: "results-spin__wrapper"}))
 	        ));
@@ -21449,12 +21434,12 @@
 	    for (i=0; i< log.length; i++) {
 	        log_items.push(React.createElement("li", {key: i}, log[i]));
 	    }
-	    return (React.createElement("ul", {className: "preview-processing-log"}, log_items));
+	    return (React.createElement("ul", {key: "log", className: "preview-processing-log"}, log_items));
 	}
 
 	var render_results = function (results) {
 	    // сами результаты
-	    return(React.createElement("div", {className: "changelog-preview-container"}, 
+	    return(React.createElement("div", {key: "results", className: "changelog-preview-container"}, 
 	        React.createElement("h1", null, "This is the latest versions for this package"), 
 	        React.createElement("div", {className: "changelog-preview", dangerouslySetInnerHTML: {__html: results}})
 	        ));
@@ -21477,7 +21462,7 @@
 
 	    var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: opts.button_title, onClick: opts.on_submit, disabled: opts.disabled});
 
-	    var save_panel = (React.createElement("div", null, 
+	    var save_panel = (React.createElement("div", {key: "save-panel"}, 
 	        React.createElement("div", {className: "input"}, 
 	        namespace_error, React.createElement("br", null), 
 	        React.createElement("input", {name: "namespace", 
@@ -21534,7 +21519,7 @@
 	    var options = R.map(render_option, opts.downloaders);
 	    
 	    var change_downloader_panel = (
-	        React.createElement("div", null, 
+	        React.createElement("div", {key: "downloader-panel"}, 
 	        React.createElement("p", null, "Please, select which downloader to use:"), 
 	        React.createElement("select", {className: "downloader-selector", 
 	        name: "downloader", 
@@ -21551,7 +21536,7 @@
 
 	var render_tune_parser_panel = function(opts) {
 	    return (
-	        React.createElement("div", null, 
+	        React.createElement("div", {key: "parser-panel"}, 
 	        React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
 	            className: "new-package__search-input", 
 	        name: "search_list", 
@@ -21805,58 +21790,48 @@
 
 	        var content = [];
 	        var next_actions = [];
-	//        if (this.props.mode == 'edit') {
+
 	        content.push(React.createElement("input", {name: "changelog_source", 
+	                     key: "source", 
 	                     type: "text", 
 	                     placeholder: "Changelog's source URL", 
 	                     className: "text-input", 
-	                     value: this.state.source}));
-	        // } else {
-	        //     if (this.state.tracked) {
-	        //       content.push(<p className="plate">Horay! The package was added and is available <a href="/p/{this.props.namespace}}/{{this.props.name}}/">on a separate page</a>.</p>);
-	        //     } else {
-
-	            
-	        //    if (username == "" && this.state.tracked) {
-	        //        content.push(<p className="plate plate_warning">To continue tracking of this package, please, login through <a href="{login_url_github}">GitHub</a> or <a href="{login_url_twitter}">Twitter</a>.</p>);
-	        //    }
-	        // }
-
-	        // if (!this.state.tracked) {
-	        //     content = content.concat(this.draw_table());
-	        // }
-
+	                     value: this.state.source, 
+	                     onChange: this.on_field_change}));
 
 	        var tabs = [];
 	        var tab_panels = [];
 
 	        var add_tab = function (text, content) {
 	            tabs.push(React.createElement(Tab, null,  text ));
-	            tab_panels.push(React.createElement(TabPanel, null,  content ));
+	            tab_panels.push(React.createElement(TabPanel, {key:  text },  content ));
 	        }
 
-	        if (this.state.status == 'success') {
-	            add_tab('Save', render_save_panel({
-	                disabled: !this.can_save(),
-	                button_title: this.state.save_button_title,
-	                on_submit: this.save_and_redirect,
-	                namespace_error: this.state.namespace_error,
-	                name_error: this.state.name_error,
-	                description: this.state.description,
-	                on_field_change: this.on_field_change,
-	                namespace: this.state.namespace,
-	                name: this.state.name,
-	            }));
-	        }
-	        
-	        // спрашиваем, всё ли с логом в порядке и предлагаем затрекать
-	        if (this.state.waiting) {
+	        var status = this.state.status;
+
+	        if (status == 'processing') {
 	            content.push(render_we_are_waiting());
 	            content.push(render_log(this.state.log));
 	        } else {
-	            if (this.state.status == 'success') {
+	            if (status == 'success') {
 	                content.push(render_results(this.state.results));
+
+	                add_tab('Save', render_save_panel({
+	                    disabled: !this.can_save(),
+	                    button_title: this.state.save_button_title,
+	                    on_submit: this.save_and_redirect,
+	                    namespace_error: this.state.namespace_error,
+	                    name_error: this.state.name_error,
+	                    description: this.state.description,
+	                    on_field_change: this.on_field_change,
+	                    namespace: this.state.namespace,
+	                    name: this.state.name,
+	                }));
 	            }
+	            if (status == 'error') {
+	                content.push(render_log(this.state.log));
+	            }
+
 	            add_tab('Change downloader',
 	                    render_change_downloader_panel({
 	                        downloader: this.state.downloader,
@@ -21872,16 +21847,9 @@
 	                        disabled: this.state.waiting,
 	                        value: this.state.search_list
 	                    }));
-	        }
 
-	        if (this.state.problem) {
-	            content.push(render_problem(this.state.problem));
-	        }
-	        
-	        if (this.state.status != 'processing') {
 	            content.push(render_tabs(tabs, tab_panels));
 	        }
-	                  
 	        
 	        return (React.createElement("div", {className: "package-settings"}, content));
 	    }
@@ -24630,6 +24598,7 @@
 	  propTypes: {
 	    selected: _react.PropTypes.bool,
 	    id: _react.PropTypes.string,
+	//    key: _react.PropTypes.string,
 	    tabId: _react.PropTypes.string,
 	    children: _react.PropTypes.oneOfType([_react.PropTypes.array, _react.PropTypes.object, _react.PropTypes.string])
 	  },
@@ -24642,6 +24611,7 @@
 	    return {
 	      selected: false,
 	      id: null,
+	//      key: null,
 	      tabId: null
 	    };
 	  },
@@ -24649,6 +24619,9 @@
 	  render: function render() {
 	    var children = this.context.forceRenderTabPanel || this.props.selected ? this.props.children : null;
 
+	      // console.log('RENDERING TABS');
+	      // console.log('KEY IS:');
+	      // console.log(this.props.key);
 	    return _react2['default'].createElement(
 	      'div',
 	      {
@@ -24661,6 +24634,7 @@
 	    );
 	  }
 	});
+
 
 /***/ },
 /* 200 */
