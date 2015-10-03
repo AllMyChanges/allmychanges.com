@@ -7,7 +7,7 @@ def update_requirements():
     local('pip-compile --annotate requirements.in')
     local('pip-compile --annotate requirements-dev.in')
 
-def _get_docker_command(name, ports=[], image='allmychanges.com:pdb'):
+def _get_docker_command(name, ports=[], image='allmychanges.com'):
     return ('docker run '
             '--rm '
             '-t -i '
