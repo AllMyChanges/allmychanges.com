@@ -4,7 +4,9 @@ import shutil
 import arrow
 
 from django.utils import timezone
-from allmychanges.utils import discard_seconds
+from allmychanges.utils import (
+    discard_seconds,
+    update_fields)
 from allmychanges.exceptions import (
     UpdateError)
 from allmychanges import chat
@@ -168,6 +170,7 @@ def update_preview_or_changelog(obj, downloader=None):
     problem = None
     path = None
     found = False
+    downloader = downloader or obj.downloader
 
     try:
 #        with pdb_enabled():
@@ -204,6 +207,7 @@ def update_preview_or_changelog(obj, downloader=None):
                     #print 'Num versions from VCS:', len(raw_data)
 
                 if versions:
+                    update_fields(obj, downloader=downloader)
                     obj.set_processing_status('Updating database')
                     update_changelog_from_raw_data3(obj, versions)
                 else:

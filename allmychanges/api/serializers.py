@@ -77,6 +77,8 @@ class ChangelogSerializer(ModelSerializer):
             'ignore_list',
             'search_list',
             'xslt',
+            'downloader',
+            'downloaders',
         )
 
 

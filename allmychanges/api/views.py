@@ -442,9 +442,6 @@ class ChangelogViewSet(HandleExceptionMixin,
     def update(self, *args, **kwargs):
         response = super(ChangelogViewSet, self).update(*args, **kwargs)
 
-        if self.original_source != self.object.source:
-            update_fields(self.object, downloader=None)
-
         if self.object.versions.count() == 0:
             # try to move preview's versions
 

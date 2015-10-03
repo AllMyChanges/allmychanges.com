@@ -21361,7 +21361,7 @@
 
 	// В целом
 	// [ ] невозможно сменить URL существующего пакета
-	// [ ] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
+	// [+] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
 	// [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 	//     например, если прервать worker.
 	// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
@@ -21665,6 +21665,8 @@
 	        var data = {
 	            'namespace': this.state.namespace,
 	            'description': this.state.description,
+	            'downloader': this.state.downloader,
+	            'downloaders': this.state.downloaders,
 	            'name': this.state.name,
 	            'source': this.state.source,
 	            'search_list': this.state.search_list,

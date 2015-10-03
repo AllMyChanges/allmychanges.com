@@ -213,12 +213,10 @@ class Downloadable(object):
     to update attribute `downloader` if needed and then to
     download repository into a temporary directory.
     """
-    def download(self, downloader=None):
+    def download(self, downloader):
         """This method fetches repository into a temporary directory
         and returns path to this directory.
         """
-
-        downloader = downloader or self.downloader
 
         # TODO: убрать отсюда guess. Для всех Changelog
         # downloader должен быть проставлен, я для
