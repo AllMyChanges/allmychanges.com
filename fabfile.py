@@ -1,4 +1,7 @@
+import time
+
 from fabric.api import local
+
 
 def update_requirements():
     local('pip-compile --annotate requirements.in')
@@ -75,10 +78,55 @@ def coverage():
     local('nosetests --with-coverage --cover-package=allmychanges --cover-html --cover-erase --cover-inclusive --cover-html-dir=static/coverage')
     local('ssh back open http://art.dev.allmychanges.com:8000/static/coverage/index.html')
 
+
 def start():
-    local('docker start mysql.allmychanges.com')
-    local('docker start redis.allmychanges.com')
+    containers = _get_docker_containers()
+    if 'mysql.allmychanges.com' in containers:
+        local('docker start mysql.allmychanges.com')
+    else:
+        local('docker run --name mysql.allmychanges.com -e MYSQL_ROOT_PASSWORD=password -d mysql')
+        print 'Waiting for mysql start'
+        time.sleep(30)
+        local('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
+        local('docker run --rm -it -v `pwd`:/app --link mysql.allmychanges.com allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
+
+    if 'redis.allmychanges.com' in containers:
+        local('docker start redis.allmychanges.com')
+    else:
+        local('docker run --name redis.allmychanges.com -d redis')
+
 
 def stop():
-    local('docker rm --force -v rqworker.command.allmychanges.com')
-    local('docker rm --force -v runserver.command.allmychanges.com')
+    local('docker rm --force -v rqworker.command.allmychanges.com; true')
+    local('docker rm --force -v runserver.command.allmychanges.com; true')
+    local('docker stop mysql.allmychanges.com; true')
+    local('docker stop redis.allmychanges.com; true')
+
+
+def delete_containers():
+    containers = (
+        'rqworker.command.allmychanges.com',
+        'runserver.command.allmychanges.com',
+        'mysql.allmychanges.com',
+        'redis.allmychanges.com')
+
+    for container in containers:
+        local('docker rm --force -v {0}; true'.format(container))
+
+
+def _get_docker_containers():
+    import docker
+    import os
+    cert_path = os.environ['DOCKER_CERT_PATH']
+
+    tls_config = docker.tls.TLSConfig(
+        client_cert=(os.path.join(cert_path, 'cert.pem'),
+                     os.path.join(cert_path, 'key.pem')),
+        verify=False,
+    )
+    cl = docker.Client(base_url=os.environ['DOCKER_HOST'].replace('tcp://', 'https://'),
+                tls=tls_config)
+
+    containers = cl.containers(all=True)
+    containers = [c['Names'][0].strip('/') for c in containers]
+    return containers
