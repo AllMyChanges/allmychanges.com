@@ -46,9 +46,9 @@
 
 	__webpack_require__(1).render()
 	__webpack_require__(163).render()
-	__webpack_require__(202).render()
 	__webpack_require__(203).render()
-	__webpack_require__(205).render()
+	__webpack_require__(204).render()
+	__webpack_require__(206).render()
 
 
 /***/ },
@@ -20768,7 +20768,7 @@
 	var PackageSettings = __webpack_require__(172)
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(200)
+	window.intro = __webpack_require__(201)
 
 	$(document).ready(function() {
 	    window.intro.push({'element': $(".magic-prompt")[0],
@@ -21357,19 +21357,22 @@
 	// новое TODO:
 
 	// На чем закончил:
-	// обнаружил, что при сохраненни changelog список downloaders сохраняется в базу как строка
+	// сделал возможной смену source url
+	// теперь надо сделать настрояки парсера
 
 	// В целом
 	// [+] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
-	//->[ ] когда открываешь changelog для редактирования:
+	// [+] когда открываешь changelog для редактирования:
 	//     [+] не показывается существующие версии, хотя они должны были быть скопированы с preview
-	//     [ ] не заполнен список допустимых downloaders
-	// [ ] невозможно сменить URL существующего пакета
+	//     [+] не заполнен список допустимых downloaders
+	// [+] невозможно сменить URL существующего пакета
 	// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
 	// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
 	// [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 	//     например, если прервать worker.
 	// [ ] после сохранения объекта в нотифайке сверхку на работают апострофы you&#39;ve 
+	// [ ] для экрана небольшой высоты не надо делать меню с настройками плавающим, а надо закреплять его внизу, и
+	//     само preview ограничивать по высоте
 
 	// Не относящееся к странице
 	// [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
@@ -21398,6 +21401,9 @@
 	// [+] если changelog не найден, не показывать текст This is the latest versions
 	// [+] если changelog не найден, показывать полный лог, а не только problem
 	// [ ] надо сделать отбивку кнопки Apply
+	// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать
+	// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку
+
 
 	// На табе Tune Parser:
 	// Что показывать:
@@ -21419,8 +21425,9 @@
 	// [ ] сделать отображение сообщений, чтобы они
 	//     приезжали в ответе на save
 
+	var Accordion = __webpack_require__(173);
 	var React = __webpack_require__(3);
-	var ReactTabs = __webpack_require__(173);
+	var ReactTabs = __webpack_require__(174);
 	var Tab = ReactTabs.Tab;
 	var Tabs = ReactTabs.Tabs;
 	var TabList = ReactTabs.TabList;
@@ -21436,6 +21443,14 @@
 	        )
 	        )
 	   );
+	}
+
+	var render_need_apply_plate = function (on_submit) {
+	    return (
+	        React.createElement("div", {key: "tune", className: "changelog-settings__tune"}, 
+	        React.createElement("p", null, "You changed the source URL, please, hit \"Apply\" button to search changelog data at the new source."), 
+	        React.createElement("input", {type: "submit", className: "button _good", value: "Apply", onClick: on_submit})
+	        ));
 	}
 
 	var render_we_are_waiting = function() {
@@ -21554,15 +21569,39 @@
 	}
 
 	var render_tune_parser_panel = function(opts) {
-	    return (
-	        React.createElement("div", {key: "parser-panel"}, 
-	        React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
-	            className: "new-package__search-input", 
-	        name: "search_list", 
-	        onChange: opts.on_field_change, 
-	        disabled: opts.disabled, 
-	        value: opts.value})
-	        ));
+
+	    return (React.createElement(Accordion, {title: "Accordion Title Here"}));
+
+	    // var Accordion = require('react-accordion-component');
+	    // var elements = [
+	    //     {
+	    //         title: 'Search in',
+	    //         onClick: function(){},
+	    //         content: "FOO"
+	    //     },
+	    //     {
+	    //         title: 'Exclude',
+	    //         onClick: function(){},
+	    //         content: "Bar"
+	    //     },
+	    //     {
+	    //         title: 'Exclude',
+	    //         onClick: function(){},
+	    //         content: "Bar"
+	    //     }
+	    // ];
+	        
+	    // return <Accordion key="parser-panel" elements={elements} />;
+
+	    // return (
+	    //     <div key="parser-panel">
+	    //     <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
+	    //         className="new-package__search-input"
+	    //     name="search_list"
+	    //     onChange={opts.on_field_change}
+	    //     disabled={opts.disabled}
+	    //     value={opts.value}></textarea>
+	    //     </div>);
 	}
 
 
@@ -21647,9 +21686,11 @@
 	        // when field changes will be applied to the state
 
 	        var name = event.target.name;
-	        UserStory.log(["field [name=", name, "] was changed"], ["on"]);
+	        var new_value = event.target.value;
+
+	        UserStory.log(["field [name=", name, "] was changed to [new_value=", new_value, "]"], ["on"]);
 	        var params = {}
-	        params[name] = event.target.value;
+	        params[name] = new_value;
 
 	        var callback = function () {
 	            if (name == 'namespace' || name == 'name') {
@@ -21812,7 +21853,7 @@
 	        var content = [];
 	        var next_actions = [];
 
-	        content.push(React.createElement("input", {name: "changelog_source", 
+	        content.push(React.createElement("input", {name: "source", 
 	                     key: "source", 
 	                     type: "text", 
 	                     placeholder: "Changelog's source URL", 
@@ -21871,7 +21912,11 @@
 	                        value: this.state.search_list
 	                    }));
 
-	            content.push(render_tabs(tabs, tab_panels));
+	            if (this.preview.source != this.state.source) {
+	                content.push(render_need_apply_plate(this.apply_downloader_settings));
+	            } else {
+	                content.push(render_tabs(tabs, tab_panels));
+	            }
 	        }
 	        
 	        return (React.createElement("div", {className: "package-settings"}, content));
@@ -21883,17 +21928,80 @@
 /* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/** @jsx React.DOM **/
 
-	module.exports = {
-	  Tabs: __webpack_require__(174),
-	  TabList: __webpack_require__(197),
-	  Tab: __webpack_require__(196),
-	  TabPanel: __webpack_require__(199)
-	};
+	var React = __webpack_require__(3);
+
+	var Section = React.createClass({displayName: "Section",
+	  handleClick: function(){
+	    if(this.state.open) {
+	      this.setState({
+	        open: false,
+	        class: "accordion__section"
+	      });
+	    }else{
+	      this.setState({
+	        open: true,
+	        class: "accordion__section accordion__section_open"
+	      });
+	    }
+	  },
+	  getInitialState: function(){
+	     return {
+	       open: false,
+	       class: "accordion__section"
+	     }
+	  },
+	  render: function() {
+	    return (
+	      React.createElement("div", {className: this.state.class}, 
+	        React.createElement("button", null, "toggle"), 
+	        React.createElement("div", {className: "accordion__section-head", onClick: this.handleClick}, this.props.title), 
+	        React.createElement("div", {className: "accordion__content-wrap"}, 
+	          React.createElement("div", {className: "accordion__content"}, 
+	            this.props.children
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+
+	var Accordion = React.createClass({displayName: "Accordion",
+	  render: function() {
+	    return (
+	      React.createElement("div", {className: "accordion"}, 
+	        React.createElement(Section, {title: "Section Title One"}, "   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!"
+	        ), 
+	        React.createElement(Section, {title: "Section Title Two"}, "   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!"
+	        ), 
+	        React.createElement(Section, {title: "Section Title Three"}, "   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!"
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = Accordion;
+
+	// React.renderComponent(<Accordion title="Accordion Title Here" />, document.getElementById('accordian')); 
+
 
 /***/ },
 /* 174 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	  Tabs: __webpack_require__(175),
+	  TabList: __webpack_require__(198),
+	  Tab: __webpack_require__(197),
+	  TabPanel: __webpack_require__(200)
+	};
+
+/***/ },
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -21901,19 +22009,19 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _reactAddons = __webpack_require__(175);
+	var _reactAddons = __webpack_require__(176);
 
 	var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-	var _jsStylesheet = __webpack_require__(193);
+	var _jsStylesheet = __webpack_require__(194);
 
 	var _jsStylesheet2 = _interopRequireDefault(_jsStylesheet);
 
-	var _helpersUuid = __webpack_require__(194);
+	var _helpersUuid = __webpack_require__(195);
 
 	var _helpersUuid2 = _interopRequireDefault(_helpersUuid);
 
-	var _helpersChildrenPropType = __webpack_require__(195);
+	var _helpersChildrenPropType = __webpack_require__(196);
 
 	var _helpersChildrenPropType2 = _interopRequireDefault(_helpersChildrenPropType);
 
@@ -21961,7 +22069,7 @@
 	  },
 
 	  componentWillMount: function componentWillMount() {
-	    (0, _jsStylesheet2['default'])(__webpack_require__(198));
+	    (0, _jsStylesheet2['default'])(__webpack_require__(199));
 	  },
 
 	  componentWillReceiveProps: function componentWillReceiveProps(newProps) {
@@ -22224,14 +22332,14 @@
 	});
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(176);
+	module.exports = __webpack_require__(177);
 
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -22254,18 +22362,18 @@
 
 	'use strict';
 
-	var LinkedStateMixin = __webpack_require__(177);
+	var LinkedStateMixin = __webpack_require__(178);
 	var React = __webpack_require__(4);
 	var ReactComponentWithPureRenderMixin =
-	  __webpack_require__(180);
-	var ReactCSSTransitionGroup = __webpack_require__(181);
+	  __webpack_require__(181);
+	var ReactCSSTransitionGroup = __webpack_require__(182);
 	var ReactFragment = __webpack_require__(12);
-	var ReactTransitionGroup = __webpack_require__(182);
+	var ReactTransitionGroup = __webpack_require__(183);
 	var ReactUpdates = __webpack_require__(28);
 
-	var cx = __webpack_require__(190);
-	var cloneWithProps = __webpack_require__(184);
-	var update = __webpack_require__(191);
+	var cx = __webpack_require__(191);
+	var cloneWithProps = __webpack_require__(185);
+	var update = __webpack_require__(192);
 
 	React.addons = {
 	  CSSTransitionGroup: ReactCSSTransitionGroup,
@@ -22282,7 +22390,7 @@
 
 	if ("production" !== process.env.NODE_ENV) {
 	  React.addons.Perf = __webpack_require__(152);
-	  React.addons.TestUtils = __webpack_require__(192);
+	  React.addons.TestUtils = __webpack_require__(193);
 	}
 
 	module.exports = React;
@@ -22290,7 +22398,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 177 */
+/* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22307,8 +22415,8 @@
 
 	'use strict';
 
-	var ReactLink = __webpack_require__(178);
-	var ReactStateSetters = __webpack_require__(179);
+	var ReactLink = __webpack_require__(179);
+	var ReactStateSetters = __webpack_require__(180);
 
 	/**
 	 * A simple mixin around ReactLink.forState().
@@ -22335,7 +22443,7 @@
 
 
 /***/ },
-/* 178 */
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22412,7 +22520,7 @@
 
 
 /***/ },
-/* 179 */
+/* 180 */
 /***/ function(module, exports) {
 
 	/**
@@ -22522,7 +22630,7 @@
 
 
 /***/ },
-/* 180 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22575,7 +22683,7 @@
 
 
 /***/ },
-/* 181 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22597,10 +22705,10 @@
 	var assign = __webpack_require__(15);
 
 	var ReactTransitionGroup = React.createFactory(
-	  __webpack_require__(182)
+	  __webpack_require__(183)
 	);
 	var ReactCSSTransitionGroupChild = React.createFactory(
-	  __webpack_require__(187)
+	  __webpack_require__(188)
 	);
 
 	var ReactCSSTransitionGroup = React.createClass({
@@ -22649,7 +22757,7 @@
 
 
 /***/ },
-/* 182 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22666,10 +22774,10 @@
 	'use strict';
 
 	var React = __webpack_require__(4);
-	var ReactTransitionChildMapping = __webpack_require__(183);
+	var ReactTransitionChildMapping = __webpack_require__(184);
 
 	var assign = __webpack_require__(15);
-	var cloneWithProps = __webpack_require__(184);
+	var cloneWithProps = __webpack_require__(185);
 	var emptyFunction = __webpack_require__(18);
 
 	var ReactTransitionGroup = React.createClass({
@@ -22883,7 +22991,7 @@
 
 
 /***/ },
-/* 183 */
+/* 184 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22992,7 +23100,7 @@
 
 
 /***/ },
-/* 184 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23010,7 +23118,7 @@
 	'use strict';
 
 	var ReactElement = __webpack_require__(13);
-	var ReactPropTransferer = __webpack_require__(185);
+	var ReactPropTransferer = __webpack_require__(186);
 
 	var keyOf = __webpack_require__(41);
 	var warning = __webpack_require__(17);
@@ -23054,7 +23162,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 185 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23072,7 +23180,7 @@
 
 	var assign = __webpack_require__(15);
 	var emptyFunction = __webpack_require__(18);
-	var joinClasses = __webpack_require__(186);
+	var joinClasses = __webpack_require__(187);
 
 	/**
 	 * Creates a transfer strategy that will merge prop values using the supplied
@@ -23168,7 +23276,7 @@
 
 
 /***/ },
-/* 186 */
+/* 187 */
 /***/ function(module, exports) {
 
 	/**
@@ -23213,7 +23321,7 @@
 
 
 /***/ },
-/* 187 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23232,8 +23340,8 @@
 
 	var React = __webpack_require__(4);
 
-	var CSSCore = __webpack_require__(188);
-	var ReactTransitionEvents = __webpack_require__(189);
+	var CSSCore = __webpack_require__(189);
+	var ReactTransitionEvents = __webpack_require__(190);
 
 	var onlyChild = __webpack_require__(158);
 	var warning = __webpack_require__(17);
@@ -23364,7 +23472,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 188 */
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23479,7 +23587,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 189 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23594,7 +23702,7 @@
 
 
 /***/ },
-/* 190 */
+/* 191 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23653,7 +23761,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 191 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23827,7 +23935,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 192 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -24345,7 +24453,7 @@
 
 
 /***/ },
-/* 193 */
+/* 194 */
 /***/ function(module, exports, __webpack_require__) {
 
 	!(function() {
@@ -24389,7 +24497,7 @@
 
 
 /***/ },
-/* 194 */
+/* 195 */
 /***/ function(module, exports) {
 
 	// Get a universally unique identifier
@@ -24401,7 +24509,7 @@
 	};
 
 /***/ },
-/* 195 */
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24412,11 +24520,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _componentsTab = __webpack_require__(196);
+	var _componentsTab = __webpack_require__(197);
 
 	var _componentsTab2 = _interopRequireDefault(_componentsTab);
 
-	var _componentsTabList = __webpack_require__(197);
+	var _componentsTabList = __webpack_require__(198);
 
 	var _componentsTabList2 = _interopRequireDefault(_componentsTabList);
 
@@ -24450,7 +24558,7 @@
 	};
 
 /***/ },
-/* 196 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -24520,7 +24628,7 @@
 	});
 
 /***/ },
-/* 197 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -24549,7 +24657,7 @@
 	});
 
 /***/ },
-/* 198 */
+/* 199 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24603,7 +24711,7 @@
 	};
 
 /***/ },
-/* 199 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -24660,10 +24768,10 @@
 
 
 /***/ },
-/* 200 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PriorityQueue = __webpack_require__(201)
+	var PriorityQueue = __webpack_require__(202)
 	var _introjs_items = new PriorityQueue(function(a, b) {
 	    return a.priority - b.priority});
 
@@ -24701,7 +24809,7 @@
 
 
 /***/ },
-/* 201 */
+/* 202 */
 /***/ function(module, exports) {
 
 	/**
@@ -24879,7 +24987,7 @@
 
 
 /***/ },
-/* 202 */
+/* 203 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Share = __webpack_require__(169)
@@ -24897,10 +25005,10 @@
 
 
 /***/ },
-/* 203 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(204)
+	var Promo = __webpack_require__(205)
 
 	module.exports = {
 	    render: function () {
@@ -24912,7 +25020,7 @@
 
 
 /***/ },
-/* 204 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(3);
@@ -25108,10 +25216,10 @@
 
 
 /***/ },
-/* 205 */
+/* 206 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(206)
+	var Landing = __webpack_require__(207)
 
 	module.exports = {
 	    render: function () {
@@ -25123,7 +25231,7 @@
 
 
 /***/ },
-/* 206 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(3);

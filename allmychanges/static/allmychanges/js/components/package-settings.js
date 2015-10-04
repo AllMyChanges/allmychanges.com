@@ -1,19 +1,22 @@
 // новое TODO:
 
 // На чем закончил:
-// обнаружил, что при сохраненни changelog список downloaders сохраняется в базу как строка
+// сделал возможной смену source url
+// теперь надо сделать настрояки парсера
 
 // В целом
 // [+] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
-//->[ ] когда открываешь changelog для редактирования:
+// [+] когда открываешь changelog для редактирования:
 //     [+] не показывается существующие версии, хотя они должны были быть скопированы с preview
-//     [ ] не заполнен список допустимых downloaders
-// [ ] невозможно сменить URL существующего пакета
+//     [+] не заполнен список допустимых downloaders
+// [+] невозможно сменить URL существующего пакета
 // [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
 // [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
 // [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 //     например, если прервать worker.
 // [ ] после сохранения объекта в нотифайке сверхку на работают апострофы you&#39;ve 
+// [ ] для экрана небольшой высоты не надо делать меню с настройками плавающим, а надо закреплять его внизу, и
+//     само preview ограничивать по высоте
 
 // Не относящееся к странице
 // [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
@@ -42,6 +45,9 @@
 // [+] если changelog не найден, не показывать текст This is the latest versions
 // [+] если changelog не найден, показывать полный лог, а не только problem
 // [ ] надо сделать отбивку кнопки Apply
+// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать
+// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку
+
 
 // На табе Tune Parser:
 // Что показывать:
@@ -63,6 +69,7 @@
 // [ ] сделать отображение сообщений, чтобы они
 //     приезжали в ответе на save
 
+var Accordion = require('./accordion');
 var React = require('react');
 var ReactTabs = require('react-tabs');
 var Tab = ReactTabs.Tab;
@@ -80,6 +87,14 @@ var render_tabs = function(tabs, tab_panels) {
         </Tabs>
         </div>
    );
+}
+
+var render_need_apply_plate = function (on_submit) {
+    return (
+        <div key="tune" className="changelog-settings__tune">
+        <p>You changed the source URL, please, hit "Apply" button to search changelog data at the new source.</p>
+        <input type="submit" className="button _good" value="Apply" onClick={on_submit}/>
+        </div>);
 }
 
 var render_we_are_waiting = function() {
@@ -198,15 +213,39 @@ var render_change_downloader_panel = function (opts) {
 }
 
 var render_tune_parser_panel = function(opts) {
-    return (
-        <div key="parser-panel">
-        <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
-            className="new-package__search-input"
-        name="search_list"
-        onChange={opts.on_field_change}
-        disabled={opts.disabled}
-        value={opts.value}></textarea>
-        </div>);
+
+    return (<Accordion title="Accordion Title Here" />);
+
+    // var Accordion = require('react-accordion-component');
+    // var elements = [
+    //     {
+    //         title: 'Search in',
+    //         onClick: function(){},
+    //         content: "FOO"
+    //     },
+    //     {
+    //         title: 'Exclude',
+    //         onClick: function(){},
+    //         content: "Bar"
+    //     },
+    //     {
+    //         title: 'Exclude',
+    //         onClick: function(){},
+    //         content: "Bar"
+    //     }
+    // ];
+        
+    // return <Accordion key="parser-panel" elements={elements} />;
+
+    // return (
+    //     <div key="parser-panel">
+    //     <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
+    //         className="new-package__search-input"
+    //     name="search_list"
+    //     onChange={opts.on_field_change}
+    //     disabled={opts.disabled}
+    //     value={opts.value}></textarea>
+    //     </div>);
 }
 
 
@@ -291,9 +330,11 @@ module.exports = React.createClass({
         // when field changes will be applied to the state
 
         var name = event.target.name;
-        // field [name] was changed @on-field-change
+        var new_value = event.target.value;
+
+        // field [name] was changed to [new_value] @on-field-change
         var params = {}
-        params[name] = event.target.value;
+        params[name] = new_value;
 
         var callback = function () {
             if (name == 'namespace' || name == 'name') {
@@ -456,7 +497,7 @@ module.exports = React.createClass({
         var content = [];
         var next_actions = [];
 
-        content.push(<input name="changelog_source"
+        content.push(<input name="source"
                      key="source"
                      type="text"
                      placeholder="Changelog&#39;s source URL"
@@ -515,7 +556,11 @@ module.exports = React.createClass({
                         value: this.state.search_list
                     }));
 
-            content.push(render_tabs(tabs, tab_panels));
+            if (this.preview.source != this.state.source) {
+                content.push(render_need_apply_plate(this.apply_downloader_settings));
+            } else {
+                content.push(render_tabs(tabs, tab_panels));
+            }
         }
         
         return (<div className="package-settings">{content}</div>);

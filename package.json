@@ -26,7 +26,9 @@
     "karma-jasmine": "^0.1.5",
     "parker": "0.0.8",
     "priorityqueuejs": "^1.0.0",
-    "react-tabs": "^0.4.1"
+    "react-tabs": "^0.4.1",
+    "react-accordion": "0.1.0",
+    "react-accordion-component": "1.0.10"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

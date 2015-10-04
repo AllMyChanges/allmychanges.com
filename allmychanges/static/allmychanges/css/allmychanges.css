@@ -1068,6 +1068,97 @@ a:hover {
   font-size: 1.5em;
   margin-bottom: 1em;
 }
+.accordion {
+  box-sizing: border-box;
+  width: 40%;
+  max-width: 30em;
+  min-width: 15em;
+  overflow: hidden;
+}
+.accordion__section {
+  position: relative;
+  width: 100%;
+  border-bottom: 2px solid #c80e3d;
+}
+.accordion__section button {
+  position: absolute;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  height: 3em;
+  width: 3em;
+  outline: 0;
+  border: 0;
+  background: none;
+  text-indent: -9999%;
+  pointer-events: none;
+}
+.accordion__section button:before {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 12px;
+  width: 4px;
+  border-radius: 0.3em;
+  background: #ee0c4b;
+  transform-origin: 50%;
+  top: 50%;
+  left: 50%;
+  transition: all 0.25s ease-in-out;
+  transform: translate(75%, -50%) rotate(45deg);
+}
+.accordion__section button:after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 12px;
+  width: 4px;
+  border-radius: 0.3em;
+  background: #ee0c4b;
+  transform-origin: 50%;
+  top: 50%;
+  left: 50%;
+  transition: all 0.25s ease-in-out;
+  transform: translate(-75%, -50%) rotate(-45deg);
+}
+.accordion__section_open button:before,
+.accordion__section_open button:after {
+  height: 14px;
+}
+.accordion__section_open button:before {
+  transform: translate(0%, -50%) rotate(-45deg);
+}
+.accordion__section_open button:after {
+  transform: translate(0%, -50%) rotate(45deg);
+}
+.accordion__section_open .accordion__content-wrap {
+  height: 120px;
+}
+.accordion__section_open .accordion__section-head {
+  border-bottom: 2px dotted #ee0c4b;
+}
+.accordion__section-head {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  font-weight: 700;
+  color: #888;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 1em;
+  padding-right: 2.1em;
+}
+.accordion__content {
+  padding: 1em;
+  color: #333;
+  line-height: 1.3;
+}
+.accordion__content-wrap {
+  height: 0;
+  overflow: hidden;
+  transition: all 0.2s ease-in;
+}
 .login-menu-container {
   display: inline-block;
   position: relative;
@@ -1450,7 +1541,7 @@ body.email {
   width: 25em;
 }
 .digest-source__problem {
-  color: #f00;
+  color: #ee0c4b;
 }
 .digest-source__waiting {
   color: #00f;
