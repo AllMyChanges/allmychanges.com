@@ -1,24 +1,6 @@
 
-lightred = #f12e50;
-red = #ee0c4b;
-darkred = #c80e3d;
-
-
-/* * { */
-/*   box-sizing: border-box; */
-/*   &:before, &:after { */
-/*     box-sizing: border-box; */
-/*   } */
-/* } */
-
-/* body { */
-/*   background: black; */
-/* } */
-
 .accordion {
     box-sizing: border-box;
-
-//    background: lightred;
     width: 40%;
     max-width: 30em;
     min-width: 15em;
@@ -27,7 +9,7 @@ darkred = #c80e3d;
     &__section {
         position: relative;
         width: 100%;
-        border-bottom: 2px solid darkred;
+        border-bottom: 2px solid light-red-color;
 
         button {
             position: absolute;
@@ -49,7 +31,7 @@ darkred = #c80e3d;
                 height: 12px;
                 width: 4px;
                 border-radius: .3em;
-                background: red;
+                background: light-red-color;
                 transform-origin: 50%;
                 top: 50%;
                 left: 50%;
@@ -63,7 +45,7 @@ darkred = #c80e3d;
                 height: 12px;
                 width: 4px;
                 border-radius: .3em;
-                background: red;
+                background: light-red-color;
                 transform-origin: 50%;
                 top: 50%;
                 left: 50%;
@@ -85,10 +67,10 @@ darkred = #c80e3d;
                 }
             }
             .accordion__content-wrap {
-                height: 120px;
+                height: 180px;
             }
             .accordion__section-head {
-                border-bottom: 2px dotted red;
+                border-bottom: 2px dotted light-red-color;
             }
         }
 

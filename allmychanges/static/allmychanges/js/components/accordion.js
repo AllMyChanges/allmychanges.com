@@ -38,20 +38,14 @@ var Section = React.createClass({
 });
 
 var Accordion = React.createClass({
-  render: function() {
-    return (
-      <div className="accordion">
-        <Section title="Section Title One">   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!
-        </Section>
-        <Section title="Section Title Two">   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!
-        </Section>
-        <Section title="Section Title Three">   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!
-        </Section>
-      </div>
-    );
-  }
+    render: function() {
+        var elements = this.props.elements.map(function(e, i) {
+            return <Section key={i} title={e.title}>{e.content}</Section>
+        });
+
+        return <div className="accordion">{elements}</div>;
+    }
 });
 
 module.exports = Accordion;
 
-// React.renderComponent(<Accordion title="Accordion Title Here" />, document.getElementById('accordian')); 

@@ -21357,8 +21357,7 @@
 	// новое TODO:
 
 	// На чем закончил:
-	// сделал возможной смену source url
-	// теперь надо сделать настрояки парсера
+
 
 	// В целом
 	// [+] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
@@ -21411,6 +21410,10 @@
 	// Exclude
 	// XSLT потом надо сделать так, чтобы их можно было указывать много, и они применялись для файлов по маске
 	// SED  то же самое
+	// [+] сделал аккордион и сохранение настроек
+	// [ ] сделать поля ввода пошире
+	// [ ] поправить положение кнопки Apply
+	// [ ] сделать так, чтобы apply становилась доступной только если данные поменялись
 
 
 	// Хорошо бы так же сделать:
@@ -21570,38 +21573,48 @@
 
 	var render_tune_parser_panel = function(opts) {
 
-	    return (React.createElement(Accordion, {title: "Accordion Title Here"}));
-
-	    // var Accordion = require('react-accordion-component');
-	    // var elements = [
-	    //     {
-	    //         title: 'Search in',
-	    //         onClick: function(){},
-	    //         content: "FOO"
-	    //     },
-	    //     {
-	    //         title: 'Exclude',
-	    //         onClick: function(){},
-	    //         content: "Bar"
-	    //     },
-	    //     {
-	    //         title: 'Exclude',
-	    //         onClick: function(){},
-	    //         content: "Bar"
-	    //     }
-	    // ];
+	    var elements = [
+	        {
+	            title: 'Search in dirs or files',
+	            content: (
+	        React.createElement("textarea", {placeholder: "Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.", 
+	            className: "new-package__search-input", 
+	        name: "search_list", 
+	        onChange: opts.on_field_change, 
+	        disabled: opts.disabled, 
+	        value: opts.search_list})
+	            )
+	        },
+	        {
+	            title: 'Exclude some dirs or files',
+	            content: (
+	        React.createElement("textarea", {placeholder: "Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.", 
+	            className: "new-package__ignore-input", 
+	        name: "ignore_list", 
+	        onChange: opts.on_field_change, 
+	        disabled: opts.disabled, 
+	        value: opts.ignore_list})
+	)
+	        },
+	        {
+	            title: 'XSL Transformation',
+	            content:
+	            (
+	                    React.createElement("textarea", {placeholder: "Behold XSLT's mighty power!", 
+	                className: "new-package__xslt-input", 
+	                onChange: opts.on_field_change, 
+	                name: "xslt", 
+	                value: opts.xslt})
+	            )
+	        }
+	    ];
 	        
-	    // return <Accordion key="parser-panel" elements={elements} />;
-
-	    // return (
-	    //     <div key="parser-panel">
-	    //     <textarea placeholder="Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search."
-	    //         className="new-package__search-input"
-	    //     name="search_list"
-	    //     onChange={opts.on_field_change}
-	    //     disabled={opts.disabled}
-	    //     value={opts.value}></textarea>
-	    //     </div>);
+	    return (
+	        React.createElement("div", {key: "tune-parser-panel"}, 
+	        React.createElement(Accordion, {elements: elements}), 
+	        React.createElement("input", {type: "submit", className: "button _good", value: "Apply", onClick: opts.on_submit})
+	        )
+	    );
 	}
 
 
@@ -21669,13 +21682,29 @@
 	            .success(this.update_preview_callback);
 	    },
 	    apply_downloader_settings: function() {
-	        UserStory.log(["applying downloader-sttings"], ["apply"]);
+	        UserStory.log(["applying downloader-settings"], ["apply"]);
 	        this.save_preview_params();
 
 	        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
 	                method: 'PATCH',
 	                data: JSON.stringify({
 	                    downloader: this.state.downloader
+	                }),
+	                contentType: 'application/json',
+	                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	            .success(this.update_preview_callback);
+	    },
+	    apply_parser_settings: function() {
+	        UserStory.log(["applying downloader-sttings"], ["apply"]);
+	        this.save_preview_params();
+	//        this.setState({'status': 'processing'});
+
+	        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
+	                method: 'PATCH',
+	                data: JSON.stringify({
+	                    search_list: this.state.search_list,
+	                    ignore_list: this.state.ignore_list,
+	                    xslt: this.state.xslt
 	                }),
 	                contentType: 'application/json',
 	                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
@@ -21908,11 +21937,16 @@
 	            add_tab('Tune parser',
 	                    render_tune_parser_panel({
 	                        on_field_change: this.on_field_change,
+	                        on_submit: this.apply_parser_settings,
 	                        disabled: this.state.waiting,
-	                        value: this.state.search_list
+	                        search_list: this.state.search_list,
+	                        ignore_list: this.state.ignore_list,
+	                        xslt: this.state.xslt
 	                    }));
 
 	            if (this.preview.source != this.state.source) {
+	                // TODO: надо проверить, что source для preview сохраняется
+	                // кажется, что PATCH тут будет вызываться неверно
 	                content.push(render_need_apply_plate(this.apply_downloader_settings));
 	            } else {
 	                content.push(render_tabs(tabs, tab_panels));
@@ -21968,23 +22002,17 @@
 	});
 
 	var Accordion = React.createClass({displayName: "Accordion",
-	  render: function() {
-	    return (
-	      React.createElement("div", {className: "accordion"}, 
-	        React.createElement(Section, {title: "Section Title One"}, "   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!"
-	        ), 
-	        React.createElement(Section, {title: "Section Title Two"}, "   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!"
-	        ), 
-	        React.createElement(Section, {title: "Section Title Three"}, "   Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!"
-	        )
-	      )
-	    );
-	  }
+	    render: function() {
+	        var elements = this.props.elements.map(function(e, i) {
+	            return React.createElement(Section, {key: i, title: e.title}, e.content)
+	        });
+
+	        return React.createElement("div", {className: "accordion"}, elements);
+	    }
 	});
 
 	module.exports = Accordion;
 
-	// React.renderComponent(<Accordion title="Accordion Title Here" />, document.getElementById('accordian')); 
 
 
 /***/ },

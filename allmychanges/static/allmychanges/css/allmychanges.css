@@ -1078,7 +1078,7 @@ a:hover {
 .accordion__section {
   position: relative;
   width: 100%;
-  border-bottom: 2px solid #c80e3d;
+  border-bottom: 2px solid #d9042b;
 }
 .accordion__section button {
   position: absolute;
@@ -1100,7 +1100,7 @@ a:hover {
   height: 12px;
   width: 4px;
   border-radius: 0.3em;
-  background: #ee0c4b;
+  background: #d9042b;
   transform-origin: 50%;
   top: 50%;
   left: 50%;
@@ -1114,7 +1114,7 @@ a:hover {
   height: 12px;
   width: 4px;
   border-radius: 0.3em;
-  background: #ee0c4b;
+  background: #d9042b;
   transform-origin: 50%;
   top: 50%;
   left: 50%;
@@ -1132,10 +1132,10 @@ a:hover {
   transform: translate(0%, -50%) rotate(45deg);
 }
 .accordion__section_open .accordion__content-wrap {
-  height: 120px;
+  height: 180px;
 }
 .accordion__section_open .accordion__section-head {
-  border-bottom: 2px dotted #ee0c4b;
+  border-bottom: 2px dotted #d9042b;
 }
 .accordion__section-head {
   box-sizing: border-box;
@@ -1541,7 +1541,7 @@ body.email {
   width: 25em;
 }
 .digest-source__problem {
-  color: #ee0c4b;
+  color: #f00;
 }
 .digest-source__waiting {
   color: #00f;

@@ -440,8 +440,6 @@ class ChangelogViewSet(HandleExceptionMixin,
         return response
 
     def update(self, *args, **kwargs):
-        import pdb; pdb.set_trace()
-
         response = super(ChangelogViewSet, self).update(*args, **kwargs)
 
         if self.object.versions.count() == 0:
