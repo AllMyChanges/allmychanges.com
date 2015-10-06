@@ -79,23 +79,37 @@ var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
 
 
+var render_tune_panel = function(content) {
+    var style = {};
+    if (content === undefined) {
+        style['height'] = 0;
+    }
+    return (
+            <div key="tune" className="changelog-settings__tune" style={style}>
+          <div className="changelog-settings__tune-content">
+            {content}
+          </div>
+        </div>
+   );
+}
+
+
 var render_tabs = function(tabs, tab_panels) {
     return (
-        <div key="tune" className="changelog-settings__tune">
         <Tabs>
-        <TabList>{ tabs }</TabList>
-        { tab_panels }
+            <TabList>{ tabs }</TabList>
+            { tab_panels }
         </Tabs>
-        </div>
    );
 }
 
 var render_need_apply_plate = function (on_submit) {
     return (
-        <div key="tune" className="changelog-settings__tune">
-        <p>You changed the source URL, please, hit "Apply" button to search changelog data at the new source.</p>
-        <input type="submit" className="button _good" value="Apply" onClick={on_submit}/>
-        </div>);
+        <div>
+            <p>You changed the source URL, please, hit "Apply" button to search changelog data at the new source.</p>
+            <input type="submit" className="button _good" value="Apply" onClick={on_submit}/>
+        </div>
+    )
 }
 
 var render_we_are_waiting = function() {
@@ -557,6 +571,7 @@ module.exports = React.createClass({
         if (status == 'processing') {
             content.push(render_we_are_waiting());
             content.push(render_log(this.state.log));
+            content.push(render_tune_panel());
         } else {
             // статус равен created, когда мы открыли changelog
             // для редактирования и версии preview взяты из него
@@ -601,11 +616,13 @@ module.exports = React.createClass({
             if (this.preview.source != this.state.source) {
                 // TODO: надо проверить, что source для preview сохраняется
                 // кажется, что PATCH тут будет вызываться неверно
-                content.push(render_need_apply_plate(this.apply_downloader_settings));
+                content.push(render_tune_panel(render_need_apply_plate(this.apply_downloader_settings)));
+                $('.changelog-settings__tune').height(0);
             } else {
-                content.push(render_tabs(tabs, tab_panels));
+                content.push(render_tune_panel(render_tabs(tabs, tab_panels)));
             }
         }
+        $('.changelog-settings__tune').height($('.changelog-settings__tune-content').height())
         
         return (<div className="package-settings">{content}</div>);
     }
