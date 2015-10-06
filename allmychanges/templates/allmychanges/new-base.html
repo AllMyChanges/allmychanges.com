@@ -219,7 +219,7 @@ var _prum = [['id', '{{ settings.PINGDOM_ID }}'],
 <script type="text/javascript">
 setTimeout(function() {
     {% for message in messages %}
-       PubSub.publish('show-info', '{{ message }}');
+       PubSub.publish('show-info', '{{ message|escapejs }}');
     {% endfor %}
 }, 500);
 </script>
