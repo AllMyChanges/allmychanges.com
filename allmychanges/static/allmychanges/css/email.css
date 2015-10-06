@@ -453,6 +453,7 @@ a {
   width: 100%;
 }
 .buttons-row {
+  margin-top: 10px;
   text-align: right;
 }
 .vlink {

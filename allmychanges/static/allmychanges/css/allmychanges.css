@@ -329,6 +329,7 @@ select {
   width: 100%;
 }
 .buttons-row {
+  margin-top: 10px;
   text-align: right;
 }
 .vlink {
@@ -1070,15 +1071,13 @@ a:hover {
 }
 .accordion {
   box-sizing: border-box;
-  width: 40%;
-  max-width: 30em;
   min-width: 15em;
   overflow: hidden;
 }
 .accordion__section {
   position: relative;
   width: 100%;
-  border-bottom: 2px solid #d9042b;
+  border-bottom: 2px solid #808080;
 }
 .accordion__section button {
   position: absolute;
@@ -1135,7 +1134,7 @@ a:hover {
   height: 180px;
 }
 .accordion__section_open .accordion__section-head {
-  border-bottom: 2px dotted #d9042b;
+  border-bottom: 2px dotted #808080;
 }
 .accordion__section-head {
   box-sizing: border-box;
@@ -1432,6 +1431,9 @@ a:hover {
 }
 .changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {
   background: rgba(255,255,255,0.9);
+}
+.changelog-settings__tune-panel {
+  max-width: 800px;
 }
 .packages-list {
   list-style: outside none none;

@@ -21368,10 +21368,10 @@
 	// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
 	// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
 	// [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
-	//     например, если прервать worker.
-	// [ ] после сохранения объекта в нотифайке сверхку на работают апострофы you&#39;ve 
+	//     например, если прервать worker (после)
+	// [ ] после сохранения объекта в нотифайке сверху не работают апострофы you&#39;ve (обязательно пофиксить)
 	// [ ] для экрана небольшой высоты не надо делать меню с настройками плавающим, а надо закреплять его внизу, и
-	//     само preview ограничивать по высоте
+	//     само preview ограничивать по высоте (обязательно пофиксить)
 
 	// Не относящееся к странице
 	// [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
@@ -21381,8 +21381,8 @@
 	// На табе описания:
 	// [+] после нажатия Save нужно редиректить на страницу пакета
 	// [+] когда меняется namespace или name, надо мгновенно дисейблить кнопку save до окончания валидации
-	// [ ] сохранение по Ctrl-Enter и Cmd+Enter.
-	// [ ] сделать так, чтобы таб был пониже, описания ошибок спрятать внутрь полей
+	// [ ] сохранение по Ctrl-Enter и Cmd+Enter (после)
+	// [ ] сделать так, чтобы таб был пониже, описания ошибок спрятать внутрь полей (после, хотя хорошо бы))
 
 	// на странице changedownloader:
 	// [+] надо показывать только список тех даунлоадеров, что выдал guess
@@ -21394,14 +21394,14 @@
 	//     - а затем использовать для показа списка доступных
 	// [+] и в выпадушке должен быть выбран текущий downloader
 	// [+] надо добавить кнопку Apply
-	// -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
+	// [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
 	// [+] сделать так, чтобы не сбрасывался список downloaders
 	// [+] если в случае когда changelog не найден скрывался таб Save
 	// [+] если changelog не найден, не показывать текст This is the latest versions
 	// [+] если changelog не найден, показывать полный лог, а не только problem
-	// [ ] надо сделать отбивку кнопки Apply
-	// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать
-	// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку
+	// [+] надо сделать отбивку кнопки Apply
+	// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать (после выкатывания)
+	// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку (после)
 
 
 	// На табе Tune Parser:
@@ -21411,20 +21411,18 @@
 	// XSLT потом надо сделать так, чтобы их можно было указывать много, и они применялись для файлов по маске
 	// SED  то же самое
 	// [+] сделал аккордион и сохранение настроек
-	// [ ] сделать поля ввода пошире
-	// [ ] поправить положение кнопки Apply
-	// [ ] сделать так, чтобы apply становилась доступной только если данные поменялись
+	// [+] сделать поля ввода пошире
+	// [+] поправить положение кнопки Apply
+	// [ ] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
 
 
 	// Хорошо бы так же сделать:
-	// [ ] Анимацию, чтобы панель настроек выезжала снизу
+	//->[ ] Анимацию, чтобы панель настроек выезжала снизу (кажется это легко, надо сделать, чтобы привлекать к табу внимание)
 
 	// старое тодо, оставленное для размышлений:
 	// [ ] разобраться, почему ошибка для google play не показывается, а для hg или git показывается
 	// [ ] выяснить почему для Google play не показывается статус процесса обработки
 	// [ ] проверить, как работает search in
-	// [ ] добавить exclude
-	// [ ] добавить XSLT
 	// [ ] сделать отображение сообщений, чтобы они
 	//     приезжали в ответе на save
 
@@ -21497,41 +21495,44 @@
 	        description_error = React.createElement("span", {className: "input__error"}, "Description should be no more than 255 symbols.");
 	    }
 
-	    var save_button = React.createElement("input", {type: "submit", className: "button _good _large magic-prompt__apply", value: opts.button_title, onClick: opts.on_submit, disabled: opts.disabled});
+	    var save_button = React.createElement("input", {type: "submit", className: "button _good _large", value: opts.button_title, onClick: opts.on_submit, disabled: opts.disabled});
 
-	    var save_panel = (React.createElement("div", {key: "save-panel"}, 
-	        React.createElement("div", {className: "input"}, 
-	        namespace_error, React.createElement("br", null), 
-	        React.createElement("input", {name: "namespace", 
-	        type: "text", 
-	        placeholder: "Namespace (e.g. python, node)", 
-	        onChange: opts.on_field_change, 
-	        className: "text-input", 
-	        value: opts.namespace})
-	        ), 
+	    var save_panel = (
+	          React.createElement("div", {key: "save-panel"}, 
+	            React.createElement("div", {className: "changelog-settings__tune-panel"}, 
+	              React.createElement("div", {className: "input"}, 
+	                namespace_error, React.createElement("br", null), 
+	                React.createElement("input", {name: "namespace", 
+	                       type: "text", 
+	                       placeholder: "Namespace (e.g. python, node)", 
+	                       onChange: opts.on_field_change, 
+	                       className: "text-input", 
+	                       value: opts.namespace})
+	              ), 
 
-	        React.createElement("div", {className: "input"}, 
-	        name_error, React.createElement("br", null), 
-	        React.createElement("input", {name: "name", 
-	        type: "text", 
-	        placeholder: "Package name", 
-	        onChange: opts.on_field_change, 
-	        className: "text-input", 
-	        value: opts.name})
-	        ), 
-	        
-	        React.createElement("div", {className: "input"}, 
-	        description_error, React.createElement("br", null), 
-	        React.createElement("input", {name: "description", 
-	        type: "text", 
-	        placeholder: "Describe what it does.", 
-	        onChange: opts.on_field_change, 
-	        className: "text-input", 
-	        value: opts.description})
-	        ), 
+	              React.createElement("div", {className: "input"}, 
+	                name_error, React.createElement("br", null), 
+	                React.createElement("input", {name: "name", 
+	                       type: "text", 
+	                       placeholder: "Package name", 
+	                       onChange: opts.on_field_change, 
+	                       className: "text-input", 
+	                       value: opts.name})
+	              ), 
+	              
+	              React.createElement("div", {className: "input"}, 
+	                description_error, React.createElement("br", null), 
+	                React.createElement("input", {name: "description", 
+	                       type: "text", 
+	                       placeholder: "Describe what it does.", 
+	                       onChange: opts.on_field_change, 
+	                       className: "text-input", 
+	                       value: opts.description})
+	              ), 
 
-	        React.createElement("p", {className: "buttons-row"}, save_button)
-	        ));
+	              React.createElement("p", {className: "buttons-row"}, save_button)
+	            )
+	          ));
 	    return save_panel;
 	}
 
@@ -21557,15 +21558,20 @@
 	    
 	    var change_downloader_panel = (
 	        React.createElement("div", {key: "downloader-panel"}, 
-	        React.createElement("p", null, "Please, select which downloader to use:"), 
-	        React.createElement("select", {className: "downloader-selector", 
-	        name: "downloader", 
-	        value: opts.downloader, 
-	        onChange: opts.on_field_change, 
-	        disabled: opts.disabled}, 
-	        options
-	        ), 
-	        React.createElement("input", {type: "submit", className: "button _good", value: "Apply", onClick: opts.on_submit})
+	            React.createElement("div", {className: "changelog-settings__tune-panel"}, 
+	              React.createElement("p", null, "Please, select which downloader to use:"), 
+	              React.createElement("select", {className: "downloader-selector", 
+	                      name: "downloader", 
+	                      value: opts.downloader, 
+	                      onChange: opts.on_field_change, 
+	                      disabled: opts.disabled}, 
+	                options
+	              ), 
+	        
+	              React.createElement("p", {className: "buttons-row"}, 
+	                React.createElement("input", {type: "submit", className: "button _good _large", value: "Apply", onClick: opts.on_submit})
+	              )
+	            )
 	        ));
 
 	    return change_downloader_panel;
@@ -21611,8 +21617,12 @@
 	        
 	    return (
 	        React.createElement("div", {key: "tune-parser-panel"}, 
-	        React.createElement(Accordion, {elements: elements}), 
-	        React.createElement("input", {type: "submit", className: "button _good", value: "Apply", onClick: opts.on_submit})
+	          React.createElement("div", {className: "changelog-settings__tune-panel"}, 
+	            React.createElement(Accordion, {elements: elements}), 
+	            React.createElement("p", {className: "buttons-row"}, 
+	              React.createElement("input", {type: "submit", className: "button _good _large", value: "Apply", onClick: opts.on_submit})
+	            )
+	          )
 	        )
 	    );
 	}

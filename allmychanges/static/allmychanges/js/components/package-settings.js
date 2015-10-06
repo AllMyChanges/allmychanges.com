@@ -12,10 +12,10 @@
 // [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
 // [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
 // [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
-//     например, если прервать worker.
-// [ ] после сохранения объекта в нотифайке сверхку на работают апострофы you&#39;ve 
+//     например, если прервать worker (после)
+// [ ] после сохранения объекта в нотифайке сверху не работают апострофы you&#39;ve (обязательно пофиксить)
 // [ ] для экрана небольшой высоты не надо делать меню с настройками плавающим, а надо закреплять его внизу, и
-//     само preview ограничивать по высоте
+//     само preview ограничивать по высоте (обязательно пофиксить)
 
 // Не относящееся к странице
 // [ ] нельзя запустить dbshell: CommandError: You appear not to have the 'mysql' program installed or on your path.
@@ -25,8 +25,8 @@
 // На табе описания:
 // [+] после нажатия Save нужно редиректить на страницу пакета
 // [+] когда меняется namespace или name, надо мгновенно дисейблить кнопку save до окончания валидации
-// [ ] сохранение по Ctrl-Enter и Cmd+Enter.
-// [ ] сделать так, чтобы таб был пониже, описания ошибок спрятать внутрь полей
+// [ ] сохранение по Ctrl-Enter и Cmd+Enter (после)
+// [ ] сделать так, чтобы таб был пониже, описания ошибок спрятать внутрь полей (после, хотя хорошо бы))
 
 // на странице changedownloader:
 // [+] надо показывать только список тех даунлоадеров, что выдал guess
@@ -38,14 +38,14 @@
 //     - а затем использовать для показа списка доступных
 // [+] и в выпадушке должен быть выбран текущий downloader
 // [+] надо добавить кнопку Apply
-// -> [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
+// [+] сделать так, чтобы http downloader хоть писал в лог, что скачивает такую-то страницу
 // [+] сделать так, чтобы не сбрасывался список downloaders
 // [+] если в случае когда changelog не найден скрывался таб Save
 // [+] если changelog не найден, не показывать текст This is the latest versions
 // [+] если changelog не найден, показывать полный лог, а не только problem
-// [ ] надо сделать отбивку кнопки Apply
-// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать
-// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку
+// [+] надо сделать отбивку кнопки Apply
+// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать (после выкатывания)
+// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку (после)
 
 
 // На табе Tune Parser:
@@ -55,20 +55,18 @@
 // XSLT потом надо сделать так, чтобы их можно было указывать много, и они применялись для файлов по маске
 // SED  то же самое
 // [+] сделал аккордион и сохранение настроек
-// [ ] сделать поля ввода пошире
-// [ ] поправить положение кнопки Apply
-// [ ] сделать так, чтобы apply становилась доступной только если данные поменялись
+// [+] сделать поля ввода пошире
+// [+] поправить положение кнопки Apply
+// [ ] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
 
 
 // Хорошо бы так же сделать:
-// [ ] Анимацию, чтобы панель настроек выезжала снизу
+//->[ ] Анимацию, чтобы панель настроек выезжала снизу (кажется это легко, надо сделать, чтобы привлекать к табу внимание)
 
 // старое тодо, оставленное для размышлений:
 // [ ] разобраться, почему ошибка для google play не показывается, а для hg или git показывается
 // [ ] выяснить почему для Google play не показывается статус процесса обработки
 // [ ] проверить, как работает search in
-// [ ] добавить exclude
-// [ ] добавить XSLT
 // [ ] сделать отображение сообщений, чтобы они
 //     приезжали в ответе на save
 
@@ -141,41 +139,44 @@ var render_save_panel = function (opts) {
         description_error = <span className="input__error">Description should be no more than 255 symbols.</span>;
     }
 
-    var save_button = <input type="submit" className="button _good _large magic-prompt__apply" value={opts.button_title} onClick={opts.on_submit} disabled={opts.disabled}/>;
+    var save_button = <input type="submit" className="button _good _large" value={opts.button_title} onClick={opts.on_submit} disabled={opts.disabled}/>;
 
-    var save_panel = (<div key="save-panel">
-        <div className="input">
-        {namespace_error}<br/>
-        <input name="namespace"
-        type="text"
-        placeholder="Namespace (e.g. python, node)"
-        onChange={opts.on_field_change}
-        className="text-input"
-        value={opts.namespace}/>
-        </div>
+    var save_panel = (
+          <div key="save-panel">
+            <div className="changelog-settings__tune-panel">
+              <div className="input">
+                {namespace_error}<br/>
+                <input name="namespace"
+                       type="text"
+                       placeholder="Namespace (e.g. python, node)"
+                       onChange={opts.on_field_change}
+                       className="text-input"
+                       value={opts.namespace}/>
+              </div>
 
-        <div className="input">
-        {name_error}<br/>
-        <input name="name"
-        type="text"
-        placeholder="Package name"
-        onChange={opts.on_field_change}
-        className="text-input"
-        value={opts.name}/>
-        </div>
-        
-        <div className="input">
-        {description_error}<br/>
-        <input name="description"
-        type="text"
-        placeholder="Describe what it does."
-        onChange={opts.on_field_change}
-        className="text-input"
-        value={opts.description}/>
-        </div>
+              <div className="input">
+                {name_error}<br/>
+                <input name="name"
+                       type="text"
+                       placeholder="Package name"
+                       onChange={opts.on_field_change}
+                       className="text-input"
+                       value={opts.name}/>
+              </div>
+              
+              <div className="input">
+                {description_error}<br/>
+                <input name="description"
+                       type="text"
+                       placeholder="Describe what it does."
+                       onChange={opts.on_field_change}
+                       className="text-input"
+                       value={opts.description}/>
+              </div>
 
-        <p className="buttons-row">{save_button}</p>
-        </div>);
+              <p className="buttons-row">{save_button}</p>
+            </div>
+          </div>);
     return save_panel;
 }
 
@@ -201,15 +202,20 @@ var render_change_downloader_panel = function (opts) {
     
     var change_downloader_panel = (
         <div key="downloader-panel">
-        <p>Please, select which downloader to use:</p>
-        <select className="downloader-selector"
-        name="downloader"
-        value={opts.downloader}
-        onChange={opts.on_field_change}
-        disabled={opts.disabled}>
-        {options}
-        </select>
-        <input type="submit" className="button _good" value="Apply" onClick={opts.on_submit}/>
+            <div className="changelog-settings__tune-panel">
+              <p>Please, select which downloader to use:</p>
+              <select className="downloader-selector"
+                      name="downloader"
+                      value={opts.downloader}
+                      onChange={opts.on_field_change}
+                      disabled={opts.disabled}>
+                {options}
+              </select>
+        
+              <p className="buttons-row">
+                <input type="submit" className="button _good _large" value="Apply" onClick={opts.on_submit}/>
+              </p>
+            </div>
         </div>);
 
     return change_downloader_panel;
@@ -255,8 +261,12 @@ var render_tune_parser_panel = function(opts) {
         
     return (
         <div key="tune-parser-panel">
-        <Accordion elements={elements} />
-        <input type="submit" className="button _good" value="Apply" onClick={opts.on_submit}/>
+          <div className="changelog-settings__tune-panel">
+            <Accordion elements={elements} />
+            <p className="buttons-row">
+              <input type="submit" className="button _good _large" value="Apply" onClick={opts.on_submit}/>
+            </p>
+          </div>
         </div>
     );
 }
