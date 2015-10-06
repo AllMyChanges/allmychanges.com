@@ -1,20 +1,28 @@
 /** @jsx React.DOM **/
 
 var React = require('react');
+var css = require('./accordion.styl');
+
 
 var Section = React.createClass({
-  handleClick: function(){
-    if(this.state.open) {
+  handleClick: function() {
+    if (this.state.open) {
       this.setState({
         open: false,
         class: "accordion__section"
       });
-    }else{
+    } else {
       this.setState({
         open: true,
         class: "accordion__section accordion__section_open"
       });
     }
+      console.log('onToggle:');
+      console.log(this.props.onToggle);
+      
+      if (this.props.onToggle !== undefined) {
+          this.props.onToggle();
+      }
   },
   getInitialState: function(){
      return {
@@ -40,8 +48,8 @@ var Section = React.createClass({
 var Accordion = React.createClass({
     render: function() {
         var elements = this.props.elements.map(function(e, i) {
-            return <Section key={i} title={e.title}>{e.content}</Section>
-        });
+            return <Section key={i} title={e.title} onToggle={this.props.onToggle}>{e.content}</Section>
+        }.bind(this));
 
         return <div className="accordion">{elements}</div>;
     }

@@ -9,4 +9,5 @@
 ;; активируем projectile и helm для него
 (projectile-global-mode)
 (setq projectile-completion-system 'helm)
+(setq projectile-globally-ignored-directories '(".git" ".tox" "env" "node_modules"))
 (helm-projectile-on)

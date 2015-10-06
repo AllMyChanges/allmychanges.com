@@ -46,9 +46,9 @@
 
 	__webpack_require__(1).render()
 	__webpack_require__(163).render()
-	__webpack_require__(203).render()
-	__webpack_require__(204).render()
-	__webpack_require__(206).render()
+	__webpack_require__(207).render()
+	__webpack_require__(208).render()
+	__webpack_require__(210).render()
 
 
 /***/ },
@@ -20768,7 +20768,7 @@
 	var PackageSettings = __webpack_require__(172)
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(201)
+	window.intro = __webpack_require__(205)
 
 	$(document).ready(function() {
 	    window.intro.push({'element': $(".magic-prompt")[0],
@@ -21365,8 +21365,8 @@
 	//     [+] не показывается существующие версии, хотя они должны были быть скопированы с preview
 	//     [+] не заполнен список допустимых downloaders
 	// [+] невозможно сменить URL существующего пакета
-	// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
-	// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
+	// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой (после)
+	// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога (после)
 	// [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 	//     например, если прервать worker (после)
 	// [ ] после сохранения объекта в нотифайке сверху не работают апострофы you&#39;ve (обязательно пофиксить)
@@ -21417,7 +21417,8 @@
 
 
 	// Хорошо бы так же сделать:
-	//->[ ] Анимацию, чтобы панель настроек выезжала снизу (кажется это легко, надо сделать, чтобы привлекать к табу внимание)
+	// [+] Анимацию, чтобы панель настроек выезжала снизу (кажется это легко, надо сделать, чтобы привлекать к табу внимание)
+	//     Оказалось, что не так легко.
 
 	// старое тодо, оставленное для размышлений:
 	// [ ] разобраться, почему ошибка для google play не показывается, а для hg или git показывается
@@ -21428,7 +21429,7 @@
 
 	var Accordion = __webpack_require__(173);
 	var React = __webpack_require__(3);
-	var ReactTabs = __webpack_require__(174);
+	var ReactTabs = __webpack_require__(178);
 	var Tab = ReactTabs.Tab;
 	var Tabs = ReactTabs.Tabs;
 	var TabList = ReactTabs.TabList;
@@ -21437,11 +21438,19 @@
 
 	var render_tune_panel = function(content) {
 	    var style = {};
+	    
 	    if (content === undefined) {
+	        console.log('Setting height to 0 during rendering');
 	        style['height'] = 0;
+	        style['padding-top'] = 0;
+	        style['padding-bottom'] = 0;
+	    } else {
+	        var new_height = $('.changelog-settings__tune-content').height() + 20;
+	        console.log('Setting height to ' + new_height + ' during rendering');
+	        style['height'] = new_height;
 	    }
 	    return (
-	            React.createElement("div", {key: "tune", className: "changelog-settings__tune", style: style}, 
+	        React.createElement("div", {key: "tune", className: "changelog-settings__tune", style: style}, 
 	          React.createElement("div", {className: "changelog-settings__tune-content"}, 
 	            content
 	          )
@@ -21450,9 +21459,9 @@
 	}
 
 
-	var render_tabs = function(tabs, tab_panels) {
+	var render_tabs = function(tabs, tab_panels, on_select) {
 	    return (
-	        React.createElement(Tabs, null, 
+	        React.createElement(Tabs, {onSelect: on_select}, 
 	            React.createElement(TabList, null,  tabs ), 
 	             tab_panels 
 	        )
@@ -21561,11 +21570,7 @@
 	                                 'github_releases': 'GitHub Releases'};
 	    var render_option = function (item) {
 	        var name = item.name;
-	        if (name == opts.downloader) {
-	            return React.createElement("option", {value: name, key: name, selected: true}, available_downloaders[name]);
-	        } else {
-	            return React.createElement("option", {value: name, key: name}, available_downloaders[name]);
-	        }
+	        return React.createElement("option", {value: name, key: name}, available_downloaders[name]);
 	    };
 	    
 	    var options = R.map(render_option, opts.downloaders);
@@ -21632,7 +21637,7 @@
 	    return (
 	        React.createElement("div", {key: "tune-parser-panel"}, 
 	          React.createElement("div", {className: "changelog-settings__tune-panel"}, 
-	            React.createElement(Accordion, {elements: elements}), 
+	            React.createElement(Accordion, {elements: elements, onToggle: opts.on_toggle}), 
 	            React.createElement("p", {className: "buttons-row"}, 
 	              React.createElement("input", {type: "submit", className: "button _good _large", value: "Apply", onClick: opts.on_submit})
 	            )
@@ -21669,6 +21674,7 @@
 	                name_error: !this.props.namespace && 'Please, fill this field' || '',
 	                status: null, // here we store preview's status as it returned by API
 	                problem: null,
+	                tune_panel_height: 0,
 	                log: []};
 	    },
 	    componentDidMount: function() {
@@ -21901,6 +21907,16 @@
 	                       problem: false})
 	        this.wait_for_preview();
 	    },
+	    update_tune_panel_height: function (timeout) {
+	        return function() {
+	            // this function updates tune panel height and does
+	            // this after a small delay, because when tabs are changed, we need
+	            // time untill this switch will be done
+	            setTimeout(function () {
+	                this.forceUpdate();
+	            }.bind(this), timeout);
+	        }.bind(this);
+	    },
 	    render: function() {
 
 	        var content = [];
@@ -21963,6 +21979,7 @@
 	                    render_tune_parser_panel({
 	                        on_field_change: this.on_field_change,
 	                        on_submit: this.apply_parser_settings,
+	                        on_toggle: this.update_tune_panel_height(300),
 	                        disabled: this.state.waiting,
 	                        search_list: this.state.search_list,
 	                        ignore_list: this.state.ignore_list,
@@ -21973,13 +21990,17 @@
 	                // TODO: надо проверить, что source для preview сохраняется
 	                // кажется, что PATCH тут будет вызываться неверно
 	                content.push(render_tune_panel(render_need_apply_plate(this.apply_downloader_settings)));
-	                $('.changelog-settings__tune').height(0);
+	                // console.log('Setting height to 0 because of source changed');
+	                // $('.changelog-settings__tune').height(0);
 	            } else {
-	                content.push(render_tune_panel(render_tabs(tabs, tab_panels)));
+	                content.push(
+	                    render_tune_panel(
+	                        render_tabs(
+	                            tabs,
+	                            tab_panels,
+	                            this.update_tune_panel_height(30))));
 	            }
 	        }
-	        $('.changelog-settings__tune').height($('.changelog-settings__tune-content').height())
-	        
 	        return (React.createElement("div", {className: "package-settings"}, content));
 	    }
 	});
@@ -21992,20 +22013,28 @@
 	/** @jsx React.DOM **/
 
 	var React = __webpack_require__(3);
+	var css = __webpack_require__(174);
+
 
 	var Section = React.createClass({displayName: "Section",
-	  handleClick: function(){
-	    if(this.state.open) {
+	  handleClick: function() {
+	    if (this.state.open) {
 	      this.setState({
 	        open: false,
 	        class: "accordion__section"
 	      });
-	    }else{
+	    } else {
 	      this.setState({
 	        open: true,
 	        class: "accordion__section accordion__section_open"
 	      });
 	    }
+	      console.log('onToggle:');
+	      console.log(this.props.onToggle);
+	      
+	      if (this.props.onToggle !== undefined) {
+	          this.props.onToggle();
+	      }
 	  },
 	  getInitialState: function(){
 	     return {
@@ -22031,8 +22060,8 @@
 	var Accordion = React.createClass({displayName: "Accordion",
 	    render: function() {
 	        var elements = this.props.elements.map(function(e, i) {
-	            return React.createElement(Section, {key: i, title: e.title}, e.content)
-	        });
+	            return React.createElement(Section, {key: i, title: e.title, onToggle: this.props.onToggle}, e.content)
+	        }.bind(this));
 
 	        return React.createElement("div", {className: "accordion"}, elements);
 	    }
@@ -22046,17 +22075,338 @@
 /* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	// style-loader: Adds some css to the DOM by adding a <style> tag
 
-	module.exports = {
-	  Tabs: __webpack_require__(175),
-	  TabList: __webpack_require__(198),
-	  Tab: __webpack_require__(197),
-	  TabPanel: __webpack_require__(200)
-	};
+	// load the styles
+	var content = __webpack_require__(175);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(177)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../../node_modules/css-loader/index.js!./../../../../../node_modules/stylus-loader/index.js!./accordion.styl", function() {
+				var newContent = require("!!./../../../../../node_modules/css-loader/index.js!./../../../../../node_modules/stylus-loader/index.js!./accordion.styl");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
 
 /***/ },
 /* 175 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(176)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".accordion {\n  box-sizing: border-box;\n  min-width: 15em;\n  overflow: hidden;\n}\n.accordion__section {\n  position: relative;\n  width: 100%;\n  border-bottom: 2px solid #808080;\n}\n.accordion__section button {\n  position: absolute;\n  right: 0;\n  margin: 0;\n  padding: 0;\n  height: 3em;\n  width: 3em;\n  outline: 0;\n  border: 0;\n  background: none;\n  text-indent: -9999%;\n  pointer-events: none;\n}\n.accordion__section button:before {\n  content: '';\n  display: block;\n  position: absolute;\n  height: 12px;\n  width: 4px;\n  border-radius: 0.3em;\n  background: #d9042b;\n  transform-origin: 50%;\n  top: 50%;\n  left: 50%;\n  transition: all 0.25s ease-in-out;\n  transform: translate(75%, -50%) rotate(45deg);\n}\n.accordion__section button:after {\n  content: '';\n  display: block;\n  position: absolute;\n  height: 12px;\n  width: 4px;\n  border-radius: 0.3em;\n  background: #d9042b;\n  transform-origin: 50%;\n  top: 50%;\n  left: 50%;\n  transition: all 0.25s ease-in-out;\n  transform: translate(-75%, -50%) rotate(-45deg);\n}\n.accordion__section_open button:before,\n.accordion__section_open button:after {\n  height: 14px;\n}\n.accordion__section_open button:before {\n  transform: translate(0%, -50%) rotate(-45deg);\n}\n.accordion__section_open button:after {\n  transform: translate(0%, -50%) rotate(45deg);\n}\n.accordion__section_open .accordion__content-wrap {\n  height: 180px;\n}\n.accordion__section_open .accordion__section-head {\n  border-bottom: 2px dotted #808080;\n}\n.accordion__section-head {\n  box-sizing: border-box;\n  width: 100%;\n  overflow: hidden;\n  cursor: pointer;\n  font-weight: 700;\n  color: #888;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  padding: 1em;\n  padding-right: 2.1em;\n}\n.accordion__content {\n  padding: 1em;\n  color: #333;\n  line-height: 1.3;\n}\n.accordion__content-wrap {\n  height: 0;\n  overflow: hidden;\n  transition: all 0.2s ease-in;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 176 */
+/***/ function(module, exports) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
+
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
+
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
+
+
+/***/ },
+/* 177 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	var stylesInDom = {},
+		memoize = function(fn) {
+			var memo;
+			return function () {
+				if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+				return memo;
+			};
+		},
+		isOldIE = memoize(function() {
+			return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+		}),
+		getHeadElement = memoize(function () {
+			return document.head || document.getElementsByTagName("head")[0];
+		}),
+		singletonElement = null,
+		singletonCounter = 0;
+
+	module.exports = function(list, options) {
+		if(false) {
+			if(typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+		}
+
+		options = options || {};
+		// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+		// tags it will allow on a page
+		if (typeof options.singleton === "undefined") options.singleton = isOldIE();
+
+		var styles = listToStyles(list);
+		addStylesToDom(styles, options);
+
+		return function update(newList) {
+			var mayRemove = [];
+			for(var i = 0; i < styles.length; i++) {
+				var item = styles[i];
+				var domStyle = stylesInDom[item.id];
+				domStyle.refs--;
+				mayRemove.push(domStyle);
+			}
+			if(newList) {
+				var newStyles = listToStyles(newList);
+				addStylesToDom(newStyles, options);
+			}
+			for(var i = 0; i < mayRemove.length; i++) {
+				var domStyle = mayRemove[i];
+				if(domStyle.refs === 0) {
+					for(var j = 0; j < domStyle.parts.length; j++)
+						domStyle.parts[j]();
+					delete stylesInDom[domStyle.id];
+				}
+			}
+		};
+	}
+
+	function addStylesToDom(styles, options) {
+		for(var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+			if(domStyle) {
+				domStyle.refs++;
+				for(var j = 0; j < domStyle.parts.length; j++) {
+					domStyle.parts[j](item.parts[j]);
+				}
+				for(; j < item.parts.length; j++) {
+					domStyle.parts.push(addStyle(item.parts[j], options));
+				}
+			} else {
+				var parts = [];
+				for(var j = 0; j < item.parts.length; j++) {
+					parts.push(addStyle(item.parts[j], options));
+				}
+				stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+			}
+		}
+	}
+
+	function listToStyles(list) {
+		var styles = [];
+		var newStyles = {};
+		for(var i = 0; i < list.length; i++) {
+			var item = list[i];
+			var id = item[0];
+			var css = item[1];
+			var media = item[2];
+			var sourceMap = item[3];
+			var part = {css: css, media: media, sourceMap: sourceMap};
+			if(!newStyles[id])
+				styles.push(newStyles[id] = {id: id, parts: [part]});
+			else
+				newStyles[id].parts.push(part);
+		}
+		return styles;
+	}
+
+	function createStyleElement() {
+		var styleElement = document.createElement("style");
+		var head = getHeadElement();
+		styleElement.type = "text/css";
+		head.appendChild(styleElement);
+		return styleElement;
+	}
+
+	function createLinkElement() {
+		var linkElement = document.createElement("link");
+		var head = getHeadElement();
+		linkElement.rel = "stylesheet";
+		head.appendChild(linkElement);
+		return linkElement;
+	}
+
+	function addStyle(obj, options) {
+		var styleElement, update, remove;
+
+		if (options.singleton) {
+			var styleIndex = singletonCounter++;
+			styleElement = singletonElement || (singletonElement = createStyleElement());
+			update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
+			remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
+		} else if(obj.sourceMap &&
+			typeof URL === "function" &&
+			typeof URL.createObjectURL === "function" &&
+			typeof URL.revokeObjectURL === "function" &&
+			typeof Blob === "function" &&
+			typeof btoa === "function") {
+			styleElement = createLinkElement();
+			update = updateLink.bind(null, styleElement);
+			remove = function() {
+				styleElement.parentNode.removeChild(styleElement);
+				if(styleElement.href)
+					URL.revokeObjectURL(styleElement.href);
+			};
+		} else {
+			styleElement = createStyleElement();
+			update = applyToTag.bind(null, styleElement);
+			remove = function() {
+				styleElement.parentNode.removeChild(styleElement);
+			};
+		}
+
+		update(obj);
+
+		return function updateStyle(newObj) {
+			if(newObj) {
+				if(newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap)
+					return;
+				update(obj = newObj);
+			} else {
+				remove();
+			}
+		};
+	}
+
+	var replaceText = (function () {
+		var textStore = [];
+
+		return function (index, replacement) {
+			textStore[index] = replacement;
+			return textStore.filter(Boolean).join('\n');
+		};
+	})();
+
+	function applyToSingletonTag(styleElement, index, remove, obj) {
+		var css = remove ? "" : obj.css;
+
+		if (styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = replaceText(index, css);
+		} else {
+			var cssNode = document.createTextNode(css);
+			var childNodes = styleElement.childNodes;
+			if (childNodes[index]) styleElement.removeChild(childNodes[index]);
+			if (childNodes.length) {
+				styleElement.insertBefore(cssNode, childNodes[index]);
+			} else {
+				styleElement.appendChild(cssNode);
+			}
+		}
+	}
+
+	function applyToTag(styleElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+
+		if(media) {
+			styleElement.setAttribute("media", media)
+		}
+
+		if(styleElement.styleSheet) {
+			styleElement.styleSheet.cssText = css;
+		} else {
+			while(styleElement.firstChild) {
+				styleElement.removeChild(styleElement.firstChild);
+			}
+			styleElement.appendChild(document.createTextNode(css));
+		}
+	}
+
+	function updateLink(linkElement, obj) {
+		var css = obj.css;
+		var media = obj.media;
+		var sourceMap = obj.sourceMap;
+
+		if(sourceMap) {
+			// http://stackoverflow.com/a/26603875
+			css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+		}
+
+		var blob = new Blob([css], { type: "text/css" });
+
+		var oldSrc = linkElement.href;
+
+		linkElement.href = URL.createObjectURL(blob);
+
+		if(oldSrc)
+			URL.revokeObjectURL(oldSrc);
+	}
+
+
+/***/ },
+/* 178 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	  Tabs: __webpack_require__(179),
+	  TabList: __webpack_require__(202),
+	  Tab: __webpack_require__(201),
+	  TabPanel: __webpack_require__(204)
+	};
+
+/***/ },
+/* 179 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -22064,19 +22414,19 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _reactAddons = __webpack_require__(176);
+	var _reactAddons = __webpack_require__(180);
 
 	var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-	var _jsStylesheet = __webpack_require__(194);
+	var _jsStylesheet = __webpack_require__(198);
 
 	var _jsStylesheet2 = _interopRequireDefault(_jsStylesheet);
 
-	var _helpersUuid = __webpack_require__(195);
+	var _helpersUuid = __webpack_require__(199);
 
 	var _helpersUuid2 = _interopRequireDefault(_helpersUuid);
 
-	var _helpersChildrenPropType = __webpack_require__(196);
+	var _helpersChildrenPropType = __webpack_require__(200);
 
 	var _helpersChildrenPropType2 = _interopRequireDefault(_helpersChildrenPropType);
 
@@ -22124,7 +22474,7 @@
 	  },
 
 	  componentWillMount: function componentWillMount() {
-	    (0, _jsStylesheet2['default'])(__webpack_require__(199));
+	    (0, _jsStylesheet2['default'])(__webpack_require__(203));
 	  },
 
 	  componentWillReceiveProps: function componentWillReceiveProps(newProps) {
@@ -22387,14 +22737,14 @@
 	});
 
 /***/ },
-/* 176 */
+/* 180 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(177);
+	module.exports = __webpack_require__(181);
 
 
 /***/ },
-/* 177 */
+/* 181 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -22417,18 +22767,18 @@
 
 	'use strict';
 
-	var LinkedStateMixin = __webpack_require__(178);
+	var LinkedStateMixin = __webpack_require__(182);
 	var React = __webpack_require__(4);
 	var ReactComponentWithPureRenderMixin =
-	  __webpack_require__(181);
-	var ReactCSSTransitionGroup = __webpack_require__(182);
+	  __webpack_require__(185);
+	var ReactCSSTransitionGroup = __webpack_require__(186);
 	var ReactFragment = __webpack_require__(12);
-	var ReactTransitionGroup = __webpack_require__(183);
+	var ReactTransitionGroup = __webpack_require__(187);
 	var ReactUpdates = __webpack_require__(28);
 
-	var cx = __webpack_require__(191);
-	var cloneWithProps = __webpack_require__(185);
-	var update = __webpack_require__(192);
+	var cx = __webpack_require__(195);
+	var cloneWithProps = __webpack_require__(189);
+	var update = __webpack_require__(196);
 
 	React.addons = {
 	  CSSTransitionGroup: ReactCSSTransitionGroup,
@@ -22445,7 +22795,7 @@
 
 	if ("production" !== process.env.NODE_ENV) {
 	  React.addons.Perf = __webpack_require__(152);
-	  React.addons.TestUtils = __webpack_require__(193);
+	  React.addons.TestUtils = __webpack_require__(197);
 	}
 
 	module.exports = React;
@@ -22453,7 +22803,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 178 */
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22470,8 +22820,8 @@
 
 	'use strict';
 
-	var ReactLink = __webpack_require__(179);
-	var ReactStateSetters = __webpack_require__(180);
+	var ReactLink = __webpack_require__(183);
+	var ReactStateSetters = __webpack_require__(184);
 
 	/**
 	 * A simple mixin around ReactLink.forState().
@@ -22498,7 +22848,7 @@
 
 
 /***/ },
-/* 179 */
+/* 183 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22575,7 +22925,7 @@
 
 
 /***/ },
-/* 180 */
+/* 184 */
 /***/ function(module, exports) {
 
 	/**
@@ -22685,7 +23035,7 @@
 
 
 /***/ },
-/* 181 */
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22738,7 +23088,7 @@
 
 
 /***/ },
-/* 182 */
+/* 186 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22760,10 +23110,10 @@
 	var assign = __webpack_require__(15);
 
 	var ReactTransitionGroup = React.createFactory(
-	  __webpack_require__(183)
+	  __webpack_require__(187)
 	);
 	var ReactCSSTransitionGroupChild = React.createFactory(
-	  __webpack_require__(188)
+	  __webpack_require__(192)
 	);
 
 	var ReactCSSTransitionGroup = React.createClass({
@@ -22812,7 +23162,7 @@
 
 
 /***/ },
-/* 183 */
+/* 187 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -22829,10 +23179,10 @@
 	'use strict';
 
 	var React = __webpack_require__(4);
-	var ReactTransitionChildMapping = __webpack_require__(184);
+	var ReactTransitionChildMapping = __webpack_require__(188);
 
 	var assign = __webpack_require__(15);
-	var cloneWithProps = __webpack_require__(185);
+	var cloneWithProps = __webpack_require__(189);
 	var emptyFunction = __webpack_require__(18);
 
 	var ReactTransitionGroup = React.createClass({
@@ -23046,7 +23396,7 @@
 
 
 /***/ },
-/* 184 */
+/* 188 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23155,7 +23505,7 @@
 
 
 /***/ },
-/* 185 */
+/* 189 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23173,7 +23523,7 @@
 	'use strict';
 
 	var ReactElement = __webpack_require__(13);
-	var ReactPropTransferer = __webpack_require__(186);
+	var ReactPropTransferer = __webpack_require__(190);
 
 	var keyOf = __webpack_require__(41);
 	var warning = __webpack_require__(17);
@@ -23217,7 +23567,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 186 */
+/* 190 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23235,7 +23585,7 @@
 
 	var assign = __webpack_require__(15);
 	var emptyFunction = __webpack_require__(18);
-	var joinClasses = __webpack_require__(187);
+	var joinClasses = __webpack_require__(191);
 
 	/**
 	 * Creates a transfer strategy that will merge prop values using the supplied
@@ -23331,7 +23681,7 @@
 
 
 /***/ },
-/* 187 */
+/* 191 */
 /***/ function(module, exports) {
 
 	/**
@@ -23376,7 +23726,7 @@
 
 
 /***/ },
-/* 188 */
+/* 192 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23395,8 +23745,8 @@
 
 	var React = __webpack_require__(4);
 
-	var CSSCore = __webpack_require__(189);
-	var ReactTransitionEvents = __webpack_require__(190);
+	var CSSCore = __webpack_require__(193);
+	var ReactTransitionEvents = __webpack_require__(194);
 
 	var onlyChild = __webpack_require__(158);
 	var warning = __webpack_require__(17);
@@ -23527,7 +23877,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 189 */
+/* 193 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23642,7 +23992,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 190 */
+/* 194 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -23757,7 +24107,7 @@
 
 
 /***/ },
-/* 191 */
+/* 195 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23816,7 +24166,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 192 */
+/* 196 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -23990,7 +24340,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 193 */
+/* 197 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -24508,7 +24858,7 @@
 
 
 /***/ },
-/* 194 */
+/* 198 */
 /***/ function(module, exports, __webpack_require__) {
 
 	!(function() {
@@ -24552,7 +24902,7 @@
 
 
 /***/ },
-/* 195 */
+/* 199 */
 /***/ function(module, exports) {
 
 	// Get a universally unique identifier
@@ -24564,7 +24914,7 @@
 	};
 
 /***/ },
-/* 196 */
+/* 200 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24575,11 +24925,11 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _componentsTab = __webpack_require__(197);
+	var _componentsTab = __webpack_require__(201);
 
 	var _componentsTab2 = _interopRequireDefault(_componentsTab);
 
-	var _componentsTabList = __webpack_require__(198);
+	var _componentsTabList = __webpack_require__(202);
 
 	var _componentsTabList2 = _interopRequireDefault(_componentsTabList);
 
@@ -24613,7 +24963,7 @@
 	};
 
 /***/ },
-/* 197 */
+/* 201 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -24683,7 +25033,7 @@
 	});
 
 /***/ },
-/* 198 */
+/* 202 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -24712,7 +25062,7 @@
 	});
 
 /***/ },
-/* 199 */
+/* 203 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -24766,7 +25116,7 @@
 	};
 
 /***/ },
-/* 200 */
+/* 204 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -24823,10 +25173,10 @@
 
 
 /***/ },
-/* 201 */
+/* 205 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var PriorityQueue = __webpack_require__(202)
+	var PriorityQueue = __webpack_require__(206)
 	var _introjs_items = new PriorityQueue(function(a, b) {
 	    return a.priority - b.priority});
 
@@ -24864,7 +25214,7 @@
 
 
 /***/ },
-/* 202 */
+/* 206 */
 /***/ function(module, exports) {
 
 	/**
@@ -25042,7 +25392,7 @@
 
 
 /***/ },
-/* 203 */
+/* 207 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Share = __webpack_require__(169)
@@ -25060,10 +25410,10 @@
 
 
 /***/ },
-/* 204 */
+/* 208 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Promo = __webpack_require__(205)
+	var Promo = __webpack_require__(209)
 
 	module.exports = {
 	    render: function () {
@@ -25075,7 +25425,7 @@
 
 
 /***/ },
-/* 205 */
+/* 209 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(3);
@@ -25271,10 +25621,10 @@
 
 
 /***/ },
-/* 206 */
+/* 210 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Landing = __webpack_require__(207)
+	var Landing = __webpack_require__(211)
 
 	module.exports = {
 	    render: function () {
@@ -25286,7 +25636,7 @@
 
 
 /***/ },
-/* 207 */
+/* 211 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(3);

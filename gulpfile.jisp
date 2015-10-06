@@ -38,16 +38,20 @@
 (task         "webpack"
   gulp.src    "allmychanges/static/allmychanges/js/react-site.js"
   plug.webpack   (output: (filename: "allmychanges/static/allmychanges/js-compiled/react-site.js")
-                  module: (loaders: (list (test: /\.js$/ loader: "jsx"))))
+                          module: (loaders: (list
+                                             (test: /\.js$/ loader: "jsx")
+;                                             (test: /\.css$/ loader: "style!css")
+                                             (test: /\.styl$/ loader: "style!css!stylus"))))
   plug.userStory ()
   gulp.dest   "./")
 
 
 
 (gulp.task "watch" (fn (do
-                           (gulp.watch "allmychanges/static/allmychanges/jisp/*.jisp" `("jisp"))
-                           (gulp.watch "allmychanges/static/allmychanges/js/**/*.js" `("webpack"))
-                           (gulp.watch "allmychanges/static/allmychanges/stylus/**/*.styl" `("css")))))
+                        (gulp.watch "allmychanges/static/allmychanges/jisp/*.jisp" `("jisp"))
+                        (gulp.watch "allmychanges/static/allmychanges/js/**/*.js" `("webpack"))
+                         (gulp.watch "allmychanges/static/allmychanges/js/**/*.styl" `("webpack"))
+                        (gulp.watch "allmychanges/static/allmychanges/stylus/**/*.styl" `("css")))))
 
 
 (task "default" `("jisp" "watch"))

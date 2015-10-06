@@ -9,8 +9,8 @@
 //     [+] не показывается существующие версии, хотя они должны были быть скопированы с preview
 //     [+] не заполнен список допустимых downloaders
 // [+] невозможно сменить URL существующего пакета
-// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой
-// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога
+// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой (после)
+// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога (после)
 // [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 //     например, если прервать worker (после)
 // [ ] после сохранения объекта в нотифайке сверху не работают апострофы you&#39;ve (обязательно пофиксить)
@@ -61,7 +61,8 @@
 
 
 // Хорошо бы так же сделать:
-//->[ ] Анимацию, чтобы панель настроек выезжала снизу (кажется это легко, надо сделать, чтобы привлекать к табу внимание)
+// [+] Анимацию, чтобы панель настроек выезжала снизу (кажется это легко, надо сделать, чтобы привлекать к табу внимание)
+//     Оказалось, что не так легко.
 
 // старое тодо, оставленное для размышлений:
 // [ ] разобраться, почему ошибка для google play не показывается, а для hg или git показывается
@@ -81,11 +82,19 @@ var TabPanel = ReactTabs.TabPanel;
 
 var render_tune_panel = function(content) {
     var style = {};
+    
     if (content === undefined) {
+        console.log('Setting height to 0 during rendering');
         style['height'] = 0;
+        style['padding-top'] = 0;
+        style['padding-bottom'] = 0;
+    } else {
+        var new_height = $('.changelog-settings__tune-content').height() + 20;
+        console.log('Setting height to ' + new_height + ' during rendering');
+        style['height'] = new_height;
     }
     return (
-            <div key="tune" className="changelog-settings__tune" style={style}>
+        <div key="tune" className="changelog-settings__tune" style={style}>
           <div className="changelog-settings__tune-content">
             {content}
           </div>
@@ -94,9 +103,9 @@ var render_tune_panel = function(content) {
 }
 
 
-var render_tabs = function(tabs, tab_panels) {
+var render_tabs = function(tabs, tab_panels, on_select) {
     return (
-        <Tabs>
+        <Tabs onSelect={on_select}>
             <TabList>{ tabs }</TabList>
             { tab_panels }
         </Tabs>
@@ -205,11 +214,7 @@ var render_change_downloader_panel = function (opts) {
                                  'github_releases': 'GitHub Releases'};
     var render_option = function (item) {
         var name = item.name;
-        if (name == opts.downloader) {
-            return <option value={name} key={name} selected>{available_downloaders[name]}</option>;
-        } else {
-            return <option value={name} key={name}>{available_downloaders[name]}</option>;
-        }
+        return <option value={name} key={name}>{available_downloaders[name]}</option>;
     };
     
     var options = R.map(render_option, opts.downloaders);
@@ -276,7 +281,7 @@ var render_tune_parser_panel = function(opts) {
     return (
         <div key="tune-parser-panel">
           <div className="changelog-settings__tune-panel">
-            <Accordion elements={elements} />
+            <Accordion elements={elements} onToggle={opts.on_toggle}/>
             <p className="buttons-row">
               <input type="submit" className="button _good _large" value="Apply" onClick={opts.on_submit}/>
             </p>
@@ -313,6 +318,7 @@ module.exports = React.createClass({
                 name_error: !this.props.namespace && 'Please, fill this field' || '',
                 status: null, // here we store preview's status as it returned by API
                 problem: null,
+                tune_panel_height: 0,
                 log: []};
     },
     componentDidMount: function() {
@@ -545,6 +551,16 @@ module.exports = React.createClass({
                        problem: false})
         this.wait_for_preview();
     },
+    update_tune_panel_height: function (timeout) {
+        return function() {
+            // this function updates tune panel height and does
+            // this after a small delay, because when tabs are changed, we need
+            // time untill this switch will be done
+            setTimeout(function () {
+                this.forceUpdate();
+            }.bind(this), timeout);
+        }.bind(this);
+    },
     render: function() {
 
         var content = [];
@@ -607,6 +623,7 @@ module.exports = React.createClass({
                     render_tune_parser_panel({
                         on_field_change: this.on_field_change,
                         on_submit: this.apply_parser_settings,
+                        on_toggle: this.update_tune_panel_height(300),
                         disabled: this.state.waiting,
                         search_list: this.state.search_list,
                         ignore_list: this.state.ignore_list,
@@ -617,13 +634,17 @@ module.exports = React.createClass({
                 // TODO: надо проверить, что source для preview сохраняется
                 // кажется, что PATCH тут будет вызываться неверно
                 content.push(render_tune_panel(render_need_apply_plate(this.apply_downloader_settings)));
-                $('.changelog-settings__tune').height(0);
+                // console.log('Setting height to 0 because of source changed');
+                // $('.changelog-settings__tune').height(0);
             } else {
-                content.push(render_tune_panel(render_tabs(tabs, tab_panels)));
+                content.push(
+                    render_tune_panel(
+                        render_tabs(
+                            tabs,
+                            tab_panels,
+                            this.update_tune_panel_height(30))));
             }
         }
-        $('.changelog-settings__tune').height($('.changelog-settings__tune-content').height())
-        
         return (<div className="package-settings">{content}</div>);
     }
 });
