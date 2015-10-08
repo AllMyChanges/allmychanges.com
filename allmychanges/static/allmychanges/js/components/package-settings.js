@@ -1,7 +1,7 @@
 // новое TODO:
 
 // На чем закончил:
-
+// делал так, чтобы на маленькой высоте экрана скрывалась часть превью
 
 // В целом
 // [+] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
@@ -13,8 +13,8 @@
 // [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога (после)
 // [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 //     например, если прервать worker (после)
-// [ ] после сохранения объекта в нотифайке сверху не работают апострофы you&#39;ve (обязательно пофиксить)
-// [ ] для экрана небольшой высоты не надо делать меню с настройками плавающим, а надо закреплять его внизу, и
+// [+] после сохранения объекта в нотифайке сверху не работают апострофы you&#39;ve (обязательно пофиксить)
+// [+] для экрана небольшой высоты не надо делать меню с настройками плавающим, а надо закреплять его внизу, и
 //     само preview ограничивать по высоте (обязательно пофиксить)
 
 // Не относящееся к странице
@@ -140,11 +140,27 @@ var render_log = function(log) {
 }
 
 var render_results = function (results) {
+    // тут есть баг с тем, что заданный max-height не ресетится после того,
+    // как окно растягивается, и плашка начинает "плавать"
+    // при этом footer "подягивается" вверх и начинает наезжать на
+    // превью
+    // пока я решил забить, потому что вряд ли кто-то будет ресайзить окно
+    // во время добавления нового ченьджлога
+    
+    var show_more = function (a1, a2, a3, a4) {
+        var sel = $('.preview-container__content');
+        var new_height = parseInt(sel.css('max-height')) + 500;
+        sel.css('max-height', new_height);
+    }
     // сами результаты
-    return(<div key="results" className="changelog-preview-container">
-        <h1>This is the latest versions for this package</h1>
-        <div className="changelog-preview" dangerouslySetInnerHTML={{__html: results}}></div>
-        </div>);
+    return(
+            <div key="results" className="preview-container">
+              <h1>This is the latest versions for this package</h1>
+              <div className="preview-container__content" dangerouslySetInnerHTML={{__html: results}}></div>
+              <div className="preview-container__show-more">
+                <input type="button" className="button _good" onClick={show_more} value="show more"/>
+              </div>
+            </div>);
 }
 
 var render_save_panel = function (opts) {
@@ -645,6 +661,6 @@ module.exports = React.createClass({
                             this.update_tune_panel_height(30))));
             }
         }
-        return (<div className="package-settings">{content}</div>);
+        return (<div className="changelog-settings">{content}</div>);
     }
 });

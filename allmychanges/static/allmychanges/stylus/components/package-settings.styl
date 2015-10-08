@@ -1,18 +1,23 @@
 .changelog-settings {
     &__tune {
-        position: fixed;
-        bottom: 0;
+        @media (min-height: 500px) {
+            position: fixed;
+            bottom: 0;
+            box-shadow: 0px 0px 20px gray;
+            transition: all 0.2s ease-in;
+        }
+        @media (max-height: 500px) {
+            box-shadow: 0px -3px 10px gray;
+        }
+        
         width: 100%;
         left: 0;
-//        min-height: 200px;
         padding-left: 100px;
         padding-right: 100px;
         padding-top: 10px;
         padding-bottom: 10px;
         background: rgba(255, 255, 255, 0.9);
         box-sizing: border-box;
-        box-shadow: 0px 0px 20px gray;
-        transition: all 0.2s ease-in;
 
         .react-tabs [role=tab][aria-selected=true] {
             background: rgba(255, 255, 255, 0.9);
@@ -21,6 +26,41 @@
         &-panel {
             max-width: 800px;
         }
+    }
+}
+
+preview-threshold-height = 500px
+
+.preview-container {
+    margin-top: 20px;
+
+    @media (max-height: preview-threshold-height) {
+        margin-bottom: 30px;
+    }
+        
+    &__content {
+        @media (max-height: preview-threshold-height) {
+            max-height: 300px;
+            overflow: hidden;
+            border-bottom: 1px solid gray;
+        }
+    }
+    
+    &__show-more {
+        padding-top: 5px;
+        text-align: center;
+        
+        @media (min-height: preview-threshold-height) {
+            display: none;
+        }
+        @media (max-height: preview-threshold-height) {
+            display: block;
+        }
+    }
+    
+    > h1 {
+        font-size: 30px;
+        font-height: 30px;
     }
 }
 

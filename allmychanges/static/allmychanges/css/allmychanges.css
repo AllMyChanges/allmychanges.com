@@ -697,13 +697,6 @@ a:hover {
 .namespace-name-cell__namespace-cell {
   vertical-align: bottom;
 }
-.changelog-preview-container {
-  margin-top: 40px;
-}
-.changelog-preview-container > h1 {
-  font-size: 30px;
-  font-height: 30px;
-}
 .tune-options {
   margin-left: 20px;
   margin-top: 20px;
@@ -1327,8 +1320,6 @@ a:hover {
   margin-top: 22px;
 }
 .changelog-settings__tune {
-  position: fixed;
-  bottom: 0;
   width: 100%;
   left: 0;
   padding-left: 100px;
@@ -1337,14 +1328,58 @@ a:hover {
   padding-bottom: 10px;
   background: rgba(255,255,255,0.9);
   box-sizing: border-box;
-  box-shadow: 0px 0px 20px #808080;
-  transition: all 0.2s ease-in;
+}
+@media (min-height: 500px) {
+  .changelog-settings__tune {
+    position: fixed;
+    bottom: 0;
+    box-shadow: 0px 0px 20px #808080;
+    transition: all 0.2s ease-in;
+  }
+}
+@media (max-height: 500px) {
+  .changelog-settings__tune {
+    box-shadow: 0px -3px 10px #808080;
+  }
 }
 .changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {
   background: rgba(255,255,255,0.9);
 }
 .changelog-settings__tune-panel {
   max-width: 800px;
+}
+.preview-container {
+  margin-top: 20px;
+}
+@media (max-height: 500px) {
+  .preview-container {
+    margin-bottom: 30px;
+  }
+}
+@media (max-height: 500px) {
+  .preview-container__content {
+    max-height: 300px;
+    overflow: hidden;
+    border-bottom: 1px solid #808080;
+  }
+}
+.preview-container__show-more {
+  padding-top: 5px;
+  text-align: center;
+}
+@media (min-height: 500px) {
+  .preview-container__show-more {
+    display: none;
+  }
+}
+@media (max-height: 500px) {
+  .preview-container__show-more {
+    display: block;
+  }
+}
+.preview-container > h1 {
+  font-size: 30px;
+  font-height: 30px;
 }
 .clear-both {
   clear: both;

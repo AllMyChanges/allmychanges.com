@@ -779,13 +779,6 @@ a:hover {
 .namespace-name-cell__namespace-cell {
   vertical-align: bottom;
 }
-.changelog-preview-container {
-  margin-top: 40px;
-}
-.changelog-preview-container > h1 {
-  font-size: 30px;
-  font-height: 30px;
-}
 .tune-options {
   margin-left: 20px;
   margin-top: 20px;
