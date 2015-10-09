@@ -21402,7 +21402,7 @@
 	// [+] надо сделать отбивку кнопки Apply
 	// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать (после выкатывания)
 	// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку (после)
-	//->[ ] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
+	// [+] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
 
 	// На табе Tune Parser:
 	// Что показывать:
@@ -21414,6 +21414,7 @@
 	// [+] сделать поля ввода пошире
 	// [+] поправить положение кнопки Apply
 	// [+] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
+	// [ ] сделать так, чтобы apply работал, сейчас ничего не происходит (обязательно)
 
 
 	// Хорошо бы так же сделать:
@@ -21590,7 +21591,17 @@
 	    };
 	    
 	    var options = R.map(render_option, opts.downloaders);
+
+	    var button_style = {transition: 'all 0.2s ease-in', opacity: 0};
+	    var button_disabled = true;
 	    
+	    if (opts.need_apply) {
+	        button_style.opacity = 1;
+	        button_disabled = false;
+	    } else {
+	        button_style.cursor = 'default';
+	    }
+	        
 	    var change_downloader_panel = (
 	        React.createElement("div", {key: "downloader-panel"}, 
 	            React.createElement("div", {className: "changelog-settings__tune-panel"}, 
@@ -21598,13 +21609,17 @@
 	              React.createElement("select", {className: "downloader-selector", 
 	                      name: "downloader", 
 	                      value: opts.downloader, 
-	                      onChange: opts.on_field_change, 
-	                      disabled: opts.disabled}, 
+	                      onChange: opts.on_field_change}, 
 	                options
 	              ), 
 	        
 	              React.createElement("p", {className: "buttons-row"}, 
-	                React.createElement("input", {type: "submit", className: "button _good _large", value: "Apply", onClick: opts.on_submit})
+	                React.createElement("input", {type: "submit", 
+	                       className: "button _good _large", 
+	                       value: "Apply", 
+	                       onClick: opts.on_submit, 
+	                       style: button_style, 
+	                       disabled: button_disabled})
 	              )
 	            )
 	        ));
@@ -21879,6 +21894,12 @@
 	    fetch_rendered_preview: function() {
 	        var promice = $.get('/preview/' + this.props.preview_id + '/')
 	        promice.success(function(data) {
+	            // нужно сохранить настройки preview
+	            // с которыми были получены результаты,
+	            // чтобы правильно показывать или не показывать
+	            // кнопки Apply
+	            this.save_preview_params();
+	            
 	            this.setState({waiting: false,
 	                           results: data});
 	        }.bind(this));
@@ -21903,7 +21924,7 @@
 	        UserStory.log(["checking if preview is ready"], ["wait"]);
 	        $.get('/v1/previews/' + this.props.preview_id + '/')
 	            .success(function(data) {
-	                UserStory.log(["received results about preview state"], ["wait"]);
+	                UserStory.log(["received [data=", data, "] about preview state"], ["wait"]);
 	                this.setState({'log': data.log,
 	                               'status': data.status,
 	                               'downloaders': data.downloaders,
@@ -21995,13 +22016,20 @@
 	                content.push(render_log(this.state.log));
 	            }
 
+	            var is_downloader_options_should_be_applied = function () {
+	                var result = (
+	                    this.state.downloader != this.preview.downloader);
+	                UserStory.log(["STATE [this.state.downloader=", this.state.downloader, "] != [this.preview.downloader=", this.preview.downloader, "]"], ["debug"]);
+	                return result;
+	            }.bind(this)
+
 	            add_tab('Change downloader',
 	                    render_change_downloader_panel({
 	                        downloader: this.state.downloader,
 	                        downloaders: this.state.downloaders,
 	                        on_field_change: this.on_field_change,
 	                        on_submit: this.apply_downloader_settings,
-	                        disabled: this.state.waiting
+	                        need_apply: is_downloader_options_should_be_applied()
 	                    }));
 
 	            var is_parser_options_should_be_applied = function () {
@@ -22009,7 +22037,6 @@
 	                    this.state.search_list != this.preview.search_list
 	                        || this.state.ignore_list != this.preview.ignore_list
 	                        || this.state.xslt != this.preview.xslt);
-	                UserStory.log(["PARSER OPTIONS NEED APPLY? [result=", result, "]"], ["debug"]);
 	                return result;
 	            }.bind(this)
 	            
