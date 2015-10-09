@@ -21402,7 +21402,7 @@
 	// [+] надо сделать отбивку кнопки Apply
 	// [ ] для http downloader надо сделать отдельную настройку с маской урлов которые скачивать (после выкатывания)
 	// [ ] предусмотреть миграцию для пакетов, использующих http downloader и специальную настройку (после)
-
+	//->[ ] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
 
 	// На табе Tune Parser:
 	// Что показывать:
@@ -21413,7 +21413,7 @@
 	// [+] сделал аккордион и сохранение настроек
 	// [+] сделать поля ввода пошире
 	// [+] поправить положение кнопки Apply
-	// [ ] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
+	// [+] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
 
 
 	// Хорошо бы так же сделать:
@@ -21622,7 +21622,6 @@
 	            className: "new-package__search-input", 
 	        name: "search_list", 
 	        onChange: opts.on_field_change, 
-	        disabled: opts.disabled, 
 	        value: opts.search_list})
 	            )
 	        },
@@ -21633,7 +21632,6 @@
 	            className: "new-package__ignore-input", 
 	        name: "ignore_list", 
 	        onChange: opts.on_field_change, 
-	        disabled: opts.disabled, 
 	        value: opts.ignore_list})
 	)
 	        },
@@ -21649,13 +21647,28 @@
 	            )
 	        }
 	    ];
+
+	    var button_style = {transition: 'all 0.2s ease-in', opacity: 0};
+	    var button_disabled = true;
+	    
+	    if (opts.need_apply) {
+	        button_style.opacity = 1;
+	        button_disabled = false;
+	    } else {
+	        button_style.cursor = 'default';
+	    }
 	        
 	    return (
 	        React.createElement("div", {key: "tune-parser-panel"}, 
 	          React.createElement("div", {className: "changelog-settings__tune-panel"}, 
 	            React.createElement(Accordion, {elements: elements, onToggle: opts.on_toggle}), 
 	            React.createElement("p", {className: "buttons-row"}, 
-	              React.createElement("input", {type: "submit", className: "button _good _large", value: "Apply", onClick: opts.on_submit})
+	            React.createElement("input", {type: "submit", 
+	                   className: "button _good _large", 
+	                   value: "Apply", 
+	                   onClick: opts.on_submit, 
+	                   style: button_style, 
+	                   disabled: button_disabled})
 	            )
 	          )
 	        )
@@ -21991,15 +22004,24 @@
 	                        disabled: this.state.waiting
 	                    }));
 
+	            var is_parser_options_should_be_applied = function () {
+	                var result = (
+	                    this.state.search_list != this.preview.search_list
+	                        || this.state.ignore_list != this.preview.ignore_list
+	                        || this.state.xslt != this.preview.xslt);
+	                UserStory.log(["PARSER OPTIONS NEED APPLY? [result=", result, "]"], ["debug"]);
+	                return result;
+	            }.bind(this)
+	            
 	            add_tab('Tune parser',
 	                    render_tune_parser_panel({
 	                        on_field_change: this.on_field_change,
 	                        on_submit: this.apply_parser_settings,
 	                        on_toggle: this.update_tune_panel_height(300),
-	                        disabled: this.state.waiting,
 	                        search_list: this.state.search_list,
 	                        ignore_list: this.state.ignore_list,
-	                        xslt: this.state.xslt
+	                        xslt: this.state.xslt,
+	                        need_apply: is_parser_options_should_be_applied()
 	                    }));
 
 	            if (this.preview.source != this.state.source) {
