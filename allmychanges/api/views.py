@@ -556,10 +556,22 @@ class PreviewViewSet(HandleExceptionMixin,
         super(PreviewViewSet, self).partial_update(*args, **kwargs)
 
         data = self.request.DATA
-        if 'downloader' in data:
+
+        fields_which_can_be_updated = (
+            'downloader',
+            'search_list',
+            'ignore_list',
+            'xslt')
+
+        updated_fields = {
+            key: value
+            for key, value in data.items()
+            if key in fields_which_can_be_updated}
+
+        if updated_fields:
             update_fields(self.object,
                           log=[],
-                          downloader=data['downloader'])
+                          **updated_fields)
             self.object.schedule_update()
 
         return Response({'result': 'scheduled'})

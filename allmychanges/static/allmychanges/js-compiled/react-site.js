@@ -21357,7 +21357,6 @@
 	// новое TODO:
 
 	// На чем закончил:
-	// делал так, чтобы на маленькой высоте экрана скрывалась часть превью
 
 	// В целом
 	// [+] кажется, при сохранении превью, не сохраняется выбранный downloader, надо проверить
@@ -21365,7 +21364,7 @@
 	//     [+] не показывается существующие версии, хотя они должны были быть скопированы с preview
 	//     [+] не заполнен список допустимых downloaders
 	// [+] невозможно сменить URL существующего пакета
-	// [ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой (после)
+	//->[ ] разные items лога надо красить в разные цвета, чтобы ошибка была с красной иконкой, а нормальные пункты — с зеленой (после)
 	// [ ] во время поиска ченьджлога, надо показывать крутилку напротив последнего пункта лога (после)
 	// [ ] никак не обрабатываются ошибки, происходящие во время ожидания результатов preview.
 	//     например, если прервать worker (после)
@@ -21414,7 +21413,7 @@
 	// [+] сделать поля ввода пошире
 	// [+] поправить положение кнопки Apply
 	// [+] сделать так, чтобы apply становилась доступной только если данные поменялись (хорошо бы сделать)
-	// [ ] сделать так, чтобы apply работал, сейчас ничего не происходит (обязательно)
+	// [+] сделать так, чтобы apply работал, сейчас ничего не происходит (обязательно)
 
 
 	// Хорошо бы так же сделать:
@@ -21756,7 +21755,7 @@
 	            .success(this.update_preview_callback);
 	    },
 	    apply_downloader_settings: function() {
-	        UserStory.log(["applying downloader-settings"], ["apply"]);
+	        UserStory.log(["applying downloader settings"], ["apply"]);
 	        this.save_preview_params();
 
 	        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
@@ -21769,9 +21768,8 @@
 	            .success(this.update_preview_callback);
 	    },
 	    apply_parser_settings: function() {
-	        UserStory.log(["applying downloader-sttings"], ["apply"]);
+	        UserStory.log(["applying parser settings"], ["apply"]);
 	        this.save_preview_params();
-	//        this.setState({'status': 'processing'});
 
 	        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
 	                method: 'PATCH',
@@ -22019,7 +22017,6 @@
 	            var is_downloader_options_should_be_applied = function () {
 	                var result = (
 	                    this.state.downloader != this.preview.downloader);
-	                UserStory.log(["STATE [this.state.downloader=", this.state.downloader, "] != [this.preview.downloader=", this.preview.downloader, "]"], ["debug"]);
 	                return result;
 	            }.bind(this)
 
