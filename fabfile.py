@@ -24,6 +24,9 @@ def _get_docker_command(name, ports=[], image='allmychanges.com'):
                 image=image,
                 ports=' '.join('-p ' + p for p in ports))
 
+def build_docker_image():
+    local('docker build -t allmychanges.com .')
+
 def shell():
     local(_get_docker_command('shell.command.allmychanges.com') + (
         '/env/bin/python /app/manage.py '

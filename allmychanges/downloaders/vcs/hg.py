@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import os
 import shutil
 import envoy
@@ -42,10 +44,13 @@ def download(source,
     url = source.replace('hg+', '')
 
     with cd(path):
-        import time
-        time.sleep(20)
-        envoy.run('cp -r /app/fake/anyjson ./')
-        return path
+
+        # TODO: сделать настройку через переменную окружения
+        if False:
+            import time
+            time.sleep(20)
+            envoy.run('cp -r /app/fake/anyjson ./')
+            return path
 
         response = envoy.run('hg clone {url} {path}'.format(url=url,
                                                              path=path))

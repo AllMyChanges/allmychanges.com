@@ -1,4 +1,6 @@
+# coding: utf-8
 
+from twiggy_goodies.threading import log
 
 def get_modules():
     from allmychanges.downloaders.vcs import git
@@ -33,18 +35,24 @@ def guess_downloaders(source):
     # downloaders to use information from other downloaders
     # this way, we can disable http downloader, if feed
     # downloader was discovered before
+
+    # TODO: сделать настройку через переменную окружения
     print 'Guessing downloaders'
-#    yield {'name': 'git'}
-    yield {'name': 'hg'}
-    yield {'name': 'http'}
-    return
+
+    if False:
+        yield {'name': 'hg'}
+        yield {'name': 'http'}
+        return
     discovered = {}
 
-    for module in get_modules():
+    modules = get_modules()
+
+    for module in modules:
         result = module.guess(source, discovered=discovered)
         if result:
             name = module.__name__.rsplit('.', 1)[-1]
             result['name'] = name
+            print result
             yield result
 
             # this way we could stop if google play or appstore
