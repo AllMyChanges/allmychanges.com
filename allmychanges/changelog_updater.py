@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import datetime
 import copy
 import shutil
@@ -171,10 +173,13 @@ def update_preview_or_changelog(obj, downloader=None):
     path = None
     found = False
     downloader = downloader or obj.downloader
+    downloader_name = downloader if isinstance(downloader, basestring) else downloader['name']
 
     try:
 #        with pdb_enabled():
-        obj.set_processing_status('Downloading data using "{0}" downloader'.format(downloader))
+        obj.set_processing_status(
+            'Downloading data using "{0}" downloader'.format(
+                downloader_name))
         path = obj.download(downloader)
     except UpdateError as e:
         problem = u', '.join(e.args)
@@ -207,7 +212,9 @@ def update_preview_or_changelog(obj, downloader=None):
                     #print 'Num versions from VCS:', len(raw_data)
 
                 if versions:
-                    update_fields(obj, downloader=downloader)
+                    # TODO: тут надо бы сохранять целиком downloader, как dict
+                    # чтобы вместе с параметрами
+                    update_fields(obj, downloader=downloader_name)
                     obj.set_processing_status('Updating database')
                     update_changelog_from_raw_data3(obj, versions)
                 else:

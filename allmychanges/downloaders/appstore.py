@@ -11,9 +11,9 @@ from django.conf import settings
 from collections import defaultdict
 from twiggy_goodies.threading import log
 from allmychanges.utils import (
-    cd, get_text_from_response, is_http_url,
-    first_sentences,
-    html_document_fromstring)
+    cd, get_text_from_response,
+    first_sentences)
+from allmychanges.exceptions import AppStoreAppNotFound
 
 
 def guess(source, discovered={}):

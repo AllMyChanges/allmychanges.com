@@ -1,5 +1,9 @@
 import re
 
+from allmychanges.downloaders.appstore import (
+    get_itunes_app_id,
+    get_itunes_app_data)
+
 
 def normalize_url(url, for_checkout=True, return_itunes_data=False):
     """Normalize url either for browser or for checkout.

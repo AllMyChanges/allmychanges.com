@@ -159,7 +159,8 @@ var render_change_downloader_panel = function (opts) {
                                  'http': 'Single HTML Page',
                                  'rechttp': 'Multiple HTML Pages',
                                  'google_play': 'Google Play',
-                                 'itunes': 'Apple AppStore',
+                                 'itunes': 'Apple AppStore', # TODO убрать это после полной миграции настроек даунлоадеров
+                                 'appstore': 'Apple AppStore',
                                  'git': 'Git Repository',
                                  'hg': 'Mercurial Repository',
                                  'github_releases': 'GitHub Releases'};

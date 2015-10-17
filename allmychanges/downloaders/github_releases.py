@@ -5,6 +5,7 @@ import tempfile
 import shutil
 import codecs
 import os
+import re
 
 from collections import defaultdict
 from django.conf import settings
@@ -14,10 +15,7 @@ from allmychanges.downloaders.vcs.git import (
     get_github_api_url,
     get_github_name_and_description,
     get_github_auth_headers)
-from allmychanges.utils import (
-    cd, get_text_from_response, is_http_url,
-    first_sentences,
-    html_document_fromstring)
+from allmychanges.utils import cd
 from twiggy_goodies.threading import log
 
 
