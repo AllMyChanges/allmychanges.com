@@ -72,6 +72,13 @@
 //     приезжали в ответе на save
 
 var Accordion = require('./accordion');
+//var Spinner2 = require('./spinner');
+var ReactMDL = require('react-mdl');
+var Spinner2 = ReactMDL.Spinner;
+
+
+//var ProgressBar = ReactMDL.ProgressBar;
+
 var React = require('react');
 var ReactTabs = require('react-tabs');
 var Tab = ReactTabs.Tab;
@@ -122,20 +129,29 @@ var render_need_apply_plate = function (on_submit) {
 }
 
 var render_we_are_waiting = function() {
-    // показываем предложение подождать пока обработка закончится
     return (
         <div key="waiting">
             <div className="progress-text">Please, wait while we search a changelog.</div>
-            <div className="results-spin"><div className="results-spin__wrapper"></div></div>
         </div>);
 }
 
-var render_log = function(log) {
+var render_log = function(log, show_spinner) {
     // показываем лог
     var log_items = [];
-    for (i=0; i< log.length; i++) {
+    var spinner = <div></div> ;
+    if (show_spinner) {
+        var buffer = 10;
+        var indeterminate = false;
+        var progress = 3;
+//        spinner =  <ProgressBar buffer={buffer} indeterminate={indeterminate} progress={progress}/>;
+        spinner =  <Spinner2/>;
+    }
+    
+    for (i=0; i < log.length; i++) {
         log_items.push(<li key={i}>{log[i]}</li>);
     }
+    log_items.push(<li key="spinner">{spinner}</li>);
+    
     return (<ul key="log" className="preview-processing-log">{log_items}</ul>);
 }
 
@@ -558,10 +574,10 @@ module.exports = React.createClass({
     },
     wait_for_preview: function () {
         // waiting for preview results @wait-for-preview
-        if (this.spinner === undefined) {
-            // creating a spinner @wait-for-preview
-            this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
-        }
+        // if (this.spinner === undefined) {
+        //     // creating a spinner @wait-for-preview
+        //     this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
+        // }
 
         // checking if preview is ready @wait-for-preview
         $.get('/v1/previews/' + this.props.preview_id + '/')
@@ -634,7 +650,7 @@ module.exports = React.createClass({
 
         if (status == 'processing') {
             content.push(render_we_are_waiting());
-            content.push(render_log(this.state.log));
+            content.push(render_log(this.state.log, true));
             content.push(render_tune_panel());
         } else {
             // статус равен created, когда мы открыли changelog
@@ -655,7 +671,7 @@ module.exports = React.createClass({
                 }));
             }
             if (status == 'error') {
-                content.push(render_log(this.state.log));
+                content.push(render_log(this.state.log, false));
             }
 
             var is_downloader_options_should_be_applied = function () {

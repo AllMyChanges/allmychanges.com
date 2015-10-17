@@ -42,6 +42,8 @@ def download(source,
     url = source.replace('hg+', '')
 
     with cd(path):
+        import time
+        time.sleep(20)
         envoy.run('cp -r /app/fake/anyjson ./')
         return path
 

@@ -676,14 +676,6 @@ a:hover {
 .new-package__rename-warning {
   color: #fe7649;
 }
-.results-spin {
-  height: 50px;
-}
-.results-spin__wrapper {
-  position: absolute;
-  width: 100%;
-  max-width: 800px;
-}
 .namespace-name-cell__table {
   width: 100%;
 }
@@ -1340,6 +1332,7 @@ a:hover {
 @media (max-height: 500px) {
   .changelog-settings__tune {
     box-shadow: 0px -3px 10px #808080;
+    margin-top: 20px;
   }
 }
 .changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {
@@ -1383,6 +1376,14 @@ a:hover {
 }
 .clear-both {
   clear: both;
+}
+.progress-text {
+  margin-bottom: 20px;
+}
+.preview-processing-log {
+  list-style-position: inside;
+  font-size: 20px;
+  line-height: 30px;
 }
 .packages-list {
   list-style: outside none none;

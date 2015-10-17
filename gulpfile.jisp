@@ -41,7 +41,9 @@
                           module: (loaders: (list
                                              (test: /\.js$/ loader: "jsx")
 ;                                             (test: /\.css$/ loader: "style!css")
-                                             (test: /\.styl$/ loader: "style!css!stylus"))))
+                                             (test: /\.styl$/ loader: "style!css!stylus")))
+                          externals: ("react": "React"))
+  
   plug.userStory ()
   gulp.dest   "./")
 

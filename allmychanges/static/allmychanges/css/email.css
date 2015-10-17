@@ -758,14 +758,6 @@ a:hover {
 .new-package__rename-warning {
   color: #fe7649;
 }
-.results-spin {
-  height: 50px;
-}
-.results-spin__wrapper {
-  position: absolute;
-  width: 100%;
-  max-width: 800px;
-}
 .namespace-name-cell__table {
   width: 100%;
 }
