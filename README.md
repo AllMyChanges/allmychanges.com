@@ -1,6 +1,33 @@
 allmychanges.com
 ================
 
+package.json notes
+------------------
+
+* jquery нужен, само собой
+* jquery.cookie нужен, чтобы вынимать csrftoken из куки и засовывать в HTTP заголовок
+* Модули babel-core и webpack были добавлены на верхний уровнем модулем babel-loader.
+* react и react-dom были добавлены модулем react-mdl.
+* priorityqueuejs я использую, чтобы приоретизировать показ плашек с помощью intro.js
+* react-tabs мне нужны чтобы на странице настройки пакета показывать в табиках доступные опции
+после того, как changelog был или не был найден.
+ставится с https://github.com/svetlyak40wt/react-tabs, потому что мне пришлось поправить версию
+reactjs в зависимостях с 0.13 на 0.14.
+* style-loader нужен чтобы импортировать стили внутри javascript компонент
+* css-loader нужен чтобы загружать css внутри javascript
+* stylus-loader для загрузки stylus шаблонов
+* gulp-rename gulp-uglify - чтобы собирать [минифицированную версию js](https://github.com/gulpjs/gulp/blob/master/docs/recipes/minified-and-non-minified.md)
+* gulp-concat - для того, чтобы объединить воедино кучу js файлов, которые я не могу подключить с помощью require внутри своих компонент
+* bower, всё-таки пришлось поставить, потому что не всё можно использовать через npm
+например lodash для UserStory нельзя так поставить
+
+bower modules
+-------------
+
+* lodash - нужен для UserStory
+* typehead.js - нужен для автокомлита в главной строке поиска
+* pubsub-js - чтобы показывать всплывашки и делать другие штуки по событию
+
 Как запустить всё под Docker
 ----------------------------
 

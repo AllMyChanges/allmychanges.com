@@ -1,8 +1,5 @@
-/** @jsx React.DOM **/
-
 var React = require('react');
 var css = require('./accordion.styl');
-
 
 var Section = React.createClass({
   handleClick: function() {

@@ -1,31 +1,21 @@
 # -*- coding: utf-8 -*-
 from south.utils import datetime_utils as datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
-        # Adding field 'Changelog.downloaders'
-        db.add_column(u'allmychanges_changelog', 'downloaders',
-                      self.gf('jsonfield.fields.JSONField')(default=[], blank=True),
-                      keep_default=False)
-
-        # Adding field 'Preview.downloaders'
-        db.add_column(u'allmychanges_preview', 'downloaders',
-                      self.gf('jsonfield.fields.JSONField')(default=[], blank=True),
-                      keep_default=False)
-
+        "Write your forwards methods here."
+        # Note: Don't use "from appname.models import ModelName".
+        # Use orm.ModelName to refer to models in this application,
+        # and orm['appname.ModelName'] for models in other applications.
+        orm['allmychanges.Changelog'].objects.all().update(downloaders=[])
+        orm['allmychanges.Preview'].objects.all().update(downloaders=[], log=[])
 
     def backwards(self, orm):
-        # Deleting field 'Changelog.downloaders'
-        db.delete_column(u'allmychanges_changelog', 'downloaders')
-
-        # Deleting field 'Preview.downloaders'
-        db.delete_column(u'allmychanges_preview', 'downloaders')
-
+        "Write your backwards methods here."
 
     models = {
         u'allmychanges.appstorebatch': {
@@ -257,3 +247,4 @@ class Migration(SchemaMigration):
     }
 
     complete_apps = ['allmychanges']
+    symmetrical = True

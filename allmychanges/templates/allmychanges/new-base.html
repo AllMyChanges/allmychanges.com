@@ -21,13 +21,13 @@
     {% compress css %}
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
     <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
-    <link href="{% static 'bower_components/intro.js/introjs.css' %}" rel="stylesheet">
+    <!-- TODO: научиться использовать без bower link href="{% static 'bower_components/intro.js/introjs.css' %}" rel="stylesheet"-->
     {% endcompress %}
 
-    <script src="https://fb.me/react-0.14.0.js"></script>
-    <script src="https://fb.me/react-dom-0.14.0.js"></script>
+    <!-- <script src="https://fb.me/react-0.14.0.js"></script> -->
+    <!-- <script src="https://fb.me/react-dom-0.14.0.js"></script> -->
     
-    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.js"></script>
+    <!--script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.js"></script-->
     <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.indigo-pink.min.css">
     <!-- Material Design icon font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -35,31 +35,31 @@
     <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> -->
 
     {% compress js %}
-      <script src="/static/bower_components/ramda/dist/ramda.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/bower_components/ramda/dist/ramda.js" type="text/javascript" charset="utf-8"></script>
 
       <script src="/static/bower_components/jquery/dist/jquery.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/bower_components/sticky/jquery.sticky.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/bower_components/waypoints/lib/jquery.waypoints.js" type="text/javascript" charset="utf-8"></script>
       <script src="/static/bower_components/jquery.cookie/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
-      <script src="/static/bower_components/typehead.js/dist/typeahead.jquery.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/bower_components/typehead.js/dist/typeahead.jquery.js" type="text/javascript" charset="utf-8"></script-->
 
       <!-- используется для UserStory -->
-      <script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
-      <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/bower_components/underscore/underscore.js" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/bower_components/UserStory/lib/UserStory.js" type="text/javascript" charset="utf-8"></script-->
 
-      <script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/spin.min.js" type="text/javascript" charset="utf-8"></script-->
 
       <!-- для того, чтобы колонки в каталоге рисовать -->
-      <script src="/static/jquery.tile.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/jquery.tile.js" type="text/javascript" charset="utf-8"></script-->
 
       <!-- этот pubsub используется в реактовских компонентах -->
-      <script src="/static/bower_components/pubsub-js/src/pubsub.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/bower_components/pubsub-js/src/pubsub.js" type="text/javascript" charset="utf-8"></script-->
 
       <!-- используем для привлечения внимания к элементам на странице -->
-      <script src="/static/bower_components/intro.js/intro.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/bower_components/intro.js/intro.js" type="text/javascript" charset="utf-8"></script-->
 
       <!-- для того, чтобы показывать intro только после 15 секунд неактивности -->
-      <script src="/static/bower_components/idle.js/build/idle.js" type="text/javascript" charset="utf-8"></script>
+      <!--script src="/static/bower_components/idle.js/build/idle.js" type="text/javascript" charset="utf-8"></script-->
     {% endcompress %}
 
 
@@ -69,10 +69,6 @@
         var username = "{{ request.user.username }}";
         var login_url_github = "{% url "social:begin" "github" %}";
         var login_url_twitter = "{% url "social:begin" "twitter" %}";
-
-        UserStory.configure({
-          on: ['*']
-        });
       </script>
 
     {% block extra_head %}{% endblock extra_head %}
@@ -218,7 +214,7 @@ var _prum = [['id', '{{ settings.PINGDOM_ID }}'],
 <!-- /Pingdom -->
 {% endif %}
 
-<script src="/static/allmychanges/js-compiled/react-site.js" type="text/javascript" charset="utf-8"></script>
+<script src="/static/allmychanges/js-compiled/all.min.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
@@ -232,6 +228,12 @@ setTimeout(function() {
 }, 500);
 </script>
 {% endif %}
+
+      <script type="text/javascript">
+        UserStory.configure({
+          on: ['*']
+        });
+      </script>
 
 </body>
 </html>

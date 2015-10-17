@@ -1385,6 +1385,10 @@ a:hover {
   font-size: 20px;
   line-height: 30px;
 }
+.preview-processing-log__spinner {
+  list-style: none;
+  padding-left: 20px;
+}
 .packages-list {
   list-style: outside none none;
   font-size: 20px;

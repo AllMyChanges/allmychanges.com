@@ -32,6 +32,12 @@ def shell():
 def dbshell():
     local('docker exec -it mysql.allmychanges.com mysql -ppassword allmychanges')
 
+def get_db_from_production():
+#    local('scp clupea:/mnt/yandex.disk/backups/mysql/allmychanges/latest.sql.bz2 dumps/')
+#    local('bunzip2 dumps/latest.sql.bz2')
+#    local('docker exec -ti mysql.allmychanges.com bash')
+    local('docker exec mysql.allmychanges.com /dumps/restore.sh')
+
 def runserver():
     local(_get_docker_command('runserver.command.allmychanges.com',
                               ports=['8000:8000']) + (
@@ -56,7 +62,7 @@ def watch_on_static():
 
 
 def manage(args=''):
-    local(_get_docker_command('tests.command.allmychanges.com') +
+    local(_get_docker_command('manage.command.allmychanges.com') +
         '/env/bin/python /app/manage.py ' + args)
 
 def test(args=''):
@@ -79,12 +85,20 @@ def coverage():
     local('ssh back open http://art.dev.allmychanges.com:8000/static/coverage/index.html')
 
 
+def drop_database():
+    local('docker rm -fv mysql.allmychanges.com')
+
+def create_database():
+    start()
+    get_db_from_production()
+    manage('migrate')
+
 def start():
     containers = _get_docker_containers()
     if 'mysql.allmychanges.com' in containers:
         local('docker start mysql.allmychanges.com')
     else:
-        local('docker run --name mysql.allmychanges.com -e MYSQL_ROOT_PASSWORD=password -d mysql')
+        local('docker run --name mysql.allmychanges.com -v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
         print 'Waiting for mysql start'
         time.sleep(30)
         local('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
