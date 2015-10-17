@@ -161,7 +161,7 @@ def update_preview_task(preview_id):
             if downloaders:
                 for downloader in downloaders:
                     print 'trying', downloader
-                    found = update_preview_or_changelog(preview, downloader['name'])
+                    found = update_preview_or_changelog(preview, downloader)
                     if found:
                         break
             else:

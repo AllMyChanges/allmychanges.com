@@ -1,6 +1,9 @@
-import requests
 import os
+import feedparser
+import shutil
+import tempfile
 
+from django.conf import settings
 from collections import defaultdict
 from allmychanges.downloaders.utils import feedfinder
 

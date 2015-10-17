@@ -40,7 +40,7 @@ MARKUP_CHOICES = (
 NAME_LENGTH = 80
 NAMESPACE_LENGTH = 80
 DESCRIPTION_LENGTH = 255
-
+PROCESSING_STATUS_LENGTH = 40
 
 # based on http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
 
@@ -229,10 +229,17 @@ class Downloadable(object):
         #         self.downloader = downloader
         #         self.save(update_fields=('downloader',))
 
+        if isinstance(downloader, dict):
+            params = downloader.get('params', {})
+            downloader = downloader['name']
+        else:
+            params = {}
+
         download = get_downloader(downloader)
         return download(self.source,
                         search_list=self.get_search_list(),
-                        ignore_list=self.get_ignore_list())
+                        ignore_list=self.get_ignore_list(),
+                        **params)
 
 
     # A mixin to get/set ignore and check lists on a model.
@@ -318,7 +325,7 @@ class Changelog(Downloadable, models.Model):
         blank=True)
 
     status = models.CharField(max_length=40, default='created')
-    processing_status = models.CharField(max_length=40)
+    processing_status = models.CharField(max_length=PROCESSING_STATUS_LENGTH)
     icon = models.CharField(max_length=1000,
                             blank=True, null=True)
 
@@ -760,7 +767,7 @@ class Preview(Downloadable, models.Model):
 
     def set_processing_status(self, status):
         self.log.append(status)
-        self.processing_status = status
+        self.processing_status = status[:PROCESSING_STATUS_LENGTH]
         self.updated_at = timezone.now()
 
         self.save(update_fields=('processing_status',
