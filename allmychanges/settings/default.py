@@ -255,6 +255,7 @@ ADVANCED_EDITORS = set(['svetlyak40wt', 'Bugagazavr'])
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
 
+
 def init_logging(filename, logstash=False):
     import logging
     from twiggy import add_emitters, outputs, levels, formats

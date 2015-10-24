@@ -1,10 +1,11 @@
 # coding: utf-8
 
-from twiggy_goodies.threading import log
+#from twiggy_goodies.threading import log
 
 def get_modules():
     from allmychanges.downloaders.vcs import git
     from allmychanges.downloaders.vcs import hg
+    from allmychanges.downloaders.vcs import git_commits
     from allmychanges.downloaders import (
         fake,
         github_releases,
@@ -19,15 +20,22 @@ def get_modules():
         google_play,
         git,
         github_releases,
+        git_commits,
         hg,
         feed,
         http,
     ]
 
+
+def get_downloader_name(module):
+    return module.__name__.replace('allmychanges.downloaders.', '')
+
+
 def get_modules_map():
-    return dict(
-        (module.__name__.rsplit('.', 1)[-1], module)
-        for module in get_modules())
+    return {
+        get_downloader_name(module): module
+        for module in get_modules()
+    }
 
 
 def guess_downloaders(source):
@@ -39,18 +47,18 @@ def guess_downloaders(source):
     # TODO: сделать настройку через переменную окружения
     print 'Guessing downloaders'
 
-    if False:
-        yield {'name': 'hg'}
-        yield {'name': 'http'}
-        return
     discovered = {}
 
     modules = get_modules()
 
+    if True:
+        yield {'name': 'vcs.git_commits'}
+        return
+
     for module in modules:
         result = module.guess(source, discovered=discovered)
         if result:
-            name = module.__name__.rsplit('.', 1)[-1]
+            name = get_downloader_name(module)
             result['name'] = name
             print result
             yield result

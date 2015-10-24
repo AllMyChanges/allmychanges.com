@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import re
 import requests
 import os
 import shutil
@@ -11,9 +10,8 @@ from collections import defaultdict
 from django.conf import settings
 from allmychanges.downloaders.utils import normalize_url
 from allmychanges.utils import (
-    cd, get_text_from_response, is_http_url,
-    first_sentences,
-    html_document_fromstring)
+    cd,
+    first_sentences)
 
 
 def split_branch(url):

@@ -26,7 +26,7 @@ from allmychanges.utils import (
     html_document_fromstring)
 from allmychanges.parsing.unreleased import mention_unreleased
 from allmychanges.parsing.postprocessors import sed
-from allmychanges.env import Environment
+from allmychanges.env import Environment, deserialize_envs
 from django.conf import settings
 from twiggy_goodies.threading import log
 
@@ -115,6 +115,16 @@ def get_files(env, walk=os.walk):
                 return True, markup
         return False, None
 
+    saved_env_file = os.path.join(env.dirname, 'versions.amchenvs')
+
+    if os.path.exists(saved_env_file):
+        # if we have already processed environment
+        # then will read only this file
+        yield env.push(type='filename',
+                       filename=saved_env_file,
+                       markup='amchenvs')
+        return
+
     for root, dirs, files in walk(env.dirname):
         root = force_text(root)
         for filename in files:
@@ -178,20 +188,6 @@ def read_file(obj):
             pass
 
 
-# TODO: remove
-def parse_files(file_objects):
-    """Outputs separate sections (header + notes/items)
-    from every file.
-    """
-    for obj in file_objects:
-        markup = get_markup(obj)
-        if markup is not None:
-            versions = globals().get('parse_{0}_file'.format(markup))(obj)
-            for version in versions:
-                # this information will be required late
-                version['filename'] = get_file_name(obj)
-                yield version
-
 def parse_file(env):
     """Outputs separate sections (header + notes/items)
     from every file.
@@ -204,9 +200,14 @@ def parse_file(env):
 
     if markup is not None:
         parser = globals().get('parse_{0}_file'.format(markup))
+
         versions = parser(env)
         for version in versions:
             yield version
+
+
+def parse_amchenvs_file(obj):
+    return deserialize_envs(obj.content)
 
 
 def parse_markdown_file(obj):

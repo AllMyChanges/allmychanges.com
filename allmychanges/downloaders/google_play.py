@@ -1,11 +1,12 @@
 import re
+import os
+import tempfile
+import shutil
 
 from collections import defaultdict
 from django.conf import settings
 from allmychanges.utils import (
-    cd, get_text_from_response, is_http_url,
-    first_sentences,
-    html_document_fromstring)
+    first_sentences)
 
 
 def guess(source, discovered={}):
@@ -66,9 +67,9 @@ def google_play_get_api():
     return api
 
 
-def google_play_downloader(source,
-                           search_list=[],
-                           ignore_list=[]):
+def download(source,
+             search_list=[],
+             ignore_list=[]):
     """Downloads latest release note from Google Play.
     """
     app_id = google_play_get_id(source)

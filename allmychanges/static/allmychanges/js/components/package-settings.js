@@ -159,9 +159,10 @@ var render_change_downloader_panel = function (opts) {
                                  'http': 'Single HTML Page',
                                  'rechttp': 'Multiple HTML Pages',
                                  'google_play': 'Google Play',
-                                 'itunes': 'Apple AppStore', # TODO убрать это после полной миграции настроек даунлоадеров
+                                 'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
                                  'appstore': 'Apple AppStore',
-                                 'git': 'Git Repository',
+                                 'vcs.git': 'Git Repository',
+                                 'vcs.git_commits': 'Git Commits',
                                  'hg': 'Mercurial Repository',
                                  'github_releases': 'GitHub Releases'};
     var render_option = function (item) {

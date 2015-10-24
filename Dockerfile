@@ -23,6 +23,7 @@ WORKDIR /app
 
 RUN virtualenv --python=python2 /env
 RUN /env/bin/pip install -r requirements-dev.txt
+RUN /env/bin/pip install -r requirements-from-git.txt
 RUN /env/bin/pip install -e /app
 
 ENV PATH=/env/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

@@ -68,3 +68,6 @@ gulp.task('js', ['webpack'], function() {
         .pipe(rename({extname: '.min.js'}))
         .pipe(gulp.dest(js_dest));
 });
+
+
+gulp.task('default', ['css', 'js']);
