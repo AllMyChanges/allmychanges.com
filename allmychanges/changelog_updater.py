@@ -168,7 +168,10 @@ def pdb_enabled():
     setattr(pdb, 'enabled', previous_value)
 
 
-def update_preview_or_changelog(obj, downloader=None):
+def update_preview_or_changelog(obj, downloader=None, ignore_problem=False):
+    """
+    Set ignore_problem=True to not set preview's status to 'error'
+    """
     problem = None
     path = None
     found = False
@@ -223,8 +226,9 @@ def update_preview_or_changelog(obj, downloader=None):
             shutil.rmtree(path)
 
     if problem is not None:
-        obj.set_processing_status(problem)
-        obj.set_status('error', problem=problem)
+        if not ignore_problem:
+            obj.set_processing_status(problem)
+            obj.set_status('error', problem=problem)
     else:
         obj.set_status('success')
 

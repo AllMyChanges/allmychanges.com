@@ -32,6 +32,7 @@ def get_github_auth_headers():
 
 def download(source,
              **params):
+
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url, username, repo_name = normalize_url(source)
 

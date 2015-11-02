@@ -168,12 +168,18 @@ def update_preview_task(preview_id):
 
 
             if downloaders:
-                for downloader in downloaders:
-                    print 'trying', downloader
-                    # if downloader['name'] == 'github_releases':
-                    #     import pdb; pdb.set_trace()
+                num_downloaders = len(downloaders)
 
-                    found = update_preview_or_changelog(preview, downloader)
+                for idx, downloader in enumerate(downloaders):
+                    print 'trying', downloader
+                    last_downloader = idx == (num_downloaders - 1)
+                    ignore_problem = True if not last_downloader else False
+
+                    found = update_preview_or_changelog(
+                        preview,
+                        downloader,
+                        ignore_problem=ignore_problem)
+
                     if found:
                         break
             else:
