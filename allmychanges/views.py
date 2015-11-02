@@ -1093,7 +1093,6 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
             'waiting-in-the-queue': 'Waiting in the queue.',
             'downloading': 'Downloading sources.',
             'searching-versions': 'Searching versions.',
-            'processing-vcs-history': 'Processing VCS history.',
             'updating-database': 'Updating database.',
         }
         status = self.preview.get_processing_status()

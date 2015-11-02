@@ -10,9 +10,7 @@ def guess(source, discovered):
         return {'source': source}
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
+def download(source, **params):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
 
     source = source.replace('test+', '')

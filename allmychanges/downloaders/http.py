@@ -12,8 +12,7 @@ from cgi import parse_header
 from collections import defaultdict
 from django.conf import settings
 from allmychanges.utils import (
-    cd, get_text_from_response, is_http_url,
-    first_sentences,
+    get_text_from_response, is_http_url,
     html_document_fromstring)
 from allmychanges.exceptions import DownloaderWarning
 from twiggy_goodies.threading import log
@@ -48,7 +47,8 @@ def guess(source, discovered={}):
 def download(source,
              search_list=[],
              ignore_list=[],
-             only_one=False):
+             only_one=False,
+             **params):
     """
     Param `only_one` needed to emulate http_downloader which fetches
     only one page.

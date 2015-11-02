@@ -200,17 +200,6 @@ def update_preview_or_changelog(obj, downloader=None):
                                            obj.get_ignore_list(),
                                            obj.get_search_list(),
                                            obj.xslt)
-                #print 'Num versions from pipeline:', len(versions)
-
-                # if not versions:
-                #     log.debug('updating v2 from vcs')
-                #     obj.set_processing_status('processing-vcs-history')
-                #     versions = vcs_processing_pipe(path,
-                #                                    obj.get_ignore_list(),
-                #                                    obj.get_search_list())
-
-                    #print 'Num versions from VCS:', len(raw_data)
-
                 if versions:
                     # TODO: тут надо бы сохранять целиком downloader, как dict
                     # чтобы вместе с параметрами
@@ -227,7 +216,8 @@ def update_preview_or_changelog(obj, downloader=None):
                 log.trace().error('Unable to update changelog')
             except Exception as e:
                 problem = unicode(e)
-                log.trace().error('Unable to update changelog')
+                log.trace().error(
+                    'Unable to update changelog because of unhandled exception')
 
         finally:
             shutil.rmtree(path)

@@ -38,9 +38,7 @@ def guess(source, discovered={}):
 
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
+def download(source, **params):
     url, username, repo = normalize_url(source)
     releases = get_github_releases(username, repo)
 

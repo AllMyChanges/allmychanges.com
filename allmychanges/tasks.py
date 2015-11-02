@@ -151,16 +151,28 @@ def update_preview_task(preview_id):
                       channel='tasks')
 
             if not preview.downloader:
+                print 'Guessed downloaders FOO'
                 preview.set_processing_status('Guessing downloaders')
                 downloaders = list(guess_downloaders(preview.source))
+                print ''
+                print 'Guessed downloaders:'
+                for d in downloaders:
+                    print d
+                print ''
                 update_fields(preview, downloaders=downloaders)
             else:
+                print ''
+                print 'Guessed downloaders BOO (dont need to guess)'
+                print ''
                 downloaders = [{'name': preview.downloader}]
 
 
             if downloaders:
                 for downloader in downloaders:
                     print 'trying', downloader
+                    # if downloader['name'] == 'github_releases':
+                    #     import pdb; pdb.set_trace()
+
                     found = update_preview_or_changelog(preview, downloader)
                     if found:
                         break

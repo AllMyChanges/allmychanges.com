@@ -24,9 +24,7 @@ def guess(source, discovered={}):
     return result
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
+def download(source, **params):
     source = source.replace('rss+', '').replace('atom+', '').replace('feed+', '')
     feed = feedparser.parse(source)
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)

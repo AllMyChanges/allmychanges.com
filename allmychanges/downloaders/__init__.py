@@ -1,6 +1,9 @@
 # coding: utf-8
 
+import time
+
 #from twiggy_goodies.threading import log
+
 
 def get_modules():
     from allmychanges.downloaders.vcs import git
@@ -16,14 +19,14 @@ def get_modules():
 
     return [
         fake,
-        appstore,
-        google_play,
         git,
         github_releases,
         git_commits,
         hg,
-        feed,
         http,
+        feed,
+        appstore,
+        google_play,
     ]
 
 
@@ -51,14 +54,23 @@ def guess_downloaders(source):
 
     modules = get_modules()
 
-    if True:
-        yield {'name': 'vcs.git_commits'}
+    if False:
+        yield {'name': 'http'}
+        yield {'name': 'vcs.git'}
         return
 
     for module in modules:
+        name = get_downloader_name(module)
+        print ''
+        print 'Guessing if {0} can be used'.format(name)
+        start = time.time()
+
         result = module.guess(source, discovered=discovered)
+        end = time.time()
+        print 'Guess took {0} seconds'.format(end - start)
+        print 'Result is:', result
+
         if result:
-            name = get_downloader_name(module)
             result['name'] = name
             print result
             yield result

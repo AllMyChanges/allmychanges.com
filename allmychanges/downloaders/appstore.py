@@ -6,6 +6,8 @@ import anyjson
 import tempfile
 import requests
 import shutil
+import plistlib
+
 
 from django.conf import settings
 from collections import defaultdict
@@ -236,9 +238,7 @@ def get_itunes_release_notes(app_id, fronts=_try_fronts):
             return data
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
+def download(source, **params):
     """Processes iOS app's changelog from urls like these
     https://itunes.apple.com/in/app/temple-run/id420009108?mt=8
     https://itunes.apple.com/en/app/slack-team-communication/id618783545?l=en&mt=8

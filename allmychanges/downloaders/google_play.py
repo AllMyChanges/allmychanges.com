@@ -67,9 +67,7 @@ def google_play_get_api():
     return api
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
+def download(source, **params):
     """Downloads latest release note from Google Play.
     """
     app_id = google_play_get_id(source)

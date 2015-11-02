@@ -3,18 +3,20 @@ import envoy
 import os
 
 
-from collections import defaultdict
 from django.conf import settings
-from allmychanges.downloaders.vcs.git import download as git_download
+from allmychanges.downloaders.vcs.git import (
+    download as git_download,
+    guess as git_guess)
 from allmychanges.vcs_extractor import get_versions_from_vcs
 from allmychanges.env import Environment, serialize_envs
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
-    print 'DOWNLOAD'
-    if True:
+# TODO: make smater guess someday
+guess = git_guess
+
+
+def download(source, **params):
+    if False:
         path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
         # import time
         # time.sleep(0)
@@ -31,11 +33,3 @@ def download(source,
             f.write(serialize_envs(versions))
 
     return path
-
-
-
-def guess(source, discovered={}):
-    print 'GUESS'
-    result = defaultdict(dict)
-    result['changelog']['source'] = source
-    return result

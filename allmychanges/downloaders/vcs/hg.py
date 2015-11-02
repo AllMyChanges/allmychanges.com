@@ -8,10 +8,7 @@ import tempfile
 from django.conf import settings
 from collections import defaultdict
 from allmychanges.downloaders.utils import normalize_url
-from allmychanges.utils import (
-    cd, get_text_from_response, is_http_url,
-    first_sentences,
-    html_document_fromstring)
+from allmychanges.utils import cd
 
 
 def guess(source, discovered={}):
@@ -37,9 +34,7 @@ def guess(source, discovered={}):
     return result
 
 
-def download(source,
-             search_list=[],
-             ignore_list=[]):
+def download(source, **params):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url = source.replace('hg+', '')
 
