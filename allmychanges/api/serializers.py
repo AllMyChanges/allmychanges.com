@@ -79,6 +79,7 @@ class ChangelogSerializer(ModelSerializer):
     updated_at = serializers.Field(source='updated_at')
     next_update_at = serializers.Field(source='next_update_at')
     latest_version = serializers.Field(source='latest_version')
+    downloader_settings = JSONField()
     downloaders = JSONField()
 
     class Meta:
@@ -106,6 +107,7 @@ class ChangelogSerializer(ModelSerializer):
 
 class PreviewSerializer(ModelSerializer):
     resource_uri = ResourceUriField(view_name='preview-detail')
+    downloader_settings = JSONField()
     downloaders = JSONField()
 
     class Meta:

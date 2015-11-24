@@ -53,6 +53,7 @@ def download(source,
     Param `only_one` needed to emulate http_downloader which fetches
     only one page.
     """
+    raise RuntimeError()
     DEFAULT_UPPER_LIMIT = 100
     UPPER_LIMITS = {
         'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,

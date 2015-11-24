@@ -9,7 +9,7 @@ var MagicPrompt = require('../components/magic-prompt.js')
 var Share = require('../components/share.js')
 var Notifications = require('../components/notifications.js')
 var FeedbackForm = require('../components/feedback-form.js')
-var PackageSettings = require('../components/package-settings.js')
+var PackageSettings = require('../components/package-settings')
 
 /* make introjs globally available */
 window.intro = require('../components/intro.js')

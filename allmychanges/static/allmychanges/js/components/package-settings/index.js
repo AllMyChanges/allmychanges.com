@@ -1,4 +1,4 @@
-var Accordion = require('./accordion');
+var Accordion = require('../accordion');
 var ReactMDL = require('react-mdl');
 var Spinner2 = ReactMDL.Spinner;
 var R = require('ramda');
@@ -10,6 +10,7 @@ var Tab = ReactTabs.Tab;
 var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
+var DOWNLOADER_SETTINGS_RENDERERS = require('./downloader-settings');
 
 
 var render_tune_panel = function(content) {
@@ -181,6 +182,33 @@ var render_change_downloader_panel = function (opts) {
     } else {
         button_style.cursor = 'default';
     }
+
+    var downloader_settings;
+    var downloader_name;
+    if (opts.downloader) {
+        downloader_name = opts.downloader;
+    } else {
+        if (opts.downloaders.length > 0) {
+            downloader_name = opts.downloaders[0].name;
+        }
+    }
+
+    function on_change_downloader_settings(new_settings) {
+        console.log('New downloader settings:');
+        console.log(new_settings);
+    }
+
+    var downloader_settings_renderer = DOWNLOADER_SETTINGS_RENDERERS[downloader_name];
+    if (downloader_settings_renderer !== undefined) {
+        downloader_settings = downloader_settings_renderer.bind(this)();
+    }
+
+    var on_field_change = function(ev) {
+        this.update_tune_panel_height(300);
+        if (opts.on_field_change) {
+            opts.on_field_change(ev)
+        }
+    }.bind(this);
         
     var change_downloader_panel = (
         <div key="downloader-panel">
@@ -189,10 +217,12 @@ var render_change_downloader_panel = function (opts) {
               <select className="downloader-selector"
                       name="downloader"
                       value={opts.downloader}
-                      onChange={opts.on_field_change}>
+                      onChange={on_field_change}>
                 {options}
               </select>
-        
+
+              {downloader_settings}
+              
               <p className="buttons-row">
                 <input type="submit"
                        className="button _good _large"
@@ -279,6 +309,7 @@ module.exports = React.createClass({
     getInitialState: function () {
         // init add new page @add-new
         // downloader [this.props.downloader] @add-new
+        console.log('in getInitialState, downloader is:' + this.props.downloader);
         return {tracked: false,
                 saving: false,
                 validating: false, // выставляется, когда мы ждем проверки namespace и name
@@ -290,6 +321,7 @@ module.exports = React.createClass({
                 results: null,
                 save_button_title: ((this.props.mode == 'edit') ? 'Save' : 'Save&Track'),
                 downloader: this.props.downloader,
+                downloader_settings: {},
                 downloaders: [],
                 namespace: this.props.namespace || '',
                 namespace_error: !this.props.namespace && 'Please, fill this field' || '',
@@ -306,9 +338,12 @@ module.exports = React.createClass({
         this.update_preview_callback();
     },
     save_preview_params: function () {
+        // downloader [this.state.downloader] @save-preview-params
+        console.log('in save_preview_params, downloader is:' + this.state.downloader);
         this.preview = {
             source: this.state.source,
             downloader: this.state.downloader,
+            downloader_settings: R.clone(this.state.downloader_settings),
             search_list: this.state.search_list,
             ignore_list: this.state.ignore_list,
             xslt: this.state.xslt};
@@ -495,11 +530,6 @@ module.exports = React.createClass({
     },
     wait_for_preview: function () {
         // waiting for preview results @wait-for-preview
-        // if (this.spinner === undefined) {
-        //     // creating a spinner @wait-for-preview
-        //     this.spinner = new Spinner({left: '50%', top: '30px'}).spin($('.results-spin__wrapper')[0]);
-        // }
-
         // checking if preview is ready @wait-for-preview
         $.get('/v1/previews/' + this.props.preview_id + '/')
             .success(function(data) {
@@ -515,14 +545,6 @@ module.exports = React.createClass({
                 } else {
                     // preview data is ready @wait-for-preview
                     this.fetch_rendered_preview();
-
-                    // if (data.hasClass('package-changes')) {
-                    //     // showing preview @wait-for-preview
-                    //     this.setState({results: data_orig});
-                    // } else {
-                    //     // showing a problem @wait-for-preview
-                    //     this.setState({problem: data_orig});
-                    // }
                 }
             }.bind(this))
             .error(function(data) {
@@ -597,12 +619,19 @@ module.exports = React.createClass({
 
             var is_downloader_options_should_be_applied = function () {
                 var result = (
-                    this.state.downloader != this.preview.downloader);
+                    this.state.downloader != this.preview.downloader ||
+                        !R.equals(this.state.downloader_settings, this.preview.downloader_settings));
+
+                if (result) {
+                    console.log('Downloader options SHOULD be applied');
+                } else {
+                    console.log('Downloader options SHOULD NOT be applied');
+                }
                 return result;
             }.bind(this)
 
             add_tab('Change downloader',
-                    render_change_downloader_panel({
+                    render_change_downloader_panel.bind(this)({
                         downloader: this.state.downloader,
                         downloaders: this.state.downloaders,
                         on_field_change: this.on_field_change,

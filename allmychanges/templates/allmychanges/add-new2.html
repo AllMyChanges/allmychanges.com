@@ -13,7 +13,7 @@
      data-preview-id="{{ preview.id }}"
      data-changelog-id="{{ changelog.id }}"
      data-source="{{ preview.source }}"
-     data-downloader="{{ preview.downloader }}"
+     data-downloader="{% firstof preview.downloader '' %}"
 {% if changelog.name %}
      data-name="{{ preview.name }}"{% endif %}
 {% if changelog.namespace %}

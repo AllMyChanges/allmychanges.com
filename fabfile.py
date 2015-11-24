@@ -147,3 +147,26 @@ def _get_docker_containers():
     containers = cl.containers(all=True)
     containers = [c['Names'][0].strip('/') for c in containers]
     return containers
+
+
+def versioneye():
+    import requests
+
+    API_KEY = '6456641e554ff23dcdc8'
+    VERSIONEYE_SERVER = 'https://www.versioneye.com'
+    PRJ_REQUIREMENTS_TXT = (
+        ('56506b4253ef5f000c000c71', 'requirements.txt'),
+        ('56506bdcd91d82000a000e0c', 'package.json'),)
+
+    for project, filename in PRJ_REQUIREMENTS_TXT:
+        url = '{server}/api/v2/projects/{project}?api_key={key}'.format(
+            server=VERSIONEYE_SERVER,
+            project=project,
+            key=API_KEY)
+
+        response = requests.post(
+            url,
+#            data=dict(name='project_file'),
+            files=dict(project_file=open(filename, 'rb')))
+
+        assert response.status_code == 201

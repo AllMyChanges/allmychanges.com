@@ -319,6 +319,10 @@ class Changelog(Downloadable, models.Model):
                                    blank=True,
                                    default='')
     downloader = models.CharField(max_length=20, blank=True, null=True)
+    downloader_settings = jsonfield.JSONField(
+        default={},
+        help_text=('JSON with settings for selected downloader.'),
+        blank=True)
     downloaders = jsonfield.JSONField(
         default=[],
         help_text=('JSON with guessed downloaders and their additional meta information.'),
@@ -726,6 +730,10 @@ class Preview(Downloadable, models.Model):
                                help_text='Latest error message',
                                blank=True, null=True)
     downloader = models.CharField(max_length=255, blank=True, null=True)
+    downloader_settings = jsonfield.JSONField(
+        default={},
+        help_text=('JSON with settings for selected downloader.'),
+        blank=True)
     downloaders = jsonfield.JSONField(
         default=[],
         help_text=('JSON with guessed downloaders and their additional meta information.'),
