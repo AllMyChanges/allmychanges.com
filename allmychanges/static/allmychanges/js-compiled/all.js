@@ -27270,9 +27270,9 @@ componentHandler.register({
 
 	__webpack_require__(1).render();
 	__webpack_require__(163).render();
-	__webpack_require__(252).render();
 	__webpack_require__(253).render();
-	__webpack_require__(255).render();
+	__webpack_require__(254).render();
+	__webpack_require__(256).render();
 
 /***/ },
 /* 1 */
@@ -47271,7 +47271,7 @@ componentHandler.register({
 	var PackageSettings = __webpack_require__(172);
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(250);
+	window.intro = __webpack_require__(251);
 
 	$(document).ready(function () {
 	    window.intro.push({ 'element': $(".magic-prompt")[0],
@@ -48037,7 +48037,7 @@ componentHandler.register({
 	var Tabs = ReactTabs.Tabs;
 	var TabList = ReactTabs.TabList;
 	var TabPanel = ReactTabs.TabPanel;
-	var DOWNLOADER_SETTINGS_RENDERERS = __webpack_require__(249);
+	var render_change_downloader_panel = __webpack_require__(249);
 
 	var render_tune_panel = function render_tune_panel(content) {
 	    var style = {};
@@ -48239,101 +48239,6 @@ componentHandler.register({
 	    return save_panel;
 	};
 
-	var render_change_downloader_panel = function render_change_downloader_panel(opts) {
-	    var available_downloaders = { 'feed': 'Rss/Atom Feed',
-	        'http': 'Single HTML Page',
-	        'rechttp': 'Multiple HTML Pages',
-	        'google_play': 'Google Play',
-	        'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
-	        'appstore': 'Apple AppStore',
-	        'vcs.git': 'Git Repository',
-	        'vcs.git_commits': 'Git Commits',
-	        'hg': 'Mercurial Repository',
-	        'github_releases': 'GitHub Releases' };
-	    var render_option = function render_option(item) {
-	        var name = item.name;
-	        return React.createElement(
-	            'option',
-	            { value: name, key: name },
-	            available_downloaders[name]
-	        );
-	    };
-
-	    var options = R.map(render_option, opts.downloaders);
-
-	    var button_style = { transition: 'all 0.2s ease-in', opacity: 0 };
-	    var button_disabled = true;
-
-	    if (opts.need_apply) {
-	        button_style.opacity = 1;
-	        button_disabled = false;
-	    } else {
-	        button_style.cursor = 'default';
-	    }
-
-	    var downloader_settings;
-	    var downloader_name;
-	    if (opts.downloader) {
-	        downloader_name = opts.downloader;
-	    } else {
-	        if (opts.downloaders.length > 0) {
-	            downloader_name = opts.downloaders[0].name;
-	        }
-	    }
-
-	    function on_change_downloader_settings(new_settings) {
-	        console.log('New downloader settings:');
-	        console.log(new_settings);
-	    }
-
-	    var downloader_settings_renderer = DOWNLOADER_SETTINGS_RENDERERS[downloader_name];
-	    if (downloader_settings_renderer !== undefined) {
-	        downloader_settings = downloader_settings_renderer.bind(this)();
-	    }
-
-	    var on_field_change = (function (ev) {
-	        this.update_tune_panel_height(300);
-	        if (opts.on_field_change) {
-	            opts.on_field_change(ev);
-	        }
-	    }).bind(this);
-
-	    var change_downloader_panel = React.createElement(
-	        'div',
-	        { key: 'downloader-panel' },
-	        React.createElement(
-	            'div',
-	            { className: 'changelog-settings__tune-panel' },
-	            React.createElement(
-	                'p',
-	                null,
-	                'Please, select which downloader to use:'
-	            ),
-	            React.createElement(
-	                'select',
-	                { className: 'downloader-selector',
-	                    name: 'downloader',
-	                    value: opts.downloader,
-	                    onChange: on_field_change },
-	                options
-	            ),
-	            downloader_settings,
-	            React.createElement(
-	                'p',
-	                { className: 'buttons-row' },
-	                React.createElement('input', { type: 'submit',
-	                    className: 'button _good _large',
-	                    value: 'Apply',
-	                    onClick: opts.on_submit,
-	                    style: button_style,
-	                    disabled: button_disabled })
-	            )
-	        )
-	    );
-
-	    return change_downloader_panel;
-	};
-
 	var render_tune_parser_panel = function render_tune_parser_panel(opts) {
 
 	    var elements = [{
@@ -48400,7 +48305,9 @@ componentHandler.register({
 	    getInitialState: function getInitialState() {
 	        // init add new page @add-new
 	        // downloader [this.props.downloader] @add-new
-	        console.log('in getInitialState, downloader is:' + this.props.downloader);
+	        var downloader = R.or(this.props.downloader, R.path('name', R.head(this.props.downloaders || [])));
+
+	        console.log('in getInitialState, downloader is:' + downloader);
 	        return { tracked: false,
 	            saving: false,
 	            validating: false, // выставляется, когда мы ждем проверки namespace и name
@@ -48411,7 +48318,7 @@ componentHandler.register({
 	            xslt: this.props.xslt || '',
 	            results: null,
 	            save_button_title: this.props.mode == 'edit' ? 'Save' : 'Save&Track',
-	            downloader: this.props.downloader,
+	            downloader: downloader,
 	            downloader_settings: {},
 	            downloaders: [],
 	            namespace: this.props.namespace || '',
@@ -48461,9 +48368,7 @@ componentHandler.register({
 
 	        $.ajax({ url: '/v1/previews/' + this.props.preview_id + '/',
 	            method: 'PATCH',
-	            data: JSON.stringify({
-	                downloader: this.state.downloader
-	            }),
+	            data: JSON.stringify(R.pick(['downloader', 'downloader_settings'], this.state)),
 	            contentType: 'application/json',
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
@@ -48628,16 +48533,19 @@ componentHandler.register({
 	        this.wait_for_preview();
 	    },
 	    update_tune_panel_height: function update_tune_panel_height(timeout) {
-	        return (function () {
+	        var _this = this;
+
+	        return function () {
 	            // this function updates tune panel height and does
 	            // this after a small delay, because when tabs are changed, we need
 	            // time untill this switch will be done
-	            setTimeout((function () {
-	                this.forceUpdate();
-	            }).bind(this), timeout);
-	        }).bind(this);
+	            setTimeout(function () {
+	                _this.forceUpdate();
+	            }, timeout);
+	        };
 	    },
 	    render: function render() {
+	        var _this2 = this;
 
 	        var content = [];
 	        var next_actions = [];
@@ -48697,6 +48605,12 @@ componentHandler.register({
 	            var is_downloader_options_should_be_applied = (function () {
 	                var result = this.state.downloader != this.preview.downloader || !R.equals(this.state.downloader_settings, this.preview.downloader_settings);
 
+	                console.log('this.state.downloader: ' + this.state.downloader);
+	                console.log('this.preview.downloader: ' + this.preview.downloader);
+
+	                console.log('this.state.downloader_settings: ' + JSON.stringify(this.state.downloader_settings));
+	                console.log('this.preview.downloader_settings: ' + JSON.stringify(this.preview.downloader_settings));
+
 	                if (result) {
 	                    console.log('Downloader options SHOULD be applied');
 	                } else {
@@ -48705,10 +48619,22 @@ componentHandler.register({
 	                return result;
 	            }).bind(this);
 
-	            add_tab('Change downloader', render_change_downloader_panel.bind(this)({
+	            var update_downloader_settings = function update_downloader_settings(settings) {
+	                console.log('Updating downloader settings: ' + JSON.stringify(settings));
+	                _this2.setState({ 'downloader_settings': settings }, _this2.update_tune_panel_height(1));
+	            };
+
+	            var update_downloader = function update_downloader(downloader) {
+	                console.log('update_downloader');
+	                _this2.setState({ 'downloader': downloader }, _this2.update_tune_panel_height(1));
+	            };
+
+	            add_tab('Change downloader', render_change_downloader_panel({
 	                downloader: this.state.downloader,
+	                update_downloader: update_downloader,
+	                downloader_settings: this.state.downloader_settings,
+	                update_settings: update_downloader_settings,
 	                downloaders: this.state.downloaders,
-	                on_field_change: this.on_field_change,
 	                on_submit: this.apply_downloader_settings,
 	                need_apply: is_downloader_options_should_be_applied()
 	            }));
@@ -63879,44 +63805,118 @@ componentHandler.register({
 
 	'use strict';
 
+	var R = __webpack_require__(220);
 	var React = __webpack_require__(3);
+	var DOWNLOADERS_SETTINGS_RENDERERS = __webpack_require__(250);
+	var default_option_value = '---';
 
-	function http() {
-	    var _this = this;
-
-	    var settings = this.state.downloader_settings;
-
-	    var update_settings = function update_settings(event) {
-	        var name = event.target.name;
-	        var new_value = event.target.value;
-	        if (event.target.type == 'checkbox') {
-	            new_value = event.target.checked;
-	        }
-	        console.log('Updating downloader setting ' + name + '=' + new_value);
-
-	        settings[name] = new_value;
-	        _this.setState({ 'downloader_settings': settings });
+	var panel = function panel(opts) {
+	    var available_downloaders = { 'feed': 'Rss/Atom Feed',
+	        'http': 'Single HTML Page',
+	        'rechttp': 'Multiple HTML Pages',
+	        'google_play': 'Google Play',
+	        'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
+	        'appstore': 'Apple AppStore',
+	        'vcs.git': 'Git Repository',
+	        'vcs.git_commits': 'Git Commits',
+	        'hg': 'Mercurial Repository',
+	        'github_releases': 'GitHub Releases' };
+	    var render_option = function render_option(item) {
+	        var name = item.name;
+	        return React.createElement(
+	            'option',
+	            { value: name, key: name },
+	            available_downloaders[name]
+	        );
 	    };
 
-	    return React.createElement(
-	        'p',
-	        null,
-	        React.createElement('input', { type: 'checkbox', name: 'recusive', checked: settings.recursive, onChange: update_settings })
+	    var options = [React.createElement(
+	        'option',
+	        { value: null, key: 'undefined' },
+	        default_option_value
+	    )].concat(R.map(render_option, opts.downloaders));
+
+	    var button_style = { transition: 'all 0.2s ease-in', opacity: 0 };
+	    var button_disabled = true;
+
+	    if (opts.need_apply) {
+	        button_style.opacity = 1;
+	        button_disabled = false;
+	    } else {
+	        button_style.cursor = 'default';
+	    }
+
+	    // var downloader_name;
+	    // if (opts.downloader) {
+	    //     downloader_name = opts.downloader;
+	    // } else {
+	    //     if (opts.downloaders.length > 0) {
+	    //         downloader_name = opts.downloaders[0].name;
+	    //     }
+	    // }
+
+	    function on_change_downloader_settings(new_settings) {
+	        console.log('New downloader settings:');
+	        console.log(new_settings);
+	    }
+
+	    // if (opts.downloader !== undefined) {
+	    //     debugger
+	    // }
+	    var downloader_settings_renderer = DOWNLOADERS_SETTINGS_RENDERERS[opts.downloader];
+	    var downloader_settings;
+
+	    if (downloader_settings_renderer !== undefined) {
+	        downloader_settings = downloader_settings_renderer(opts.downloader_settings, opts.update_settings);
+	    }
+
+	    var on_downloader_change = function on_downloader_change(event) {
+	        console.log('on_downloader_change');
+	        var value = event.target.value;
+	        if (value == default_option_value) {
+	            value = null;
+	        }
+	        opts.update_downloader(value);
+	        opts.update_settings({});
+	    };
+
+	    var change_downloader_panel = React.createElement(
+	        'div',
+	        { key: 'downloader-panel' },
+	        React.createElement(
+	            'div',
+	            { className: 'changelog-settings__tune-panel' },
+	            React.createElement(
+	                'p',
+	                null,
+	                'Please, select which downloader to use:'
+	            ),
+	            React.createElement(
+	                'select',
+	                { className: 'downloader-selector',
+	                    name: 'downloader',
+	                    value: opts.downloader,
+	                    onChange: on_downloader_change },
+	                options
+	            ),
+	            downloader_settings,
+	            React.createElement(
+	                'p',
+	                { className: 'buttons-row' },
+	                React.createElement('input', { type: 'submit',
+	                    className: 'button _good _large',
+	                    value: 'Apply',
+	                    onClick: opts.on_submit,
+	                    style: button_style,
+	                    disabled: button_disabled })
+	            )
+	        )
 	    );
+
+	    return change_downloader_panel;
 	};
 
-	function git(settings) {
-	    return React.createElement(
-	        'p',
-	        null,
-	        'GIT DOWNLOADER SETTINGS'
-	    );
-	};
-
-	module.exports = {
-	    'http': http,
-	    'git': git
-	};
+	module.exports = panel;
 
 /***/ },
 /* 250 */
@@ -63924,7 +63924,106 @@ componentHandler.register({
 
 	'use strict';
 
-	var PriorityQueue = __webpack_require__(251);
+	var React = __webpack_require__(3);
+	var R = __webpack_require__(220);
+
+	// each downloader should get two parameters:
+	// settings is a dictionary with downloader's settings
+	// update_settings is a function of parent component
+	// to be called to change 'downloader_settings' attribute
+	// of the preview
+
+	function http(settings, update_settings) {
+	    var on_recursive_change = function on_recursive_change(event) {
+	        if (event.target.checked) {
+	            settings = R.assoc('recursive', true, settings);
+	        } else {
+	            settings = R.dissoc('recursive', settings);
+	        }
+	        update_settings(settings);
+	    };
+
+	    var on_search_list_change = function on_search_list_change(event) {
+	        settings = R.assoc('search_list', event.target.value, settings);
+	        update_settings(settings);
+	    };
+
+	    var on_ignore_list_change = function on_ignore_list_change(event) {
+	        settings = R.assoc('ignore_list', event.target.value, settings);
+	        update_settings(settings);
+	    };
+
+	    var recursive_settings;
+
+	    if (settings.recursive) {
+	        recursive_settings = React.createElement(
+	            'div',
+	            null,
+	            React.createElement(
+	                'label',
+	                { htmlFor: 'ignore_list' },
+	                'Download urls like these:'
+	            ),
+	            React.createElement('textarea', { placeholder: 'Enter here a directories where parser should search for changelogs. By default parser searches through all sources and sometimes it consider a changelog file which are not changelogs. Using this field you could narrow the search.',
+	                className: 'new-package__search-input',
+	                name: 'search_list',
+	                onChange: on_search_list_change,
+	                value: settings.search_list }),
+	            React.createElement(
+	                'label',
+	                { htmlFor: 'ignore_list' },
+	                'Ignore these url patterns:'
+	            ),
+	            React.createElement('textarea', { placeholder: 'Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.',
+	                className: 'new-package__ignore-input',
+	                name: 'ignore_list',
+	                onChange: on_ignore_list_change,
+	                value: settings.ignore_list })
+	        );
+	    }
+
+	    return React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	            'label',
+	            { htmlFor: 'recursive' },
+	            'Recursive:'
+	        ),
+	        React.createElement('input', { type: 'checkbox', name: 'recusive', checked: settings.recursive, onChange: on_recursive_change }),
+	        recursive_settings
+	    );
+	};
+
+	function git(settings, update_settings) {
+	    return React.createElement(
+	        'p',
+	        null,
+	        'GIT DOWNLOADER SETTINGS'
+	    );
+	};
+
+	function unknown(settings, update_settings) {
+	    return React.createElement(
+	        'p',
+	        null,
+	        'Our algorithms were unable to determine right downloader settings.'
+	    );
+	};
+
+	module.exports = {
+	    'http': http,
+	    'git': git,
+	    'null': unknown
+	};
+
+/***/ },
+/* 251 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var PriorityQueue = __webpack_require__(252);
 	var _introjs_items = new PriorityQueue(function (a, b) {
 	    return a.priority - b.priority;
 	});
@@ -63962,7 +64061,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 251 */
+/* 252 */
 /***/ function(module, exports) {
 
 	/**
@@ -64141,7 +64240,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 252 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64158,12 +64257,12 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 253 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Promo = __webpack_require__(254);
+	var Promo = __webpack_require__(255);
 
 	module.exports = {
 	    render: function render() {
@@ -64174,7 +64273,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 254 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64408,12 +64507,12 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 255 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Landing = __webpack_require__(256);
+	var Landing = __webpack_require__(257);
 
 	module.exports = {
 	    render: function render() {
@@ -64424,7 +64523,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 256 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

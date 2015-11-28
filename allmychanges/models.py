@@ -218,27 +218,17 @@ class Downloadable(object):
         and returns path to this directory.
         """
 
-        # TODO: убрать отсюда guess. Для всех Changelog
-        # downloader должен быть проставлен, я для
-        # Preview guess вызывается в другом месте
-
-        # if not downloader:
-        #     downloaders = list(guess_downloaders(self.source))
-        #     if downloaders:
-        #         downloader = downloaders[0]['name']
-        #         self.downloader = downloader
-        #         self.save(update_fields=('downloader',))
-
         if isinstance(downloader, dict):
             params = downloader.get('params', {})
             downloader = downloader['name']
         else:
             params = {}
 
+        params.update(self.downloader_settings or {})
+
+        print 'Calling "{0}" with params {1}'.format(downloader, params)
         download = get_downloader(downloader)
         return download(self.source,
-                        search_list=self.get_search_list(),
-                        ignore_list=self.get_ignore_list(),
                         **params)
 
 

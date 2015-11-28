@@ -10,8 +10,7 @@ var Tab = ReactTabs.Tab;
 var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
-var DOWNLOADER_SETTINGS_RENDERERS = require('./downloader-settings');
-
+var render_change_downloader_panel = require('./tune-downloader');
 
 var render_tune_panel = function(content) {
     var style = {};
@@ -155,87 +154,6 @@ var render_save_panel = function (opts) {
     return save_panel;
 }
 
-var render_change_downloader_panel = function (opts) {
-    var available_downloaders = {'feed': 'Rss/Atom Feed',
-                                 'http': 'Single HTML Page',
-                                 'rechttp': 'Multiple HTML Pages',
-                                 'google_play': 'Google Play',
-                                 'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
-                                 'appstore': 'Apple AppStore',
-                                 'vcs.git': 'Git Repository',
-                                 'vcs.git_commits': 'Git Commits',
-                                 'hg': 'Mercurial Repository',
-                                 'github_releases': 'GitHub Releases'};
-    var render_option = function (item) {
-        var name = item.name;
-        return <option value={name} key={name}>{available_downloaders[name]}</option>;
-    };
-    
-    var options = R.map(render_option, opts.downloaders);
-
-    var button_style = {transition: 'all 0.2s ease-in', opacity: 0};
-    var button_disabled = true;
-    
-    if (opts.need_apply) {
-        button_style.opacity = 1;
-        button_disabled = false;
-    } else {
-        button_style.cursor = 'default';
-    }
-
-    var downloader_settings;
-    var downloader_name;
-    if (opts.downloader) {
-        downloader_name = opts.downloader;
-    } else {
-        if (opts.downloaders.length > 0) {
-            downloader_name = opts.downloaders[0].name;
-        }
-    }
-
-    function on_change_downloader_settings(new_settings) {
-        console.log('New downloader settings:');
-        console.log(new_settings);
-    }
-
-    var downloader_settings_renderer = DOWNLOADER_SETTINGS_RENDERERS[downloader_name];
-    if (downloader_settings_renderer !== undefined) {
-        downloader_settings = downloader_settings_renderer.bind(this)();
-    }
-
-    var on_field_change = function(ev) {
-        this.update_tune_panel_height(300);
-        if (opts.on_field_change) {
-            opts.on_field_change(ev)
-        }
-    }.bind(this);
-        
-    var change_downloader_panel = (
-        <div key="downloader-panel">
-            <div className="changelog-settings__tune-panel">
-              <p>Please, select which downloader to use:</p>
-              <select className="downloader-selector"
-                      name="downloader"
-                      value={opts.downloader}
-                      onChange={on_field_change}>
-                {options}
-              </select>
-
-              {downloader_settings}
-              
-              <p className="buttons-row">
-                <input type="submit"
-                       className="button _good _large"
-                       value="Apply"
-                       onClick={opts.on_submit}
-                       style={button_style}
-                       disabled={button_disabled}/>
-              </p>
-            </div>
-        </div>);
-
-    return change_downloader_panel;
-}
 
 var render_tune_parser_panel = function(opts) {
 
@@ -309,7 +227,12 @@ module.exports = React.createClass({
     getInitialState: function () {
         // init add new page @add-new
         // downloader [this.props.downloader] @add-new
-        console.log('in getInitialState, downloader is:' + this.props.downloader);
+        var downloader = R.or(
+            this.props.downloader,
+            R.path('name',
+                   R.head(this.props.downloaders || [])));
+        
+        console.log('in getInitialState, downloader is:' + downloader);
         return {tracked: false,
                 saving: false,
                 validating: false, // выставляется, когда мы ждем проверки namespace и name
@@ -320,7 +243,7 @@ module.exports = React.createClass({
                 xslt: this.props.xslt || '',
                 results: null,
                 save_button_title: ((this.props.mode == 'edit') ? 'Save' : 'Save&Track'),
-                downloader: this.props.downloader,
+                downloader: downloader,
                 downloader_settings: {},
                 downloaders: [],
                 namespace: this.props.namespace || '',
@@ -376,9 +299,11 @@ module.exports = React.createClass({
 
         $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
                 method: 'PATCH',
-                data: JSON.stringify({
-                    downloader: this.state.downloader
-                }),
+                data: JSON.stringify(
+                    R.pick(['downloader',
+                            'downloader_settings'],
+                           this.state)
+                ),
                 contentType: 'application/json',
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
@@ -559,14 +484,14 @@ module.exports = React.createClass({
         this.wait_for_preview();
     },
     update_tune_panel_height: function (timeout) {
-        return function() {
+        return () => {
             // this function updates tune panel height and does
             // this after a small delay, because when tabs are changed, we need
             // time untill this switch will be done
-            setTimeout(function () {
+            setTimeout(() => {
                 this.forceUpdate();
-            }.bind(this), timeout);
-        }.bind(this);
+            }, timeout);
+        };
     },
     render: function() {
 
@@ -622,6 +547,12 @@ module.exports = React.createClass({
                     this.state.downloader != this.preview.downloader ||
                         !R.equals(this.state.downloader_settings, this.preview.downloader_settings));
 
+                console.log('this.state.downloader: ' + this.state.downloader);
+                console.log('this.preview.downloader: ' + this.preview.downloader);
+
+                console.log('this.state.downloader_settings: ' + JSON.stringify(this.state.downloader_settings));
+                console.log('this.preview.downloader_settings: ' + JSON.stringify(this.preview.downloader_settings));
+
                 if (result) {
                     console.log('Downloader options SHOULD be applied');
                 } else {
@@ -630,11 +561,25 @@ module.exports = React.createClass({
                 return result;
             }.bind(this)
 
+            var update_downloader_settings = (settings) => {
+                console.log('Updating downloader settings: ' + JSON.stringify(settings));
+                this.setState({'downloader_settings': settings},
+                              this.update_tune_panel_height(1));
+            }
+            
+            var update_downloader = (downloader) => {
+                console.log('update_downloader');
+                this.setState({'downloader': downloader},
+                              this.update_tune_panel_height(1));
+            }
+
             add_tab('Change downloader',
-                    render_change_downloader_panel.bind(this)({
+                    render_change_downloader_panel({
                         downloader: this.state.downloader,
+                        update_downloader: update_downloader,
+                        downloader_settings: this.state.downloader_settings,
+                        update_settings: update_downloader_settings,
                         downloaders: this.state.downloaders,
-                        on_field_change: this.on_field_change,
                         on_submit: this.apply_downloader_settings,
                         need_apply: is_downloader_options_should_be_applied()
                     }));

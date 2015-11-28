@@ -28,10 +28,10 @@ def guess(source, discovered={}):
     result = defaultdict(dict)
     path = ''
     try:
-        path = download(source, only_one=True)
+        path = download(source, recursive=False)
         # if everything is OK, start populating result
         result['changelog']['source'] = source
-        result['params']['only_one'] = True
+        result['params']['recursive'] = False
 
     except:
         # ignore errors because most probably, they are from git command
@@ -45,14 +45,15 @@ def guess(source, discovered={}):
 
 
 def download(source,
-             search_list=[],
-             ignore_list=[],
-             only_one=False,
+             # recursive=False,
+             # search_list=[],
+             # ignore_list=[],
              **params):
     """
-    Param `only_one` needed to emulate http_downloader which fetches
+    Param `recursive=False` needed to emulate http_downloader which fetches
     only one page.
     """
+    print 'HTTP DOWNLOADER Called with {0}'.format(params)
     raise RuntimeError()
     DEFAULT_UPPER_LIMIT = 100
     UPPER_LIMITS = {
@@ -72,7 +73,7 @@ def download(source,
     search_list = [item
                    for item, parser_name in search_list
                    if is_http_url(item)]
-    if only_one:
+    if not recursive:
         limit_urls = 1
         search_patterns = []
     else:
@@ -183,7 +184,7 @@ def download(source,
             already_seen.add(url)
             fetch_page(url)
 
-        if len(already_seen) == limit_urls and not only_one:
+        if len(already_seen) == limit_urls and recursive:
             if limit_urls == upper_limit:
                 message = ('Please, specify more URL patterns '
                            'because we hit the limit ({upper_limit} '

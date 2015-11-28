@@ -559,6 +559,7 @@ class PreviewViewSet(HandleExceptionMixin,
 
         fields_which_can_be_updated = (
             'downloader',
+            'downloader_settings',
             'search_list',
             'ignore_list',
             'xslt')
