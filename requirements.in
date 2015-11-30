@@ -39,7 +39,8 @@ django-oauth-toolkit
 django-markdown2
 django-sendmail-backend
 
-CommonMark
+#CommonMark
+git+git://github.com/svetlyak40wt/CommonMark-py.git@fix-DoS-in-comments-parsing
 
 # for building rss feeds
 feedgen
