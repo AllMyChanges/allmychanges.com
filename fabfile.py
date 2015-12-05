@@ -18,6 +18,7 @@ def _get_docker_command(name, ports=[], image='allmychanges.com'):
             '--link redis.allmychanges.com '
             '{ports} '
             '-e DEBUG=yes '
+            '-e DEV_DOWNLOAD=yes '
             '--name {name} '
             '{image} ').format(
                 name=name,
