@@ -1,3 +1,7 @@
+/*
+  This module renders a panel with downloader settings.
+*/
+
 var R = require('ramda');
 var React = require('react');
 var DOWNLOADERS_SETTINGS_RENDERERS = require('./downloaders-settings');
@@ -5,8 +9,8 @@ var default_option_value = '---';
 
 var panel = function (opts) {
     var available_downloaders = {'feed': 'Rss/Atom Feed',
-                                 'http': 'Single HTML Page',
-                                 'rechttp': 'Multiple HTML Pages',
+                                 'http': 'HTML Pages',
+                                 'rechttp': 'Multiple HTML Pages', // TODO remove
                                  'google_play': 'Google Play',
                                  'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
                                  'appstore': 'Apple AppStore',

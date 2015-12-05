@@ -101,6 +101,7 @@ class ChangelogSerializer(ModelSerializer):
             'search_list',
             'xslt',
             'downloader',
+            'downloader_settings',
             'downloaders',
         )
 
@@ -114,6 +115,7 @@ class PreviewSerializer(ModelSerializer):
         model = Preview
         fields = (
             'downloader',
+            'downloader_settings',
             'downloaders',
             'resource_uri',
             'status',

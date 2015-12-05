@@ -2,6 +2,7 @@ var Accordion = require('../accordion');
 var ReactMDL = require('react-mdl');
 var Spinner2 = ReactMDL.Spinner;
 var R = require('ramda');
+var css = require('./index.styl');
 
 
 var React = require('react');
@@ -10,29 +11,8 @@ var Tab = ReactTabs.Tab;
 var Tabs = ReactTabs.Tabs;
 var TabList = ReactTabs.TabList;
 var TabPanel = ReactTabs.TabPanel;
-var render_change_downloader_panel = require('./tune-downloader');
-
-var render_tune_panel = function(content) {
-    var style = {};
-    
-    if (content === undefined) {
-        console.log('Setting height to 0 during rendering');
-        style['height'] = 0;
-        style['padding-top'] = 0;
-        style['padding-bottom'] = 0;
-    } else {
-        var new_height = $('.changelog-settings__tune-content').height() + 20;
-        console.log('Setting height to ' + new_height + ' during rendering');
-        style['height'] = new_height;
-    }
-    return (
-        <div key="tune" className="changelog-settings__tune" style={style}>
-          <div className="changelog-settings__tune-content">
-            {content}
-          </div>
-        </div>
-   );
-}
+var render_change_downloader_tab = require('./tune-downloader');
+var TunePanel = require('./tune-panel');
 
 
 var render_tabs = function(tabs, tab_panels, on_select) {
@@ -244,7 +224,7 @@ module.exports = React.createClass({
                 results: null,
                 save_button_title: ((this.props.mode == 'edit') ? 'Save' : 'Save&Track'),
                 downloader: downloader,
-                downloader_settings: {},
+                downloader_settings: this.props.downloader_settings,
                 downloaders: [],
                 namespace: this.props.namespace || '',
                 namespace_error: !this.props.namespace && 'Please, fill this field' || '',
@@ -353,6 +333,7 @@ module.exports = React.createClass({
             'namespace': this.state.namespace,
             'description': this.state.description,
             'downloader': this.state.downloader,
+            'downloader_settings': this.state.downloader_settings,
             'downloaders': this.state.downloaders,
             'name': this.state.name,
             'source': this.state.source,
@@ -519,7 +500,6 @@ module.exports = React.createClass({
         if (status == 'processing') {
             content.push(render_we_are_waiting());
             content.push(render_log(this.state.log, true));
-            content.push(render_tune_panel());
         } else {
             // статус равен created, когда мы открыли changelog
             // для редактирования и версии preview взяты из него
@@ -574,7 +554,7 @@ module.exports = React.createClass({
             }
 
             add_tab('Change downloader',
-                    render_change_downloader_panel({
+                    render_change_downloader_tab({
                         downloader: this.state.downloader,
                         update_downloader: update_downloader,
                         downloader_settings: this.state.downloader_settings,
@@ -606,16 +586,17 @@ module.exports = React.createClass({
             if (this.preview.source != this.state.source) {
                 // TODO: надо проверить, что source для preview сохраняется
                 // кажется, что PATCH тут будет вызываться неверно
-                content.push(render_tune_panel(render_need_apply_plate(this.apply_downloader_settings)));
+                content.push(<TunePanel>{render_need_apply_plate(this.apply_downloader_settings)}</TunePanel>);
                 // console.log('Setting height to 0 because of source changed');
                 // $('.changelog-settings__tune').height(0);
             } else {
                 content.push(
-                    render_tune_panel(
-                        render_tabs(
+                    <TunePanel>
+                        {render_tabs(
                             tabs,
                             tab_panels,
-                            this.update_tune_panel_height(30))));
+                            this.update_tune_panel_height(30))}
+                    </TunePanel>);
             }
         }
         return (<div className="changelog-settings">{content}</div>);

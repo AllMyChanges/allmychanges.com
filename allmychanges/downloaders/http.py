@@ -12,8 +12,12 @@ from cgi import parse_header
 from collections import defaultdict
 from django.conf import settings
 from allmychanges.utils import (
-    get_text_from_response, is_http_url,
-    html_document_fromstring)
+    get_text_from_response,
+    is_http_url,
+    html_document_fromstring,
+    split_filenames,
+    parse_search_list,
+)
 from allmychanges.exceptions import DownloaderWarning
 from twiggy_goodies.threading import log
 
@@ -45,16 +49,19 @@ def guess(source, discovered={}):
 
 
 def download(source,
-             # recursive=False,
-             # search_list=[],
-             # ignore_list=[],
+             recursive=False,
+             search_list='',
+             ignore_list='',
              **params):
     """
     Param `recursive=False` needed to emulate http_downloader which fetches
     only one page.
     """
     print 'HTTP DOWNLOADER Called with {0}'.format(params)
-    raise RuntimeError()
+    search_list = parse_search_list(search_list)
+    ignore_list = split_filenames(ignore_list)
+
+    # raise RuntimeError()
     DEFAULT_UPPER_LIMIT = 100
     UPPER_LIMITS = {
         'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,
@@ -63,6 +70,9 @@ def download(source,
         'rechttp+https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
         'rechttp+https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
     }
+    UPPER_LIMITS.update(
+        (key.replace('rechttp+', ''), value)
+        for key, value in UPPER_LIMITS.items())
     upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
     base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
@@ -73,6 +83,7 @@ def download(source,
     search_list = [item
                    for item, parser_name in search_list
                    if is_http_url(item)]
+
     if not recursive:
         limit_urls = 1
         search_patterns = []

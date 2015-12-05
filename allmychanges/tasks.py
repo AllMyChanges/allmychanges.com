@@ -183,7 +183,9 @@ def update_preview_task(preview_id):
                     if found:
                         break
             else:
-                preview.set_processing_status('Unable to find downloader for this URL')
+                problem = 'Unable to find downloader for this URL'
+                preview.set_processing_status(problem)
+                preview.set_status('error', problem=problem)
         finally:
             log.info('Task done')
 

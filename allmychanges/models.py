@@ -25,7 +25,6 @@ from allmychanges.utils import (
 )
 from allmychanges import chat
 from allmychanges.downloaders import (
-    guess_downloaders,
     get_downloader)
 
 from allmychanges.tasks import (
@@ -417,6 +416,7 @@ class Changelog(Downloadable, models.Model):
 
     def create_preview(self, user, light_user, **params):
         params.setdefault('downloader', self.downloader)
+        params.setdefault('downloader_settings', self.downloader_settings)
         params.setdefault('downloaders', self.downloaders)
         params.setdefault('source', self.source)
         params.setdefault('search_list', self.search_list)

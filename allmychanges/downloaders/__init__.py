@@ -54,7 +54,7 @@ def guess_downloaders(source):
 
     modules = get_modules()
 
-    if True:
+    if False:
         yield {'name': 'http'}
         yield {'name': 'vcs.git'}
         return

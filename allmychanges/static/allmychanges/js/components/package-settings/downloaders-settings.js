@@ -1,3 +1,8 @@
+/*
+  This module renders different settings
+  for selected downloader.
+*/
+
 var React = require('react');
 var R = require('ramda');
 

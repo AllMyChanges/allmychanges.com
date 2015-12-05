@@ -445,7 +445,8 @@ class ChangelogViewSet(HandleExceptionMixin,
         if self.object.versions.count() == 0:
             # try to move preview's versions
 
-            preview = list(self.object.previews.filter(light_user=self.request.light_user).order_by('-id')[:1])
+            preview = list(self.object.previews.filter(
+                light_user=self.request.light_user).order_by('-id')[:1])
             if preview:
                 preview = preview[0]
                 for version in preview.versions.all():
@@ -457,10 +458,15 @@ class ChangelogViewSet(HandleExceptionMixin,
                                                self.request.light_user)
         if result:
             messages.info(self.request,
-                          'Congratulations, you\'ve become a moderator of this changelog. Now you have rights to edit and to care about this changelog in future.')
+                          'Congratulations, you\'ve become a moderator of this '
+                          'changelog. Now you have rights to edit and to care '
+                          'about this changelog in future.')
         if result == 'light':
             messages.warning(self.request,
-                             'Because you are not logged in, we\'ll remember that you are a moderator for 24 hour. To make this permanent, please, login or sign up as soon as possible.')
+                             'Because you are not logged in, we\'ll remember '
+                             'that you are a moderator for 24 hour. To make '
+                             'this permanent, please, login or sign up as soon '
+                             'as possible.')
 
 
         if self.request.method == 'PUT':

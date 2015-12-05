@@ -27270,9 +27270,9 @@ componentHandler.register({
 
 	__webpack_require__(1).render();
 	__webpack_require__(163).render();
-	__webpack_require__(253).render();
-	__webpack_require__(254).render();
 	__webpack_require__(256).render();
+	__webpack_require__(257).render();
+	__webpack_require__(259).render();
 
 /***/ },
 /* 1 */
@@ -47271,7 +47271,7 @@ componentHandler.register({
 	var PackageSettings = __webpack_require__(172);
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(251);
+	window.intro = __webpack_require__(254);
 
 	$(document).ready(function () {
 	    window.intro.push({ 'element': $(".magic-prompt")[0],
@@ -47328,11 +47328,15 @@ componentHandler.register({
 	            React.render(React.createElement(FeedbackForm, { page: element.dataset['page'] }), element);
 	        });
 	        $('.add-new-container').each(function (idx, element) {
+	            var downloader_settings = element.dataset['downloaderSettings'];
+	            downloader_settings = JSON.parse(downloader_settings);
+
 	            React.render(React.createElement(PackageSettings, {
 	                preview_id: element.dataset['previewId'],
 	                changelog_id: element.dataset['changelogId'],
 	                source: element.dataset['source'],
 	                downloader: element.dataset['downloader'],
+	                downloader_settings: downloader_settings,
 	                name: element.dataset['name'],
 	                namespace: element.dataset['namespace'],
 	                description: element.dataset['description'],
@@ -48030,38 +48034,16 @@ componentHandler.register({
 	var ReactMDL = __webpack_require__(178);
 	var Spinner2 = ReactMDL.Spinner;
 	var R = __webpack_require__(220);
+	var css = __webpack_require__(221);
 
 	var React = __webpack_require__(3);
-	var ReactTabs = __webpack_require__(221);
+	var ReactTabs = __webpack_require__(223);
 	var Tab = ReactTabs.Tab;
 	var Tabs = ReactTabs.Tabs;
 	var TabList = ReactTabs.TabList;
 	var TabPanel = ReactTabs.TabPanel;
-	var render_change_downloader_panel = __webpack_require__(249);
-
-	var render_tune_panel = function render_tune_panel(content) {
-	    var style = {};
-
-	    if (content === undefined) {
-	        console.log('Setting height to 0 during rendering');
-	        style['height'] = 0;
-	        style['padding-top'] = 0;
-	        style['padding-bottom'] = 0;
-	    } else {
-	        var new_height = $('.changelog-settings__tune-content').height() + 20;
-	        console.log('Setting height to ' + new_height + ' during rendering');
-	        style['height'] = new_height;
-	    }
-	    return React.createElement(
-	        'div',
-	        { key: 'tune', className: 'changelog-settings__tune', style: style },
-	        React.createElement(
-	            'div',
-	            { className: 'changelog-settings__tune-content' },
-	            content
-	        )
-	    );
-	};
+	var render_change_downloader_tab = __webpack_require__(251);
+	var TunePanel = __webpack_require__(253);
 
 	var render_tabs = function render_tabs(tabs, tab_panels, on_select) {
 	    return React.createElement(
@@ -48319,7 +48301,7 @@ componentHandler.register({
 	            results: null,
 	            save_button_title: this.props.mode == 'edit' ? 'Save' : 'Save&Track',
 	            downloader: downloader,
-	            downloader_settings: {},
+	            downloader_settings: this.props.downloader_settings,
 	            downloaders: [],
 	            namespace: this.props.namespace || '',
 	            namespace_error: !this.props.namespace && 'Please, fill this field' || '',
@@ -48416,6 +48398,7 @@ componentHandler.register({
 	            'namespace': this.state.namespace,
 	            'description': this.state.description,
 	            'downloader': this.state.downloader,
+	            'downloader_settings': this.state.downloader_settings,
 	            'downloaders': this.state.downloaders,
 	            'name': this.state.name,
 	            'source': this.state.source,
@@ -48579,7 +48562,6 @@ componentHandler.register({
 	        if (status == 'processing') {
 	            content.push(render_we_are_waiting());
 	            content.push(render_log(this.state.log, true));
-	            content.push(render_tune_panel());
 	        } else {
 	            // статус равен created, когда мы открыли changelog
 	            // для редактирования и версии preview взяты из него
@@ -48629,7 +48611,7 @@ componentHandler.register({
 	                _this2.setState({ 'downloader': downloader }, _this2.update_tune_panel_height(1));
 	            };
 
-	            add_tab('Change downloader', render_change_downloader_panel({
+	            add_tab('Change downloader', render_change_downloader_tab({
 	                downloader: this.state.downloader,
 	                update_downloader: update_downloader,
 	                downloader_settings: this.state.downloader_settings,
@@ -48657,11 +48639,19 @@ componentHandler.register({
 	            if (this.preview.source != this.state.source) {
 	                // TODO: надо проверить, что source для preview сохраняется
 	                // кажется, что PATCH тут будет вызываться неверно
-	                content.push(render_tune_panel(render_need_apply_plate(this.apply_downloader_settings)));
+	                content.push(React.createElement(
+	                    TunePanel,
+	                    null,
+	                    render_need_apply_plate(this.apply_downloader_settings)
+	                ));
 	                // console.log('Setting height to 0 because of source changed');
 	                // $('.changelog-settings__tune').height(0);
 	            } else {
-	                    content.push(render_tune_panel(render_tabs(tabs, tab_panels, this.update_tune_panel_height(30))));
+	                    content.push(React.createElement(
+	                        TunePanel,
+	                        null,
+	                        render_tabs(tabs, tab_panels, this.update_tune_panel_height(30))
+	                    ));
 	                }
 	        }
 	        return React.createElement(
@@ -61105,17 +61095,57 @@ componentHandler.register({
 /* 221 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	// style-loader: Adds some css to the DOM by adding a <style> tag
 
-	module.exports = {
-	  Tabs: __webpack_require__(222),
-	  TabList: __webpack_require__(246),
-	  Tab: __webpack_require__(245),
-	  TabPanel: __webpack_require__(248)
-	};
+	// load the styles
+	var content = __webpack_require__(222);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(177)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../../../node_modules/css-loader/index.js!./../../../../../../node_modules/stylus-loader/index.js!./index.styl", function() {
+				var newContent = require("!!./../../../../../../node_modules/css-loader/index.js!./../../../../../../node_modules/stylus-loader/index.js!./index.styl");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
 
 /***/ },
 /* 222 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(176)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 500px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 500px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -21px;\n  margin-left: -70px;\n  width: 140px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 223 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = {
+	  Tabs: __webpack_require__(224),
+	  TabList: __webpack_require__(248),
+	  Tab: __webpack_require__(247),
+	  TabPanel: __webpack_require__(250)
+	};
+
+/***/ },
+/* 224 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -61123,19 +61153,19 @@ componentHandler.register({
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _reactAddons = __webpack_require__(223);
+	var _reactAddons = __webpack_require__(225);
 
 	var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-	var _jsStylesheet = __webpack_require__(242);
+	var _jsStylesheet = __webpack_require__(244);
 
 	var _jsStylesheet2 = _interopRequireDefault(_jsStylesheet);
 
-	var _helpersUuid = __webpack_require__(243);
+	var _helpersUuid = __webpack_require__(245);
 
 	var _helpersUuid2 = _interopRequireDefault(_helpersUuid);
 
-	var _helpersChildrenPropType = __webpack_require__(244);
+	var _helpersChildrenPropType = __webpack_require__(246);
 
 	var _helpersChildrenPropType2 = _interopRequireDefault(_helpersChildrenPropType);
 
@@ -61183,7 +61213,7 @@ componentHandler.register({
 	  },
 
 	  componentWillMount: function componentWillMount() {
-	    (0, _jsStylesheet2['default'])(__webpack_require__(247));
+	    (0, _jsStylesheet2['default'])(__webpack_require__(249));
 	  },
 
 	  componentWillReceiveProps: function componentWillReceiveProps(newProps) {
@@ -61446,7 +61476,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 223 */
+/* 225 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -61458,10 +61488,10 @@ componentHandler.register({
 	// Otherwise the build tools will attempt to build a 'react-addons-{addon}' module.
 	'require' + "('react/addons') is deprecated. " + 'Access using require' + "('react-addons-{addon}') instead.");
 
-	module.exports = __webpack_require__(224);
+	module.exports = __webpack_require__(226);
 
 /***/ },
-/* 224 */
+/* 226 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -61484,17 +61514,17 @@ componentHandler.register({
 
 	'use strict';
 
-	var LinkedStateMixin = __webpack_require__(225);
+	var LinkedStateMixin = __webpack_require__(227);
 	var React = __webpack_require__(4);
-	var ReactComponentWithPureRenderMixin = __webpack_require__(228);
-	var ReactCSSTransitionGroup = __webpack_require__(230);
-	var ReactFragment = __webpack_require__(236);
-	var ReactTransitionGroup = __webpack_require__(231);
+	var ReactComponentWithPureRenderMixin = __webpack_require__(230);
+	var ReactCSSTransitionGroup = __webpack_require__(232);
+	var ReactFragment = __webpack_require__(238);
+	var ReactTransitionGroup = __webpack_require__(233);
 	var ReactUpdates = __webpack_require__(55);
 
-	var cloneWithProps = __webpack_require__(237);
-	var shallowCompare = __webpack_require__(229);
-	var update = __webpack_require__(240);
+	var cloneWithProps = __webpack_require__(239);
+	var shallowCompare = __webpack_require__(231);
+	var update = __webpack_require__(242);
 	var warning = __webpack_require__(27);
 
 	var warnedAboutBatchedUpdates = false;
@@ -61520,14 +61550,14 @@ componentHandler.register({
 
 	if (process.env.NODE_ENV !== 'production') {
 	  React.addons.Perf = __webpack_require__(143);
-	  React.addons.TestUtils = __webpack_require__(241);
+	  React.addons.TestUtils = __webpack_require__(243);
 	}
 
 	module.exports = React;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 225 */
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -61544,8 +61574,8 @@ componentHandler.register({
 
 	'use strict';
 
-	var ReactLink = __webpack_require__(226);
-	var ReactStateSetters = __webpack_require__(227);
+	var ReactLink = __webpack_require__(228);
+	var ReactStateSetters = __webpack_require__(229);
 
 	/**
 	 * A simple mixin around ReactLink.forState().
@@ -61568,7 +61598,7 @@ componentHandler.register({
 	module.exports = LinkedStateMixin;
 
 /***/ },
-/* 226 */
+/* 228 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -61642,7 +61672,7 @@ componentHandler.register({
 	module.exports = ReactLink;
 
 /***/ },
-/* 227 */
+/* 229 */
 /***/ function(module, exports) {
 
 	/**
@@ -61761,7 +61791,7 @@ componentHandler.register({
 	module.exports = ReactStateSetters;
 
 /***/ },
-/* 228 */
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -61777,7 +61807,7 @@ componentHandler.register({
 
 	'use strict';
 
-	var shallowCompare = __webpack_require__(229);
+	var shallowCompare = __webpack_require__(231);
 
 	/**
 	 * If your React component's render function is "pure", e.g. it will render the
@@ -61812,7 +61842,7 @@ componentHandler.register({
 	module.exports = ReactComponentWithPureRenderMixin;
 
 /***/ },
-/* 229 */
+/* 231 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -61841,7 +61871,7 @@ componentHandler.register({
 	module.exports = shallowCompare;
 
 /***/ },
-/* 230 */
+/* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -61862,8 +61892,8 @@ componentHandler.register({
 
 	var assign = __webpack_require__(41);
 
-	var ReactTransitionGroup = __webpack_require__(231);
-	var ReactCSSTransitionGroupChild = __webpack_require__(233);
+	var ReactTransitionGroup = __webpack_require__(233);
+	var ReactCSSTransitionGroupChild = __webpack_require__(235);
 
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -61929,7 +61959,7 @@ componentHandler.register({
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 231 */
+/* 233 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -61946,7 +61976,7 @@ componentHandler.register({
 	'use strict';
 
 	var React = __webpack_require__(4);
-	var ReactTransitionChildMapping = __webpack_require__(232);
+	var ReactTransitionChildMapping = __webpack_require__(234);
 
 	var assign = __webpack_require__(41);
 	var emptyFunction = __webpack_require__(17);
@@ -62139,7 +62169,7 @@ componentHandler.register({
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 232 */
+/* 234 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -62242,7 +62272,7 @@ componentHandler.register({
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 233 */
+/* 235 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -62262,8 +62292,8 @@ componentHandler.register({
 	var React = __webpack_require__(4);
 	var ReactDOM = __webpack_require__(5);
 
-	var CSSCore = __webpack_require__(234);
-	var ReactTransitionEvents = __webpack_require__(235);
+	var CSSCore = __webpack_require__(236);
+	var ReactTransitionEvents = __webpack_require__(237);
 
 	var onlyChild = __webpack_require__(157);
 
@@ -62407,7 +62437,7 @@ componentHandler.register({
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 234 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -62510,7 +62540,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 235 */
+/* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -62624,7 +62654,7 @@ componentHandler.register({
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 236 */
+/* 238 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -62694,7 +62724,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 237 */
+/* 239 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -62712,7 +62742,7 @@ componentHandler.register({
 	'use strict';
 
 	var ReactElement = __webpack_require__(44);
-	var ReactPropTransferer = __webpack_require__(238);
+	var ReactPropTransferer = __webpack_require__(240);
 
 	var keyOf = __webpack_require__(80);
 	var warning = __webpack_require__(27);
@@ -62754,7 +62784,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 238 */
+/* 240 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -62772,7 +62802,7 @@ componentHandler.register({
 
 	var assign = __webpack_require__(41);
 	var emptyFunction = __webpack_require__(17);
-	var joinClasses = __webpack_require__(239);
+	var joinClasses = __webpack_require__(241);
 
 	/**
 	 * Creates a transfer strategy that will merge prop values using the supplied
@@ -62867,7 +62897,7 @@ componentHandler.register({
 	module.exports = ReactPropTransferer;
 
 /***/ },
-/* 239 */
+/* 241 */
 /***/ function(module, exports) {
 
 	/**
@@ -62911,7 +62941,7 @@ componentHandler.register({
 	module.exports = joinClasses;
 
 /***/ },
-/* 240 */
+/* 242 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -63024,7 +63054,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 241 */
+/* 243 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -63497,7 +63527,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ },
-/* 242 */
+/* 244 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63535,7 +63565,7 @@ componentHandler.register({
 	})();
 
 /***/ },
-/* 243 */
+/* 245 */
 /***/ function(module, exports) {
 
 	// Get a universally unique identifier
@@ -63547,7 +63577,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 244 */
+/* 246 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63558,11 +63588,11 @@ componentHandler.register({
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _componentsTab = __webpack_require__(245);
+	var _componentsTab = __webpack_require__(247);
 
 	var _componentsTab2 = _interopRequireDefault(_componentsTab);
 
-	var _componentsTabList = __webpack_require__(246);
+	var _componentsTabList = __webpack_require__(248);
 
 	var _componentsTabList2 = _interopRequireDefault(_componentsTabList);
 
@@ -63596,7 +63626,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 245 */
+/* 247 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -63666,7 +63696,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 246 */
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -63695,7 +63725,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 247 */
+/* 249 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -63749,7 +63779,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 248 */
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -63800,20 +63830,24 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 249 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
+
+	/*
+	  This module renders a panel with downloader settings.
+	*/
 
 	'use strict';
 
 	var R = __webpack_require__(220);
 	var React = __webpack_require__(3);
-	var DOWNLOADERS_SETTINGS_RENDERERS = __webpack_require__(250);
+	var DOWNLOADERS_SETTINGS_RENDERERS = __webpack_require__(252);
 	var default_option_value = '---';
 
 	var panel = function panel(opts) {
 	    var available_downloaders = { 'feed': 'Rss/Atom Feed',
-	        'http': 'Single HTML Page',
-	        'rechttp': 'Multiple HTML Pages',
+	        'http': 'HTML Pages',
+	        'rechttp': 'Multiple HTML Pages', // TODO remove
 	        'google_play': 'Google Play',
 	        'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
 	        'appstore': 'Apple AppStore',
@@ -63919,8 +63953,13 @@ componentHandler.register({
 	module.exports = panel;
 
 /***/ },
-/* 250 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
+
+	/*
+	  This module renders different settings
+	  for selected downloader.
+	*/
 
 	'use strict';
 
@@ -64018,12 +64057,104 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 251 */
+/* 253 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+	  This module renders bottom panel with downloader and parser settings.
+	*/
+	'use strict';
+
+	var React = __webpack_require__(3);
+
+	var Panel = React.createClass({
+	    displayName: 'Panel',
+
+	    getInitialState: function getInitialState() {
+	        return {
+	            collapsed: false,
+	            'class': "changelog-settings__tune"
+	        };
+	    },
+	    render: function render() {
+	        var _this = this;
+
+	        var style = {};
+	        var content = this.props.children;
+
+	        if (content === undefined) {
+	            console.log('Setting height to 0 during rendering');
+	            style['height'] = 0;
+	            style['padding-top'] = 0;
+	            style['padding-bottom'] = 0;
+	        } else {
+	            var new_height;
+	            if (this.state.collapsed) {
+	                new_height = 20;
+	            } else {
+	                new_height = $('.changelog-settings__tune-content').height() + 20;
+	            }
+	            console.log('Setting height to ' + new_height + ' during rendering');
+	            style['height'] = new_height;
+	        }
+
+	        var on_click = function on_click(ev) {
+	            console.log('Clicked');
+
+	            if (_this.state.collapsed) {
+	                _this.setState({
+	                    collapsed: false,
+	                    'class': "changelog-settings__tune"
+	                });
+	            } else {
+	                _this.setState({
+	                    collapsed: true,
+	                    'class': "changelog-settings__tune changelog-settings__tune_collapsed"
+	                });
+	            }
+	        };
+
+	        var collapse_button;
+	        if (this.state.collapsed) {
+	            collapse_button = React.createElement(
+	                'button',
+	                { className: 'changelog-settings__collapse-button',
+	                    onClick: on_click },
+	                '⬆︎ ⬆︎ ⬆︎︎'
+	            );
+	        } else {
+	            collapse_button = React.createElement(
+	                'button',
+	                { className: 'changelog-settings__collapse-button',
+	                    onClick: on_click },
+	                '⬇︎ ⬇︎ ⬇︎'
+	            );
+	        }
+
+	        // ⬆︎
+
+	        return React.createElement(
+	            'div',
+	            { key: 'tune', className: this.state['class'], style: style },
+	            collapse_button,
+	            React.createElement(
+	                'div',
+	                { className: 'changelog-settings__tune-content' },
+	                content
+	            )
+	        );
+	    }
+	});
+
+	module.exports = Panel;
+
+/***/ },
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var PriorityQueue = __webpack_require__(252);
+	var PriorityQueue = __webpack_require__(255);
 	var _introjs_items = new PriorityQueue(function (a, b) {
 	    return a.priority - b.priority;
 	});
@@ -64061,7 +64192,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 252 */
+/* 255 */
 /***/ function(module, exports) {
 
 	/**
@@ -64240,7 +64371,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 253 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64257,12 +64388,12 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 254 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Promo = __webpack_require__(255);
+	var Promo = __webpack_require__(258);
 
 	module.exports = {
 	    render: function render() {
@@ -64273,7 +64404,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 255 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64507,12 +64638,12 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 256 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Landing = __webpack_require__(257);
+	var Landing = __webpack_require__(260);
 
 	module.exports = {
 	    render: function render() {
@@ -64523,7 +64654,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 257 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

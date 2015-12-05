@@ -1,4 +1,5 @@
 {% extends "allmychanges/new-base.html" %}
+{% load allmychanges_tags %}
 
 {% block content %}
 
@@ -14,6 +15,7 @@
      data-changelog-id="{{ changelog.id }}"
      data-source="{{ preview.source }}"
      data-downloader="{% firstof preview.downloader '' %}"
+     data-downloader-settings="{{ preview.downloader_settings|json }}"
 {% if changelog.name %}
      data-name="{{ preview.name }}"{% endif %}
 {% if changelog.namespace %}

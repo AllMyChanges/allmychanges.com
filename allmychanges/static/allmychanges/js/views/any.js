@@ -85,12 +85,16 @@ module.exports = {
                 element);
         });
         $('.add-new-container').each(function (idx, element) {
+            var downloader_settings = element.dataset['downloaderSettings'];
+            downloader_settings = JSON.parse(downloader_settings);
+            
             React.render(
                 <PackageSettings
                      preview_id={element.dataset['previewId']}
                      changelog_id={element.dataset['changelogId']}
                      source={element.dataset['source']}
                      downloader={element.dataset['downloader']}
+                     downloader_settings={downloader_settings}
                      name={element.dataset['name']}
                      namespace={element.dataset['namespace']}
                      description={element.dataset['description']}
