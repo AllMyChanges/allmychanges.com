@@ -24,11 +24,13 @@ var render_tabs = function(tabs, tab_panels, on_select) {
    );
 }
 
-var render_need_apply_plate = function (on_submit) {
+var render_change_source_plate = function (on_submit) {
     return (
         <div>
             <p>You changed the source URL, please, hit "Apply" button to search changelog data at the new source.</p>
-            <input type="submit" className="button _good" value="Apply" onClick={on_submit}/>
+            <p className="buttons-row">
+              <input type="submit" className="button _good" value="Apply" onClick={on_submit}/>
+            </p>
         </div>
     )
 }
@@ -288,17 +290,29 @@ module.exports = React.createClass({
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
     },
+    apply_new_source_settings: function() {
+        // applying downloader settings @apply-downloader-settings
+        this.save_preview_params();
+
+        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
+                method: 'PATCH',
+                data: JSON.stringify(
+                    R.pick(['source'], this.state)
+                ),
+                contentType: 'application/json',
+                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+            .success(this.update_preview_callback);
+    },
     apply_parser_settings: function() {
         // applying parser settings @apply-downloader-settings
         this.save_preview_params();
 
         $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
                 method: 'PATCH',
-                data: JSON.stringify({
-                    search_list: this.state.search_list,
-                    ignore_list: this.state.ignore_list,
-                    xslt: this.state.xslt
-                }),
+                data: JSON.stringify(
+                    R.pick(['search_list', 'ignore_list', 'xslt'],
+                           this.state)
+                ),
                 contentType: 'application/json',
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
@@ -503,6 +517,11 @@ module.exports = React.createClass({
         } else {
             // статус равен created, когда мы открыли changelog
             // для редактирования и версии preview взяты из него
+            console.log('STATUS: ' + status);
+            
+            if (status == 'error') {
+                content.push(render_log(this.state.log, false));
+            }
             if (status == 'success' || status == 'created') {
                 content.push(render_results(this.state.results));
 
@@ -518,85 +537,83 @@ module.exports = React.createClass({
                     name: this.state.name,
                 }));
             }
-            if (status == 'error') {
-                content.push(render_log(this.state.log, false));
-            }
+            if (status != 'processing') {
+                var is_downloader_options_should_be_applied = function () {
+                    var result = (
+                        this.state.downloader != this.preview.downloader ||
+                            !R.equals(this.state.downloader_settings, this.preview.downloader_settings));
 
-            var is_downloader_options_should_be_applied = function () {
-                var result = (
-                    this.state.downloader != this.preview.downloader ||
-                        !R.equals(this.state.downloader_settings, this.preview.downloader_settings));
+                    console.log('this.state.downloader: ' + this.state.downloader);
+                    console.log('this.preview.downloader: ' + this.preview.downloader);
 
-                console.log('this.state.downloader: ' + this.state.downloader);
-                console.log('this.preview.downloader: ' + this.preview.downloader);
+                    console.log('this.state.downloader_settings: ' + JSON.stringify(this.state.downloader_settings));
+                    console.log('this.preview.downloader_settings: ' + JSON.stringify(this.preview.downloader_settings));
 
-                console.log('this.state.downloader_settings: ' + JSON.stringify(this.state.downloader_settings));
-                console.log('this.preview.downloader_settings: ' + JSON.stringify(this.preview.downloader_settings));
+                    if (result) {
+                        console.log('Downloader options SHOULD be applied');
+                    } else {
+                        console.log('Downloader options SHOULD NOT be applied');
+                    }
+                    return result;
+                }.bind(this)
 
-                if (result) {
-                    console.log('Downloader options SHOULD be applied');
-                } else {
-                    console.log('Downloader options SHOULD NOT be applied');
+                var update_downloader_settings = (settings) => {
+                    console.log('Updating downloader settings: ' + JSON.stringify(settings));
+                    this.setState({'downloader_settings': settings},
+                                  this.update_tune_panel_height(1));
                 }
-                return result;
-            }.bind(this)
+                
+                var update_downloader = (downloader) => {
+                    console.log('update_downloader');
+                    this.setState({'downloader': downloader},
+                                  this.update_tune_panel_height(1));
+                }
 
-            var update_downloader_settings = (settings) => {
-                console.log('Updating downloader settings: ' + JSON.stringify(settings));
-                this.setState({'downloader_settings': settings},
-                              this.update_tune_panel_height(1));
-            }
-            
-            var update_downloader = (downloader) => {
-                console.log('update_downloader');
-                this.setState({'downloader': downloader},
-                              this.update_tune_panel_height(1));
-            }
+                add_tab('Change downloader',
+                        render_change_downloader_tab({
+                            downloader: this.state.downloader,
+                            update_downloader: update_downloader,
+                            downloader_settings: this.state.downloader_settings,
+                            update_settings: update_downloader_settings,
+                            downloaders: this.state.downloaders,
+                            on_submit: this.apply_downloader_settings,
+                            need_apply: is_downloader_options_should_be_applied()
+                        }));
 
-            add_tab('Change downloader',
-                    render_change_downloader_tab({
-                        downloader: this.state.downloader,
-                        update_downloader: update_downloader,
-                        downloader_settings: this.state.downloader_settings,
-                        update_settings: update_downloader_settings,
-                        downloaders: this.state.downloaders,
-                        on_submit: this.apply_downloader_settings,
-                        need_apply: is_downloader_options_should_be_applied()
-                    }));
+                var is_parser_options_should_be_applied = function () {
+                    var result = (
+                        this.state.search_list != this.preview.search_list
+                            || this.state.ignore_list != this.preview.ignore_list
+                            || this.state.xslt != this.preview.xslt);
+                    return result;
+                }.bind(this)
+                
+                add_tab('Tune parser',
+                        render_tune_parser_panel({
+                            on_field_change: this.on_field_change,
+                            on_submit: this.apply_parser_settings,
+                            on_toggle: this.update_tune_panel_height(300),
+                            search_list: this.state.search_list,
+                            ignore_list: this.state.ignore_list,
+                            xslt: this.state.xslt,
+                            need_apply: is_parser_options_should_be_applied()
+                        }));
 
-            var is_parser_options_should_be_applied = function () {
-                var result = (
-                    this.state.search_list != this.preview.search_list
-                        || this.state.ignore_list != this.preview.ignore_list
-                        || this.state.xslt != this.preview.xslt);
-                return result;
-            }.bind(this)
-            
-            add_tab('Tune parser',
-                    render_tune_parser_panel({
-                        on_field_change: this.on_field_change,
-                        on_submit: this.apply_parser_settings,
-                        on_toggle: this.update_tune_panel_height(300),
-                        search_list: this.state.search_list,
-                        ignore_list: this.state.ignore_list,
-                        xslt: this.state.xslt,
-                        need_apply: is_parser_options_should_be_applied()
-                    }));
-
-            if (this.preview.source != this.state.source) {
-                // TODO: надо проверить, что source для preview сохраняется
-                // кажется, что PATCH тут будет вызываться неверно
-                content.push(<TunePanel>{render_need_apply_plate(this.apply_downloader_settings)}</TunePanel>);
-                // console.log('Setting height to 0 because of source changed');
-                // $('.changelog-settings__tune').height(0);
-            } else {
-                content.push(
-                    <TunePanel>
-                        {render_tabs(
-                            tabs,
-                            tab_panels,
-                            this.update_tune_panel_height(30))}
-                    </TunePanel>);
+                if (this.preview.source != this.state.source) {
+                    // TODO: надо проверить, что source для preview сохраняется
+                    // кажется, что PATCH тут будет вызываться неверно
+                    content.push(<TunePanel>{render_change_source_plate(this.apply_new_source_settings)}</TunePanel>);
+                    // console.log('Setting height to 0 because of source changed');
+                    // $('.changelog-settings__tune').height(0);
+                } else {
+                    content.push(
+                            <TunePanel>
+                            {render_tabs(
+                                tabs,
+                                tab_panels,
+                                this.update_tune_panel_height(30))}
+                        </TunePanel>);
+                }
             }
         }
         return (<div className="changelog-settings">{content}</div>);

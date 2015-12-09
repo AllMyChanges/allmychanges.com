@@ -564,6 +564,7 @@ class PreviewViewSet(HandleExceptionMixin,
         data = self.request.DATA
 
         fields_which_can_be_updated = (
+            'source',
             'downloader',
             'downloader_settings',
             'search_list',
