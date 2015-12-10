@@ -24,7 +24,6 @@ ALLOWED_HOSTS = ['allmychanges.com', 'localhost']
 
 METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'
-PINGDOM_ID = '55b0e587abe53dba777b23c6'
 
 SLACK_URLS = {
     'default': 'https://hooks.slack.com/services/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',

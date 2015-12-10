@@ -198,22 +198,6 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 <!-- /Google.Analytics counter -->
 {% endif %}
 
-{% if settings.PINGDOM_ID %}
-<!-- Pingdom performance counter -->
-<script>
-var _prum = [['id', '{{ settings.PINGDOM_ID }}'],
-             ['mark', 'firstbyte', (new Date()).getTime()]];
-(function() {
-    var s = document.getElementsByTagName('script')[0]
-      , p = document.createElement('script');
-    p.async = 'async';
-    p.src = '//rum-static.pingdom.net/prum.min.js';
-    s.parentNode.insertBefore(p, s);
-})();
-</script>
-<!-- /Pingdom -->
-{% endif %}
-
 <script src="/static/allmychanges/js-compiled/all.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
 <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
