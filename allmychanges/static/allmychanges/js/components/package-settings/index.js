@@ -15,9 +15,9 @@ var render_change_downloader_tab = require('./tune-downloader');
 var TunePanel = require('./tune-panel');
 
 
-var render_tabs = function(tabs, tab_panels, on_select) {
+var render_tabs = function(tabs, tab_panels) {
     return (
-        <Tabs onSelect={on_select}>
+        <Tabs>
             <TabList>{ tabs }</TabList>
             { tab_panels }
         </Tabs>
@@ -31,6 +31,14 @@ var render_change_source_plate = function (on_submit) {
             <p className="buttons-row">
               <input type="submit" className="button _good" value="Apply" onClick={on_submit}/>
             </p>
+        </div>
+    )
+}
+
+var render_no_downloaders_plate = function () {
+    return (
+        <div>
+            <p>No downloaders are able to process this source url, please change it to something else and try again.</p>
         </div>
     )
 }
@@ -186,7 +194,7 @@ var render_tune_parser_panel = function(opts) {
     return (
         <div key="tune-parser-panel">
           <div className="changelog-settings__tune-panel">
-            <Accordion elements={elements} onToggle={opts.on_toggle}/>
+            <Accordion elements={elements}/>
             <p className="buttons-row">
             <input type="submit"
                    className="button _good _large"
@@ -478,16 +486,6 @@ module.exports = React.createClass({
                        problem: false})
         this.wait_for_preview();
     },
-    update_tune_panel_height: function (timeout) {
-        return () => {
-            // this function updates tune panel height and does
-            // this after a small delay, because when tabs are changed, we need
-            // time untill this switch will be done
-            setTimeout(() => {
-                this.forceUpdate();
-            }, timeout);
-        };
-    },
     render: function() {
 
         var content = [];
@@ -559,14 +557,12 @@ module.exports = React.createClass({
 
                 var update_downloader_settings = (settings) => {
                     console.log('Updating downloader settings: ' + JSON.stringify(settings));
-                    this.setState({'downloader_settings': settings},
-                                  this.update_tune_panel_height(1));
+                    this.setState({'downloader_settings': settings});
                 }
                 
                 var update_downloader = (downloader) => {
                     console.log('update_downloader');
-                    this.setState({'downloader': downloader},
-                                  this.update_tune_panel_height(1));
+                    this.setState({'downloader': downloader});
                 }
 
                 add_tab('Change downloader',
@@ -592,27 +588,24 @@ module.exports = React.createClass({
                         render_tune_parser_panel({
                             on_field_change: this.on_field_change,
                             on_submit: this.apply_parser_settings,
-                            on_toggle: this.update_tune_panel_height(300),
                             search_list: this.state.search_list,
                             ignore_list: this.state.ignore_list,
                             xslt: this.state.xslt,
                             need_apply: is_parser_options_should_be_applied()
                         }));
-
-                if (this.preview.source != this.state.source) {
-                    // TODO: надо проверить, что source для preview сохраняется
-                    // кажется, что PATCH тут будет вызываться неверно
-                    content.push(<TunePanel>{render_change_source_plate(this.apply_new_source_settings)}</TunePanel>);
-                    // console.log('Setting height to 0 because of source changed');
-                    // $('.changelog-settings__tune').height(0);
+            }
+            
+            if (this.preview.source != this.state.source) {
+                content.push(<TunePanel>{render_change_source_plate(this.apply_new_source_settings)}</TunePanel>);
+            } else {
+                if (this.state.downloaders.length == 0) {
+                    content.push(<TunePanel>{render_no_downloaders_plate()}</TunePanel>);
                 } else {
                     content.push(
-                            <TunePanel>
-                            {render_tabs(
-                                tabs,
-                                tab_panels,
-                                this.update_tune_panel_height(30))}
-                        </TunePanel>);
+        <TunePanel>
+          {render_tabs(tabs,
+                       tab_panels)}
+        </TunePanel>);
                 }
             }
         }

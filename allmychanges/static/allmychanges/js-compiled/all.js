@@ -48045,10 +48045,10 @@ componentHandler.register({
 	var render_change_downloader_tab = __webpack_require__(251);
 	var TunePanel = __webpack_require__(253);
 
-	var render_tabs = function render_tabs(tabs, tab_panels, on_select) {
+	var render_tabs = function render_tabs(tabs, tab_panels) {
 	    return React.createElement(
 	        Tabs,
-	        { onSelect: on_select },
+	        null,
 	        React.createElement(
 	            TabList,
 	            null,
@@ -48071,6 +48071,18 @@ componentHandler.register({
 	            'p',
 	            { className: 'buttons-row' },
 	            React.createElement('input', { type: 'submit', className: 'button _good', value: 'Apply', onClick: on_submit })
+	        )
+	    );
+	};
+
+	var render_no_downloaders_plate = function render_no_downloaders_plate() {
+	    return React.createElement(
+	        'div',
+	        null,
+	        React.createElement(
+	            'p',
+	            null,
+	            'No downloaders are able to process this source url, please change it to something else and try again.'
 	        )
 	    );
 	};
@@ -48266,7 +48278,7 @@ componentHandler.register({
 	        React.createElement(
 	            'div',
 	            { className: 'changelog-settings__tune-panel' },
-	            React.createElement(Accordion, { elements: elements, onToggle: opts.on_toggle }),
+	            React.createElement(Accordion, { elements: elements }),
 	            React.createElement(
 	                'p',
 	                { className: 'buttons-row' },
@@ -48525,20 +48537,8 @@ componentHandler.register({
 	            problem: false });
 	        this.wait_for_preview();
 	    },
-	    update_tune_panel_height: function update_tune_panel_height(timeout) {
-	        var _this = this;
-
-	        return function () {
-	            // this function updates tune panel height and does
-	            // this after a small delay, because when tabs are changed, we need
-	            // time untill this switch will be done
-	            setTimeout(function () {
-	                _this.forceUpdate();
-	            }, timeout);
-	        };
-	    },
 	    render: function render() {
-	        var _this2 = this;
+	        var _this = this;
 
 	        var content = [];
 	        var next_actions = [];
@@ -48615,12 +48615,12 @@ componentHandler.register({
 
 	                var update_downloader_settings = function update_downloader_settings(settings) {
 	                    console.log('Updating downloader settings: ' + JSON.stringify(settings));
-	                    _this2.setState({ 'downloader_settings': settings }, _this2.update_tune_panel_height(1));
+	                    _this.setState({ 'downloader_settings': settings });
 	                };
 
 	                var update_downloader = function update_downloader(downloader) {
 	                    console.log('update_downloader');
-	                    _this2.setState({ 'downloader': downloader }, _this2.update_tune_panel_height(1));
+	                    _this.setState({ 'downloader': downloader });
 	                };
 
 	                add_tab('Change downloader', render_change_downloader_tab({
@@ -48641,30 +48641,33 @@ componentHandler.register({
 	                add_tab('Tune parser', render_tune_parser_panel({
 	                    on_field_change: this.on_field_change,
 	                    on_submit: this.apply_parser_settings,
-	                    on_toggle: this.update_tune_panel_height(300),
 	                    search_list: this.state.search_list,
 	                    ignore_list: this.state.ignore_list,
 	                    xslt: this.state.xslt,
 	                    need_apply: is_parser_options_should_be_applied()
 	                }));
+	            }
 
-	                if (this.preview.source != this.state.source) {
-	                    // TODO: надо проверить, что source для preview сохраняется
-	                    // кажется, что PATCH тут будет вызываться неверно
+	            if (this.preview.source != this.state.source) {
+	                content.push(React.createElement(
+	                    TunePanel,
+	                    null,
+	                    render_change_source_plate(this.apply_new_source_settings)
+	                ));
+	            } else {
+	                if (this.state.downloaders.length == 0) {
 	                    content.push(React.createElement(
 	                        TunePanel,
 	                        null,
-	                        render_change_source_plate(this.apply_new_source_settings)
+	                        render_no_downloaders_plate()
 	                    ));
-	                    // console.log('Setting height to 0 because of source changed');
-	                    // $('.changelog-settings__tune').height(0);
 	                } else {
-	                        content.push(React.createElement(
-	                            TunePanel,
-	                            null,
-	                            render_tabs(tabs, tab_panels, this.update_tune_panel_height(30))
-	                        ));
-	                    }
+	                    content.push(React.createElement(
+	                        TunePanel,
+	                        null,
+	                        render_tabs(tabs, tab_panels)
+	                    ));
+	                }
 	            }
 	        }
 	        return React.createElement(
@@ -64089,8 +64092,33 @@ componentHandler.register({
 	            'class': "changelog-settings__tune"
 	        };
 	    },
-	    render: function render() {
+	    componentDidMount: function componentDidMount() {
 	        var _this = this;
+
+	        var margin = 20;
+
+	        if (this.state.collapsed) {
+	            this.height = margin;
+	        } else {
+	            // Попробовать React.findDOMNode(this)
+	            this.height = $('.changelog-settings__tune-content').height() + margin;
+	            console.log('=========> new height calculated: ' + this.height);
+	        }
+
+	        this.timer = setInterval(function () {
+	            var new_height = $('.changelog-settings__tune-content').height() + margin;
+	            if (_this.height != new_height) {
+	                console.log('Forcing update from component');
+	                _this.height = new_height;
+	                _this.forceUpdate();
+	            }
+	        }, 50);
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        clearInterval(this.timer);
+	    },
+	    render: function render() {
+	        var _this2 = this;
 
 	        var style = {};
 	        var content = this.props.children;
@@ -64101,26 +64129,20 @@ componentHandler.register({
 	            style['padding-top'] = 0;
 	            style['padding-bottom'] = 0;
 	        } else {
-	            var new_height;
-	            if (this.state.collapsed) {
-	                new_height = 20;
-	            } else {
-	                new_height = $('.changelog-settings__tune-content').height() + 20;
-	            }
-	            console.log('Setting height to ' + new_height + ' during rendering');
-	            style['height'] = new_height;
+	            console.log('Setting height to ' + this.height + ' during rendering');
+	            style['height'] = this.height;
 	        }
 
 	        var on_click = function on_click(ev) {
 	            console.log('Clicked');
 
-	            if (_this.state.collapsed) {
-	                _this.setState({
+	            if (_this2.state.collapsed) {
+	                _this2.setState({
 	                    collapsed: false,
 	                    'class': "changelog-settings__tune"
 	                });
 	            } else {
-	                _this.setState({
+	                _this2.setState({
 	                    collapsed: true,
 	                    'class': "changelog-settings__tune changelog-settings__tune_collapsed"
 	                });

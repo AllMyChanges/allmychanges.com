@@ -10,6 +10,30 @@ var Panel = React.createClass({
             class: "changelog-settings__tune"
         }
     },
+    componentDidMount: function() {
+        var margin = 20;
+        
+        if (this.state.collapsed) {
+            this.height = margin;
+        } else {
+            // Попробовать React.findDOMNode(this)
+            this.height = $('.changelog-settings__tune-content').height() + margin;
+            console.log('=========> new height calculated: ' + this.height);
+        }
+        
+        this.timer = setInterval(() => {
+            var new_height = $('.changelog-settings__tune-content').height() + margin;
+            if (this.height != new_height) {
+                console.log('Forcing update from component');
+                this.height = new_height;
+                this.forceUpdate();
+            }
+        }, 50);
+
+    },
+    componentWillUnmount: function() {
+        clearInterval(this.timer);
+    },
     render: function() {
         var style = {};
         var content = this.props.children;
@@ -20,14 +44,8 @@ var Panel = React.createClass({
             style['padding-top'] = 0;
             style['padding-bottom'] = 0;
         } else {
-            var new_height;
-            if (this.state.collapsed) {
-                new_height = 20;
-            } else {
-                new_height = $('.changelog-settings__tune-content').height() + 20;
-            }
-            console.log('Setting height to ' + new_height + ' during rendering');
-            style['height'] = new_height;
+            console.log('Setting height to ' + this.height + ' during rendering');
+            style['height'] = this.height;
         }
 
         var on_click = (ev) => {
