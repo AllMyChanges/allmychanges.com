@@ -17,6 +17,7 @@
     "gulp-user-story": "0.0.2",
     "gulp-webpack": "^1.5.0",
     "jquery": "^2.1.4",
+    "jquery-sticky": "^1.0.3",
     "jquery.cookie": "^1.4.1",
     "lodash": "^3.10.1",
     "priorityqueuejs": "^1.0.0",
@@ -27,6 +28,7 @@
     "react-tabs": "git+https://github.com/svetlyak40wt/react-tabs.git",
     "style-loader": "^0.12.4",
     "stylus-loader": "^1.4.0",
+    "waypoints": "^4.0.0",
     "webpack": "^1.12.2"
   },
   "scripts": {

@@ -48,9 +48,9 @@
 
 	__webpack_require__(1).render();
 	__webpack_require__(163).render();
-	__webpack_require__(256).render();
 	__webpack_require__(257).render();
-	__webpack_require__(259).render();
+	__webpack_require__(258).render();
+	__webpack_require__(260).render();
 
 /***/ },
 /* 1 */
@@ -20047,11 +20047,14 @@
 	var Notifications = __webpack_require__(170);
 	var FeedbackForm = __webpack_require__(171);
 	var PackageSettings = __webpack_require__(172);
+	var init_sticky_versions = __webpack_require__(254);
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(254);
+	window.intro = __webpack_require__(255);
 
 	$(document).ready(function () {
+	    init_sticky_versions();
+
 	    window.intro.push({ 'element': $(".magic-prompt")[0],
 	        'intro': 'Using this search bar, you could search for packages and add a source URLs.'
 	    }, 500);
@@ -33920,7 +33923,7 @@
 
 
 	// module
-	exports.push([module.id, ".changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 300px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 300px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -21px;\n  margin-left: -20px;\n  width: 40px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n}\n", ""]);
+	exports.push([module.id, ".changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 300px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 300px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -15px;\n  margin-left: -20px;\n  width: 40px;\n  height: 15px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n  vertical-align: bottom;\n}\n", ""]);
 
 	// exports
 
@@ -36968,11 +36971,61 @@
 
 /***/ },
 /* 254 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	var init = function init() {
+	  $(document).ready(function () {
+	    // делаем табло со списком версий прилипающим кверху при прокрутке
+	    $(".version-links-container").sticky({
+	      topSpacing: 0,
+	      className: "version-links-container__sticky",
+	      wrapperClassName: "version-links-container__wrapper"
+	    });
+
+	    // обрабатываем клик, чтобы при прокрутке не загораживать
+	    // кусок changelog с выбранной версией
+	    var version_links_height = $('.version-links').height();
+
+	    $('.version-links__item a').click(function (ev) {
+	      ev.preventDefault();
+	      var version = $(this).text();
+	      var section_top = $('[name="' + version + '"]').position().top;
+
+	      var top = section_top - (version_links_height + 20);
+	      if ($('.version-links__sticky').length == 0) {
+	        // это нужно потому, что когда заголовок становится липким, то его содержимое
+	        // вычитается из высоты страницы, сдвигая все заголовки вверх
+	        top -= version_links_height + 20;
+	      }
+	      window.scroll(0, top);
+	    });
+
+	    // используем плагин, чтобы помечать ссылку с текущей версией
+	    $(".package-version__number a").waypoint({
+	      handler: function handler(direction) {
+	        $(".version-links__item").removeClass("version-links__selected-item");
+	        $(".version-links__item-" + this.element.text.replace(/\./g, "-")).addClass("version-links__selected-item");
+	      },
+	      offset: "30%"
+	    });
+
+	    intro.push({ 'element': $(".page-header__buttons")[0],
+	      'intro': 'Use these buttons to follow new packages or report about issues.'
+	    }, 1000);
+	  });
+	};
+
+	module.exports = init;
+
+/***/ },
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var PriorityQueue = __webpack_require__(255);
+	var PriorityQueue = __webpack_require__(256);
 	var _introjs_items = new PriorityQueue(function (a, b) {
 	    return a.priority - b.priority;
 	});
@@ -37010,7 +37063,7 @@
 	};
 
 /***/ },
-/* 255 */
+/* 256 */
 /***/ function(module, exports) {
 
 	/**
@@ -37189,7 +37242,7 @@
 	};
 
 /***/ },
-/* 256 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37206,12 +37259,12 @@
 	};
 
 /***/ },
-/* 257 */
+/* 258 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Promo = __webpack_require__(258);
+	var Promo = __webpack_require__(259);
 
 	module.exports = {
 	    render: function render() {
@@ -37222,7 +37275,7 @@
 	};
 
 /***/ },
-/* 258 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37456,12 +37509,12 @@
 	});
 
 /***/ },
-/* 259 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Landing = __webpack_require__(260);
+	var Landing = __webpack_require__(261);
 
 	module.exports = {
 	    render: function render() {
@@ -37472,7 +37525,7 @@
 	};
 
 /***/ },
-/* 260 */
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

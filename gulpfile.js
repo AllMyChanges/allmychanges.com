@@ -48,6 +48,8 @@ var source_js_files = [
     'node_modules/gulp-user-story/node_modules/user-story/lib/UserStory.js',
     'node_modules/jquery/dist/jquery.js',
     'node_modules/jquery.cookie/jquery.cookie.js',
+    'node_modules/jquery-sticky/jquery.sticky.js',
+    'node_modules/waypoints/lib/jquery.waypoints.js',
     'allmychanges/static/spin.min.js', // TODO: это надо заменить на mdl.Spinner
     'allmychanges/static/jquery.tile.js',
     'bower_components/typeahead.js/dist/typeahead.jquery.js',
