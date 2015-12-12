@@ -22,7 +22,12 @@ var Panel = React.createClass({
         }
         
         this.timer = setInterval(() => {
-            var new_height = $('.changelog-settings__tune-content').height() + margin;
+            var new_height;
+            if (this.state.collapsed) {
+                new_height = margin;
+            } else {
+                new_height = $('.changelog-settings__tune-content').height() + margin;
+            }
             if (this.height != new_height) {
                 console.log('Forcing update from component');
                 this.height = new_height;
@@ -68,11 +73,11 @@ var Panel = React.createClass({
         if (this.state.collapsed) {
             collapse_button = (
 <button className="changelog-settings__collapse-button"
-        onClick={on_click}>⬆︎ ⬆︎ ⬆︎︎</button>);
+        onClick={on_click}>︽</button>);
         } else {
             collapse_button = (
 <button className="changelog-settings__collapse-button"
-        onClick={on_click}>⬇︎ ⬇︎ ⬇︎</button>);
+        onClick={on_click}>︾</button>);
         }
 
         // ⬆︎

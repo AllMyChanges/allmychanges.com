@@ -61142,7 +61142,7 @@ componentHandler.register({
 
 
 	// module
-	exports.push([module.id, ".changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 500px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 500px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -21px;\n  margin-left: -70px;\n  width: 140px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n}\n", ""]);
+	exports.push([module.id, ".changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 300px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 300px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -21px;\n  margin-left: -20px;\n  width: 40px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n}\n", ""]);
 
 	// exports
 
@@ -64106,7 +64106,12 @@ componentHandler.register({
 	        }
 
 	        this.timer = setInterval(function () {
-	            var new_height = $('.changelog-settings__tune-content').height() + margin;
+	            var new_height;
+	            if (_this.state.collapsed) {
+	                new_height = margin;
+	            } else {
+	                new_height = $('.changelog-settings__tune-content').height() + margin;
+	            }
 	            if (_this.height != new_height) {
 	                console.log('Forcing update from component');
 	                _this.height = new_height;
@@ -64155,14 +64160,14 @@ componentHandler.register({
 	                'button',
 	                { className: 'changelog-settings__collapse-button',
 	                    onClick: on_click },
-	                '⬆︎ ⬆︎ ⬆︎︎'
+	                '︽'
 	            );
 	        } else {
 	            collapse_button = React.createElement(
 	                'button',
 	                { className: 'changelog-settings__collapse-button',
 	                    onClick: on_click },
-	                '⬇︎ ⬇︎ ⬇︎'
+	                '︾'
 	            );
 	        }
 
