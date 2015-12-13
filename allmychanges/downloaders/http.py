@@ -58,7 +58,6 @@ def download(source,
     only one page.
     """
     print 'HTTP DOWNLOADER Called with {0}'.format(params)
-    raise RuntimeError()
     search_list = parse_search_list(search_list)
     ignore_list = split_filenames(ignore_list)
 

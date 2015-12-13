@@ -54,10 +54,10 @@ def guess_downloaders(source):
 
     modules = get_modules()
 
-    if True:
-        yield {'name': 'http'}
-        yield {'name': 'vcs.git'}
-        return
+    # if True:
+    #     yield {'name': 'http'}
+    #     yield {'name': 'vcs.git'}
+    #     return
 
     for module in modules:
         name = get_downloader_name(module)
@@ -73,7 +73,7 @@ def guess_downloaders(source):
         if result:
             result['name'] = name
             print result
-#            yield result
+            yield result
 
             # this way we could stop if google play or appstore
             # url was discovered
