@@ -4,6 +4,7 @@ import requests
 import time
 import math
 import datetime
+import random
 import subprocess
 
 from hashlib import md5, sha1
@@ -434,15 +435,24 @@ class Changelog(Downloadable, models.Model):
         """
         hour = 60 * 60
         min_update_interval = hour
-        time_to_next_update = 4 * hour
+        max_update_interval = 48 * hour
         num_trackers = self.trackers.count()
-        time_to_next_update = time_to_next_update / math.log(max(math.e,
+        # here we divide max interval on 2 because
+        # on the last stage will add some randomness to
+        # the resulting value
+        time_to_next_update = (max_update_interval / 2) / math.log(max(math.e,
                                                                  num_trackers))
 
         time_to_next_update = max(min_update_interval,
                                   time_to_next_update,
                                   2 * self.last_update_took)
 
+        # add some randomness
+        time_to_next_update = random.randint(
+            int(time_to_next_update * 0.8),
+            int(time_to_next_update * 2.0))
+
+        # limit upper bound
         return timezone.now() + datetime.timedelta(0, time_to_next_update)
 
     def calc_next_update_if_error(self):
