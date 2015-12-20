@@ -46,7 +46,7 @@ def test_preview():
 
     # проверим, что у preview есть поле log, и оно список
     preview = refresh(preview)
-    eq_(0, len(preview.log))
+    eq_(5, len(preview.log))
 
     # теперь обновим preview на несуществующий источник
     response = cl.post(preview_url,
@@ -130,7 +130,8 @@ def test_when_preview_saved_versions_are_copied_to_changelog():
                          reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
                          namespace=changelog.namespace,
                          name=changelog.name,
-                         source='http://github.com/svetlyak40wt/django-fields')
+                         source='http://github.com/svetlyak40wt/django-fields',
+                         downloader='git.vcs')
     check_status_code(200, response)
 
     # versions now moved to the changelog

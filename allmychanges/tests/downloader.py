@@ -35,18 +35,6 @@ def test_guesser():
 #    eq_('svn', guess('http://my-svn-repository-for-allmychanges.googlecode.com/svn/trunk/'))
 
 
-def test_guesser_called_during_the_changelog_download():
-    ch = Changelog.objects.create(source='https://github.com/svetlyak40wt/django-perfect404')
-    eq_(None, ch.downloader)
-
-    path = ch.download()
-    if path:
-        shutil.rmtree(path)
-
-    ch = refresh(ch)
-    eq_('git', ch.downloader)
-
-
 def test_google_play_get_id():
     url = 'https://play.google.com/store/apps/details?id=com.runtastic.android.pro2&hl=en%27'
     google_play_id = 'com.runtastic.android.pro2'

@@ -18,7 +18,9 @@ def test_light_user_becomes_a_moderator_after_changing_changelog():
     check_status_code(200,
                       cl.put(reverse('changelog-detail',
                                      kwargs=dict(pk=changelog.id)),
-                             data=anyjson.serialize(dict(source=changelog.source)),
+                             data=anyjson.serialize(dict(
+                                 source=changelog.source,
+                                 downloader='vcs.git')),
                              content_type='application/json'))
     eq_(1, changelog.light_moderators.count())
 
@@ -26,7 +28,9 @@ def test_light_user_becomes_a_moderator_after_changing_changelog():
     check_status_code(200,
                       cl.put(reverse('changelog-detail',
                                      kwargs=dict(pk=changelog.id)),
-                             data=anyjson.serialize(dict(source=changelog.source)),
+                             data=anyjson.serialize(dict(
+                                 source=changelog.source,
+                                 downloader='vcs.git')),
                             content_type='application/json'))
     eq_(1, changelog.light_moderators.count())
 
@@ -52,7 +56,9 @@ def test_normal_user_becomes_a_moderator_after_changing_changelog():
     check_status_code(200,
                       cl.put(reverse('changelog-detail',
                                      kwargs=dict(pk=changelog.id)),
-                             data=anyjson.serialize(dict(source=changelog.source)),
+                             data=anyjson.serialize(dict(
+                                 source=changelog.source,
+                                 downloader='vcs.git')),
                              content_type='application/json'))
     eq_(0, changelog.light_moderators.count())
     eq_(1, changelog.moderators.count())
@@ -61,7 +67,9 @@ def test_normal_user_becomes_a_moderator_after_changing_changelog():
     check_status_code(200,
                       cl.put(reverse('changelog-detail',
                                      kwargs=dict(pk=changelog.id)),
-                             data=anyjson.serialize(dict(source=changelog.source)),
+                             data=anyjson.serialize(dict(
+                                 source=changelog.source,
+                                 downloader='vcs.git')),
                              content_type='application/json'))
     eq_(0, changelog.light_moderators.count())
     eq_(1, changelog.moderators.count())

@@ -13,7 +13,10 @@ from allmychanges.parsing.pipeline import parse_html_file
 def test_update_package_using_full_pipeline():
     art = create_user('art')
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='test+samples/very-simple.md')
+        namespace='python',
+        name='pip',
+        source='samples/very-simple.md',
+        downloader='fake')
     art.track(changelog)
 
     update_preview_or_changelog(changelog)
@@ -117,7 +120,10 @@ def test_html_parser_makes_hierarchy():
 def test_exclude_version_if_it_includes_few_other_versions():
     art = create_user('art')
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='test+samples/celery/1')
+        namespace='python',
+        name='pip',
+        source='samples/celery/1',
+        downloader='fake')
     art.track(changelog)
 
     update_preview_or_changelog(changelog)
@@ -130,7 +136,10 @@ def test_exclude_version_if_it_includes_few_other_versions():
 def test_exclude_version_if_it_included_in_the_version_with_same_number_and_bigger_content():
     art = create_user('art')
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='test+samples/celery/2')
+        namespace='python',
+        name='pip',
+        source='samples/celery/2',
+        downloader='fake')
     art.track(changelog)
 
     update_preview_or_changelog(changelog)
@@ -150,7 +159,10 @@ def test_exclude_outer_version_if_it_includes_a_single_version_which_is_subversi
     # this is the case when 3.1 version includes one 3.1.0 version
     art = create_user('art')
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='test+samples/celery/3')
+        namespace='python',
+        name='pip',
+        source='samples/celery/3',
+        downloader='fake')
     art.track(changelog)
 
     update_preview_or_changelog(changelog)
@@ -167,7 +179,10 @@ def test_exclude_outer_version_if_it_includes_a_single_version_which_is_subversi
 def test_exclude_inner_version_if_it_is_included_into_an_outer_version_with_differ_number():
     art = create_user('art')
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='test+samples/celery/4')
+        namespace='python',
+        name='pip',
+        source='samples/celery/4',
+        downloader='fake')
     art.track(changelog)
 
     update_preview_or_changelog(changelog)
@@ -180,7 +195,10 @@ def test_exclude_inner_version_if_it_is_included_into_an_outer_version_with_diff
 # def test_exclude_inner_version_if_it_is_greater_than_outer():
 #     art = create_user('art')
 #     changelog = Changelog.objects.create(
-#         namespace='python', name='pip', source='test+samples/celery/5')
+#         namespace='python',
+#         name='pip',
+#         source='samples/celery/5',
+#         downloader='fake')
 #     art.track(changelog)
 
 #     update_preview_or_changelog(changelog)
@@ -197,7 +215,10 @@ def test_not_exclude_two_versions_with_same_content():
     # content an none of them should be excluded
     art = create_user('art')
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='test+samples/express.js')
+        namespace='python',
+        name='pip',
+        source='samples/express.js',
+        downloader='fake')
     art.track(changelog)
 
     update_preview_or_changelog(changelog)

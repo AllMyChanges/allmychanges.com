@@ -78,11 +78,12 @@ def test2(args=''):
 
 
 def test_failed(args=''):
-    local('nosetests --with-progressive --failed ' + args)
-
+    local(_get_docker_command('tests.command.allmychanges.com') + (
+        '/env/bin/nosetests --with-progressive --failed ') + args)
 
 def test_failed2(args=''):
-    local('nosetests --failed ' + args)
+    local(_get_docker_command('tests.command.allmychanges.com') + (
+        '/env/bin/nosetests --failed ') + args)
 
 def coverage():
     local('nosetests --with-coverage --cover-package=allmychanges --cover-html --cover-erase --cover-inclusive --cover-html-dir=static/coverage')
