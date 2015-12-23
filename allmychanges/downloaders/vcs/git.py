@@ -8,6 +8,7 @@ import envoy
 
 from collections import defaultdict
 from django.conf import settings
+from twiggy_goodies.threading import log
 from allmychanges.downloaders.utils import normalize_url
 from allmychanges.utils import (
     cd,
@@ -35,27 +36,38 @@ def download(source,
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url, username, repo_name = normalize_url(source)
 
-    url, branch = split_branch(url)
+    with log.name_and_fields(
+            'vcs.git', url=url, username=username, repo=repo_name):
 
-    with cd(path):
-        response = envoy.run('git clone {url} {path}'.format(url=url,
-                                                             path=path))
-        if response.status_code != 0:
-            if os.path.exists(path):
-                shutil.rmtree(path)
-            raise RuntimeError('Bad status_code from git clone: {0}. '
-                               'Git\'s stderr: {1}'.format(
-                                   response.status_code, response.std_err))
+        url, branch = split_branch(url)
 
-        if branch:
-            response = envoy.run('git checkout -b {branch} origin/{branch}'.format(branch=branch))
-
+        with cd(path):
+            log.info('Cloning repository')
+            response = envoy.run('git clone {url} {path}'.format(url=url,
+                                                                 path=path))
             if response.status_code != 0:
                 if os.path.exists(path):
                     shutil.rmtree(path)
-                raise RuntimeError('Bad status_code from git checkout -b {0}: {1}. '
-                                   'Git\'s stderr: {2}'.format(
-                                       branch, response.status_code, response.std_err))
+                raise RuntimeError('Bad status_code from git clone: {0}. '
+                                   'Git\'s stderr: {1}'.format(
+                                       response.status_code, response.std_err))
+
+            if branch:
+                with log.fields(branch=branch):
+                    log.info('Switching to branch')
+
+                    response = envoy.run(
+                        'git checkout -b {branch} origin/{branch}'.format(
+                            branch=branch))
+
+                    if response.status_code != 0:
+                        if os.path.exists(path):
+                            shutil.rmtree(path)
+                        raise RuntimeError('Bad status_code from git checkout -b {0}: {1}. '
+                                           'Git\'s stderr: {2}'.format(
+                                               branch, response.status_code, response.std_err))
+
+            log.info('Done')
 
     return path
 

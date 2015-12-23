@@ -20690,7 +20690,7 @@
 	        var closeItem2 = (function (item_id) {
 	            return (function () {
 	                // closing item [item_id] @notifications
-	                items = this.state.items;
+	                var items = this.state.items;
 	                items = _.filter(items, function (item) {
 	                    return item.id != item_id;
 	                });
@@ -21141,33 +21141,55 @@
 	            contentType: 'application/json',
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
-	    apply_downloader_settings: function apply_downloader_settings() {
-	        // applying downloader settings @apply-downloader-settings
-	        this.save_preview_params();
+	    // apply_downloader_settings: function() {
+	    //     // applying downloader settings @apply-downloader-settings
+	    //     this.save_preview_params();
 
-	        $.ajax({ url: '/v1/previews/' + this.props.preview_id + '/',
-	            method: 'PATCH',
-	            data: JSON.stringify(R.pick(['downloader', 'downloader_settings'], this.state)),
-	            contentType: 'application/json',
-	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
-	    },
-	    apply_new_source_settings: function apply_new_source_settings() {
-	        // applying downloader settings @apply-downloader-settings
-	        this.save_preview_params();
+	    //     $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
+	    //             method: 'PATCH',
+	    //             data: JSON.stringify(
+	    //                 R.pick(['downloader',
+	    //                         'downloader_settings'],
+	    //                        this.state)
+	    //             ),
+	    //             contentType: 'application/json',
+	    //             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	    //         .success(this.update_preview_callback);
+	    // },
+	    // apply_new_source_settings: function() {
+	    //     // applying downloader settings @apply-downloader-settings
+	    //     this.save_preview_params();
 
-	        $.ajax({ url: '/v1/previews/' + this.props.preview_id + '/',
-	            method: 'PATCH',
-	            data: JSON.stringify(R.pick(['source'], this.state)),
-	            contentType: 'application/json',
-	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
-	    },
-	    apply_parser_settings: function apply_parser_settings() {
+	    //     $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
+	    //             method: 'PATCH',
+	    //             data: JSON.stringify(
+	    //                 R.pick(['source'], this.state)
+	    //             ),
+	    //             contentType: 'application/json',
+	    //             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	    //         .success(this.update_preview_callback);
+	    // },
+	    // apply_parser_settings: function() {
+	    //     // applying parser settings @apply-downloader-settings
+	    //     this.save_preview_params();
+
+	    //     $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
+	    //             method: 'PATCH',
+	    //             data: JSON.stringify(
+	    //                 R.pick(['search_list', 'ignore_list', 'xslt'],
+	    //                        this.state)
+	    //             ),
+	    //             contentType: 'application/json',
+	    //             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
+	    //         .success(this.update_preview_callback);
+	    // },
+	    apply_settings: function apply_settings() {
 	        // applying parser settings @apply-downloader-settings
 	        this.save_preview_params();
 
 	        $.ajax({ url: '/v1/previews/' + this.props.preview_id + '/',
 	            method: 'PATCH',
-	            data: JSON.stringify(R.pick(['search_list', 'ignore_list', 'xslt'], this.state)),
+	            data: JSON.stringify(R.pick(['downloader', 'downloader_settings', 'search_list', 'ignore_list', 'xslt', 'source'], this.state)),
 	            contentType: 'application/json',
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
@@ -21376,15 +21398,16 @@
 	                    name: this.state.name
 	                }));
 	            }
+
 	            if (status != 'processing') {
-	                var is_downloader_options_should_be_applied = (function () {
-	                    var result = this.state.downloader != this.preview.downloader || !R.equals(this.state.downloader_settings, this.preview.downloader_settings);
+	                var is_downloader_options_should_be_applied = function is_downloader_options_should_be_applied() {
+	                    var result = _this.state.downloader != _this.preview.downloader || !R.equals(_this.state.downloader_settings, _this.preview.downloader_settings);
 
-	                    console.log('this.state.downloader: ' + this.state.downloader);
-	                    console.log('this.preview.downloader: ' + this.preview.downloader);
+	                    console.log('this.state.downloader: ' + _this.state.downloader);
+	                    console.log('this.preview.downloader: ' + _this.preview.downloader);
 
-	                    console.log('this.state.downloader_settings: ' + JSON.stringify(this.state.downloader_settings));
-	                    console.log('this.preview.downloader_settings: ' + JSON.stringify(this.preview.downloader_settings));
+	                    console.log('this.state.downloader_settings: ' + JSON.stringify(_this.state.downloader_settings));
+	                    console.log('this.preview.downloader_settings: ' + JSON.stringify(_this.preview.downloader_settings));
 
 	                    if (result) {
 	                        console.log('Downloader options SHOULD be applied');
@@ -21392,7 +21415,16 @@
 	                        console.log('Downloader options SHOULD NOT be applied');
 	                    }
 	                    return result;
-	                }).bind(this);
+	                };
+
+	                var is_parser_options_should_be_applied = function is_parser_options_should_be_applied() {
+	                    var result = _this.state.search_list != _this.preview.search_list || _this.state.ignore_list != _this.preview.ignore_list || _this.state.xslt != _this.preview.xslt;
+	                    return result;
+	                };
+
+	                var is_settings_should_be_applied = function is_settings_should_be_applied() {
+	                    return is_downloader_options_should_be_applied() || is_parser_options_should_be_applied();
+	                };
 
 	                var update_downloader_settings = function update_downloader_settings(settings) {
 	                    console.log('Updating downloader settings: ' + JSON.stringify(settings));
@@ -21410,22 +21442,17 @@
 	                    downloader_settings: this.state.downloader_settings,
 	                    update_settings: update_downloader_settings,
 	                    downloaders: this.state.downloaders,
-	                    on_submit: this.apply_downloader_settings,
-	                    need_apply: is_downloader_options_should_be_applied()
+	                    on_submit: this.apply_settings,
+	                    need_apply: is_settings_should_be_applied()
 	                }));
-
-	                var is_parser_options_should_be_applied = (function () {
-	                    var result = this.state.search_list != this.preview.search_list || this.state.ignore_list != this.preview.ignore_list || this.state.xslt != this.preview.xslt;
-	                    return result;
-	                }).bind(this);
 
 	                add_tab('Tune parser', render_tune_parser_panel({
 	                    on_field_change: this.on_field_change,
-	                    on_submit: this.apply_parser_settings,
+	                    on_submit: this.apply_settings,
 	                    search_list: this.state.search_list,
 	                    ignore_list: this.state.ignore_list,
 	                    xslt: this.state.xslt,
-	                    need_apply: is_parser_options_should_be_applied()
+	                    need_apply: is_settings_should_be_applied()
 	                }));
 	            }
 
@@ -21433,7 +21460,7 @@
 	                content.push(React.createElement(
 	                    TunePanel,
 	                    null,
-	                    render_change_source_plate(this.apply_new_source_settings)
+	                    render_change_source_plate(this.apply_settings)
 	                ));
 	            } else {
 	                if (this.state.downloaders.length == 0) {

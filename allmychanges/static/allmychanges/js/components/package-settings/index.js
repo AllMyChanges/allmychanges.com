@@ -283,42 +283,19 @@ module.exports = React.createClass({
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
     },
-    apply_downloader_settings: function() {
-        // applying downloader settings @apply-downloader-settings
-        this.save_preview_params();
-
-        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
-                method: 'PATCH',
-                data: JSON.stringify(
-                    R.pick(['downloader',
-                            'downloader_settings'],
-                           this.state)
-                ),
-                contentType: 'application/json',
-                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-            .success(this.update_preview_callback);
-    },
-    apply_new_source_settings: function() {
-        // applying downloader settings @apply-downloader-settings
-        this.save_preview_params();
-
-        $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
-                method: 'PATCH',
-                data: JSON.stringify(
-                    R.pick(['source'], this.state)
-                ),
-                contentType: 'application/json',
-                headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-            .success(this.update_preview_callback);
-    },
-    apply_parser_settings: function() {
+    apply_settings: function() {
         // applying parser settings @apply-downloader-settings
         this.save_preview_params();
 
         $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
                 method: 'PATCH',
                 data: JSON.stringify(
-                    R.pick(['search_list', 'ignore_list', 'xslt'],
+                    R.pick(['downloader',
+                            'downloader_settings',
+                            'search_list',
+                            'ignore_list',
+                            'xslt',
+                            'source'],
                            this.state)
                 ),
                 contentType: 'application/json',
@@ -535,8 +512,9 @@ module.exports = React.createClass({
                     name: this.state.name,
                 }));
             }
+            
             if (status != 'processing') {
-                var is_downloader_options_should_be_applied = function () {
+                var is_downloader_options_should_be_applied = () => {
                     var result = (
                         this.state.downloader != this.preview.downloader ||
                             !R.equals(this.state.downloader_settings, this.preview.downloader_settings));
@@ -553,13 +531,25 @@ module.exports = React.createClass({
                         console.log('Downloader options SHOULD NOT be applied');
                     }
                     return result;
-                }.bind(this)
+                }
+                
+                var is_parser_options_should_be_applied = () => {
+                    var result = (
+                        this.state.search_list != this.preview.search_list
+                            || this.state.ignore_list != this.preview.ignore_list
+                            || this.state.xslt != this.preview.xslt);
+                    return result;
+                }
+
+                var is_settings_should_be_applied = () => {
+                    return is_downloader_options_should_be_applied() || is_parser_options_should_be_applied();
+                }
 
                 var update_downloader_settings = (settings) => {
                     console.log('Updating downloader settings: ' + JSON.stringify(settings));
                     this.setState({'downloader_settings': settings});
                 }
-                
+
                 var update_downloader = (downloader) => {
                     console.log('update_downloader');
                     this.setState({'downloader': downloader});
@@ -572,31 +562,23 @@ module.exports = React.createClass({
                             downloader_settings: this.state.downloader_settings,
                             update_settings: update_downloader_settings,
                             downloaders: this.state.downloaders,
-                            on_submit: this.apply_downloader_settings,
-                            need_apply: is_downloader_options_should_be_applied()
+                            on_submit: this.apply_settings,
+                            need_apply: is_settings_should_be_applied()
                         }));
 
-                var is_parser_options_should_be_applied = function () {
-                    var result = (
-                        this.state.search_list != this.preview.search_list
-                            || this.state.ignore_list != this.preview.ignore_list
-                            || this.state.xslt != this.preview.xslt);
-                    return result;
-                }.bind(this)
-                
                 add_tab('Tune parser',
                         render_tune_parser_panel({
                             on_field_change: this.on_field_change,
-                            on_submit: this.apply_parser_settings,
+                            on_submit: this.apply_settings,
                             search_list: this.state.search_list,
                             ignore_list: this.state.ignore_list,
                             xslt: this.state.xslt,
-                            need_apply: is_parser_options_should_be_applied()
+                            need_apply: is_settings_should_be_applied()
                         }));
             }
             
             if (this.preview.source != this.state.source) {
-                content.push(<TunePanel>{render_change_source_plate(this.apply_new_source_settings)}</TunePanel>);
+                content.push(<TunePanel>{render_change_source_plate(this.apply_settings)}</TunePanel>);
             } else {
                 if (this.state.downloaders.length == 0) {
                     content.push(<TunePanel>{render_no_downloaders_plate()}</TunePanel>);

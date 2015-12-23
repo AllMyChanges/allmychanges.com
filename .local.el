@@ -11,3 +11,16 @@
 (setq projectile-completion-system 'helm)
 (setq projectile-globally-ignored-directories '(".git" ".tox" "env" "node_modules"))
 (helm-projectile-on)
+
+;; для автокомплита в js2-mode используем tern
+;; https://truongtx.me/2014/04/20/emacs-javascript-completion-and-refactoring/
+(setq tern-command (list (expand-file-name "node_modules/.bin/tern")))
+
+(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+
+(eval-after-load 'tern
+  '(progn
+     (require 'tern-auto-complete)
+     (tern-ac-setup)))
+
+(auto-complete-mode)

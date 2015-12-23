@@ -28,6 +28,7 @@
     "react-tabs": "git+https://github.com/svetlyak40wt/react-tabs.git",
     "style-loader": "^0.12.4",
     "stylus-loader": "^1.4.0",
+    "tern": "^0.16.0",
     "waypoints": "^4.0.0",
     "webpack": "^1.12.2"
   },
