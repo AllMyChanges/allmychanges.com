@@ -26,14 +26,24 @@ var webpack_config = {
     }//, externals: {"react": "React"}
 };
 
+var combiner = require('stream-combiner2');
+
 gulp.task('webpack', function() {
-    return gulp.src('allmychanges/static/allmychanges/js/react-site.js')
-        .pipe(webpack(webpack_config))
-        .pipe(user_story())
-        .pipe(gulp.dest('./'))
-        .pipe(uglify())
-        .pipe(rename({extname: '.min.js'}))
-        .pipe(gulp.dest('./'));
+    // здесь мы используем combiner, как указано тут:
+    // https://github.com/gulpjs/gulp/blob/master/docs/recipes/combining-streams-to-handle-errors.md#combining-streams-to-handle-errors
+    // чтобы перехватить ошибки в цепочке обработчиков
+    
+    var combined = combiner.obj([
+        gulp.src('allmychanges/static/allmychanges/js/react-site.js'),
+        webpack(webpack_config),
+        user_story(),
+        gulp.dest('./'),
+        uglify(),
+        rename({extname: '.min.js'}),
+        gulp.dest('./')]);
+
+    combined.on('error', console.error.bind(console));
+    return combined;
 });
 
 gulp.task('css', function() {

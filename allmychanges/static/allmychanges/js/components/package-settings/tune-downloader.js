@@ -46,8 +46,8 @@ var panel = function (opts) {
     // }
 
     function on_change_downloader_settings(new_settings) {
-        console.log('New downloader settings:');
-        console.log(new_settings);
+        // New downloader settings [new_settings] @package_settings.tune_downloader.on_change_downloader_settings
+        return;
     }
 
     // if (opts.downloader !== undefined) {
@@ -63,8 +63,8 @@ var panel = function (opts) {
     }
 
     var on_downloader_change = (event) => {
-        console.log('on_downloader_change');
         var value = event.target.value;
+        // downloader was changed to [value] @package_settings.tune_downloader.on_downloader_change
         if (value == default_option_value) {
             value = null;
         }

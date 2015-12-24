@@ -21083,7 +21083,7 @@
 	    validate_namespace_name_timeout: null,
 
 	    getInitialState: function getInitialState() {
-	        UserStory.log(["[this.props.downloader][[this.props.downloader=", [this.props.downloader, "]"], ["package_settings.getInitialState"]);
+	        UserStory.log(["We've got this downloader [this.props.downloader=", this.props.downloader, "]"], ["package_settings.getInitialState"]);
 	        var downloader = R.or(this.props.downloader, R.path('name', R.head(this.props.downloaders || [])));
 
 	        UserStory.log(["downloader is [downloader=", downloader, "]"], ["package_settings.getInitialState"]);
@@ -36678,8 +36678,8 @@
 	    // }
 
 	    function on_change_downloader_settings(new_settings) {
-	        console.log('New downloader settings:');
-	        console.log(new_settings);
+	        UserStory.log(["New downloader settings [new_settings=", new_settings, "]"], ["package_settings.tune_downloader.on_change_downloader_settings"]);
+	        return;
 	    }
 
 	    // if (opts.downloader !== undefined) {
@@ -36693,8 +36693,8 @@
 	    }
 
 	    var on_downloader_change = function on_downloader_change(event) {
-	        console.log('on_downloader_change');
 	        var value = event.target.value;
+	        UserStory.log(["downloader was changed to [value=", value, "]"], ["package_settings.tune_downloader.on_downloader_change"]);
 	        if (value == default_option_value) {
 	            value = null;
 	        }
@@ -36874,7 +36874,7 @@
 	        } else {
 	            // Попробовать React.findDOMNode(this)
 	            this.height = $('.changelog-settings__tune-content').height() + margin;
-	            console.log('=========> new height calculated: ' + this.height);
+	            UserStory.log(["new height calculated [this.height=", this.height, "]"], ["package_settings.tune_panel.componentDidMount"]);
 	        }
 
 	        this.timer = setInterval(function () {
@@ -36885,7 +36885,7 @@
 	                new_height = $('.changelog-settings__tune-content').height() + margin;
 	            }
 	            if (_this.height != new_height) {
-	                console.log('Forcing update from component');
+	                UserStory.log(["Forcing update from component, new height is [new_height=", new_height, "]"], ["package_settings.tune_panel.componentDidMount.timer"]);
 	                _this.height = new_height;
 	                _this.forceUpdate();
 	            }
@@ -36901,17 +36901,17 @@
 	        var content = this.props.children;
 
 	        if (content === undefined) {
-	            console.log('Setting height to 0 during rendering');
+	            UserStory.log(["Panel height is 0 because there is no content"], ["package_settings.tune_panel.render"]);
 	            style['height'] = 0;
 	            style['padding-top'] = 0;
 	            style['padding-bottom'] = 0;
 	        } else {
-	            console.log('Setting height to ' + this.height + ' during rendering');
+	            UserStory.log(["Panel height is [this.height=", this.height, "]"], ["package_settings.tune_panel.render"]);
 	            style['height'] = this.height;
 	        }
 
 	        var on_click = function on_click(ev) {
-	            console.log('Clicked');
+	            UserStory.log(["Collapse button was clicked"], ["package_settings.tune_panel.on_click"]);
 
 	            if (_this2.state.collapsed) {
 	                _this2.setState({
@@ -36942,8 +36942,6 @@
 	                '︾'
 	            );
 	        }
-
-	        // ⬆︎
 
 	        return React.createElement(
 	            'div',

@@ -215,7 +215,7 @@ module.exports = React.createClass({
     validate_namespace_name_timeout: null,
 
     getInitialState: function () {
-        // [this.props.downloader] @package_settings.getInitialState
+        // We've got this downloader [this.props.downloader] @package_settings.getInitialState
         var downloader = R.or(
             this.props.downloader,
             R.path('name',

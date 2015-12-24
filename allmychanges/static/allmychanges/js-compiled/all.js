@@ -47927,7 +47927,7 @@ componentHandler.register({
 	    displayName: 'exports',
 
 	    getInitialState: function getInitialState() {
-	        UserStory.log(["init BLAH track button for [this.props.username=", this.props.username, "]"], ["buttons.track"]);
+	        UserStory.log(["init track button for [this.props.username=", this.props.username, "]"], ["buttons.track"]);
 	        return { tracked: this.props.tracked == 'true',
 	            show_popup: false };
 	    },
@@ -48980,7 +48980,7 @@ componentHandler.register({
 	};
 
 	var render_log = function render_log(log, show_spinner) {
-	    // показываем лог
+	    UserStory.log(["показываем лог"], ["package_settings.render_log"]);
 	    var log_items = [];
 
 	    for (var i = 0; i < log.length; i++) {
@@ -49181,11 +49181,10 @@ componentHandler.register({
 	    validate_namespace_name_timeout: null,
 
 	    getInitialState: function getInitialState() {
-	        UserStory.log(["init add new page"], ["add"]);
-	        UserStory.log(["downloader [this.props.downloader=", this.props.downloader, "]"], ["add"]);
+	        UserStory.log(["We've got this downloader [this.props.downloader=", this.props.downloader, "]"], ["package_settings.getInitialState"]);
 	        var downloader = R.or(this.props.downloader, R.path('name', R.head(this.props.downloaders || [])));
 
-	        UserStory.log(["downloader is [downloader=", downloader, "]"], ["package"]);
+	        UserStory.log(["downloader is [downloader=", downloader, "]"], ["package_settings.getInitialState"]);
 	        return { tracked: false,
 	            saving: false,
 	            validating: false, // выставляется, когда мы ждем проверки namespace и name
@@ -49214,7 +49213,7 @@ componentHandler.register({
 	        this.update_preview_callback();
 	    },
 	    save_preview_params: function save_preview_params() {
-	        UserStory.log(["downloader [this.state.downloader=", this.state.downloader, "]"], ["save"]);
+	        UserStory.log(["downloader [this.state.downloader=", this.state.downloader, "]"], ["package_settings.save_preview_params"]);
 	        this.preview = {
 	            source: this.state.source,
 	            downloader: this.state.downloader,
@@ -49228,7 +49227,7 @@ componentHandler.register({
 	        return result;
 	    },
 	    update_preview: function update_preview() {
-	        UserStory.log(["updating preview"], ["update"]);
+	        UserStory.log(["updating preview"], ["package_settings.update_preview"]);
 
 	        // this field keeps state for which preview was generated
 	        this.save_preview_params();
@@ -49240,7 +49239,7 @@ componentHandler.register({
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
 	    apply_settings: function apply_settings() {
-	        UserStory.log(["applying parser settings"], ["apply"]);
+	        UserStory.log(["applying parser settings"], ["package_settings.apply_settings"]);
 	        this.save_preview_params();
 
 	        $.ajax({ url: '/v1/previews/' + this.props.preview_id + '/',
@@ -49256,7 +49255,7 @@ componentHandler.register({
 	        var name = event.target.name;
 	        var new_value = event.target.value;
 
-	        UserStory.log(["field [name=", name, "] was changed to [new_value=", new_value, "]"], ["on"]);
+	        UserStory.log(["field [name=", name, "] was changed to [new_value=", new_value, "]"], ["package_settings.on_field_change"]);
 	        var params = {};
 	        params[name] = new_value;
 
@@ -49272,7 +49271,7 @@ componentHandler.register({
 	        this.setState(params, callback);
 	    },
 	    save: function save() {
-	        UserStory.log(["Saving"], ["package"]);
+	        UserStory.log(["Saving"], ["package_settings.save"]);
 	        this.setState({ saving: true,
 	            save_button_title: 'Saving...' });
 	        var data = {
@@ -49302,7 +49301,7 @@ componentHandler.register({
 	        this.save().success(this.redirect);
 	    },
 	    save_and_track: function save_and_track() {
-	        UserStory.log(["Saving and tracking"], ["package"]);
+	        UserStory.log(["Saving and tracking"], ["package_settings.save_and_track"]);
 	        this.save().success(function () {
 	            $.ajax({
 	                url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
@@ -49311,7 +49310,7 @@ componentHandler.register({
 	        });
 	    },
 	    redirect: function redirect(data) {
-	        UserStory.log(["Redirecting to package's page"], ["package"]);
+	        UserStory.log(["Redirecting to package's page"], ["package_settings.redirect"]);
 	        window.location = data['absolute_uri'];
 	    },
 	    is_name_or_namespace_were_changed: function is_name_or_namespace_were_changed() {
@@ -49322,13 +49321,13 @@ componentHandler.register({
 	        return result;
 	    },
 	    schedule_validation: function schedule_validation() {
-	        UserStory.log(["scheduling namespace or name validation"], ["schedule"]);
+	        UserStory.log(["scheduling namespace or name validation"], ["package_settings.schedule_validation"]);
 	        window.clearTimeout(this.validate_namespace_name_timeout);
 	        this.setState({ validating: true });
 	        this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
 	    },
 	    validate_namespace_and_name: function validate_namespace_and_name() {
-	        UserStory.log(["validating namespace and name"], ["validate"]);
+	        UserStory.log(["validating namespace and name"], ["package_settings.validate_namespace_and_name"]);
 	        $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id).success((function (data) {
 	            var namespace_error = '';
 	            var name_error = '';
@@ -49369,7 +49368,7 @@ componentHandler.register({
 	        }).bind(this));
 	    },
 	    update_downloader: function update_downloader(downloader) {
-	        UserStory.log(["Updating downloader"], ["package"]);
+	        UserStory.log(["Updating downloader"], ["package_settings.update_downloader"]);
 	        var current_downloader = R.find(R.propEq('name', downloader), this.state.downloaders);
 
 	        var params = { 'downloader': downloader };
@@ -49387,10 +49386,9 @@ componentHandler.register({
 	    wait_for_preview: function wait_for_preview() {
 	        var _this = this;
 
-	        UserStory.log(["waiting for preview results"], ["wait"]);
-	        UserStory.log(["checking if preview is ready"], ["wait"]);
+	        UserStory.log(["waiting for preview results"], ["package_settings.wait_for_preview"]);
 	        $.get('/v1/previews/' + this.props.preview_id + '/').success(function (data) {
-	            UserStory.log(["received [data=", data, "] about preview state"], ["wait"]);
+	            UserStory.log(["received [data=", data, "] about preview state"], ["package_settings.wait_for_preview"]);
 	            _this.setState({ 'log': data.log,
 	                'status': data.status,
 	                'downloaders': data.downloaders,
@@ -49399,18 +49397,18 @@ componentHandler.register({
 	            });
 
 	            if (data.status == 'processing') {
-	                UserStory.log(["preview is still in processing status"], ["wait"]);
+	                UserStory.log(["preview is still in processing status"], ["package_settings.wait_for_preview"]);
 	                setTimeout(_this.wait_for_preview, 1000);
 	            } else {
-	                UserStory.log(["preview data is ready"], ["wait"]);
+	                UserStory.log(["preview data is ready"], ["package_settings.wait_for_preview"]);
 	                _this.fetch_rendered_preview();
 	            }
 	        }).error(function (data) {
-	            UserStory.log(["some shit happened"], ["wait"]);
+	            UserStory.log(["some shit happened"], ["package_settings.wait_for_preview"]);
 	        });
 	    },
 	    update_preview_callback: function update_preview_callback() {
-	        UserStory.log(["resetting state before waiting for preview results"], ["update"]);
+	        UserStory.log(["resetting state before waiting for preview results"], ["package_settings.update_preview_callback"]);
 	        this.setState({ waiting: true,
 	            results: null,
 	            problem: false });
@@ -49479,9 +49477,9 @@ componentHandler.register({
 	                    var result = _this2.state.downloader != _this2.preview.downloader || !R.equals(_this2.state.downloader_settings, _this2.preview.downloader_settings);
 
 	                    if (result) {
-	                        UserStory.log(["Downloader options SHOULD be applied"], ["package"]);
+	                        UserStory.log(["Downloader options SHOULD be applied"], ["package_settings.render"]);
 	                    } else {
-	                            UserStory.log(["Downloader options SHOULD NOT be applied"], ["package"]);
+	                            UserStory.log(["Downloader options SHOULD NOT be applied"], ["package_settings.render"]);
 	                        }
 	                    return result;
 	                };
@@ -49496,7 +49494,7 @@ componentHandler.register({
 	                };
 
 	                var update_downloader_settings = function update_downloader_settings(settings) {
-	                    UserStory.log(["Updating downloader [settings=", settings, "]"], ["package"]);
+	                    UserStory.log(["Updating downloader [settings=", settings, "]"], ["package_settings.update_downloader_settings"]);
 	                    _this2.setState({ 'downloader_settings': settings });
 	                };
 
@@ -64778,8 +64776,8 @@ componentHandler.register({
 	    // }
 
 	    function on_change_downloader_settings(new_settings) {
-	        console.log('New downloader settings:');
-	        console.log(new_settings);
+	        UserStory.log(["New downloader settings [new_settings=", new_settings, "]"], ["package_settings.tune_downloader.on_change_downloader_settings"]);
+	        return;
 	    }
 
 	    // if (opts.downloader !== undefined) {
@@ -64793,8 +64791,8 @@ componentHandler.register({
 	    }
 
 	    var on_downloader_change = function on_downloader_change(event) {
-	        console.log('on_downloader_change');
 	        var value = event.target.value;
+	        UserStory.log(["downloader was changed to [value=", value, "]"], ["package_settings.tune_downloader.on_downloader_change"]);
 	        if (value == default_option_value) {
 	            value = null;
 	        }
@@ -64974,7 +64972,7 @@ componentHandler.register({
 	        } else {
 	            // Попробовать React.findDOMNode(this)
 	            this.height = $('.changelog-settings__tune-content').height() + margin;
-	            console.log('=========> new height calculated: ' + this.height);
+	            UserStory.log(["new height calculated [this.height=", this.height, "]"], ["package_settings.tune_panel.componentDidMount"]);
 	        }
 
 	        this.timer = setInterval(function () {
@@ -64985,7 +64983,7 @@ componentHandler.register({
 	                new_height = $('.changelog-settings__tune-content').height() + margin;
 	            }
 	            if (_this.height != new_height) {
-	                console.log('Forcing update from component');
+	                UserStory.log(["Forcing update from component, new height is [new_height=", new_height, "]"], ["package_settings.tune_panel.componentDidMount.timer"]);
 	                _this.height = new_height;
 	                _this.forceUpdate();
 	            }
@@ -65001,17 +64999,17 @@ componentHandler.register({
 	        var content = this.props.children;
 
 	        if (content === undefined) {
-	            console.log('Setting height to 0 during rendering');
+	            UserStory.log(["Panel height is 0 because there is no content"], ["package_settings.tune_panel.render"]);
 	            style['height'] = 0;
 	            style['padding-top'] = 0;
 	            style['padding-bottom'] = 0;
 	        } else {
-	            console.log('Setting height to ' + this.height + ' during rendering');
+	            UserStory.log(["Panel height is [this.height=", this.height, "]"], ["package_settings.tune_panel.render"]);
 	            style['height'] = this.height;
 	        }
 
 	        var on_click = function on_click(ev) {
-	            console.log('Clicked');
+	            UserStory.log(["Collapse button was clicked"], ["package_settings.tune_panel.on_click"]);
 
 	            if (_this2.state.collapsed) {
 	                _this2.setState({
@@ -65042,8 +65040,6 @@ componentHandler.register({
 	                '︾'
 	            );
 	        }
-
-	        // ⬆︎
 
 	        return React.createElement(
 	            'div',

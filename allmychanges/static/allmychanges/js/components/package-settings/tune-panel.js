@@ -18,7 +18,7 @@ var Panel = React.createClass({
         } else {
             // Попробовать React.findDOMNode(this)
             this.height = $('.changelog-settings__tune-content').height() + margin;
-            console.log('=========> new height calculated: ' + this.height);
+            // new height calculated [this.height] @package_settings.tune_panel.componentDidMount
         }
         
         this.timer = setInterval(() => {
@@ -29,7 +29,7 @@ var Panel = React.createClass({
                 new_height = $('.changelog-settings__tune-content').height() + margin;
             }
             if (this.height != new_height) {
-                console.log('Forcing update from component');
+                // Forcing update from component, new height is [new_height] @package_settings.tune_panel.componentDidMount.timer
                 this.height = new_height;
                 this.forceUpdate();
             }
@@ -44,17 +44,17 @@ var Panel = React.createClass({
         var content = this.props.children;
         
         if (content === undefined) {
-            console.log('Setting height to 0 during rendering');
+            // Panel height is 0 because there is no content @package_settings.tune_panel.render
             style['height'] = 0;
             style['padding-top'] = 0;
             style['padding-bottom'] = 0;
         } else {
-            console.log('Setting height to ' + this.height + ' during rendering');
+            // Panel height is [this.height] @package_settings.tune_panel.render
             style['height'] = this.height;
         }
 
         var on_click = (ev) => {
-            console.log('Clicked');
+            // Collapse button was clicked @package_settings.tune_panel.on_click
             
             if (this.state.collapsed) {
                 this.setState({
@@ -80,8 +80,6 @@ var Panel = React.createClass({
         onClick={on_click}>︾</button>);
         }
 
-        // ⬆︎
-        
         return (
 <div key="tune" className={this.state.class} style={style}>
   { collapse_button }
