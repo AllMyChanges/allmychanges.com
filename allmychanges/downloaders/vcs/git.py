@@ -92,7 +92,15 @@ def download(source,
     return path
 
 
-def guess(source, discovered={}):
+def guess(source, discovered={}, callback=None):
+    """Тут callback используется для того, чтобы сделать
+    дополнительные проверки скачанного репозитория.
+    Ему передается path и словарь result.
+    Callback может вернуть словарь, и тот будет использован
+    вместо result. Если callback вернул None,
+    то считается что guess прошел безуспешно.
+    """
+
     result = defaultdict(dict)
     source, username, repo = normalize_url(source)
 
@@ -111,6 +119,11 @@ def guess(source, discovered={}):
             except:
                 pass
 
+        if callable(callback):
+            return callback(path, result)
+        else:
+            return result
+
     except:
         # ignore errors because most probably, they are from git command
         # which won't be able to clone repository from strange url
@@ -118,9 +131,6 @@ def guess(source, discovered={}):
     finally:
         if os.path.exists(path):
             shutil.rmtree(path)
-
-    return result
-
 
 
 def get_github_name_and_description(username, repo):
