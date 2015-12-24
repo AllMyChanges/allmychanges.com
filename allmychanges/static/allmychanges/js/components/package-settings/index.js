@@ -51,7 +51,7 @@ var render_we_are_waiting = function() {
 }
 
 var render_log = function(log, show_spinner) {
-    // показываем лог
+    // показываем лог @package_settings.render_log
     var log_items = [];
     
     for (var i=0; i < log.length; i++) {
@@ -215,14 +215,13 @@ module.exports = React.createClass({
     validate_namespace_name_timeout: null,
 
     getInitialState: function () {
-        // init add new page @add-new
-        // downloader [this.props.downloader] @add-new
+        // [this.props.downloader] @package_settings.getInitialState
         var downloader = R.or(
             this.props.downloader,
             R.path('name',
                    R.head(this.props.downloaders || [])));
-        
-        console.log('in getInitialState, downloader is:' + downloader);
+
+        // downloader is [downloader] @package_settings.getInitialState
         return {tracked: false,
                 saving: false,
                 validating: false, // выставляется, когда мы ждем проверки namespace и name
@@ -251,8 +250,7 @@ module.exports = React.createClass({
         this.update_preview_callback();
     },
     save_preview_params: function () {
-        // downloader [this.state.downloader] @save-preview-params
-        console.log('in save_preview_params, downloader is:' + this.state.downloader);
+        // downloader [this.state.downloader] @package_settings.save_preview_params
         this.preview = {
             source: this.state.source,
             downloader: this.state.downloader,
@@ -271,7 +269,7 @@ module.exports = React.createClass({
         return result;
     },
     update_preview: function() {
-        // updating preview @update-preview
+        // updating preview @package_settings.update_preview
 
         // this field keeps state for which preview was generated
         this.save_preview_params();
@@ -284,7 +282,7 @@ module.exports = React.createClass({
             .success(this.update_preview_callback);
     },
     apply_settings: function() {
-        // applying parser settings @apply-downloader-settings
+        // applying parser settings @package_settings.apply_settings
         this.save_preview_params();
 
         $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
@@ -309,7 +307,7 @@ module.exports = React.createClass({
         var name = event.target.name;
         var new_value = event.target.value;
 
-        // field [name] was changed to [new_value] @on-field-change
+        // field [name] was changed to [new_value] @package_settings.on_field_change
         var params = {}
         params[name] = new_value;
 
@@ -325,7 +323,7 @@ module.exports = React.createClass({
         this.setState(params, callback);
     },
     save: function() {
-        // Saving @package-settings
+        // Saving @package_settings.save
         this.setState({saving: true,
                        save_button_title: 'Saving...'});
         var data = {
@@ -357,7 +355,7 @@ module.exports = React.createClass({
         this.save().success(this.redirect);
     },
     save_and_track: function() {
-        // Saving and tracking @package-settings
+        // Saving and tracking @package_settings.save_and_track
         this.save().success(function() {
             $.ajax({
                 url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
@@ -367,7 +365,7 @@ module.exports = React.createClass({
         });
     },
     redirect: function(data) {
-        // Redirecting to package's page @package-settings
+        // Redirecting to package's page @package_settings.redirect
         window.location = data['absolute_uri'];
     },
     is_name_or_namespace_were_changed: function() {
@@ -384,13 +382,13 @@ module.exports = React.createClass({
         return result;
     },
     schedule_validation: function () {
-        // scheduling namespace or name validation @schedule-validation
+        // scheduling namespace or name validation @package_settings.schedule_validation
         window.clearTimeout(this.validate_namespace_name_timeout);
         this.setState({validating: true});
         this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
     },
     validate_namespace_and_name: function () {
-        // validating namespace and name @validate-namespace-and-name
+        // validating namespace and name @package_settings.validate_namespace_and_name
         $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace
               + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id)
             .success(function (data) {
@@ -434,7 +432,7 @@ module.exports = React.createClass({
         
     },
     update_downloader: function (downloader) {
-        console.log('update_downloader');
+        // Updating downloader @package_settings.update_downloader
         var current_downloader = R.find(
             R.propEq('name', downloader),
             this.state.downloaders);
@@ -455,11 +453,10 @@ module.exports = React.createClass({
         this.setState(params);
     },
     wait_for_preview: function () {
-        // waiting for preview results @wait-for-preview
-        // checking if preview is ready @wait-for-preview
+        // waiting for preview results @package_settings.wait_for_preview
         $.get('/v1/previews/' + this.props.preview_id + '/')
             .success((data) => {
-                // received [data] about preview state @wait-for-preview
+                // received [data] about preview state @package_settings.wait_for_preview
                 this.setState({'log': data.log,
                                'status': data.status,
                                'downloaders': data.downloaders,
@@ -469,19 +466,19 @@ module.exports = React.createClass({
                               });
 
                 if (data.status == 'processing') {
-                    // preview is still in processing status @wait-for-preview
+                    // preview is still in processing status @package_settings.wait_for_preview
                     setTimeout(this.wait_for_preview, 1000);
                 } else {
-                    // preview data is ready @wait-for-preview
+                    // preview data is ready @package_settings.wait_for_preview
                     this.fetch_rendered_preview();
                 }
             })
             .error(function(data) {
-                // some shit happened @wait-for-preview
+                // some shit happened @package_settings.wait_for_preview
             });
     },
     update_preview_callback: function () {
-        // resetting state before waiting for preview results @update-preview-callback
+        // resetting state before waiting for preview results @package_settings.update_preview_callback
         this.setState({waiting: true,
                        results: null,
                        problem: false})
@@ -516,7 +513,6 @@ module.exports = React.createClass({
         } else {
             // статус равен created, когда мы открыли changelog
             // для редактирования и версии preview взяты из него
-            console.log('STATUS: ' + status);
             
             if (status == 'error') {
                 content.push(render_log(this.state.log, false));
@@ -543,16 +539,10 @@ module.exports = React.createClass({
                         this.state.downloader != this.preview.downloader ||
                             !R.equals(this.state.downloader_settings, this.preview.downloader_settings));
 
-                    console.log('this.state.downloader: ' + this.state.downloader);
-                    console.log('this.preview.downloader: ' + this.preview.downloader);
-
-                    console.log('this.state.downloader_settings: ' + JSON.stringify(this.state.downloader_settings));
-                    console.log('this.preview.downloader_settings: ' + JSON.stringify(this.preview.downloader_settings));
-
                     if (result) {
-                        console.log('Downloader options SHOULD be applied');
+                        // Downloader options SHOULD be applied @package_settings.render
                     } else {
-                        console.log('Downloader options SHOULD NOT be applied');
+                        // Downloader options SHOULD NOT be applied @package_settings.render
                     }
                     return result;
                 }
@@ -570,7 +560,7 @@ module.exports = React.createClass({
                 }
 
                 var update_downloader_settings = (settings) => {
-                    console.log('Updating downloader settings: ' + JSON.stringify(settings));
+                    // Updating downloader [settings] @package_settings.update_downloader_settings
                     this.setState({'downloader_settings': settings});
                 }
 

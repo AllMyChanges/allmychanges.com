@@ -29600,7 +29600,7 @@ componentHandler.register({
 	  // IE8: When updating a just created node with innerHTML only leading
 	  // whitespace is removed. When updating an existing node with innerHTML
 	  // whitespace in root TextNodes is also collapsed.
-	  // @see quirksmode.org/bugreports/archives/2004/11/innerhtml_and_t.html
+	  UserStory.log([""], ["see"]);
 
 	  // Feature detection; only IE8 is known to behave improperly like this.
 	  var testElement = document.createElement('div');
@@ -47927,12 +47927,12 @@ componentHandler.register({
 	    displayName: 'exports',
 
 	    getInitialState: function getInitialState() {
-	        // init track button for [this.props.username] @buttons.track
+	        UserStory.log(["init BLAH track button for [this.props.username=", this.props.username, "]"], ["buttons.track"]);
 	        return { tracked: this.props.tracked == 'true',
 	            show_popup: false };
 	    },
 	    perform_action: function perform_action(action, state_after) {
-	        // performing action [action] @buttons.track
+	        UserStory.log(["performing action [action=", action, "]"], ["buttons.track"]);
 	        $.ajax({
 	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
 	            method: 'POST',
@@ -47948,7 +47948,7 @@ componentHandler.register({
 	                this.setState({ tracked: state_after });
 
 	                if (this.props.username == '') {
-	                    // if user is anonymous, then show him a fullscreen popup @buttons.track
+	                    UserStory.log(["if user is anonymous, then show him a fullscreen popup"], ["buttons.track"]);
 	                    this.setState({ show_popup: true });
 	                }
 	            }).bind(this),
@@ -47966,7 +47966,7 @@ componentHandler.register({
 	        this.perform_action('untrack', false);
 	    },
 	    handle_popup_click: function handle_popup_click(e) {
-	        // popup click @buttons.report
+	        UserStory.log(["popup click"], ["buttons.report"]);
 	        e.nativeEvent.stopImmediatePropagation();
 	    },
 	    render: function render() {
@@ -48068,7 +48068,7 @@ componentHandler.register({
 	module.exports = {
 	    reach_goal: function reach_goal(name) {
 	        if (window.yaCounter !== undefined) {
-	            // registering goal [name] @metrika.reach_goal
+	            UserStory.log(["registering goal [name=", name, "]"], ["metrika.reach_goal"]);
 	            window.yaCounter.reachGoal(name);
 	        }
 	    }
@@ -48087,7 +48087,7 @@ componentHandler.register({
 	    displayName: 'exports',
 
 	    perform_action: function perform_action(action) {
-	        // performing action [action] @buttons.skip
+	        UserStory.log(["performing action [action=", action, "]"], ["buttons.skip"]);
 	        $.ajax({
 	            url: '/v1/changelogs/' + this.props.changelog_id + '/' + action + '/',
 	            method: 'POST',
@@ -48110,7 +48110,7 @@ componentHandler.register({
 	        this.perform_action('skip', true);
 	    },
 	    handle_popup_click: function handle_popup_click(e) {
-	        // popup click @buttons.report
+	        UserStory.log(["popup click"], ["buttons.report"]);
 	        e.nativeEvent.stopImmediatePropagation();
 	    },
 	    render: function render() {
@@ -48160,14 +48160,14 @@ componentHandler.register({
 
 	    var intro_was_shown = false;
 	    var show_intro = function show_intro() {
-	        // may be showing intro if [intro_was_shown] @intro.show
+	        UserStory.log(["may be showing intro if [intro_was_shown=", intro_was_shown, "]"], ["intro.show"]);
 	        if (!intro_was_shown) {
 	            window.intro.start();
 	            intro_was_shown = true;
 	        }
 	    };
 
-	    // setting idle timer @intro.idle
+	    UserStory.log(["setting idle timer"], ["intro.idle"]);
 	    // window.intro_idle = new Idle({
 	    //     onAway : show_intro,
 	    //     awayTimeout : 15000
@@ -48326,7 +48326,7 @@ componentHandler.register({
 	            body_callback_installed: false };
 	    },
 	    handle_switcher_click: function handle_switcher_click(e) {
-	        // user clicked report button @buttons.report
+	        UserStory.log(["user clicked report button"], ["buttons.report"]);
 	        metrika.reach_goal('CLICK-REPORT-BUTTON');
 
 	        e.nativeEvent.stopImmediatePropagation();
@@ -48335,7 +48335,7 @@ componentHandler.register({
 	        if (this.state.body_callback_installed == false) {
 	            $(document).click((function () {
 	                this.setState({ show_popup: false });
-	                // hiding from body click @buttons.report
+	                UserStory.log(["hiding from body click"], ["buttons.report"]);
 	            }).bind(this));
 	            this.setState({ body_callback_installed: true });
 	        }
@@ -48352,11 +48352,11 @@ componentHandler.register({
 	        }
 	    },
 	    handle_popup_click: function handle_popup_click(e) {
-	        // popup click @buttons.report
+	        UserStory.log(["popup click"], ["buttons.report"]);
 	        e.nativeEvent.stopImmediatePropagation();
 	    },
 	    handle_post: function handle_post(e) {
-	        // sending feedback to the server @report.button
+	        UserStory.log(["sending feedback to the server"], ["report.button"]);
 	        metrika.reach_goal('REPORT');
 	        e.preventDefault();
 	        var type = this.refs.type.getDOMNode().value.trim();
@@ -48788,7 +48788,7 @@ componentHandler.register({
 	        var notifications;
 	        var closeItem2 = (function (item_id) {
 	            return (function () {
-	                // closing item [item_id] @notifications
+	                UserStory.log(["closing item [item_id=", item_id, "]"], ["notifications"]);
 	                var items = this.state.items;
 	                items = _.filter(items, function (item) {
 	                    return item.id != item_id;
@@ -48844,7 +48844,7 @@ componentHandler.register({
 	            enable_submit: this.refs.comment.getDOMNode().value.trim().length > 0 });
 	    },
 	    handle_post: function handle_post(e) {
-	        // sending feedback to the server @report.button
+	        UserStory.log(["sending feedback to the server"], ["report.button"]);
 	        metrika.reach_goal('REPORT');
 	        e.preventDefault();
 	        var comment = this.refs.comment.getDOMNode().value.trim();
@@ -49181,11 +49181,11 @@ componentHandler.register({
 	    validate_namespace_name_timeout: null,
 
 	    getInitialState: function getInitialState() {
-	        // init add new page @add-new
-	        // downloader [this.props.downloader] @add-new
+	        UserStory.log(["init add new page"], ["add"]);
+	        UserStory.log(["downloader [this.props.downloader=", this.props.downloader, "]"], ["add"]);
 	        var downloader = R.or(this.props.downloader, R.path('name', R.head(this.props.downloaders || [])));
 
-	        console.log('in getInitialState, downloader is:' + downloader);
+	        UserStory.log(["downloader is [downloader=", downloader, "]"], ["package"]);
 	        return { tracked: false,
 	            saving: false,
 	            validating: false, // выставляется, когда мы ждем проверки namespace и name
@@ -49214,8 +49214,7 @@ componentHandler.register({
 	        this.update_preview_callback();
 	    },
 	    save_preview_params: function save_preview_params() {
-	        // downloader [this.state.downloader] @save-preview-params
-	        console.log('in save_preview_params, downloader is:' + this.state.downloader);
+	        UserStory.log(["downloader [this.state.downloader=", this.state.downloader, "]"], ["save"]);
 	        this.preview = {
 	            source: this.state.source,
 	            downloader: this.state.downloader,
@@ -49229,7 +49228,7 @@ componentHandler.register({
 	        return result;
 	    },
 	    update_preview: function update_preview() {
-	        // updating preview @update-preview
+	        UserStory.log(["updating preview"], ["update"]);
 
 	        // this field keeps state for which preview was generated
 	        this.save_preview_params();
@@ -49241,7 +49240,7 @@ componentHandler.register({
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
 	    apply_settings: function apply_settings() {
-	        // applying parser settings @apply-downloader-settings
+	        UserStory.log(["applying parser settings"], ["apply"]);
 	        this.save_preview_params();
 
 	        $.ajax({ url: '/v1/previews/' + this.props.preview_id + '/',
@@ -49257,7 +49256,7 @@ componentHandler.register({
 	        var name = event.target.name;
 	        var new_value = event.target.value;
 
-	        // field [name] was changed to [new_value] @on-field-change
+	        UserStory.log(["field [name=", name, "] was changed to [new_value=", new_value, "]"], ["on"]);
 	        var params = {};
 	        params[name] = new_value;
 
@@ -49273,7 +49272,7 @@ componentHandler.register({
 	        this.setState(params, callback);
 	    },
 	    save: function save() {
-	        // Saving @package-settings
+	        UserStory.log(["Saving"], ["package"]);
 	        this.setState({ saving: true,
 	            save_button_title: 'Saving...' });
 	        var data = {
@@ -49303,7 +49302,7 @@ componentHandler.register({
 	        this.save().success(this.redirect);
 	    },
 	    save_and_track: function save_and_track() {
-	        // Saving and tracking @package-settings
+	        UserStory.log(["Saving and tracking"], ["package"]);
 	        this.save().success(function () {
 	            $.ajax({
 	                url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
@@ -49312,7 +49311,7 @@ componentHandler.register({
 	        });
 	    },
 	    redirect: function redirect(data) {
-	        // Redirecting to package's page @package-settings
+	        UserStory.log(["Redirecting to package's page"], ["package"]);
 	        window.location = data['absolute_uri'];
 	    },
 	    is_name_or_namespace_were_changed: function is_name_or_namespace_were_changed() {
@@ -49323,13 +49322,13 @@ componentHandler.register({
 	        return result;
 	    },
 	    schedule_validation: function schedule_validation() {
-	        // scheduling namespace or name validation @schedule-validation
+	        UserStory.log(["scheduling namespace or name validation"], ["schedule"]);
 	        window.clearTimeout(this.validate_namespace_name_timeout);
 	        this.setState({ validating: true });
 	        this.validate_namespace_name_timeout = window.setTimeout(this.validate_namespace_and_name, 500);
 	    },
 	    validate_namespace_and_name: function validate_namespace_and_name() {
-	        // validating namespace and name @validate-namespace-and-name
+	        UserStory.log(["validating namespace and name"], ["validate"]);
 	        $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id).success((function (data) {
 	            var namespace_error = '';
 	            var name_error = '';
@@ -49370,7 +49369,7 @@ componentHandler.register({
 	        }).bind(this));
 	    },
 	    update_downloader: function update_downloader(downloader) {
-	        console.log('update_downloader');
+	        UserStory.log(["Updating downloader"], ["package"]);
 	        var current_downloader = R.find(R.propEq('name', downloader), this.state.downloaders);
 
 	        var params = { 'downloader': downloader };
@@ -49388,10 +49387,10 @@ componentHandler.register({
 	    wait_for_preview: function wait_for_preview() {
 	        var _this = this;
 
-	        // waiting for preview results @wait-for-preview
-	        // checking if preview is ready @wait-for-preview
+	        UserStory.log(["waiting for preview results"], ["wait"]);
+	        UserStory.log(["checking if preview is ready"], ["wait"]);
 	        $.get('/v1/previews/' + this.props.preview_id + '/').success(function (data) {
-	            // received [data] about preview state @wait-for-preview
+	            UserStory.log(["received [data=", data, "] about preview state"], ["wait"]);
 	            _this.setState({ 'log': data.log,
 	                'status': data.status,
 	                'downloaders': data.downloaders,
@@ -49400,18 +49399,18 @@ componentHandler.register({
 	            });
 
 	            if (data.status == 'processing') {
-	                // preview is still in processing status @wait-for-preview
+	                UserStory.log(["preview is still in processing status"], ["wait"]);
 	                setTimeout(_this.wait_for_preview, 1000);
 	            } else {
-	                // preview data is ready @wait-for-preview
+	                UserStory.log(["preview data is ready"], ["wait"]);
 	                _this.fetch_rendered_preview();
 	            }
 	        }).error(function (data) {
-	            // some shit happened @wait-for-preview
+	            UserStory.log(["some shit happened"], ["wait"]);
 	        });
 	    },
 	    update_preview_callback: function update_preview_callback() {
-	        // resetting state before waiting for preview results @update-preview-callback
+	        UserStory.log(["resetting state before waiting for preview results"], ["update"]);
 	        this.setState({ waiting: true,
 	            results: null,
 	            problem: false });
@@ -49455,7 +49454,6 @@ componentHandler.register({
 	        } else {
 	            // статус равен created, когда мы открыли changelog
 	            // для редактирования и версии preview взяты из него
-	            console.log('STATUS: ' + status);
 
 	            if (status == 'error') {
 	                content.push(render_log(this.state.log, false));
@@ -49480,17 +49478,11 @@ componentHandler.register({
 	                var is_downloader_options_should_be_applied = function is_downloader_options_should_be_applied() {
 	                    var result = _this2.state.downloader != _this2.preview.downloader || !R.equals(_this2.state.downloader_settings, _this2.preview.downloader_settings);
 
-	                    console.log('this.state.downloader: ' + _this2.state.downloader);
-	                    console.log('this.preview.downloader: ' + _this2.preview.downloader);
-
-	                    console.log('this.state.downloader_settings: ' + JSON.stringify(_this2.state.downloader_settings));
-	                    console.log('this.preview.downloader_settings: ' + JSON.stringify(_this2.preview.downloader_settings));
-
 	                    if (result) {
-	                        console.log('Downloader options SHOULD be applied');
+	                        UserStory.log(["Downloader options SHOULD be applied"], ["package"]);
 	                    } else {
-	                        console.log('Downloader options SHOULD NOT be applied');
-	                    }
+	                            UserStory.log(["Downloader options SHOULD NOT be applied"], ["package"]);
+	                        }
 	                    return result;
 	                };
 
@@ -49504,7 +49496,7 @@ componentHandler.register({
 	                };
 
 	                var update_downloader_settings = function update_downloader_settings(settings) {
-	                    console.log('Updating downloader settings: ' + JSON.stringify(settings));
+	                    UserStory.log(["Updating downloader [settings=", settings, "]"], ["package"]);
 	                    _this2.setState({ 'downloader_settings': settings });
 	                };
 
@@ -65470,7 +65462,7 @@ componentHandler.register({
 
 	        var tracked_ids = [];
 	        $(element).on('typeahead:selected', (function (jquery, option) {
-	            // adding app to the list @ios-promo
+	            UserStory.log(["adding app to the list"], ["ios"]);
 	            var new_apps = _.union(this.state.selected_apps, [option]);
 	            this.setState({ selected_apps: new_apps });
 
@@ -65491,7 +65483,7 @@ componentHandler.register({
 	                    dataType: 'json',
 	                    headers: { 'X-CSRFToken': $.cookie('csrftoken') },
 	                    success: function success(data) {
-	                        // update the digest example @ios-promo
+	                        UserStory.log(["update the digest example"], ["ios"]);
 	                        tracked_ids[tracked_ids.length] = tracked_id;
 	                        fetch_new_digest(tracked_ids);
 	                    },
@@ -65639,7 +65631,7 @@ componentHandler.register({
 	    displayName: 'exports',
 
 	    getInitialState: function getInitialState() {
-	        // init landing page @landing-page
+	        UserStory.log(["init landing page"], ["landing"]);
 	        return { num_tracked: 0 };
 	    },
 	    componentDidMount: function componentDidMount() {},

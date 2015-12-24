@@ -16,7 +16,6 @@ var webpack_config = {
         loaders: [
             {
                 test: /\.js|\.jsx$/,
-                // это я закомментировал, потому что модуль react-tabs использует внутри ES6
                 exclude: [
                     /node_modules\/ramda/
                 ],
@@ -30,7 +29,7 @@ var webpack_config = {
 gulp.task('webpack', function() {
     return gulp.src('allmychanges/static/allmychanges/js/react-site.js')
         .pipe(webpack(webpack_config))
-//        .pipe(user_story())
+        .pipe(user_story())
         .pipe(gulp.dest('./'))
         .pipe(uglify())
         .pipe(rename({extname: '.min.js'}))
