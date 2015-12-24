@@ -1,3 +1,4 @@
+var React = require('react');
 var Promo = require('../components/ios-promo.js')
 
 module.exports = {

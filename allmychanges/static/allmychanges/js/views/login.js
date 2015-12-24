@@ -1,3 +1,4 @@
+var React = require('react');
 var PackageSelector = require('../components/package-selector/package-selector.js')
 
 module.exports = {
