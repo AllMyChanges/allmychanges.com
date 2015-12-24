@@ -1,6 +1,6 @@
 {% load staticfiles allmychanges_tags compress %}
 <!DOCTYPE html>
-<html{% block ng-app %}{% endblock %}>
+<html>
 <head>
     <title>{% block html-title %}AllMyChanges.com, release notes tracker{% endblock %}</title>
     {% block top_of_head %}{% endblock top_of_head %}
@@ -20,6 +20,11 @@
 
     {% compress css %}
     <link href="{% static 'allmychanges/css/reset.css' %}" rel="stylesheet">
+    <!--script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.js"></script-->
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.indigo-pink.min.css">
+    <!-- Material Design icon font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
     <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
     <!-- TODO: научиться использовать без bower link href="{% static 'bower_components/intro.js/introjs.css' %}" rel="stylesheet"-->
     {% endcompress %}
@@ -27,11 +32,6 @@
     <!-- <script src="https://fb.me/react-0.14.0.js"></script> -->
     <!-- <script src="https://fb.me/react-dom-0.14.0.js"></script> -->
     
-    <!--script src="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.js"></script-->
-    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.0/material.indigo-pink.min.css">
-    <!-- Material Design icon font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
     <!-- <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> -->
 
     {% compress js %}

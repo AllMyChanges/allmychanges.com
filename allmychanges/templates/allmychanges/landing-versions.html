@@ -1,10 +1,7 @@
 {% load staticfiles allmychanges_tags compress %}
 <!DOCTYPE html>
-<html{% block ng-app %}{% endblock %}>
+<html>
 <head>
-    <title>{% block html-title %}AllMyChanges.com, release notes tracker{% endblock %}</title>
-    {% block top_of_head %}{% endblock top_of_head %}
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% compress css %}
@@ -24,6 +21,5 @@
       {% include "allmychanges/blocks/package-changes.html" %}
     </ul>
   </div>
-
 </body>
 </html>
