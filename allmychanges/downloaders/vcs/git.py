@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import envoy
 
+from hashlib import md5
 from collections import defaultdict
 from django.conf import settings
 from twiggy_goodies.threading import log
@@ -35,16 +36,35 @@ def download(source,
              **params):
     path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
     url, username, repo_name = normalize_url(source)
+    cache_dir = os.path.join(settings.TEMP_DIR,
+                             'git-cache',
+                             md5(url).hexdigest())
 
-    with log.name_and_fields(
-            'vcs.git', url=url, username=username, repo=repo_name):
-
+    with log.name_and_fields('vcs.git',
+                             url=url,
+                             username=username,
+                             repo=repo_name,
+                             cache_dir=cache_dir):
         url, branch = split_branch(url)
 
         with cd(path):
-            log.info('Cloning repository')
-            response = envoy.run('git clone {url} {path}'.format(url=url,
-                                                                 path=path))
+            if not os.path.exists(cache_dir):
+                log.info('Cloning into cache dir')
+                response = envoy.run('git clone --bare {url} {path}'.format(
+                    url=url,
+                    path=cache_dir))
+
+                if response.status_code != 0:
+                    if os.path.exists(cache_dir):
+                        shutil.rmtree(cache_dir)
+                    raise RuntimeError('Bad status_code from git clone: {0}. '
+                                       'Git\'s stderr: {1}'.format(
+                                           response.status_code, response.std_err))
+
+            log.info('Cloning from cache dir')
+            response = envoy.run('git clone {url} {path}'.format(
+                url=cache_dir,
+                path=path))
             if response.status_code != 0:
                 if os.path.exists(path):
                     shutil.rmtree(path)

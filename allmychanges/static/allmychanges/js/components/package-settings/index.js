@@ -433,16 +433,40 @@ module.exports = React.createClass({
         }.bind(this));
         
     },
+    update_downloader: function (downloader) {
+        console.log('update_downloader');
+        var current_downloader = R.find(
+            R.propEq('name', downloader),
+            this.state.downloaders);
+        
+        var params = {'downloader': downloader};
+        
+        if (downloader) {
+            params = R.merge(
+                params,
+                {
+                    'namespace': this.state.namespace || current_downloader.changelog.namespace || '',
+                    'name': this.state.name || current_downloader.changelog.name || '',
+                    'description': this.state.description || current_downloader.changelog.description || ''
+                }
+            );
+            this.schedule_validation();
+        }
+        this.setState(params);
+    },
     wait_for_preview: function () {
         // waiting for preview results @wait-for-preview
         // checking if preview is ready @wait-for-preview
         $.get('/v1/previews/' + this.props.preview_id + '/')
-            .success(function(data) {
+            .success((data) => {
                 // received [data] about preview state @wait-for-preview
                 this.setState({'log': data.log,
                                'status': data.status,
                                'downloaders': data.downloaders,
-                               'downloader': data.downloader});
+                               'downloader': data.downloader},
+                              () => {
+                                  this.update_downloader(data.downloader);
+                              });
 
                 if (data.status == 'processing') {
                     // preview is still in processing status @wait-for-preview
@@ -451,7 +475,7 @@ module.exports = React.createClass({
                     // preview data is ready @wait-for-preview
                     this.fetch_rendered_preview();
                 }
-            }.bind(this))
+            })
             .error(function(data) {
                 // some shit happened @wait-for-preview
             });
@@ -550,15 +574,10 @@ module.exports = React.createClass({
                     this.setState({'downloader_settings': settings});
                 }
 
-                var update_downloader = (downloader) => {
-                    console.log('update_downloader');
-                    this.setState({'downloader': downloader});
-                }
-
                 add_tab('Change downloader',
                         render_change_downloader_tab({
                             downloader: this.state.downloader,
-                            update_downloader: update_downloader,
+                            update_downloader: this.update_downloader,
                             downloader_settings: this.state.downloader_settings,
                             update_settings: update_downloader_settings,
                             downloaders: this.state.downloaders,

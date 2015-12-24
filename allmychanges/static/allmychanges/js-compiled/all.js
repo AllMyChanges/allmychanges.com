@@ -49239,48 +49239,6 @@ componentHandler.register({
 	            contentType: 'application/json',
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
-	    // apply_downloader_settings: function() {
-	    //     // applying downloader settings @apply-downloader-settings
-	    //     this.save_preview_params();
-
-	    //     $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
-	    //             method: 'PATCH',
-	    //             data: JSON.stringify(
-	    //                 R.pick(['downloader',
-	    //                         'downloader_settings'],
-	    //                        this.state)
-	    //             ),
-	    //             contentType: 'application/json',
-	    //             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-	    //         .success(this.update_preview_callback);
-	    // },
-	    // apply_new_source_settings: function() {
-	    //     // applying downloader settings @apply-downloader-settings
-	    //     this.save_preview_params();
-
-	    //     $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
-	    //             method: 'PATCH',
-	    //             data: JSON.stringify(
-	    //                 R.pick(['source'], this.state)
-	    //             ),
-	    //             contentType: 'application/json',
-	    //             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-	    //         .success(this.update_preview_callback);
-	    // },
-	    // apply_parser_settings: function() {
-	    //     // applying parser settings @apply-downloader-settings
-	    //     this.save_preview_params();
-
-	    //     $.ajax({url: '/v1/previews/' + this.props.preview_id + '/',
-	    //             method: 'PATCH',
-	    //             data: JSON.stringify(
-	    //                 R.pick(['search_list', 'ignore_list', 'xslt'],
-	    //                        this.state)
-	    //             ),
-	    //             contentType: 'application/json',
-	    //             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
-	    //         .success(this.update_preview_callback);
-	    // },
 	    apply_settings: function apply_settings() {
 	        // applying parser settings @apply-downloader-settings
 	        this.save_preview_params();
@@ -49410,24 +49368,44 @@ componentHandler.register({
 	                problem: problem });
 	        }).bind(this));
 	    },
+	    update_downloader: function update_downloader(downloader) {
+	        console.log('update_downloader');
+	        var current_downloader = R.find(R.propEq('name', downloader), this.state.downloaders);
+
+	        var params = { 'downloader': downloader };
+
+	        if (downloader) {
+	            params = R.merge(params, {
+	                'namespace': this.state.namespace || current_downloader.changelog.namespace || '',
+	                'name': this.state.name || current_downloader.changelog.name || '',
+	                'description': this.state.description || current_downloader.changelog.description || ''
+	            });
+	            this.schedule_validation();
+	        }
+	        this.setState(params);
+	    },
 	    wait_for_preview: function wait_for_preview() {
+	        var _this = this;
+
 	        // waiting for preview results @wait-for-preview
 	        // checking if preview is ready @wait-for-preview
-	        $.get('/v1/previews/' + this.props.preview_id + '/').success((function (data) {
+	        $.get('/v1/previews/' + this.props.preview_id + '/').success(function (data) {
 	            // received [data] about preview state @wait-for-preview
-	            this.setState({ 'log': data.log,
+	            _this.setState({ 'log': data.log,
 	                'status': data.status,
 	                'downloaders': data.downloaders,
-	                'downloader': data.downloader });
+	                'downloader': data.downloader }, function () {
+	                _this.update_downloader(data.downloader);
+	            });
 
 	            if (data.status == 'processing') {
 	                // preview is still in processing status @wait-for-preview
-	                setTimeout(this.wait_for_preview, 1000);
+	                setTimeout(_this.wait_for_preview, 1000);
 	            } else {
 	                // preview data is ready @wait-for-preview
-	                this.fetch_rendered_preview();
+	                _this.fetch_rendered_preview();
 	            }
-	        }).bind(this)).error(function (data) {
+	        }).error(function (data) {
 	            // some shit happened @wait-for-preview
 	        });
 	    },
@@ -49439,7 +49417,7 @@ componentHandler.register({
 	        this.wait_for_preview();
 	    },
 	    render: function render() {
-	        var _this = this;
+	        var _this2 = this;
 
 	        var content = [];
 	        var next_actions = [];
@@ -49499,13 +49477,13 @@ componentHandler.register({
 
 	            if (status != 'processing') {
 	                var is_downloader_options_should_be_applied = function is_downloader_options_should_be_applied() {
-	                    var result = _this.state.downloader != _this.preview.downloader || !R.equals(_this.state.downloader_settings, _this.preview.downloader_settings);
+	                    var result = _this2.state.downloader != _this2.preview.downloader || !R.equals(_this2.state.downloader_settings, _this2.preview.downloader_settings);
 
-	                    console.log('this.state.downloader: ' + _this.state.downloader);
-	                    console.log('this.preview.downloader: ' + _this.preview.downloader);
+	                    console.log('this.state.downloader: ' + _this2.state.downloader);
+	                    console.log('this.preview.downloader: ' + _this2.preview.downloader);
 
-	                    console.log('this.state.downloader_settings: ' + JSON.stringify(_this.state.downloader_settings));
-	                    console.log('this.preview.downloader_settings: ' + JSON.stringify(_this.preview.downloader_settings));
+	                    console.log('this.state.downloader_settings: ' + JSON.stringify(_this2.state.downloader_settings));
+	                    console.log('this.preview.downloader_settings: ' + JSON.stringify(_this2.preview.downloader_settings));
 
 	                    if (result) {
 	                        console.log('Downloader options SHOULD be applied');
@@ -49516,7 +49494,7 @@ componentHandler.register({
 	                };
 
 	                var is_parser_options_should_be_applied = function is_parser_options_should_be_applied() {
-	                    var result = _this.state.search_list != _this.preview.search_list || _this.state.ignore_list != _this.preview.ignore_list || _this.state.xslt != _this.preview.xslt;
+	                    var result = _this2.state.search_list != _this2.preview.search_list || _this2.state.ignore_list != _this2.preview.ignore_list || _this2.state.xslt != _this2.preview.xslt;
 	                    return result;
 	                };
 
@@ -49526,17 +49504,12 @@ componentHandler.register({
 
 	                var update_downloader_settings = function update_downloader_settings(settings) {
 	                    console.log('Updating downloader settings: ' + JSON.stringify(settings));
-	                    _this.setState({ 'downloader_settings': settings });
-	                };
-
-	                var update_downloader = function update_downloader(downloader) {
-	                    console.log('update_downloader');
-	                    _this.setState({ 'downloader': downloader });
+	                    _this2.setState({ 'downloader_settings': settings });
 	                };
 
 	                add_tab('Change downloader', render_change_downloader_tab({
 	                    downloader: this.state.downloader,
-	                    update_downloader: update_downloader,
+	                    update_downloader: this.update_downloader,
 	                    downloader_settings: this.state.downloader_settings,
 	                    update_settings: update_downloader_settings,
 	                    downloaders: this.state.downloaders,
