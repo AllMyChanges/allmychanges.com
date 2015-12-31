@@ -166,7 +166,7 @@ class Command(LogMixin, BaseCommand):
     def handle(self, *args, **options):
         filename = 'migration.json'
 
-        with open(filename, 'w') as f:
+        with open(filename, 'r') as f:
             data = json.load(f)
 
         for item in progress.bar(data):
