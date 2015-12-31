@@ -182,5 +182,4 @@ class Command(LogMixin, BaseCommand):
             except Exception as e:
                 if 'Duplicate entry' in str(e):
                     log.trace().error('Duplicate error')
-                    return 'duplicate error'
-                raise
+                    print 'duplicate error', ch.id
