@@ -170,7 +170,12 @@ class Command(LogMixin, BaseCommand):
             data = json.load(f)
 
         for item in progress.bar(data):
-            ch = Changelog.objects.get(pk=item['pk'])
+            try:
+                ch = Changelog.objects.get(pk=item['pk'])
+            except Changelog.DoesNotExist:
+                print 'does not exists', item['pk']
+                continue
+
             if ch.name != item['name'] or ch.name != item['name']:
                 print 'name or namespace are not equal to the database for {0}'.format(item['pk'])
                 continue
@@ -183,3 +188,4 @@ class Command(LogMixin, BaseCommand):
                 if 'Duplicate entry' in str(e):
                     log.trace().error('Duplicate error')
                     print 'duplicate error', ch.id
+                    continue
