@@ -176,6 +176,8 @@ class Command(LogMixin, BaseCommand):
                 continue
 
             try:
+                if 'pk' in item:
+                    item.pop('pk')
                 update_fields(ch, **item)
             except Exception as e:
                 if 'Duplicate entry' in str(e):
