@@ -49,7 +49,8 @@ _debug = 0
 import sgmllib, urllib, urlparse, re, sys, robotparser
 
 import threading
-class TimeoutError(Exception): pass
+class TimeoutError(RuntimeError): pass
+
 def timelimit(timeout):
     """borrowed from web.py"""
     def _1(function):
@@ -60,7 +61,7 @@ def timelimit(timeout):
                     self.result = None
                     self.error = None
 
-                    self.setDaemon(True)
+                    self.daemon = True
                     self.start()
 
                 def run(self):
@@ -128,13 +129,19 @@ class URLGatekeeper:
         _debuglog("gatekeeper of %s says %s" % (url, allow))
         return allow
 
-    @timelimit(10)
+#    @timelimit(1)
     def get(self, url, check=True):
-        if check and not self.can_fetch(url): return ''
-        try:
-            return self.urlopener.open(url).read()
-        except:
-            return ''
+        #if check and not self.can_fetch(url): return ''
+        import requests
+        from twiggy_goodies.threading import log
+
+        with log.fields(url=url):
+            log.debug('Searching feed')
+            try:
+                return requests.get(url, timeout=3).text
+            #self.urlopener.open(url).read()
+            except RuntimeError:
+                return ''
 
 _gatekeeper = URLGatekeeper()
 

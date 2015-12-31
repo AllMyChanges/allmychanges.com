@@ -27,6 +27,7 @@ DATABASES = {
         'PASSWORD': 'allmychanges',
         'HOST': '',
         'PORT': '',
+#        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
@@ -36,6 +37,7 @@ def make_db_aliases():
     if not os.environ.get('MIGRATIONS'):
         DATABASES['server-side'] = DATABASES['default'].copy()
         DATABASES['server-side']['OPTIONS'] = {
+#            'charset': 'utf8mb4',
             'cursorclass': MySQLdb.cursors.SSCursor}
 
         # for parallel transactions

@@ -1,6 +1,7 @@
 import re
 
 from allmychanges.downloaders.appstore import (
+    AppStoreAppNotFound,
     get_itunes_app_id,
     get_itunes_app_data)
 
@@ -40,13 +41,16 @@ def normalize_url(url, for_checkout=True, return_itunes_data=False):
                 username,
                 repo)
     elif 'itunes.apple.com' in url:
-        app_id = get_itunes_app_id(url)
-        data = get_itunes_app_data(app_id)
-        if data:
-            # here we add iTunes Affilate token
-            result = [data['trackViewUrl'] + '&at=1l3vwNn', None, None]
-            if return_itunes_data:
-                result.append(data)
-            return result
+        try:
+            app_id = get_itunes_app_id(url)
+            data = get_itunes_app_data(app_id)
+            if data:
+                # here we add iTunes Affilate token
+                result = [data['trackViewUrl'] + '&at=1l3vwNn', None, None]
+                if return_itunes_data:
+                    result.append(data)
+                return result
+        except AppStoreAppNotFound:
+            pass
 
     return (url, None, url.rsplit('/')[-1])

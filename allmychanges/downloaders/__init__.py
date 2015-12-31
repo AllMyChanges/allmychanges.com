@@ -2,7 +2,7 @@
 
 import time
 
-#from twiggy_goodies.threading import log
+from twiggy_goodies.threading import log
 
 
 def get_modules():
@@ -48,38 +48,44 @@ def guess_downloaders(source):
     # downloader was discovered before
 
     # TODO: сделать настройку через переменную окружения
-    print 'Guessing downloaders'
+    with log.name_and_fields('guesser', source=source):
+        log.debug('Guessing downloaders')
 
-    discovered = {}
+        discovered = {}
 
-    modules = get_modules()
+        modules = get_modules()
 
-    # if True:
-    #     yield {'name': 'http'}
-    #     yield {'name': 'vcs.git'}
-    #     return
+        # if True:
+        #     yield {'name': 'http'}
+        #     yield {'name': 'vcs.git'}
+        #     return
 
-    for module in modules:
-        name = get_downloader_name(module)
-        print ''
-        print 'Guessing if {0} can be used'.format(name)
-        start = time.time()
+        for module in modules:
+            name = get_downloader_name(module)
+            # print ''
+            with log.fields(downloader=name):
+                log.debug('Guessing if this downloader can be used')
+                start = time.time()
 
-        result = module.guess(source, discovered=discovered)
-        end = time.time()
-        print 'Guess took {0} seconds'.format(end - start)
-        print 'Result is:', result
+                try:
+                    result = module.guess(source, discovered=discovered)
+                    end = time.time()
+                    with log.fields(elapsed_time=end - start, result=result):
+                        log.debug('Guess results')
 
-        if result:
-            result['name'] = name
-            print result
-            yield result
+                    if result:
+                        result['name'] = name
+                        yield result
 
-            # this way we could stop if google play or appstore
-            # url was discovered
-            if 'stop' in result:
-                break
-            discovered[name] = result
+                        # this way we could stop if google play or appstore
+                        # url was discovered
+                        if 'stop' in result:
+                            log.debug('Stopping because "stop" key was encountered')
+                            break
+                        discovered[name] = result
+                except RuntimeError:
+                    log.trace().error('Ignored error')
+                    pass
 
 
 def get_downloader(name):

@@ -447,7 +447,7 @@ class Changelog(Downloadable, models.Model):
         self.save(update_fields=changed_fields)
 
     def set_processing_status(self, status):
-        self.processing_status = status
+        self.processing_status = status[:PROCESSING_STATUS_LENGTH]
         self.updated_at = timezone.now()
         self.save(update_fields=('processing_status',
                                  'updated_at'))

@@ -23,4 +23,5 @@
      (require 'tern-auto-complete)
      (tern-ac-setup)))
 
+(require 'auto-complete)
 (auto-complete-mode)

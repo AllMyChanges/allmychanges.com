@@ -11,9 +11,10 @@ import plistlib
 
 from django.conf import settings
 from collections import defaultdict
-from twiggy_goodies.threading import log
 from allmychanges.utils import (
-    cd, get_text_from_response,
+    cd,
+    log,
+    get_text_from_response,
     first_sentences)
 from allmychanges.exceptions import AppStoreAppNotFound
 
@@ -21,32 +22,35 @@ from allmychanges.exceptions import AppStoreAppNotFound
 def guess(source, discovered={}):
     from allmychanges.models import DESCRIPTION_LENGTH
 
-    if not 'itunes.apple.com' in source:
-        return
+    with log.name_and_fields('appstore', source=source):
+        log.info('Guessing')
 
-    result = defaultdict(dict)
-    try:
-        app_id = get_itunes_app_id(source)
-        data = get_itunes_app_data(app_id)
-        # if everything is OK, start populating result
-        result['changelog']['source'] = source
-        result['stop'] = True
+        if not 'itunes.apple.com' in source:
+            return
 
-        name = data['trackName']
-        name = name.split(' - ', 1)[0]
-        name = name.strip()
+        result = defaultdict(dict)
+        try:
+            app_id = get_itunes_app_id(source)
+            data = get_itunes_app_data(app_id)
+            # if everything is OK, start populating result
+            result['changelog']['source'] = source
+            result['stop'] = True
 
-        result['changelog'].update(dict(
-            name=name,
-            namespace='ios',
-            description=first_sentences(data['description'],
-                                        DESCRIPTION_LENGTH)))
-    except:
-        # ignore errors because most probably, they are from git command
-        # which won't be able to clone repository from strange url
-        pass
+            name = data['trackName']
+            name = name.split(' - ', 1)[0]
+            name = name.strip()
 
-    return result
+            result['changelog'].update(dict(
+                name=name,
+                namespace='ios',
+                description=first_sentences(data['description'],
+                                            DESCRIPTION_LENGTH)))
+        except Exception:
+            # ignore errors because most probably, they are from git command
+            # which won't be able to clone repository from strange url
+            pass
+
+        return result
 
 
 fronts = [
@@ -243,38 +247,40 @@ def download(source, **params):
     https://itunes.apple.com/in/app/temple-run/id420009108?mt=8
     https://itunes.apple.com/en/app/slack-team-communication/id618783545?l=en&mt=8
     """
-    app_id = get_itunes_app_id(source)
-    data = get_itunes_release_notes(app_id)
-    if data:
-        history = data['pageData']['softwarePageData']['versionHistory']
-        if history:
-            def format_item(item):
-                version = item['versionString']
-                date = item['releaseDate']
-                notes = item.get('releaseNotes') or 'No description'
-                notes = notes.replace(u'•', u'*') # because of vk.com mothefuckers
-                notes = notes.replace(u'★', u'*') # because of temple run motherfuckers
-                text = u"""
-{version} ({date})
-==============
+    with log.name_and_fields('appstore', source=source):
+        log.info('Downloading')
+        app_id = get_itunes_app_id(source)
+        data = get_itunes_release_notes(app_id)
+        if data:
+            history = data['pageData']['softwarePageData']['versionHistory']
+            if history:
+                def format_item(item):
+                    version = item['versionString']
+                    date = item['releaseDate']
+                    notes = item.get('releaseNotes') or 'No description'
+                    notes = notes.replace(u'•', u'*') # because of vk.com mothefuckers
+                    notes = notes.replace(u'★', u'*') # because of temple run motherfuckers
+                    text = u"""
+    {version} ({date})
+    ==============
 
-{notes}
-                """.strip().format(version=version,
-                                   date=date,
-                                   notes=notes)
-                return text
+    {notes}
+                    """.strip().format(version=version,
+                                       date=date,
+                                       notes=notes)
+                    return text
 
-            path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-            try:
-                with cd(path):
-                    with open('ChangeLog', 'w') as f:
-                        items = map(format_item, history)
-                        text = u'\n\n'.join(items)
-                        f.write(text.encode('utf-8'))
+                path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
+                try:
+                    with cd(path):
+                        with open('ChangeLog', 'w') as f:
+                            items = map(format_item, history)
+                            text = u'\n\n'.join(items)
+                            f.write(text.encode('utf-8'))
 
-            except Exception, e:
-                if os.path.exists(path):
-                    shutil.rmtree(path)
-                raise RuntimeError('Unexpected exception "{0}" when fetching itunes app: {1}'.format(
-                    repr(e), app_id))
-            return path
+                except Exception, e:
+                    if os.path.exists(path):
+                        shutil.rmtree(path)
+                    raise RuntimeError('Unexpected exception "{0}" when fetching itunes app: {1}'.format(
+                        repr(e), app_id))
+                return path

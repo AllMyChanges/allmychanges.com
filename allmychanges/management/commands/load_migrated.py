@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import json
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -163,47 +164,21 @@ class Command(LogMixin, BaseCommand):
     help = u"""Download package sources into a temporary directory."""
 
     def handle(self, *args, **options):
-        filename = 'migrated-packages'
+        filename = 'migration.json'
 
-        if os.path.exists(filename):
-            with open(filename) as f:
-                lines = f.readlines()
-                lines = (line.strip() for line in lines)
-                lines = filter(None, lines)
-                lines = (line.split(' ', 1)
-                         for line in lines)
-                migrated = {int(line[0]): line[1]
-                            for line in lines}
-        else:
-            migrated = {}
+        with open(filename, 'w') as f:
+            data = json.load(f)
 
-        def save_state():
-            with open(filename, 'w') as f:
-                lines = sorted(migrated.items())
-                f.write('\n'.join(map('{0[0]} {0[1]}'.format, lines)))
+        for item in progress.bar(data):
+            ch = Changelog.objects.get(pk=item['pk'])
+            if ch.name != item['name'] or ch.name != item['name']:
+                print 'name or namespace are not equal to the database for {0}'.format(item['pk'])
+                continue
 
-        try:
-            if args:
-                for name in args:
-                    params = parse_package_name(name)
-                    ch = Changelog.objects.get(**params)
-                    # if ch.id not in migrated:
-                    status = migrate(ch)
-                    migrated[ch.id] = status
-            else:
-                changelogs = Changelog.objects.all()
-
-                for idx, ch in progress.bar(enumerate(changelogs),
-                                            expected_size=len(changelogs)):
-                    if ch.id not in migrated:
-                        status = migrate(ch)
-                        migrated[ch.id] = status
-
-                    if idx % 10:
-                        save_state()
-
-        except:
-            log.trace().error('Error during migration')
-            pass
-
-        save_state()
+            try:
+                update_fields(ch, **item)
+            except Exception as e:
+                if 'Duplicate entry' in str(e):
+                    log.trace().error('Duplicate error')
+                    return 'duplicate error'
+                raise

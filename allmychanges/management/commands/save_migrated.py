@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import json
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -163,47 +164,24 @@ class Command(LogMixin, BaseCommand):
     help = u"""Download package sources into a temporary directory."""
 
     def handle(self, *args, **options):
-        filename = 'migrated-packages'
+        filename = 'migration.json'
 
-        if os.path.exists(filename):
-            with open(filename) as f:
-                lines = f.readlines()
-                lines = (line.strip() for line in lines)
-                lines = filter(None, lines)
-                lines = (line.split(' ', 1)
-                         for line in lines)
-                migrated = {int(line[0]): line[1]
-                            for line in lines}
-        else:
-            migrated = {}
+        data = []
+        changelogs = Changelog.objects.all()
 
-        def save_state():
-            with open(filename, 'w') as f:
-                lines = sorted(migrated.items())
-                f.write('\n'.join(map('{0[0]} {0[1]}'.format, lines)))
+        for ch in progress.bar(changelogs):
+            if ch.downloaders:
+                data.append(
+                    dict(
+                        pk=ch.pk,
+                        name=ch.name,
+                        namespace=ch.namespace,
+                        source=ch.source,
+                        downloaders=ch.downloaders,
+                        downloader=ch.downloader,
+                        downloader_settings=ch.downloader_settings,
+                        search_list=ch.search_list,
+                        ignore_list=ch.ignore_list))
 
-        try:
-            if args:
-                for name in args:
-                    params = parse_package_name(name)
-                    ch = Changelog.objects.get(**params)
-                    # if ch.id not in migrated:
-                    status = migrate(ch)
-                    migrated[ch.id] = status
-            else:
-                changelogs = Changelog.objects.all()
-
-                for idx, ch in progress.bar(enumerate(changelogs),
-                                            expected_size=len(changelogs)):
-                    if ch.id not in migrated:
-                        status = migrate(ch)
-                        migrated[ch.id] = status
-
-                    if idx % 10:
-                        save_state()
-
-        except:
-            log.trace().error('Error during migration')
-            pass
-
-        save_state()
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=4)

@@ -15,6 +15,7 @@ from allmychanges import chat
 from allmychanges.version import reorder_versions
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
+from django.utils.encoding import force_str
 
 
 def has_tzinfo(obj):
@@ -138,6 +139,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.filename = getattr(raw_version, 'filename', None)
         version.date = getattr(raw_version, 'date', None)
         version.raw_text = raw_version.content
+
         version.processed_text = raw_version.processed_content
 
         if version.discovered_at is None:

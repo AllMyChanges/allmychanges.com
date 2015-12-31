@@ -18,7 +18,7 @@ def _get_docker_command(name, ports=[], image='allmychanges.com'):
             '--link redis.allmychanges.com '
             '{ports} '
             '-e DEBUG=yes '
-            '-e DEV_DOWNLOAD=yes '
+#            '-e DEV_DOWNLOAD=yes '
             '--name {name} '
             '{image} ').format(
                 name=name,
@@ -66,7 +66,8 @@ def watch_on_static():
 
 
 def manage(args=''):
-    local(_get_docker_command('manage.command.allmychanges.com') +
+    name = 'manage.command.allmychanges.com' + args.replace(' ', '_')
+    local(_get_docker_command(name) +
         '/env/bin/python /app/manage.py ' + args)
 
 def test(args=''):
