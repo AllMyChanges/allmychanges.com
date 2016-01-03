@@ -1,4 +1,6 @@
+import os
 import time
+import re
 
 from fabric.api import local
 
@@ -7,23 +9,31 @@ def update_requirements():
     local('pip-compile --annotate requirements.in')
     local('pip-compile --annotate requirements-dev.in')
 
-def _get_docker_command(name, ports=[], image='allmychanges.com'):
-    return ('docker run '
-            '--rm '
-            '-t -i '
-            '-v `pwd`:/app '
-            '-v `pwd`/logs:/var/log/allmychanges '
-            '-v `pwd`/tmp:/tmp/allmychanges '
-            '--link mysql.allmychanges.com '
-            '--link redis.allmychanges.com '
-            '{ports} '
-            '-e DEBUG=yes '
-#            '-e DEV_DOWNLOAD=yes '
-            '--name {name} '
-            '{image} ').format(
-                name=name,
-                image=image,
-                ports=' '.join('-p ' + p for p in ports))
+def _get_docker_command(name, ports=[], image=None, rm=True):
+    command = ['docker run',]
+
+    if image is None:
+        image = os.environ.get('IMAGE', 'allmychanges.com')
+
+    if rm:
+        command.append('--rm')
+
+    command.extend([
+            '-t -i',
+            '-v `pwd`:/app',
+            '-v `pwd`/logs:/var/log/allmychanges',
+            '-v `pwd`/tmp:/tmp/allmychanges',
+            '--link mysql.allmychanges.com',
+            '--link redis.allmychanges.com',
+            ' '.join('-p ' + p for p in ports),
+            '-e DEBUG=yes',
+#            '-e DEV_DOWNLOAD=yes'
+            '--name',
+            name,
+            image])
+
+    command = ' '.join(command)
+    return command + ' '
 
 def build_docker_image():
     local('docker build -t allmychanges.com .')
@@ -55,8 +65,13 @@ def rqworker():
         'default '
         'preview '))
 
-def bash():
-    local(_get_docker_command('bash.command.allmychanges.com') + 'bash')
+def bash(args=''):
+    if args == 'edit':
+        rm = False
+    else:
+        rm = True
+
+    local(_get_docker_command('bash.command.allmychanges.com', rm=rm) + 'bash')
 
 def tail_errors():
     local("tail -f logs/django-root.log | jq 'if (.[\"@fields\"].level == \"WARNING\" or .[\"@fields\"].level == \"ERROR\") then . else 0 end | objects'")
@@ -66,7 +81,8 @@ def watch_on_static():
 
 
 def manage(args=''):
-    name = 'manage.command.allmychanges.com' + args.replace(' ', '_')
+    hashed_args = re.sub(ur'[ \:/]+', '_', args)
+    name = 'manage.command.allmychanges.com' + hashed_args
     local(_get_docker_command(name) +
         '/env/bin/python /app/manage.py ' + args)
 

@@ -574,6 +574,7 @@ class Issue(models.Model):
                                         help_text='Comma-separated list of versions, related to this issue')
     email = models.CharField(max_length=100, blank=True, null=True)
     page = models.CharField(max_length=100, blank=True, null=True)
+    importance = models.IntegerField(db_index=True, blank=True, default=0)
 
     def __repr__(self):
         return """

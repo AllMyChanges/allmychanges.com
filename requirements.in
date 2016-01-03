@@ -1,4 +1,4 @@
-django>=1.6,<1.7
+django>=1.7,<1.8
 South
 djangorestframework<3.0.0
 drf-extensions
@@ -53,6 +53,9 @@ feedparser
 
 # for storing rich data about preview and changelog settings
 jsonfield
+
+# to draw progressbars
+tqdm
 
 #git+git://github.com/svetlyak40wt/django-oauth-toolkit
 #git+git://github.com/svetlyak40wt/logster.git@allmychanges
