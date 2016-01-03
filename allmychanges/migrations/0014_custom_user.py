@@ -7,7 +7,7 @@ class Migration(DataMigration):
     def forwards(self, orm):
 
         orm.User.objects.all().delete()
-        
+
         fake_counter = [0]
         def create_fake_email():
             fake_counter[0] += 1
@@ -18,23 +18,25 @@ class Migration(DataMigration):
         #     fake_counter[0] += 0
         #     return 'fake-{0}@example.com'.format(*fake_counter)
 
-        for old_u in orm['auth.User'].objects.all():
-            email = old_u.email
-            if not email or orm.User.objects.filter(email=email).count() > 0:
-                email = create_fake_email()
+        # закомментировано, потому что если накатывать миграцию с нуля,
+        # то уже нет такой таблички auth_user
+        # for old_u in orm['auth.User'].objects.all():
+        #     email = old_u.email
+        #     if not email or orm.User.objects.filter(email=email).count() > 0:
+        #         email = create_fake_email()
 
-            # username = old_u.username
-            # if not username or orm.User.objects.filter(username=username).count() > 0:
-            #     username = create_fake_username()
-                
-            orm.User.objects.create(
-                id=old_u.id,
-                username=old_u.username,
-                email=email,
-                date_joined=old_u.date_joined,
-                last_login=old_u.last_login,
-                password=old_u.password)
-            
+        #     # username = old_u.username
+        #     # if not username or orm.User.objects.filter(username=username).count() > 0:
+        #     #     username = create_fake_username()
+
+        #     orm.User.objects.create(
+        #         id=old_u.id,
+        #         username=old_u.username,
+        #         email=email,
+        #         date_joined=old_u.date_joined,
+        #         last_login=old_u.last_login,
+        #         password=old_u.password)
+
 
     def backwards(self, orm):
         pass

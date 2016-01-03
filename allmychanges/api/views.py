@@ -19,22 +19,27 @@ from rest_framework_extensions.decorators import action
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 from allmychanges.models import (Subscription,
+                                 Preview,
                                  Issue,
                                  Version,
                                  AutocompleteData,
-                                 Changelog, UserHistoryLog)
+                                 Changelog,
+                                 UserHistoryLog)
 from allmychanges import chat
 from allmychanges.api.serializers import (
     SubscriptionSerializer,
+    PreviewSerializer,
     ChangelogSerializer,
     IssueSerializer,
     VersionSerializer,
 )
-from allmychanges.utils import (count,
-                                parse_ints,
-                                join_ints)
+from allmychanges.utils import (
+    count,
+    parse_ints,
+    join_ints,
+    update_fields)
 from allmychanges.source_guesser import guess_source
 
 
@@ -449,14 +454,11 @@ class ChangelogViewSet(HandleExceptionMixin,
     def update(self, *args, **kwargs):
         response = super(ChangelogViewSet, self).update(*args, **kwargs)
 
-        if self.original_source != self.object.source:
-            self.object.downloader = None
-            self.object.save(update_fields=('downloader',))
-
         if self.object.versions.count() == 0:
             # try to move preview's versions
 
-            preview = list(self.object.previews.filter(light_user=self.request.light_user).order_by('-id')[:1])
+            preview = list(self.object.previews.filter(
+                light_user=self.request.light_user).order_by('-id')[:1])
             if preview:
                 preview = preview[0]
                 for version in preview.versions.all():
@@ -468,10 +470,15 @@ class ChangelogViewSet(HandleExceptionMixin,
                                                self.request.light_user)
         if result:
             messages.info(self.request,
-                          'Congratulations, you\'ve become a moderator of this changelog. Now you have rights to edit and to care about this changelog in future.')
+                          'Congratulations, you\'ve become a moderator of this '
+                          'changelog. Now you have rights to edit and to care '
+                          'about this changelog in future.')
         if result == 'light':
             messages.warning(self.request,
-                             'Because you are not logged in, we\'ll remember that you are a moderator for 24 hour. To make this permanent, please, login or sign up as soon as possible.')
+                             'Because you are not logged in, we\'ll remember '
+                             'that you are a moderator for 24 hour. To make '
+                             'this permanent, please, login or sign up as soon '
+                             'as possible.')
 
 
         if self.request.method == 'PUT':
@@ -556,6 +563,39 @@ class ChangelogViewSet(HandleExceptionMixin,
         return response
 
 
+class PreviewViewSet(HandleExceptionMixin,
+                     DetailSerializerMixin,
+                     viewsets.ModelViewSet):
+    serializer_class = PreviewSerializer
+    serializer_detail_class = PreviewSerializer
+    model = Preview
+
+    def partial_update(self, *args, **kwargs):
+        super(PreviewViewSet, self).partial_update(*args, **kwargs)
+
+        data = self.request.DATA
+
+        fields_which_can_be_updated = (
+            'source',
+            'downloader',
+            'downloader_settings',
+            'search_list',
+            'ignore_list',
+            'xslt')
+
+        updated_fields = {
+            key: value
+            for key, value in data.items()
+            if key in fields_which_can_be_updated}
+
+        if updated_fields:
+            update_fields(self.object,
+                          log=[],
+                          **updated_fields)
+            self.object.schedule_update()
+
+        return Response({'result': 'scheduled'})
+
 # это пока нигде не используется, надо дорабатывать
 # и возможно переносить ручку в changelog/:id/versions
 
@@ -591,14 +631,16 @@ class NamespaceAndNameForm(forms.Form):
         namespace = cleaned_data.get('namespace')
         name = cleaned_data.get('name')
 
-        try:
-            changelog = Changelog.objects.get(namespace=namespace,
-                                              name=name)
+        if namespace and name:
+            try:
+                already_taken = Changelog.objects \
+                    .filter(namespace=namespace, name=name) \
+                    .exclude(pk=changelog_id).count()
 
-            if changelog.pk != changelog_id:
-                self._errors['name'] = ['These namespace/name pair already taken.']
-        except Changelog.DoesNotExist:
-            pass
+                if already_taken:
+                    self._errors['name'] = ['These namespace/name pair already taken.']
+            except Changelog.DoesNotExist:
+                pass
 
         return cleaned_data
 

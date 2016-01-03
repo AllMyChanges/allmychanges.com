@@ -1,3 +1,5 @@
+var React = require('react');
+
 // uses jquery typeahead plugin:
 // http://twitter.github.io/typeahead.js/
 

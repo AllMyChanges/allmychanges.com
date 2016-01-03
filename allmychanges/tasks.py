@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 import anyjson
 import requests
 import datetime
@@ -7,8 +8,12 @@ from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 
-from allmychanges.downloader import normalize_url
-from allmychanges.utils import count, first_sentences
+from allmychanges.downloaders.utils import normalize_url
+from allmychanges.downloaders import guess_downloaders
+from allmychanges.utils import (
+    count,
+    update_fields,
+    first_sentences)
 from allmychanges.notifications import slack
 from allmychanges.changelog_updater import update_preview_or_changelog
 from allmychanges import chat
@@ -132,9 +137,10 @@ def schedule_updates(reschedule=False, packages=[]):
 
 @singletone('preview')
 @job('preview', timeout=600)
-@transaction.atomic
+#@transaction.atomic
 @wait_chat_threads
 def update_preview_task(preview_id):
+    print 'Update preview task'
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
         try:
@@ -143,7 +149,68 @@ def update_preview_task(preview_id):
 
             chat.send('Updating preview with source: {0}'.format(preview.source),
                       channel='tasks')
-            update_preview_or_changelog(preview)
+
+            if not preview.downloader:
+                print 'Guessed downloaders FOO'
+                preview.set_processing_status('Guessing downloaders')
+                downloaders = list(guess_downloaders(preview.source))
+                print ''
+                print 'Guessed downloaders:'
+                for d in downloaders:
+                    print d
+                print ''
+                update_fields(preview, downloaders=downloaders)
+            else:
+                print ''
+                print 'Guessed downloaders BOO (dont need to guess)'
+                print ''
+                downloaders = [{'name': preview.downloader}]
+
+
+            if downloaders:
+                num_downloaders = len(downloaders)
+
+                for idx, downloader in enumerate(downloaders):
+                    print 'trying', downloader
+                    last_downloader = idx == (num_downloaders - 1)
+                    ignore_problem = True if not last_downloader else False
+
+                    found = update_preview_or_changelog(
+                        preview,
+                        downloader,
+                        ignore_problem=ignore_problem)
+
+                    if found:
+                        break
+            else:
+                problem = 'Unable to find downloader for this URL'
+                preview.set_processing_status(problem)
+                preview.set_status('error', problem=problem)
+        finally:
+            log.info('Task done')
+
+
+@singletone('preview')
+@job('preview', timeout=600)
+@transaction.atomic
+def preview_test_task(preview_id, items):
+    print 'Previwe test task'
+    with log.fields(preview_id=preview_id):
+        log.info('Starting task')
+        try:
+            from .models import Preview
+            preview = Preview.objects.get(pk=preview_id)
+
+            text = items[0]
+            tail = items[1:]
+
+            preview.log.append({'text': items[0]})
+            preview.save(update_fields=('log',))
+
+            if tail:
+                time.sleep(5)
+                preview_test_task.delay(preview_id, tail)
+
         finally:
             log.info('Task done')
 

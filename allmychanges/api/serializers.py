@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from rest_framework import serializers, fields
+from rest_framework import serializers, fields, exceptions
 from rest_framework_extensions.fields import ResourceUriField
 
 from allmychanges.models import (
+    Preview,
     Subscription,
     Version,
     Changelog,
@@ -15,6 +16,27 @@ class URLField(fields.URLField):
         if 'validators' not in kwargs:
             kwargs['validators'] = [URLValidator()]
         super(URLField, self).__init__(**kwargs)
+
+
+class JSONField(serializers.WritableField):
+    """ https://github.com/tomchristie/django-rest-framework/issues/1880#issuecomment-70392048
+    """
+    def __init__(self, *args, **kwargs):
+        # My own way of dealing with the allow_none error issue described here:
+        #   https://github.com/tomchristie/django-rest-framework/issues/1809
+        #   https://github.com/tomchristie/django-rest-framework/issues/1880
+        kwargs.pop('allow_none', None)
+
+        super(JSONField, self).__init__(*args, **kwargs)
+
+    def from_native(self, value):
+        if value is not None and not isinstance(value, (dict, list)):
+            raise exceptions.ValidationError("Invalid JSON <{}>".format(value))
+
+        return value
+
+    def to_native(self, obj):
+        return obj
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -57,6 +79,9 @@ class ChangelogSerializer(ModelSerializer):
     updated_at = serializers.Field(source='updated_at')
     next_update_at = serializers.Field(source='next_update_at')
     latest_version = serializers.Field(source='latest_version')
+    downloader = serializers.WritableField(required=True)
+    downloader_settings = JSONField(required=False)
+    downloaders = JSONField(required=False)
 
     class Meta:
         model = Changelog
@@ -76,6 +101,28 @@ class ChangelogSerializer(ModelSerializer):
             'ignore_list',
             'search_list',
             'xslt',
+            'downloader',
+            'downloader_settings',
+            'downloaders',
+        )
+
+
+class PreviewSerializer(ModelSerializer):
+    resource_uri = ResourceUriField(view_name='preview-detail')
+    downloader_settings = JSONField()
+    downloaders = JSONField()
+
+    class Meta:
+        model = Preview
+        fields = (
+            'downloader',
+            'downloader_settings',
+            'downloaders',
+            'resource_uri',
+            'status',
+            'processing_status',
+            'log',
+            'problem',
         )
 
 

@@ -1,5 +1,6 @@
-var Package = require('./package.js')
-var metrika = require('../metrika.js')
+var React = require('react');
+var Package = require('./package.js');
+var metrika = require('../metrika.js');
 
 module.exports = React.createClass({
     getInitialState: function () {

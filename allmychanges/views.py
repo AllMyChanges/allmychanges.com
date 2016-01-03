@@ -51,10 +51,8 @@ from oauth2_provider.models import Application, AccessToken
 from allmychanges.utils import (HOUR,
                                 parse_ints,
                                 join_ints)
-from allmychanges.downloader import (
-    normalize_url,
-    guess_downloader,
-    get_namespace_guesser)
+from allmychanges.downloaders.utils import normalize_url
+from allmychanges.downloaders import guess_downloaders
 
 
 
@@ -914,6 +912,35 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         else:
             normalized_url, _, _ = normalize_url(url, for_checkout=False)
 
+            # first, we'll get params from query, if they were given
+            params = dict(name=self.request.GET.get('name'),
+                          namespace=self.request.GET.get('namespace'),
+                          description=self.request.GET.get('description', ''),
+                          icon=self.request.GET.get('icon', ''))
+
+            # and finally, we'll try to guess downloader
+            # if not params.get('downloader'):
+            #     downloaders = guess_downloaders(normalized_url)
+
+            #     params['downloader'] = ','.join(
+            #         d['name'] for d in downloaders)
+            # else:
+            downloaders = []
+
+
+            # TODO: replace with code inside of downloaders
+            # if name was not given, then we'll try to guess it
+            # if not params['name']:
+            #     guesser = get_namespace_guesser(params['downloader'])
+            #     guessed = guesser(normalized_url)
+            #     guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
+            #                                                  guessed['name'])
+            #     for key, value in guessed.items():
+            #         if value:
+            #             params[key] = value
+            # icon don't saved into the preview yet
+            icon = params.pop('icon')
+
             try:
                 changelog = Changelog.objects.get(source=normalized_url)
                 if changelog.name is not None:
@@ -926,23 +953,9 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                                      'package-create',
                                      u'User created changelog:{0}'.format(changelog.pk))
             except Changelog.DoesNotExist:
-                params = dict(name=self.request.GET.get('name'),
-                              namespace=self.request.GET.get('namespace'),
-                              description=self.request.GET.get('description', ''),
-                              icon=self.request.GET.get('icon', ''))
-
-                if not params['name']:
-                    downloader = guess_downloader(normalized_url)
-                    guesser = get_namespace_guesser(downloader)
-                    guessed = guesser(normalized_url)
-                    guessed['name'] = Changelog.create_uniq_name(guessed['namespace'],
-                                                                 guessed['name'])
-                    for key, value in guessed.items():
-                        if value:
-                            params[key] = value
-
                 changelog = Changelog.objects.create(
-                    source=normalized_url, **params)
+                    source=normalized_url,
+                    icon=icon)
 
                 if user:
                     chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
@@ -959,16 +972,17 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             changelog.problem = None
             changelog.save()
 
-
             preview = changelog.create_preview(
                 user=user,
-                light_user=self.request.light_user)
+                light_user=self.request.light_user,
+                **params)
 
             preview.schedule_update()
 
             context['changelog'] = changelog
             context['preview'] = preview
             context['can_edit'] = True
+            context['downloaders'] = downloaders
 
             if self.request.user.is_authenticated() and self.request.user.username in settings.ADVANCED_EDITORS:
                 context['can_edit_xslt'] = True
@@ -976,6 +990,9 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         context['mode'] = 'add-new'
         return context
 
+
+class AddNewView2(AddNewView):
+    template_name = 'allmychanges/add-new2.html'
 
 
 class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
@@ -1005,6 +1022,11 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
+class EditPackageView2(EditPackageView):
+    template_name = 'allmychanges/edit-package2.html'
+
+
+
 class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
     """This view is used to preview how changelog will look like
     at "Add New" page.
@@ -1016,12 +1038,11 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         preview_id = kwargs['pk']
         self.preview = Preview.objects.get(pk=preview_id)
 
-        cache_key = 'changelog-preview-{0}:{1}:{2}'.format(
+        cache_key = 'changelog-preview-{0}:{1}'.format(
             self.preview.id,
             int(time.mktime(self.preview.updated_at.timetuple()))
-            if self.preview.updated_at is not None
-            else 'missing',
-            self.preview.get_processing_status())
+               if self.preview.updated_at is not None
+               else 'missing')
 #        print 'Cache key:', cache_key
         return cache_key, 4 * HOUR
 
@@ -1066,11 +1087,12 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result['problem'] = problem
         result['show_sources'] = True
 
+        # TODO: вот это всё надо будет убрать и оставить
+        # только рендеринг changelog
         HUMANIZED = {
             'waiting-in-the-queue': 'Waiting in the queue.',
             'downloading': 'Downloading sources.',
             'searching-versions': 'Searching versions.',
-            'processing-vcs-history': 'Processing VCS history.',
             'updating-database': 'Updating database.',
         }
         status = self.preview.get_processing_status()
@@ -1099,6 +1121,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
                 preview.downloader = None
 
             preview.source = data.get('source')
+            preview.downloader = data.get('downloader')
             preview.set_status('processing')
             preview.save()
             preview.schedule_update()
@@ -1508,6 +1531,7 @@ class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
         categories = sorted(set(Changelog.objects.only_active().values_list('namespace', flat=True)))
         # иногда категория бывает не задана и тогда возникает пятисотка
         categories = filter(None, categories)
+        categories = sorted(categories)
         categories = groupby(categories, lambda item: item[0])
         categories = [(letter, list(names))
                       for letter, names in categories]

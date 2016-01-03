@@ -1,3 +1,5 @@
+var React = require('react');
+
 var LoginMenu = require('../components/login-menu.js')
 var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
@@ -7,11 +9,16 @@ var MagicPrompt = require('../components/magic-prompt.js')
 var Share = require('../components/share.js')
 var Notifications = require('../components/notifications.js')
 var FeedbackForm = require('../components/feedback-form.js')
+var PackageSettings = require('../components/package-settings')
+var init_sticky_versions = require('../components/sticky-versions');
 
 /* make introjs globally available */
 window.intro = require('../components/intro.js')
 
+
 $(document).ready(function() {
+    init_sticky_versions();
+    
     window.intro.push({'element': $(".magic-prompt")[0],
                        'intro': 'Using this search bar, you could search for packages and add a source URLs.'
                       }, 500);
@@ -79,6 +86,26 @@ module.exports = {
         $('.feedback-form-container').each(function (idx, element) {
             React.render(
                 <FeedbackForm page={element.dataset['page']}/>,
+                element);
+        });
+        $('.add-new-container').each(function (idx, element) {
+            var downloader_settings = element.dataset['downloaderSettings'];
+            downloader_settings = JSON.parse(downloader_settings);
+            
+            React.render(
+                <PackageSettings
+                     preview_id={element.dataset['previewId']}
+                     changelog_id={element.dataset['changelogId']}
+                     source={element.dataset['source']}
+                     downloader={element.dataset['downloader']}
+                     downloader_settings={downloader_settings}
+                     name={element.dataset['name']}
+                     namespace={element.dataset['namespace']}
+                     description={element.dataset['description']}
+                     search_list={element.dataset['searchList']}
+                     ignore_list={element.dataset['ignoreList']}
+                     xslt={element.dataset['xslt']}
+                     mode={element.dataset['mode']}/>,
                 element);
         });
     }

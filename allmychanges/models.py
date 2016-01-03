@@ -6,6 +6,7 @@ import math
 import datetime
 import random
 import subprocess
+import jsonfield
 
 from hashlib import md5, sha1
 from django.db import models
@@ -18,17 +19,18 @@ from south.modelsinspector import add_introspection_rules
 from twiggy_goodies.threading import log
 
 from allmychanges.validators import URLValidator
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 from allmychanges.utils import (
     split_filenames,
     parse_search_list,
 )
 from allmychanges import chat
-from allmychanges.downloader import (
-    guess_downloader,
+from allmychanges.downloaders import (
     get_downloader)
 
-from allmychanges.tasks import update_preview_task, update_changelog_task
+from allmychanges.tasks import (
+    update_preview_task,
+    update_changelog_task)
 
 
 MARKUP_CHOICES = (
@@ -38,7 +40,7 @@ MARKUP_CHOICES = (
 NAME_LENGTH = 80
 NAMESPACE_LENGTH = 80
 DESCRIPTION_LENGTH = 255
-
+PROCESSING_STATUS_LENGTH = 40
 
 # based on http://www.caktusgroup.com/blog/2013/08/07/migrating-custom-user-model-django/
 
@@ -211,18 +213,23 @@ class Downloadable(object):
     to update attribute `downloader` if needed and then to
     download repository into a temporary directory.
     """
-    def download(self):
+    def download(self, downloader):
         """This method fetches repository into a temporary directory
         and returns path to this directory.
         """
-        if self.downloader is None:
-            self.downloader = guess_downloader(self.source)
-            self.save(update_fields=('downloader',))
 
-        download = get_downloader(self.downloader)
+        if isinstance(downloader, dict):
+            params = downloader.get('params', {})
+            downloader = downloader['name']
+        else:
+            params = {}
+
+        params.update(self.downloader_settings or {})
+
+        print 'Calling "{0}" with params {1}'.format(downloader, params)
+        download = get_downloader(downloader)
         return download(self.source,
-                        search_list=self.get_search_list(),
-                        ignore_list=self.get_ignore_list())
+                        **params)
 
     # A mixin to get/set ignore and check lists on a model.
     def get_ignore_list(self):
@@ -301,8 +308,17 @@ class Changelog(Downloadable, models.Model):
                                    blank=True,
                                    default='')
     downloader = models.CharField(max_length=20, blank=True, null=True)
+    downloader_settings = jsonfield.JSONField(
+        default={},
+        help_text=('JSON with settings for selected downloader.'),
+        blank=True)
+    downloaders = jsonfield.JSONField(
+        default=[],
+        help_text=('JSON with guessed downloaders and their additional meta information.'),
+        blank=True)
+
     status = models.CharField(max_length=40, default='created')
-    processing_status = models.CharField(max_length=40)
+    processing_status = models.CharField(max_length=PROCESSING_STATUS_LENGTH)
     icon = models.CharField(max_length=1000,
                             blank=True, null=True)
 
@@ -398,13 +414,26 @@ class Changelog(Downloadable, models.Model):
     def resolve_issues(self, type):
         self.issues.filter(type=type, resolved_at=None).update(resolved_at=timezone.now())
 
-    def create_preview(self, user, light_user):
-        preview = self.previews.create(
-            source=self.source,
-            ignore_list=self.ignore_list,
-            search_list=self.search_list,
-            user=user,
-            light_user=light_user)
+    def create_preview(self, user, light_user, **params):
+        params.setdefault('downloader', self.downloader)
+        params.setdefault('downloader_settings', self.downloader_settings)
+        params.setdefault('downloaders', self.downloaders)
+        params.setdefault('source', self.source)
+        params.setdefault('search_list', self.search_list)
+        params.setdefault('ignore_list', self.ignore_list)
+        params.setdefault('xslt', self.xslt)
+
+        preview = self.previews.create(user=user, light_user=light_user, **params)
+        # preview_test_task.delay(
+        #     preview.id,
+        #     ['Guessing downloders',
+        #      'Downloading using git',
+        #      'Searching versions',
+        #      'Nothing found',
+        #      'Downloading from GitHub Review',
+        #      'Searching versions',
+        #      'Some results were found'])
+
         return preview
 
     def set_status(self, status, **kwargs):
@@ -418,7 +447,7 @@ class Changelog(Downloadable, models.Model):
         self.save(update_fields=changed_fields)
 
     def set_processing_status(self, status):
-        self.processing_status = status
+        self.processing_status = status[:PROCESSING_STATUS_LENGTH]
         self.updated_at = timezone.now()
         self.save(update_fields=('processing_status',
                                  'updated_at'))
@@ -467,7 +496,7 @@ class Changelog(Downloadable, models.Model):
             log.info('Scheduling changelog update')
 
             self.set_status('processing')
-            self.set_processing_status('waiting-in-the-queue')
+            self.set_processing_status('Waiting in the queue')
 
             self.problem = None
             self.save()
@@ -699,10 +728,21 @@ class Preview(Downloadable, models.Model):
     problem = models.CharField(max_length=1000,
                                help_text='Latest error message',
                                blank=True, null=True)
-    downloader = models.CharField(max_length=20, blank=True, null=True)
+    downloader = models.CharField(max_length=255, blank=True, null=True)
+    downloader_settings = jsonfield.JSONField(
+        default={},
+        help_text=('JSON with settings for selected downloader.'),
+        blank=True)
+    downloaders = jsonfield.JSONField(
+        default=[],
+        help_text=('JSON with guessed downloaders and their additional meta information.'),
+        blank=True)
     done = models.BooleanField(default=False)
     status = models.CharField(max_length=40, default='created')
     processing_status = models.CharField(max_length=40)
+    log = jsonfield.JSONField(default=[],
+                              help_text=('JSON with log of all operation applied during preview processing.'),
+                              blank=True)
 
     @property
     def namespace(self):
@@ -733,10 +773,13 @@ class Preview(Downloadable, models.Model):
 
 
     def set_processing_status(self, status):
-        self.processing_status = status
+        self.log.append(status)
+        self.processing_status = status[:PROCESSING_STATUS_LENGTH]
         self.updated_at = timezone.now()
+
         self.save(update_fields=('processing_status',
-                                 'updated_at'))
+                                 'updated_at',
+                                 'log'))
         key = 'preview-processing-status:{0}'.format(self.id)
         cache.set(key, status, 10 * 60)
 
@@ -747,7 +790,7 @@ class Preview(Downloadable, models.Model):
 
     def schedule_update(self):
         self.set_status('processing')
-        self.set_processing_status('waiting-in-the-queue')
+        self.set_processing_status('Waiting in the queue')
         self.versions.all().delete()
         update_preview_task.delay(self.pk)
 

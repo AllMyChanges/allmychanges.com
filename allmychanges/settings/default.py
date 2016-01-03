@@ -27,14 +27,22 @@ DATABASES = {
         'PASSWORD': 'allmychanges',
         'HOST': '',
         'PORT': '',
+#        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
-# To keep one connection for reading from server-side corsor
-# and to write to the second
-if not os.environ.get('MIGRATIONS'):
-    DATABASES['server-side'] = DATABASES['default'].copy()
-    DATABASES['server-side']['OPTIONS'] = {
-        'cursorclass': MySQLdb.cursors.SSCursor}
+
+def make_db_aliases():
+    # To keep one connection for reading from server-side corsor
+    # and to write to the second
+    if not os.environ.get('MIGRATIONS'):
+        DATABASES['server-side'] = DATABASES['default'].copy()
+        DATABASES['server-side']['OPTIONS'] = {
+#            'charset': 'utf8mb4',
+            'cursorclass': MySQLdb.cursors.SSCursor}
+
+        # for parallel transactions
+        DATABASES['parallel'] = DATABASES['default'].copy()
+
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -185,17 +193,19 @@ REST_FRAMEWORK = {
 
 REPO_ROOT = root('data')
 
+REDIS_HOST = os.environ.get('REDIS.ALLMYCHANGES.COM_PORT_6379_TCP_ADDR', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS.ALLMYCHANGES.COM_PORT_6379_TCP_PORT', 6379))
 
 RQ_QUEUES = {
     'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 0,
         'PASSWORD': '',
     },
     'preview': {
-        'HOST': 'localhost',
-        'PORT': 6379,
+        'HOST': REDIS_HOST,
+        'PORT': REDIS_PORT,
         'DB': 0,
         'PASSWORD': '',
     }
@@ -216,7 +226,6 @@ GITHUB_TOKEN = '6d7d8605f0d53f29b6e049267e8bcbc80577b27f'
 SLACK_URLS = {
     'default': 'https://hooks.slack.com/services/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'
 }
-KATO_URL = 'https://api.kato.im/rooms/1cade7d59009707e553d60bc9e0760f54dcb8d1f18544d5d2a4c4914998440c1/simple'
 CLOSEIO_KEY = '34c5992096c7f67bd5d22f24e4e87a5837f58af5f326f2cdfda932d4'
 MANDRILL_KEY = 'g3pUEIJTBEd6KGeWkKihgQ'
 # AllMyChangesBot
@@ -247,6 +256,7 @@ ADVANCED_EDITORS = set(['svetlyak40wt', 'Bugagazavr'])
 
 from .auth import *  # nopep8
 from secure_settings import *  # nopep8
+
 
 def init_logging(filename, logstash=False):
     import logging

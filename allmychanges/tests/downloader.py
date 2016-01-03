@@ -1,9 +1,8 @@
 import shutil
 import time
 
-from allmychanges.downloader import (
-    guess_downloader,
-    google_play_get_id)
+from allmychanges.downloaders import guess_downloaders
+from allmychanges.downloaders.google_play import google_play_get_id
 from allmychanges.models import Changelog
 from allmychanges.tests.utils import refresh
 from nose.tools import eq_
@@ -34,18 +33,6 @@ def test_guesser():
 
 #    eq_('svn', guess('http://svn.code.sf.net/p/mathgl/code/mathgl-2x/'))
 #    eq_('svn', guess('http://my-svn-repository-for-allmychanges.googlecode.com/svn/trunk/'))
-
-
-def test_guesser_called_during_the_changelog_download():
-    ch = Changelog.objects.create(source='https://github.com/svetlyak40wt/django-perfect404')
-    eq_(None, ch.downloader)
-
-    path = ch.download()
-    if path:
-        shutil.rmtree(path)
-
-    ch = refresh(ch)
-    eq_('git', ch.downloader)
 
 
 def test_google_play_get_id():

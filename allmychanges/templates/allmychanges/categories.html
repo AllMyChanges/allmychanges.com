@@ -22,7 +22,12 @@
     </ul>
   {% endfor %}
   <br style="clear: both"/>
+{% endblock content %}
+
+
+{% block body-bottom %}
+  {{ block.super }}
   <script>
     $('.categories__group').tile()
   </script>
-{% endblock content %}
+{% endblock %}

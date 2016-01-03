@@ -86,6 +86,12 @@
     &__button-cell {
         vertical-align: bottom;
         text-align: right;
+        input {
+          margin-right: 20px
+        }
+        input:last-of-type {
+          margin-right: 0
+        }
     }
 
     &__save-tooltip {
@@ -95,15 +101,6 @@
     }
     &__rename-warning {
         color: #FE7649;
-    }
-}
-
-.results-spin {
-    height: 50px;
-    &__wrapper {
-        position: absolute;
-        width: 100%;
-        max-width: 800px;
     }
 }
 
@@ -125,4 +122,17 @@
     vertical-align: bottom;
 }
 
+
+.tune-options {
+    margin-left: 20px;
+    margin-top: 20px;
+
+    > li {
+        margin-bottom: 10px;
+        > a {
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    }
+}
 /* end of new-package page */

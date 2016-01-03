@@ -1,5 +1,7 @@
-TrackButton = require('../track-button.js')
-SkipButton = require('../skip-button.js')
+var React = require('react');
+
+var TrackButton = require('../track-button.js')
+var SkipButton = require('../skip-button.js')
 
 module.exports = React.createClass({
   render: function() {

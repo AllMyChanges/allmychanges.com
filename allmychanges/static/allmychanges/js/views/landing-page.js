@@ -1,3 +1,4 @@
+var React = require('react');
 var Landing = require('../components/landing-page.js')
 
 module.exports = {

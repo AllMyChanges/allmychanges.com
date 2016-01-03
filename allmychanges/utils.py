@@ -17,6 +17,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.utils.encoding import force_text
+from twiggy_goodies.threading import log
 
 
 MINUTE = 60
@@ -72,7 +73,7 @@ def get_package_metadata(path, field_name):
     get_package_metadata('/path/to/repo', 'Name')
     """
     with cd(path):
-        response = envoy.run('python setup.py egg_info')
+        response = do('python setup.py egg_info')
         for line in response.std_out.split('\n'):
             if 'PKG-INFO' in line:
                 with open(line.split(None, 1)[1]) as f:
@@ -403,3 +404,25 @@ def first_sentences(text, max_length=1000):
         sum_len += sentence_len
 
     raise RuntimeError('Should never go here.')
+
+
+def update_fields(obj, **kwargs):
+    """Updates only fields given in kwargs.
+    """
+    for key, value in kwargs.items():
+        setattr(obj, key, value)
+    obj.save(update_fields=kwargs.keys())
+
+
+def do(command, timeout=60):
+    with log.fields(command=command):
+        log.debug('Running command')
+        result = envoy.run(command, timeout=timeout)#, kill_timeout=60)
+        params = dict(status_code=result.status_code)
+        if result.status_code != 0:
+            params['std_out'] = result.std_out
+            params['std_err'] = result.std_err
+
+        with log.fields(**params):
+            log.debug('Command execution was finished')
+        return result

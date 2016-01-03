@@ -22,7 +22,7 @@ from allmychanges.utils import (
     dt_in_window,
     first_sentences,
     discard_seconds)
-from allmychanges.downloader import fake_downloader
+from allmychanges.downloaders.fake import download as fake_downloader
 from allmychanges.changelog_updater import (
     update_changelog_from_raw_data3,
     fill_missing_dates2)

@@ -1,7 +1,7 @@
 import requests
 import re
 
-from allmychanges.downloader import normalize_url
+from allmychanges.downloaders.utils import normalize_url
 
 
 def _get_data(data, path):

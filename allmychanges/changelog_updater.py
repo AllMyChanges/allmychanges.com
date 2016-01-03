@@ -1,16 +1,21 @@
+# coding: utf-8
+
 import datetime
 import copy
 import shutil
 import arrow
 
 from django.utils import timezone
-from allmychanges.utils import discard_seconds
+from allmychanges.utils import (
+    discard_seconds,
+    update_fields)
 from allmychanges.exceptions import (
     UpdateError)
 from allmychanges import chat
 from allmychanges.version import reorder_versions
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
+from django.utils.encoding import force_str
 
 
 def has_tzinfo(obj):
@@ -134,6 +139,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
         version.filename = getattr(raw_version, 'filename', None)
         version.date = getattr(raw_version, 'date', None)
         version.raw_text = raw_version.content
+
         version.processed_text = raw_version.processed_content
 
         if version.discovered_at is None:
@@ -151,62 +157,83 @@ def update_changelog_from_raw_data3(obj, raw_data):
         post_tweet.delay(
             changelog_id=obj.id)
 
+from contextlib import contextmanager
 
-def update_preview_or_changelog(obj):
+@contextmanager
+def pdb_enabled():
+    import pdb
+    previous_value = getattr(pdb, 'enabled', False)
+    setattr(pdb, 'enabled', True)
+
+    yield
+
+    setattr(pdb, 'enabled', previous_value)
+
+
+def update_preview_or_changelog(obj, downloader=None, ignore_problem=False):
+    """
+    Set ignore_problem=True to not set preview's status to 'error'
+    """
     problem = None
     path = None
+    found = False
+    downloader = downloader or obj.downloader
+    downloader_name = downloader if isinstance(downloader, basestring) else downloader['name']
 
     try:
-        obj.set_processing_status('downloading')
-        path = obj.download()
+#        with pdb_enabled():
+        obj.set_processing_status(
+            'Downloading data using "{0}" downloader'.format(
+                downloader_name))
+        path = obj.download(downloader)
     except UpdateError as e:
         problem = u', '.join(e.args)
         log.trace().error('Unable to update changelog')
     except Exception as e:
-        problem = unicode(e)
+        problem = str(e).decode('utf-8')
         log.trace().error('Unable to update changelog')
 
-    if path:
+    if not path:
+        log.trace().error('Unable to update changelog')
+        problem = 'Unable to download changelog'
+    else:
         try:
             try:
-                from allmychanges.parsing.pipeline import processing_pipe, vcs_processing_pipe
-                obj.set_processing_status('searching-versions')
+                from allmychanges.parsing.pipeline import processing_pipe
+                obj.set_processing_status('Searching versions')
                 versions = processing_pipe(path,
                                            obj.get_ignore_list(),
                                            obj.get_search_list(),
                                            obj.xslt)
-                #print 'Num versions from pipeline:', len(versions)
-
-                if not versions:
-                    log.debug('updating v2 from vcs')
-                    obj.set_processing_status('processing-vcs-history')
-                    versions = vcs_processing_pipe(path,
-                                                   obj.get_ignore_list(),
-                                                   obj.get_search_list())
-
-                    #print 'Num versions from VCS:', len(raw_data)
-
                 if versions:
-                    obj.set_processing_status('updating-database')
+                    # TODO: тут надо бы сохранять целиком downloader, как dict
+                    # чтобы вместе с параметрами
+                    update_fields(obj, downloader=downloader_name)
+                    obj.set_processing_status('Updating database')
                     update_changelog_from_raw_data3(obj, versions)
                 else:
+                    print 'raising Update Error'
                     raise UpdateError('Changelog not found')
 
+                found = True
             except UpdateError as e:
                 problem = u', '.join(e.args)
                 log.trace().error('Unable to update changelog')
             except Exception as e:
                 problem = unicode(e)
-                log.trace().error('Unable to update changelog')
+                log.trace().error(
+                    'Unable to update changelog because of unhandled exception')
 
         finally:
             shutil.rmtree(path)
 
     if problem is not None:
-        obj.set_status('error', problem=problem)
+        if not ignore_problem:
+            obj.set_processing_status(problem)
+            obj.set_status('error', problem=problem)
     else:
         obj.set_status('success')
 
-    obj.set_processing_status('')
     obj.updated_at = timezone.now()
     obj.save()
+    return found

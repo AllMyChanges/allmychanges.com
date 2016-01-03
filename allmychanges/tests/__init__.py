@@ -17,3 +17,4 @@ from .churn import *
 from .unreleased import *
 from .postprocessors import *
 from .extract_version import *
+from .api2 import *

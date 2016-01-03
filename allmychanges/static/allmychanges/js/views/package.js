@@ -1,3 +1,4 @@
+var React = require('react');
 var Share = require('../components/share.js')
 
 module.exports = {

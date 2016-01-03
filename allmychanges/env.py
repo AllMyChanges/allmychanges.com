@@ -1,4 +1,7 @@
 import weakref
+import anyjson
+import arrow
+
 
 class Environment(object):
     def __init__(self, _parent=None, **kwargs):
@@ -75,3 +78,57 @@ class Environment(object):
     def get_children(self):
         return filter(None,
                       (ref() for ref in self._children))
+
+
+
+def _serialize_date(value):
+    if value:
+        return '{0:%Y-%m-%d}'.format(value)
+
+
+def _deserialize_date(value):
+    if value:
+        return arrow.get(value).date()
+
+
+def _serialize_field(key, value):
+    if key in ('date',):
+        return _serialize_date(value)
+    return value
+
+
+def _deserialize_field(key, value):
+    if key in ('date',):
+        return _deserialize_date(value)
+    return value
+
+
+def _serialize(env):
+    return {
+        key: _serialize_field(key, getattr(env, key))
+        for key in env.keys()
+    }
+
+
+def _deserialize(env):
+    attrs = {
+        key: _deserialize_field(key, value)
+        for key, value in env.items()
+    }
+    return Environment(**attrs)
+
+
+def serialize_envs(envs):
+    """Serialize envs to string as a json.
+    Returns text.
+    """
+    prepared = map(_serialize, envs)
+
+    return anyjson.dumps(prepared)
+
+
+def deserialize_envs(text):
+    """Reads json from given text and transforms some fields.
+    """
+    envs = anyjson.deserialize(text)
+    return map(_deserialize, envs)

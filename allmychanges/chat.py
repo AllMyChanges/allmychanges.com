@@ -19,19 +19,12 @@ def send(text, channel=None):
                                                   settings.SLACK_URLS['default']),
                           data=anyjson.serialize(dict(text=text)))
 
-        if settings.KATO_URL:
-            kato_text = re.sub(ur'<(.*?)\|(.*?)>', ur'[\2](\1)', text)
-            requests.post(settings.KATO_URL,
-                          data=anyjson.serialize({'text': kato_text,
-                                                  'renderer': 'markdown',
-                                                  'from': 'bot'}))
-
     thread = threading.Thread(target=remote_send)
     thread.start()
     with _threads_lock:
         _threads.append(thread)
 
-    if not settings.KATO_URL and not settings.SLACK_URLS:
+    if not settings.SLACK_URLS:
         messages.append(text)
 
 

@@ -1,3 +1,5 @@
+var React = require('react');
+
 // пример использования нотификаций:
 // PubSub.publish('show-info', 'Привет мир!');
 
@@ -31,7 +33,7 @@ module.exports = React.createClass({
         var closeItem2 = function (item_id) {
             return function() {
                 // closing item [item_id] @notifications
-                items = this.state.items;
+                var items = this.state.items;
                 items = _.filter(items, function(item) {return item.id != item_id});
                 this.setState({items: items});
             }.bind(this);

@@ -9,7 +9,9 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding index on 'AutocompleteData', fields ['source']
-        db.create_index(u'allmychanges_autocompletedata', ['source'])
+        # закомментировано, потому что mysql не дает создать индекс длинной в 1000
+        # db.create_index(u'allmychanges_autocompletedata', ['source'])
+        pass
 
 
     def backwards(self, orm):

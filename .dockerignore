@@ -1,0 +1,5 @@
+env/
+dumps/
+node_modules/
+bower_components/
+fake/

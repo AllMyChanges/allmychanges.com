@@ -59,7 +59,8 @@ def test_add_package():
     response = cl.post('/v1/changelogs/',
                        dict(namespace='python',
                             name='pip',
-                            source='https://github.com/pipa/pip'))
+                            source='https://github.com/pipa/pip',
+                            downloader='vcs.git'))
     check_status_code(201, response)
     eq_(1, Changelog.objects.count())
 
@@ -80,13 +81,14 @@ def test_put_does_not_affect_created_at_field():
                         '/v1/changelogs/{0}/'.format(changelog.id),
                         namespace='python',
                         name='pip',
-                        source='https://github.com/pipa/pip')
+                        source='https://github.com/pipa/pip',
+                        downloader='vcs.git')
     check_status_code(200, response)
 
     eq_(created_at, Changelog.objects.get(pk=changelog.pk).created_at)
 
 
-def test_put_drops_cached_downloader_type():
+def test_downloader_is_required_when_updating_changelog():
     cl = Client()
 
     create_user('art')
@@ -105,19 +107,8 @@ def test_put_drops_cached_downloader_type():
                         namespace='python',
                         name='pip',
                         source=source)
-    check_status_code(200, response)
+    check_status_code(400, response)
     eq_('git', Changelog.objects.get(pk=changelog.pk).downloader)
-
-    # now, update the source
-    new_source = 'https://github.com/pipa/pip/wiki/Changelog'
-    response = put_json(cl,
-                        '/v1/changelogs/{0}/'.format(changelog.id),
-                        namespace='python',
-                        name='pip',
-                        source=new_source)
-    check_status_code(200, response)
-    # in this case we should drop downloader field to be guessed on next update
-    eq_(None, Changelog.objects.get(pk=changelog.pk).downloader)
 
 
 class TransactionTests(TestCase):
@@ -317,7 +308,8 @@ def test_rename_changelog_using_put():
                         reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
                         namespace='other-namespace',
                         name='other',
-                        source=changelog.source)
+                        source=changelog.source,
+                        downloader='vcs.git')
     check_status_code(200, response)
 
 
@@ -333,7 +325,8 @@ def test_api_normalizes_source_url_on_create():
                          reverse('changelog-list'),
                          namespace='test',
                          name='package',
-                         source=url)
+                         source=url,
+                         downloader='vcs.git')
     check_status_code(201, response)
     ch = Changelog.objects.all()[0]
     eq_(normalized_url, ch.source)

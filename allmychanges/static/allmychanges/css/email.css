@@ -225,8 +225,7 @@ h3 a:active,
 h4 a:active,
 h5 a:active,
 h6 a:active {
-  color: #f00 !important;
-/* Preferably not the same color as the normal header link color.  There is limited support for psuedo classes in email clients, this was added just for good measure. */
+  color: #f00 !important; /* Preferably not the same color as the normal header link color.  There is limited support for psuedo classes in email clients, this was added just for good measure. */
 }
 h1 a:visited,
 h2 a:visited,
@@ -234,8 +233,7 @@ h3 a:visited,
 h4 a:visited,
 h5 a:visited,
 h6 a:visited {
-  color: #800080 !important;
-/* Preferably not the same color as the normal header link color. There is limited support for psuedo classes in email clients, this was added just for good measure. */
+  color: #800080 !important; /* Preferably not the same color as the normal header link color. There is limited support for psuedo classes in email clients, this was added just for good measure. */
 }
 /** Outlook 07, 10 Padding issue: These "newer" versions of Outlook add some padding around table cells potentially throwing off your perfectly pixeled table.  The issue can cause added space and also throw off borders completely.  Use this fix in your header or inline to safely fix your table woes.
 
@@ -350,7 +348,7 @@ a {
   background-image: linear-gradient(#ccc, #b8b8b8);
 }
 .button:disabled {
-  color: #333;
+  color: #999;
   background-color: #fff;
   border-color: #e6e6e6;
   background-image: linear-gradient(#fff, #e6e6e6);
@@ -442,15 +440,23 @@ a {
   font-size: 30px;
   line-height: 30px;
 }
-.input {
-  margin-top: 16px;
-}
 .input__error {
   margin-left: 10px;
   color: #f00;
 }
+.input__error:first-child {
+  margin-left: 0px;
+}
 .form-buttons__back {
   width: 100%;
+}
+.buttons-row {
+  margin-top: 10px;
+  text-align: right;
+}
+.vlink {
+  text-decoration: none;
+  border-bottom: 1px dashed;
 }
 .box {
   background-color: #fff;
@@ -740,6 +746,12 @@ a:hover {
   vertical-align: bottom;
   text-align: right;
 }
+.new-package__button-cell input {
+  margin-right: 20px;
+}
+.new-package__button-cell input:last-of-type {
+  margin-right: 0;
+}
 .new-package__save-tooltip {
   position: absolute;
   width: 200px;
@@ -747,14 +759,6 @@ a:hover {
 }
 .new-package__rename-warning {
   color: #fe7649;
-}
-.results-spin {
-  height: 50px;
-}
-.results-spin__wrapper {
-  position: absolute;
-  width: 100%;
-  max-width: 800px;
 }
 .namespace-name-cell__table {
   width: 100%;
@@ -768,6 +772,17 @@ a:hover {
 }
 .namespace-name-cell__namespace-cell {
   vertical-align: bottom;
+}
+.tune-options {
+  margin-left: 20px;
+  margin-top: 20px;
+}
+.tune-options > li {
+  margin-bottom: 10px;
+}
+.tune-options > li > a {
+  margin-bottom: 10px;
+  display: inline-block;
 }
 .categories__group {
   list-style: outside none none;
