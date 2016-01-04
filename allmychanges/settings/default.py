@@ -150,7 +150,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
 
-    'south',
+#    'south',
     'rest_framework',
     'django_rq',
     'django_extensions',
@@ -167,6 +167,8 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'compressor',
 )
+
+#oauth2_provider
 
 AUTH_USER_MODEL = 'allmychanges.User'
 

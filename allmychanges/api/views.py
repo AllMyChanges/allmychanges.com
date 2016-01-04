@@ -61,9 +61,9 @@ from django.db import transaction
 
 
 class HandleExceptionMixin(object):
-    @transaction.atomic()
     def dispatch(self, *args, **kwargs):
-        return super(HandleExceptionMixin, self).dispatch(*args, **kwargs)
+        with transaction.atomic():
+            return super(HandleExceptionMixin, self).dispatch(*args, **kwargs)
 
     def handle_exception(self, exc):
         count('api.exception')
@@ -469,12 +469,12 @@ class ChangelogViewSet(HandleExceptionMixin,
         result = self.object.add_to_moderators(self.request.user,
                                                self.request.light_user)
         if result:
-            messages.info(self.request,
+            messages.info(self.request._request,
                           'Congratulations, you\'ve become a moderator of this '
                           'changelog. Now you have rights to edit and to care '
                           'about this changelog in future.')
         if result == 'light':
-            messages.warning(self.request,
+            messages.warning(self.request._request,
                              'Because you are not logged in, we\'ll remember '
                              'that you are a moderator for 24 hour. To make '
                              'this permanent, please, login or sign up as soon '
