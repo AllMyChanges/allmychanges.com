@@ -1,3 +1,10 @@
+1.0.0 (2016-01-09)
+==================
+
+New mechanism of package tuning and downloader selection.
+Massive changes were made not only on the fronend, but
+also at the backend.
+
 0.30.2 (2015-08-24)
 ===================
 

@@ -22,11 +22,12 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'allmychanges_' + CURRENT_USER.replace('-', '_'),
-        'USER': 'allmychanges',
-        'PASSWORD': 'allmychanges',
-        'HOST': '',
-        'PORT': '',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'allmychanges_' + CURRENT_USER.replace('-', '_')),
+        'USER': os.environ.get('MYSQL_USER', 'allmychanges'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'allmychanges'),
+        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        'PORT': int(os.environ.get('MYSQL_PORT', 3306)),
+        'OPTIONS': {'connect_timeout': 3},
 #        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
@@ -195,8 +196,8 @@ REST_FRAMEWORK = {
 
 REPO_ROOT = root('data')
 
-REDIS_HOST = os.environ.get('REDIS.ALLMYCHANGES.COM_PORT_6379_TCP_ADDR', 'localhost')
-REDIS_PORT = int(os.environ.get('REDIS.ALLMYCHANGES.COM_PORT_6379_TCP_PORT', 6379))
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 
 RQ_QUEUES = {
     'default': {

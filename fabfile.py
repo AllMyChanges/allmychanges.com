@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import os
 import time
 import re
@@ -23,10 +25,16 @@ def _get_docker_command(name, ports=[], image=None, rm=True):
             '-v `pwd`:/app',
             '-v `pwd`/logs:/var/log/allmychanges',
             '-v `pwd`/tmp:/tmp/allmychanges',
-            '--link mysql.allmychanges.com',
-            '--link redis.allmychanges.com',
+            '--net amch',
+            # '--link mysql.allmychanges.com',
+            # '--link redis.allmychanges.com',
             ' '.join('-p ' + p for p in ports),
             '-e DEBUG=yes',
+            '-e REDIS_HOST=redis.allmychanges.com',
+            '-e MYSQL_HOST=mysql.allmychanges.com',
+            '-e MYSQL_DATABASE=allmychanges',
+            '-e MYSQL_USER=root',
+            '-e MYSQL_PASSWORD=password',
 #            '-e DEV_DOWNLOAD=yes'
             '--name',
             name,
@@ -38,6 +46,14 @@ def _get_docker_command(name, ports=[], image=None, rm=True):
 def build_docker_image():
     local('docker build -t allmychanges.com .')
 
+
+def upload_docker_image(version):
+    assert version
+    tag = 'localhost:5000/allmychanges.com:' + version
+    local('docker build -t {} .'.format(tag))
+    local('docker push ' + tag)
+
+
 def shell():
     local(_get_docker_command('shell.command.allmychanges.com') + (
         '/env/bin/python /app/manage.py '
@@ -47,8 +63,9 @@ def dbshell():
     local('docker exec -it mysql.allmychanges.com mysql -ppassword allmychanges')
 
 def get_db_from_production():
-#    local('scp clupea:/mnt/yandex.disk/backups/mysql/allmychanges/latest.sql.bz2 dumps/')
-#    local('bunzip2 dumps/latest.sql.bz2')
+    local('scp clupea:/mnt/yandex.disk/backups/mysql/allmychanges/latest.sql.bz2 dumps/')
+    local('rm -fr dumps/latest.sql')
+    local('bunzip2 dumps/latest.sql.bz2')
 #    local('docker exec -ti mysql.allmychanges.com bash')
     local('docker exec mysql.allmychanges.com /dumps/restore.sh')
 
@@ -116,20 +133,22 @@ def create_database():
     manage('migrate')
 
 def start():
+    # до выполнения надо создать сеть amch
+    # docker network create amch
     containers = _get_docker_containers()
     if 'mysql.allmychanges.com' in containers:
         local('docker start mysql.allmychanges.com')
     else:
-        local('docker run --name mysql.allmychanges.com -v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
+        local('docker run --net amch --name mysql.allmychanges.com -v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
         print 'Waiting for mysql start'
         time.sleep(30)
         local('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
-        local('docker run --rm -it -v `pwd`:/app --link mysql.allmychanges.com allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
+        local('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
 
     if 'redis.allmychanges.com' in containers:
         local('docker start redis.allmychanges.com')
     else:
-        local('docker run --name redis.allmychanges.com -d redis')
+        local('docker run --net amch --name redis.allmychanges.com -d redis')
 
 
 def stop():

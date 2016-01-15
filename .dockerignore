@@ -5,3 +5,4 @@ bower_components
 fake
 tmp
 logs
+secure_settings.py
