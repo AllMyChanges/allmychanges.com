@@ -15,7 +15,7 @@
   "dependencies": {},
   "devDependencies": {
     "lodash": "~3.10.1",
-    "typeahead.js": "typehead.js#~0.11.1",
+    "typeahead.js": "typehead.js#~0.10.5",
     "PubSubJS": "pubsub-js#~1.5.3"
   }
 }
