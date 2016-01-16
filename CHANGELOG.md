@@ -1,3 +1,19 @@
+0.31.0 (2016-01-16)
+==================
+
+### Major changes
+
+New mechanism of package tuning and downloader selection.
+Massive changes were made not only on the frontend, but
+also at the backend.
+
+### Minor
+
+Now parser is able to process changelogs which are separated
+to many files and where versions are in the filenames,
+like in [openssh's release notes](http://www.openssh.com/txt/).
+Here is the [result of parsing these release notes][openssh].
+
 0.30.2 (2015-08-24)
 ===================
 
@@ -1059,3 +1075,4 @@ There are plenty directions for approvement. Stay tuned.
 [catalogue]: http://allmychanges.com/p/
 [spring-boot]: https://allmychanges.com/p/java/spring-boot/
 [spring-framework]: https://allmychanges.com/p/java/spring-framework/
+[openssh]: https://allmychanges.com/p/soft/openssh/
