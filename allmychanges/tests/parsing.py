@@ -357,7 +357,7 @@ def test_strip_outer_tag():
 
 
 def test_parse_plain_text():
-    _test_plain_parser(u"""
+    source = u"""
 0.1:
 
  * Initial release
@@ -366,15 +366,21 @@ def test_parse_plain_text():
 
  * Added benchmarking script
  * Added support for more
-   serializer modules""", [
-       u'<ul><li>Initial release</li></ul>',
-       (u'<ul><li>Added benchmarking script</li>'
-        u'<li>Added support for more<br/>serializer modules</li></ul>')
-    ])
+   serializer modules"""
+
+    _test_plain_parser(
+        source,
+        [
+            u'<ul><li>Initial release</li></ul>',
+            (u'<ul><li>Added benchmarking script</li>'
+             u'<li>Added support for more<br/>serializer modules</li></ul>'),
+            '<pre>' + source + '</pre>',
+        ]
+    )
 
 
 def test_parse_redispy_style_plain_text():
-    _test_plain_parser(u"""
+    source = u"""
 * 2.10.2
     * Added support for Hiredis's new bytearray support. Thanks
       https://github.com/tzickel
@@ -382,10 +388,16 @@ def test_parse_redispy_style_plain_text():
 * 2.10.1
     * Fixed a bug where Sentinel connections to a server that's no longer a
       master and receives a READONLY error will disconnect and reconnect to
-      the master.""", [
-          (u'<ul><li>Added support for Hiredis\'s new bytearray support. Thanks<br/>https://github.com/tzickel</li>'
-           '<li>Fixed a bug when attempting to send large values to Redis in a Pipeline.</li></ul>'),
-          (u'<ul><li>Fixed a bug where Sentinel connections to a server that\'s no longer a<br/>master and receives a READONLY error will disconnect and reconnect to<br/>the master.</li></ul>')])
+      the master."""
+
+    _test_plain_parser(
+        source,
+        [
+            (u'<ul><li>Added support for Hiredis\'s new bytearray support. Thanks<br/>https://github.com/tzickel</li>'
+             '<li>Fixed a bug when attempting to send large values to Redis in a Pipeline.</li></ul>'),
+            (u'<ul><li>Fixed a bug where Sentinel connections to a server that\'s no longer a<br/>master and receives a READONLY error will disconnect and reconnect to<br/>the master.</li></ul>'),
+            '<pre>' + source + '</pre>'
+        ])
 
 
 def test_plaintext_parser_ignores_nested_versions():
@@ -401,9 +413,11 @@ def test_plaintext_parser_ignores_nested_versions():
 """)
 
     versions = list(parse_plain_file(file))
-    eq_(1, len(versions))
-    v = versions[0]
+    eq_(2, len(versions))
 
+    eq_('Changes', versions[1].title)
+
+    v = versions[0]
     eq_('2015.02.06, Version 0.12.0 (Stable)', v.title)
     eq_('<ul><li>npm: Upgrade to 2.5.1</li></ul>\n<ul><li>mdb_v8: update for v0.12 (Dave Pacheco)</li></ul>',
         v.content)
@@ -425,7 +439,7 @@ _test_md_parser = lambda *args: _test_parser(parse_markdown_file, *args)
 
 
 def test_nodejs_parsing():
-    _test_plain_parser(u"""
+    source = u"""
 2009.08.13, Version 0.1.4, 0f888ed6de153f68c17005211d7e0f960a5e34f3
 
       * Major refactor to evcom.
@@ -433,15 +447,22 @@ def test_nodejs_parsing():
       * Upgrade v8 to 1.3.4
         Upgrade libev to 3.8
         Upgrade http_parser to v0.2
-""", u"""
+"""
+
+    _test_plain_parser(
+        source,
+        [
+            u"""
 <ul><li>Major refactor to evcom.</li></ul>
 <ul><li>Upgrade v8 to 1.3.4<br/>Upgrade libev to 3.8<br/>Upgrade http_parser to v0.2</li></ul>
-""")
+            """,
+            '<pre>' + source + '</pre>'
+        ])
 
 
 @skip('waiting for implementation')
 def test_plaintext_parsing_of_nested_lists():
-    _test_plain_parser(u"""
+    source = u"""
 2015.03.09 version 0.8.15
 * First
   * Second
@@ -451,7 +472,12 @@ def test_plaintext_parsing_of_nested_lists():
     * Six
       * Seven
       * Eight
-""", u"""
+"""
+
+    _test_plain_parser(
+        source,
+        [
+            u"""
 <ul><li>First
         <ul><li>Second
                 <ul><li>Third
@@ -460,7 +486,10 @@ def test_plaintext_parsing_of_nested_lists():
                     <li>Six
                         <ul><li>Seven</li>
                             <li>Eight</li></ul></li></ul></li></ul></li></ul>
-""")
+            """,
+            '<pre>' + source + '</pre>'
+        ]
+    )
 
 
 def test_versions_filter():

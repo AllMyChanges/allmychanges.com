@@ -116,10 +116,11 @@ _version_regexes = [
     # or this could be a similar case, when version number
     # is a part of a filename like this
     # release-notes/0.1.1.md
+    # or txt/release-1.2.2p1
     # or dist/kafka/0.8.0/RELEASE_NOTES.html
     # but not in this case
     # <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    r'[/a-zA-Z-]{ver}(?:\.[^\d]|/)(?![^ ]*")',
+    r'[/a-zA-Z-](?<!HTTP/){ver}(?:\.[^\d]|/?)(?![^ ]*")',
 ]
 
 _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded by brackets
@@ -145,6 +146,31 @@ $"""
 
 RE_BUMP_LINE = re.compile(RE_BUMP_LINE_STR, re.VERBOSE)
 
+
+COMMON_SUFFIXES_STR = ur"""
+  -notes    |
+  .txt      |
+  .html     |
+  .rst      |
+  .md       |
+  .markdown |
+$"""
+RE_COMMON_SUFFIXES = re.compile(COMMON_SUFFIXES_STR, re.VERBOSE)
+
+
+def remove_common_suffixes(version):
+    """
+    We need this function because were unable to write
+    single complex regex which will extract version numbers
+    from strings like "releases/v1.2.3-rc1.a1.txt"
+    """
+    new_version = RE_COMMON_SUFFIXES.sub(u'', version)
+    if new_version == version:
+        return new_version
+    else:
+        return remove_common_suffixes(new_version)
+
+
 def _extract_version(line):
     if line:
         for date_str in RE_DATE.finditer(line):
@@ -161,6 +187,8 @@ def _extract_version(line):
             match = re.search(i, line)
             if match is not None:
                 version = match.group('ver')
+                version = remove_common_suffixes(version)
+
                 tokens = line.replace(version, '').split()
                 tokens = [token for token in tokens
                           if re.match(ur'[-:_]+', token) is None]

@@ -14,6 +14,8 @@ from hamcrest import (
 
 
 def test_preview():
+    _task_log[:] = []
+
     cl = Client()
     eq_(0, Preview.objects.count())
     eq_(0, Changelog.objects.count())
