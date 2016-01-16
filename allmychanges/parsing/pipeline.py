@@ -325,6 +325,11 @@ def parse_plain_file(obj):
                        title=current_title,
                        content=format_content(current_sections))
 
+    # and finally, yield full file content
+    yield obj.push(type='file_section',
+                   title=obj.filename,
+                   content='<pre>' + content + '</pre>')
+
 
 
 def search_conf_py(root_dir, doc_filename):

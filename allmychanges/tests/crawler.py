@@ -72,7 +72,7 @@ def test_extract_version():
     check('0.8.0', u'dist/kafka/0.8.0/RELEASE_NOTES.html')
 
     # https://github.com/numpy/numpy/tree/master/doc/release
-    check(None, u'doc/release/1.3.0-notes.rst')
+    check('1.3.0', u'doc/release/1.3.0-notes.rst')
 
     # https://github.com/git/git/blob/master/Documentation/RelNotes/2.3.2.txt
     check(None, u'Fixes since v2.3.1')
