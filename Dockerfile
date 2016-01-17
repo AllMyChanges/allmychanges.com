@@ -12,6 +12,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
             libxml2-dev \
             libxslt1-dev \
             mercurial \
+            mysql-client-core-5.5 \ # to make dbshell available
             libmysqlclient-dev \
             libffi-dev \
             git \
