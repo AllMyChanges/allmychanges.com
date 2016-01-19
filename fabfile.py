@@ -43,6 +43,11 @@ def _get_docker_command(name, ports=[], image=None, rm=True):
     command = ' '.join(command)
     return command + ' '
 
+
+def compile_wheels():
+    local('docker run --rm -v `pwd`:/wheels wheel-builder')
+
+
 def build_docker_image():
     local('docker build -t allmychanges.com .')
 
