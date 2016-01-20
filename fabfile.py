@@ -11,7 +11,7 @@ def update_requirements():
     local('pip-compile --annotate requirements.in')
     local('pip-compile --annotate requirements-dev.in')
 
-def _get_docker_command(name, ports=[], image=None, rm=True):
+def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ['docker run',]
 
     if image is None:
@@ -26,16 +26,18 @@ def _get_docker_command(name, ports=[], image=None, rm=True):
             '-v `pwd`/logs:/var/log/allmychanges',
             '-v `pwd`/tmp:/tmp/allmychanges',
             '--net amch',
-            # '--link mysql.allmychanges.com',
-            # '--link redis.allmychanges.com',
-            ' '.join('-p ' + p for p in ports),
-            '-e DEBUG=yes',
+            ' '.join('-p ' + p for p in ports)])
+
+    if debug:
+        command.append('-e DEBUG=yes')
+#            '-e DEV_DOWNLOAD=yes'
+
+    command.extend([
             '-e REDIS_HOST=redis.allmychanges.com',
             '-e MYSQL_HOST=mysql.allmychanges.com',
             '-e MYSQL_DATABASE=allmychanges',
             '-e MYSQL_USER=root',
             '-e MYSQL_PASSWORD=password',
-#            '-e DEV_DOWNLOAD=yes'
             '--name',
             name,
             image])
@@ -45,7 +47,7 @@ def _get_docker_command(name, ports=[], image=None, rm=True):
 
 
 def compile_wheels():
-    local('docker run --rm -v `pwd`:/wheels wheel-builder')
+    local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
 
 def build_docker_image():
@@ -79,6 +81,18 @@ def runserver():
                               ports=['8000:8000']) + (
           '/env/bin/python /app/manage.py '
           'runserver 0.0.0.0:8000'))
+
+def rungunicorn():
+    # sudo docker run --rm -ti -e MYSQL_HOST=192.241.207.244 -e DJANGO_SETTINGS_MODULE=allmychanges.settings.production -p 8000:8000 --entrypoint gunicorn edited:latest allmychanges.wsgi:application --bind 0.0.0.0:8000 --access-logfile -
+    local(_get_docker_command(
+        'runserver.command.allmychanges.com',
+        debug=False,
+        ports=['8000:8000'])
+          + (
+              'gunicorn '
+              'allmychanges.wsgi:application '
+            '--bind 0.0.0.0:8000 '
+              '--access-logfile -'))
 
 def rqworker():
     local(_get_docker_command('rqworker.command.allmychanges.com') + (
