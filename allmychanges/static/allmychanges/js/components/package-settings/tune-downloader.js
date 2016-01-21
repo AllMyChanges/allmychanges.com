@@ -9,14 +9,14 @@ var default_option_value = '---';
 
 var panel = function (opts) {
     var available_downloaders = {'feed': 'Rss/Atom Feed',
-                                 'http': 'HTML Pages',
+                                 'http': 'HTML Scraper',
                                  'rechttp': 'Multiple HTML Pages', // TODO remove
                                  'google_play': 'Google Play',
                                  'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
                                  'appstore': 'Apple AppStore',
                                  'vcs.git': 'Git Repository',
                                  'vcs.git_commits': 'Git Commits',
-                                 'hg': 'Mercurial Repository',
+                                 'vcs.hg': 'Mercurial Repository',
                                  'github_releases': 'GitHub Releases'};
     var render_option = function (item) {
         var name = item.name;
