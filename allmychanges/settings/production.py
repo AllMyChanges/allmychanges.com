@@ -20,7 +20,7 @@ BASE_URL = 'https://allmychanges.com'
 
 GRAPHITE_PREFIX = 'allmychanges'
 
-ALLOWED_HOSTS = ['allmychanges.com', 'localhost']
+ALLOWED_HOSTS = ['allmychanges.com', 'localhost', 'new1.allmychanges.com']
 
 METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'

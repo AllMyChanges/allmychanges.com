@@ -1,7 +1,10 @@
+import re
+
 from django.conf.urls import patterns, include, url
 
 from django.contrib import admin
 from django.views.generic.base import RedirectView
+from django.conf import settings
 
 admin.autodiscover()
 
@@ -43,7 +46,6 @@ from .views import (OldIndexView,
                     EditPackageView2,
                     EditPackageView)
 from .sitemaps import PackagesSitemap
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 
@@ -125,4 +127,10 @@ urlpatterns = patterns(
     url(r'^oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 )
 
-urlpatterns += staticfiles_urlpatterns()
+if True:
+    import debug_toolbar
+    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+
+from django.contrib.staticfiles.views import serve
+pattern = r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/'))
+urlpatterns += [url(pattern, serve, kwargs={'insecure': True})]

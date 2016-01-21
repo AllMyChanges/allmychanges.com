@@ -1,4 +1,5 @@
 import time
+import os
 
 from fabric.api import local
 
@@ -7,7 +8,8 @@ def update_requirements():
     local('pip-compile --annotate requirements.in')
     local('pip-compile --annotate requirements-dev.in')
 
-def _get_docker_command(name, ports=[], image='allmychanges.com'):
+
+def _get_docker_command_old(name, ports=[], image='allmychanges.com'):
     return ('docker run '
             '--rm '
             '-t -i '
@@ -18,12 +20,51 @@ def _get_docker_command(name, ports=[], image='allmychanges.com'):
             '--link redis.allmychanges.com '
             '{ports} '
             '-e DEBUG=yes '
+            '-e TOOLBAR_TOKEN=12345 '
 #            '-e DEV_DOWNLOAD=yes '
             '--name {name} '
             '{image} ').format(
                 name=name,
                 image=image,
                 ports=' '.join('-p ' + p for p in ports))
+
+def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
+    command = ['docker run',]
+
+    if image is None:
+        image = os.environ.get('IMAGE', 'allmychanges.com')
+
+    if rm:
+        command.append('--rm')
+
+    command.extend([
+            '-t -i',
+            '-v `pwd`:/app',
+            '-v `pwd`/logs:/var/log/allmychanges',
+            '-v `pwd`/tmp:/tmp/allmychanges',
+            '--net amch',
+            ' '.join('-p ' + p for p in ports)])
+
+    if debug:
+        command.append('-e DEBUG=yes')
+#            '-e DEV_DOWNLOAD=yes'
+
+    command.extend([
+            '-e REDIS_HOST=redis.allmychanges.com',
+            '-e MYSQL_HOST=mysql.allmychanges.com',
+            '-e MYSQL_DATABASE=allmychanges',
+            '-e MYSQL_USER=root',
+            '-e MYSQL_PASSWORD=password',
+            '-e TOOLBAR_TOKEN=12345',
+            '--name',
+            name,
+            image])
+
+    command = ' '.join(command)
+    return command + ' '
+
+def compile_wheels():
+    local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
 def build_docker_image():
     local('docker build -t allmychanges.com .')

@@ -195,7 +195,9 @@ def count_time(metric_key):
 
 
 def show_debug_toolbar(request):
-    if not request.GET.get('snap'):
+    if not request.GET.get('snap') and \
+       settings.TOOLBAR_TOKEN is not None and \
+       request.GET.get('toolbar') == settings.TOOLBAR_TOKEN:
         return True
 
 
