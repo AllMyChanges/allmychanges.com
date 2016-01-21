@@ -1,6 +1,8 @@
 from .default import *  # nopep8
 
 
+ENVIRONMENT = 'unittest'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

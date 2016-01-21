@@ -3,6 +3,7 @@
 import os
 from .default import *  # nopep8
 
+ENVIRONMENT = 'development'
 DEBUG = os.environ.get('DEBUG', 'no') == 'yes'
 TEMPLATE_DEBUG = DEBUG
 
