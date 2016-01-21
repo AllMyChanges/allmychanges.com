@@ -127,6 +127,10 @@ urlpatterns = patterns(
     url(r'^oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 )
 
+if True:
+    import debug_toolbar
+    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+
 from django.contrib.staticfiles.views import serve
 pattern = r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/'))
 urlpatterns += [url(pattern, serve, kwargs={'insecure': True})]

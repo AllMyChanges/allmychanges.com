@@ -38,6 +38,7 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
             '-e MYSQL_DATABASE=allmychanges',
             '-e MYSQL_USER=root',
             '-e MYSQL_PASSWORD=password',
+            '-e TOOLBAR_TOKEN=12345',
             '--name',
             name,
             image])

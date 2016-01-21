@@ -66,6 +66,12 @@
         var login_url_twitter = "{% url "social:begin" "twitter" %}";
       </script>
 
+      <!-- хак для отображения debug toolbar
+           https://github.com/django-debug-toolbar/django-debug-toolbar/issues/742 -->
+      <style>
+        [hidden][style="display: block;"] { display: block !important; }
+      </style>
+
     {% block extra_head %}{% endblock extra_head %}
 </head>
 
@@ -215,5 +221,7 @@ setTimeout(function() {
       </script>
 
       {% block body-bottom %}{% endblock %}
+      <!-- ENVIRONMENT={{ settings.ENVIRONMENT }} -->
+      <!-- DEBUG={{ settings.DEBUG }} -->
 </body>
 </html>
