@@ -281,6 +281,11 @@ module.exports = React.createClass({
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
     },
+    change_source: function() {
+        this.setState(
+            {'downloader': null},
+            this.apply_settings);
+    },
     apply_settings: function() {
         // applying parser settings @package_settings.apply_settings
         this.save_preview_params();
@@ -587,7 +592,7 @@ module.exports = React.createClass({
             }
             
             if (this.preview.source != this.state.source) {
-                content.push(<TunePanel>{render_change_source_plate(this.apply_settings)}</TunePanel>);
+                content.push(<TunePanel>{render_change_source_plate(this.change_source)}</TunePanel>);
             } else {
                 if (this.state.downloaders.length == 0) {
                     content.push(<TunePanel>{render_no_downloaders_plate()}</TunePanel>);

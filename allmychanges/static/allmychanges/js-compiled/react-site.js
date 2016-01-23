@@ -21140,6 +21140,9 @@
 	            contentType: 'application/json',
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
+	    change_source: function change_source() {
+	        this.setState({ 'downloader': null }, this.apply_settings);
+	    },
 	    apply_settings: function apply_settings() {
 	        UserStory.log(["applying parser settings"], ["package_settings.apply_settings"]);
 	        this.save_preview_params();
@@ -21424,7 +21427,7 @@
 	                content.push(React.createElement(
 	                    TunePanel,
 	                    null,
-	                    render_change_source_plate(this.apply_settings)
+	                    render_change_source_plate(this.change_source)
 	                ));
 	            } else {
 	                if (this.state.downloaders.length == 0) {
@@ -36634,14 +36637,14 @@
 
 	var panel = function panel(opts) {
 	    var available_downloaders = { 'feed': 'Rss/Atom Feed',
-	        'http': 'HTML Pages',
+	        'http': 'HTML Scraper',
 	        'rechttp': 'Multiple HTML Pages', // TODO remove
 	        'google_play': 'Google Play',
 	        'itunes': 'Apple AppStore', // TODO убрать это после полной миграции настроек даунлоадеров
 	        'appstore': 'Apple AppStore',
 	        'vcs.git': 'Git Repository',
 	        'vcs.git_commits': 'Git Commits',
-	        'hg': 'Mercurial Repository',
+	        'vcs.hg': 'Mercurial Repository',
 	        'github_releases': 'GitHub Releases' };
 	    var render_option = function render_option(item) {
 	        var name = item.name;

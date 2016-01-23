@@ -151,7 +151,7 @@ def update_preview_task(preview_id):
                       channel='tasks')
 
             if not preview.downloader:
-                print 'Guessed downloaders FOO'
+                print 'No downloader for preview, guessing...'
                 preview.set_processing_status('Guessing downloaders')
                 downloaders = list(guess_downloaders(preview.source))
                 print ''
@@ -162,7 +162,7 @@ def update_preview_task(preview_id):
                 update_fields(preview, downloaders=downloaders)
             else:
                 print ''
-                print 'Guessed downloaders BOO (dont need to guess)'
+                print 'We know downloader for preview, don\'t need to guess'
                 print ''
                 downloaders = [{'name': preview.downloader}]
 
