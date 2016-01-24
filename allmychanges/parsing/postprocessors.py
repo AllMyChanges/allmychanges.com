@@ -1,10 +1,13 @@
+# coding: utf-8
+
 import re
+
 
 def _process_rule(line):
     line = line.strip()
     if line.startswith('s/'):
         rule = line[2:].split('/')
-        return re.compile(rule[0]), rule[1]
+        return re.compile(rule[0], re.MULTILINE), rule[1]
 
 
 def sed(rules):
