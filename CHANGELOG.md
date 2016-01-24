@@ -1061,7 +1061,7 @@ There are plenty directions for approvement. Stay tuned.
 [Chrome]: http://allmychanges.com/p/soft/chrome/
 [support-email]: mailto:support@allmychanges.com
 [gitter-chat]: https://gitter.im/AllMyChanges/allmychanges.com
-[tweet-us]: https://twitter.com/intent/tweet?text=@allmychanges hey, guys, 
+[tweet-us]: https://twitter.com/intent/tweet?text=@allmychanges%20hey,%20guys,%20
 [tw-new-release-notes]: https://twitter.com/NewReleaseNotes
 [libsass]: https://allmychanges.com/p/c%2B%2B/libsass/
 [cal-heatmap]: https://github.com/kamisama/cal-heatmap
