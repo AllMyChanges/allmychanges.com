@@ -13,3 +13,19 @@ def test_sed_postprocessor_with_multiple_rules():
     s/v(\d+)/\1/
     """)
     eq_('blah 123', p('blah minor v123'))
+
+
+def test_sed_multiline_matching():
+    p = sed(ur's/^blah .*//')
+    text = """
+blah minor
+and
+blah again
+    """
+    expected = """
+
+and
+
+    """
+
+    eq_(expected, p(text))
