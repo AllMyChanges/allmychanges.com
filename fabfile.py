@@ -118,7 +118,10 @@ def watch_on_static():
 
 
 def manage(args=''):
-    hashed_args = re.sub(ur'[ \:/]+', '_', args)
+    if len(args) < 40:
+        hashed_args = re.sub(ur'[ \:/]+', '_', args)
+    else:
+        hashed_args = '.long.command'
     name = 'manage.command.allmychanges.com' + hashed_args
     local(_get_docker_command(name) +
         '/env/bin/python /app/manage.py ' + args)
