@@ -19,6 +19,4 @@ class Command(LogMixin, BaseCommand):
         transform = sed(rule)
         text = requests.get(url).text
         processed = transform(text)
-        lines = processed.split('\n')
-        processed = u'\n'.join(lines[:20])
         print processed.encode('utf-8')
