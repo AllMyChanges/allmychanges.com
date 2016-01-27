@@ -111,6 +111,11 @@ def manage(args=''):
     local(_get_docker_command(name) +
         '/env/bin/python /app/manage.py ' + args)
 
+def dev_extract_history(repo_name):
+    name = 'dev_extract_history.command.allmychanges.com'
+    local(_get_docker_command(name) +
+          '/env/bin/python /app/manage.py dev_extract_history /tmp/allmychanges/' + repo_name)
+
 def test(args=''):
     local(_get_docker_command('tests.command.allmychanges.com') + (
         '/env/bin/nosetests ') + args)
