@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import time
 import os
 
@@ -32,7 +34,7 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ['docker run',]
 
     if image is None:
-        image = os.environ.get('IMAGE', 'allmychanges.com')
+        image = os.environ.get('IMAGE', 'allmychanges.com/django-1.6')
 
     if rm:
         command.append('--rm')
@@ -70,7 +72,13 @@ def build_docker_image():
     local('docker build -t allmychanges.com .')
 
 def shell():
-    local(_get_docker_command('shell.command.allmychanges.com') + (
+    # используем shell2 потому что иначе возникает ошибка
+    # Error response from daemon: Could not find container for entity id 3f21744e9eddc17e7a4a32ac61993f5fbe3e85e0da908c1d7781d0eb4262d35c
+    # она должна быть исправлена в версии докера 1.10
+    # https://github.com/docker/docker/pull/16032
+    # и описана тут
+    # https://github.com/docker/docker/issues/17691
+    local(_get_docker_command('shell2.command.allmychanges.com') + (
         '/env/bin/python /app/manage.py '
         ' shell_plus'))
 

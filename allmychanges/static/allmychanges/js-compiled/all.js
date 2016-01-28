@@ -48824,6 +48824,9 @@ componentHandler.register({
 
 	    // this field keeps state for which preview was generated
 	    preview: {},
+	    // this field will be filled when user'll save the data
+	    // and used in redirect function
+	    absolute_uri: null,
 	    validate_namespace_name_timeout: null,
 
 	    getInitialState: function getInitialState() {
@@ -48840,6 +48843,7 @@ componentHandler.register({
 	            ignore_list: this.props.ignore_list || '',
 	            xslt: this.props.xslt || '',
 	            results: null,
+	            // TODO: проверить, что title кнопки меняется в зависимости от режима
 	            save_button_title: this.props.mode == 'edit' ? 'Save' : 'Save&Track',
 	            downloader: downloader,
 	            downloader_settings: this.props.downloader_settings,
@@ -48920,6 +48924,8 @@ componentHandler.register({
 	        this.setState(params, callback);
 	    },
 	    save: function save() {
+	        var _this = this;
+
 	        UserStory.log(["Saving"], ["package_settings.save"]);
 	        this.setState({ saving: true,
 	            save_button_title: 'Saving...' });
@@ -48939,28 +48945,34 @@ componentHandler.register({
 	            method: 'PUT',
 	            data: JSON.stringify(data),
 	            contentType: 'application/json',
-	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success((function () {
-	            this.setState({
+	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(function (data) {
+	            _this.absolute_uri = data.absolute_uri;
+
+	            _this.setState({
 	                saving: false,
 	                save_button_title: 'Save' });
 	            //                      check_and_show_messages();
-	        }).bind(this));
+	        });
 	    },
 	    save_and_redirect: function save_and_redirect() {
 	        this.save().success(this.redirect);
 	    },
 	    save_and_track: function save_and_track() {
+	        var _this2 = this;
+
 	        UserStory.log(["Saving and tracking"], ["package_settings.save_and_track"]);
 	        this.save().success(function () {
 	            $.ajax({
-	                url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
+	                url: '/v1/changelogs/' + _this2.props.changelog_id + '/track/',
 	                method: 'POST',
-	                headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.redirect);
+	                headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(_this2.redirect);
 	        });
 	    },
-	    redirect: function redirect(data) {
+	    redirect: function redirect() {
 	        UserStory.log(["Redirecting to package's page"], ["package_settings.redirect"]);
-	        window.location = data['absolute_uri'];
+	        if (this.absolute_uri) {
+	            window.location = this.absolute_uri;
+	        }
 	    },
 	    is_name_or_namespace_were_changed: function is_name_or_namespace_were_changed() {
 	        return this.props.name && this.props.name != this.state.name || this.props.namespace && this.props.namespace != this.state.namespace;
@@ -49033,24 +49045,24 @@ componentHandler.register({
 	        this.setState(params);
 	    },
 	    wait_for_preview: function wait_for_preview() {
-	        var _this = this;
+	        var _this3 = this;
 
 	        UserStory.log(["waiting for preview results"], ["package_settings.wait_for_preview"]);
 	        $.get('/v1/previews/' + this.props.preview_id + '/').success(function (data) {
 	            UserStory.log(["received [data=", data, "] about preview state"], ["package_settings.wait_for_preview"]);
-	            _this.setState({ 'log': data.log,
+	            _this3.setState({ 'log': data.log,
 	                'status': data.status,
 	                'downloaders': data.downloaders,
 	                'downloader': data.downloader }, function () {
-	                _this.update_downloader(data.downloader);
+	                _this3.update_downloader(data.downloader);
 	            });
 
 	            if (data.status == 'processing') {
 	                UserStory.log(["preview is still in processing status"], ["package_settings.wait_for_preview"]);
-	                setTimeout(_this.wait_for_preview, 1000);
+	                setTimeout(_this3.wait_for_preview, 1000);
 	            } else {
 	                UserStory.log(["preview data is ready"], ["package_settings.wait_for_preview"]);
-	                _this.fetch_rendered_preview();
+	                _this3.fetch_rendered_preview();
 	            }
 	        }).error(function (data) {
 	            UserStory.log(["some shit happened"], ["package_settings.wait_for_preview"]);
@@ -49064,7 +49076,7 @@ componentHandler.register({
 	        this.wait_for_preview();
 	    },
 	    render: function render() {
-	        var _this2 = this;
+	        var _this4 = this;
 
 	        var content = [];
 	        var next_actions = [];
@@ -49108,10 +49120,18 @@ componentHandler.register({
 	            if (status == 'success' || status == 'created') {
 	                content.push(render_results(this.state.results));
 
+	                var save_callback;
+
+	                if (this.props.mode == 'edit') {
+	                    save_callback = this.save_and_redirect;
+	                } else {
+	                    save_callback = this.save_and_track;
+	                }
+
 	                add_tab('Save', render_save_panel({
 	                    disabled: !this.can_save(),
 	                    button_title: this.state.save_button_title,
-	                    on_submit: this.save_and_redirect,
+	                    on_submit: save_callback,
 	                    namespace_error: this.state.namespace_error,
 	                    name_error: this.state.name_error,
 	                    description: this.state.description,
@@ -49123,7 +49143,7 @@ componentHandler.register({
 
 	            if (status != 'processing') {
 	                var is_downloader_options_should_be_applied = function is_downloader_options_should_be_applied() {
-	                    var result = _this2.state.downloader != _this2.preview.downloader || !R.equals(_this2.state.downloader_settings, _this2.preview.downloader_settings);
+	                    var result = _this4.state.downloader != _this4.preview.downloader || !R.equals(_this4.state.downloader_settings, _this4.preview.downloader_settings);
 
 	                    if (result) {
 	                        UserStory.log(["Downloader options SHOULD be applied"], ["package_settings.render"]);
@@ -49134,7 +49154,7 @@ componentHandler.register({
 	                };
 
 	                var is_parser_options_should_be_applied = function is_parser_options_should_be_applied() {
-	                    var result = _this2.state.search_list != _this2.preview.search_list || _this2.state.ignore_list != _this2.preview.ignore_list || _this2.state.xslt != _this2.preview.xslt;
+	                    var result = _this4.state.search_list != _this4.preview.search_list || _this4.state.ignore_list != _this4.preview.ignore_list || _this4.state.xslt != _this4.preview.xslt;
 	                    return result;
 	                };
 
@@ -49144,7 +49164,7 @@ componentHandler.register({
 
 	                var update_downloader_settings = function update_downloader_settings(settings) {
 	                    UserStory.log(["Updating downloader [settings=", settings, "]"], ["package_settings.update_downloader_settings"]);
-	                    _this2.setState({ 'downloader_settings': settings });
+	                    _this4.setState({ 'downloader_settings': settings });
 	                };
 
 	                add_tab('Change downloader', render_change_downloader_tab({

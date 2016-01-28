@@ -212,6 +212,9 @@ var render_tune_parser_panel = function(opts) {
 module.exports = React.createClass({
     // this field keeps state for which preview was generated
     preview: {},
+    // this field will be filled when user'll save the data
+    // and used in redirect function
+    absolute_uri: null,
     validate_namespace_name_timeout: null,
 
     getInitialState: function () {
@@ -349,19 +352,20 @@ module.exports = React.createClass({
             contentType: 'application/json',
             headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(
-                function() {
+                (data) => {
+                    this.absolute_uri = data.absolute_uri;
+                    
                     this.setState({
                         saving: false,
                         save_button_title: 'Save'});
-//                      check_and_show_messages();
-                }.bind(this));
+                });
     },
     save_and_redirect: function() {
         this.save().success(this.redirect);
     },
     save_and_track: function() {
         // Saving and tracking @package_settings.save_and_track
-        this.save().success(function() {
+        this.save().success(() => {
             $.ajax({
                 url: '/v1/changelogs/' + this.props.changelog_id + '/track/',
                 method: 'POST',
@@ -369,9 +373,11 @@ module.exports = React.createClass({
                 .success(this.redirect);
         });
     },
-    redirect: function(data) {
+    redirect: function() {
         // Redirecting to package's page @package_settings.redirect
-        window.location = data['absolute_uri'];
+        if (this.absolute_uri) {
+            window.location = this.absolute_uri;
+        }
     },
     is_name_or_namespace_were_changed: function() {
         return ((this.props.name && this.props.name != this.state.name) ||
@@ -525,10 +531,18 @@ module.exports = React.createClass({
             if (status == 'success' || status == 'created') {
                 content.push(render_results(this.state.results));
 
+                var save_callback;
+                
+                if (this.props.mode == 'edit') {
+                    save_callback = this.save_and_redirect;
+                } else {
+                    save_callback = this.save_and_track;
+                }
+
                 add_tab('Save', render_save_panel({
                     disabled: !this.can_save(),
                     button_title: this.state.save_button_title,
-                    on_submit: this.save_and_redirect,
+                    on_submit: save_callback,
                     namespace_error: this.state.namespace_error,
                     name_error: this.state.name_error,
                     description: this.state.description,
