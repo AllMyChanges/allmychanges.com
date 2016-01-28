@@ -43,3 +43,7 @@ nosetests.xml
 \#*
 /.hash-before-release
 /bower_components/
+/dumps/
+/fake/
+/tmp/
+/wheelhouse/
