@@ -1,4 +1,4 @@
-#!/home/art/allmychanges.com/env/bin/python
+#!/usr/bin/env python
 '''
 Note: Tested with LINUX only (known to work on Ubuntu / Suse)
 
@@ -166,6 +166,11 @@ class Browser(QObject):
 @click.option('--height', default=0, help='Screen height (default: unlimited)')
 def main(url, output, width, height):
 	webkit = Browser()
+
+        dir_name = os.path.dirname(output)
+        if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+
 	webkit.save_image(url, output, width=width, height=height)
 	del webkit
 
