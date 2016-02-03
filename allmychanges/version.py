@@ -1,4 +1,4 @@
-from itertools import takewhile
+from itertools import takewhile, groupby
 from types import IntType, LongType
 from distutils.version import (
     StrictVersion,
@@ -8,6 +8,10 @@ from distutils.version import (
 
 num_types = (IntType, LongType)
 is_number = lambda value: isinstance(value, num_types)
+
+def last(lst):
+    if lst:
+        return lst[-1]
 
 
 def separate_numbers(sequence):
@@ -71,3 +75,57 @@ def reorder_versions(version_objects):
         obj.save(update_fields=('order_idx',))
 
     return version_objects
+
+
+def find_branches(versions):
+    """Searches latest patch versions for all minor releases.
+    Also, returns the latest version because it is a tip of the tree.
+    If there isn't patch versions for some release, then it is not returned."""
+
+    versions = map(LooseVersion, versions)
+
+    # group versions by (major, minor) parts
+    major_minor = lambda item: item.version[:2]
+    versions.sort(key=major_minor)
+    tip = last(versions)
+    grouped = groupby(versions, key=major_minor)
+
+    chunks = (tuple(value) for key, value in grouped)
+
+    # we only take versions which has patches
+    chunks = (versions for versions in chunks if len(versions) > 1)
+
+    # and we only need latest patch releases
+    result = map(last, chunks)
+
+    # we also add the last version bacause it is a tip
+    if last(result) is not tip:
+        result.append(tip)
+
+    return [item.vstring for item in result]
+
+
+def is_wrong_order(versions, new_versions):
+    """Checks if new versions are out of order or there
+    is something suspicious.
+    If new_versions growth like:
+    0.1.1, 0.1.2, 0.2.0
+    it is ok.
+
+    Or if it is update to existing branches, like
+    when we have 0.2.0 and 0.3.4 versions of the library
+    and suddenly 0.2.1 and 0.3.5 patch releases are out.
+    """
+    return False
+
+
+def has_hole(versions):
+    if len(versions) < 2:
+        return False
+
+    versions = map(LooseVersion, versions)
+
+    # we compare only first three numbers
+    tuples = [tuple(version.version[:3])
+              for version in versions]
+    return False
