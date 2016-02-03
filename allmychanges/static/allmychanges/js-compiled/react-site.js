@@ -21029,8 +21029,8 @@
 	            onChange: opts.on_field_change,
 	            value: opts.search_list })
 	    }, {
-	        title: 'Exclude some dirs or files',
-	        content: React.createElement('textarea', { placeholder: 'Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.',
+	        title: 'Ignore some dirs or files',
+	        content: React.createElement('textarea', { placeholder: 'Here you could enter a list of directories for files to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places.',
 	            className: 'new-package__ignore-input',
 	            name: 'ignore_list',
 	            onChange: opts.on_field_change,
@@ -21099,7 +21099,6 @@
 	            ignore_list: this.props.ignore_list || '',
 	            xslt: this.props.xslt || '',
 	            results: null,
-	            // TODO: проверить, что title кнопки меняется в зависимости от режима
 	            save_button_title: this.props.mode == 'edit' ? 'Save' : 'Save&Track',
 	            downloader: downloader,
 	            downloader_settings: this.props.downloader_settings,
@@ -21207,7 +21206,6 @@
 	            _this.setState({
 	                saving: false,
 	                save_button_title: 'Save' });
-	            //                      check_and_show_messages();
 	        });
 	    },
 	    save_and_redirect: function save_and_redirect() {

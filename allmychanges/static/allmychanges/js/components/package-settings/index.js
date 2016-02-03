@@ -159,9 +159,9 @@ var render_tune_parser_panel = function(opts) {
             )
         },
         {
-            title: 'Exclude some dirs or files',
+            title: 'Ignore some dirs or files',
             content: (
-        <textarea placeholder="Here you could enter a list of directories to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places."
+        <textarea placeholder="Here you could enter a list of directories for files to ignore during the changelog search. This is another way how to prevent robot from taking changelog-like data from wierd places."
             className="new-package__ignore-input"
         name="ignore_list"
         onChange={opts.on_field_change}
