@@ -452,10 +452,7 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
         result['code_version'] = code_version
 
         if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
-            result['show_sources'] = True
             result['show_issues'] = True
-        else:
-            result['show_sources'] = self.request.GET.get('show_sources', None)
 
         filter_args = {'code_version': code_version}
 
@@ -1085,7 +1082,6 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         result['package'] = package_data
         result['has_results'] = has_results
         result['problem'] = problem
-        result['show_sources'] = True
 
         # TODO: вот это всё надо будет убрать и оставить
         # только рендеринг changelog
