@@ -1153,10 +1153,13 @@ class IndexView(CommonContextMixin, TemplateView):
 
 
 class IssuesFilterForm(forms.Form):
+    resolved = forms.BooleanField(required=False)
     page_size = forms.IntegerField(required=False)
     namespace = forms.CharField(required=False)
     name = forms.CharField(required=False)
     type = forms.CharField(required=False)
+    username = forms.CharField(required=False)
+    from_user = forms.BooleanField(required=False)
 
 
 class IssuesView(CommonContextMixin, TemplateView):
@@ -1166,27 +1169,33 @@ class IssuesView(CommonContextMixin, TemplateView):
         result = super(IssuesView, self).get_context_data(**kwargs)
         queryset = Issue.objects.order_by('-id')
 
-        if 'resolved' in self.request.GET:
+        form = IssuesFilterForm(self.request.GET)
+
+        if not form.is_valid():
+            raise Http404
+
+        page_size = form.cleaned_data['page_size'] or 20
+
+        if form.cleaned_data['resolved']:
             queryset = queryset.exclude(resolved_at=None)
             result['title'] = 'Resolved issues'
         else:
             queryset = queryset.filter(resolved_at=None)
             result['title'] = 'Issues'
 
-        form = IssuesFilterForm(self.request.GET)
 
-        if form.is_valid():
-            page_size = form.cleaned_data['page_size'] or 20
-
-
-            if form.cleaned_data['namespace']:
-                result['show_back_button'] = True
-                queryset = queryset.filter(changelog__namespace=form.cleaned_data['namespace'])
-            if form.cleaned_data['name']:
-                queryset = queryset.filter(changelog__name=form.cleaned_data['name'])
-            if form.cleaned_data['type']:
-                result['show_back_button'] = True
-                queryset = queryset.filter(type=form.cleaned_data['type'])
+        if form.cleaned_data['namespace']:
+            result['show_back_button'] = True
+            queryset = queryset.filter(changelog__namespace=form.cleaned_data['namespace'])
+        if form.cleaned_data['name']:
+            queryset = queryset.filter(changelog__name=form.cleaned_data['name'])
+        if form.cleaned_data['type']:
+            result['show_back_button'] = True
+            queryset = queryset.filter(type=form.cleaned_data['type'])
+        if form.cleaned_data['username']:
+            queryset = queryset.filter(user__username=form.cleaned_data['username'])
+        if form.cleaned_data['from_user']:
+            queryset = queryset.exclude(light_user__isnull=True)
 
         result['total_issues'] = queryset.count()
         result['issues'] = queryset[:page_size]
