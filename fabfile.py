@@ -69,7 +69,7 @@ def compile_wheels():
     local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
 def build_docker_image():
-    local('docker build -t allmychanges.com .')
+    local('docker build -t allmychanges.com/django-1.6 .')
 
 def shell():
     # используем shell2 потому что иначе возникает ошибка
