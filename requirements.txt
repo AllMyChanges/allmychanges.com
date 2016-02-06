@@ -82,6 +82,7 @@ times==0.7
 tqdm==3.4.0
 twiggy-goodies==0.7.0
 twiggy==0.4.7             # via twiggy-goodies
+newrelic==2.60.0.46
 
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:
