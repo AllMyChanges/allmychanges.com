@@ -6,3 +6,4 @@ fake
 tmp
 logs
 secure_settings.py
+load-tests
