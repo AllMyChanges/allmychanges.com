@@ -51,8 +51,10 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
 def compile_wheels():
     local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
-def build_docker_image():
-    local('docker build -t allmychanges.com/django-1.6 .')
+def build_docker_image(version):
+    assert version
+    tag = 'localhost:5000/allmychanges.com:' + version
+    local('docker build -t {0} .'.format(tag))
 
 
 def upload_docker_image(version):
