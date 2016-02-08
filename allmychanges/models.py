@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
 from django.core.cache import cache
-from south.modelsinspector import add_introspection_rules
+#from south.modelsinspector import add_introspection_rules
 
 from twiggy_goodies.threading import log
 
@@ -51,7 +51,7 @@ TIMEZONE_CHOICES = [(tz, tz) for tz in common_timezones]
 class URLField(models.URLField):
     default_validators = [URLValidator()]
 
-add_introspection_rules([], ["^allmychanges\.models\.URLField"])
+#add_introspection_rules([], ["^allmychanges\.models\.URLField"])
 
 
 
@@ -574,6 +574,7 @@ class Issue(models.Model):
                                         help_text='Comma-separated list of versions, related to this issue')
     email = models.CharField(max_length=100, blank=True, null=True)
     page = models.CharField(max_length=100, blank=True, null=True)
+#    importance = models.IntegerField(db_index=True, blank=True, default=0)
 
     def __repr__(self):
         return """
@@ -841,6 +842,7 @@ class Version(models.Model):
 
     class Meta:
         get_latest_by = 'order_idx'
+        ordering = ['-order_idx']
 
     def __unicode__(self):
         return self.number

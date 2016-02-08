@@ -1,7 +1,8 @@
 # coding: utf-8
 
-import time
 import os
+import time
+import re
 
 from fabric.api import local
 
@@ -11,30 +12,11 @@ def update_requirements():
     local('pip-compile --annotate requirements-dev.in')
 
 
-def _get_docker_command_old(name, ports=[], image='allmychanges.com'):
-    return ('docker run '
-            '--rm '
-            '-t -i '
-            '-v `pwd`:/app '
-            '-v `pwd`/logs:/var/log/allmychanges '
-            '-v `pwd`/tmp:/tmp/allmychanges '
-            '--link mysql.allmychanges.com '
-            '--link redis.allmychanges.com '
-            '{ports} '
-            '-e DEBUG=yes '
-            '-e TOOLBAR_TOKEN=12345 '
-#            '-e DEV_DOWNLOAD=yes '
-            '--name {name} '
-            '{image} ').format(
-                name=name,
-                image=image,
-                ports=' '.join('-p ' + p for p in ports))
-
 def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ['docker run',]
 
     if image is None:
-        image = os.environ.get('IMAGE', 'allmychanges.com/django-1.6')
+        image = os.environ.get('IMAGE', 'allmychanges.com')
 
     if rm:
         command.append('--rm')
@@ -65,11 +47,20 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ' '.join(command)
     return command + ' '
 
+
 def compile_wheels():
     local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
 def build_docker_image():
     local('docker build -t allmychanges.com/django-1.6 .')
+
+
+def upload_docker_image(version):
+    assert version
+    tag = 'localhost:5000/allmychanges.com:' + version
+    local('docker build -t {} .'.format(tag))
+    local('docker push ' + tag)
+
 
 def shell():
     # используем shell2 потому что иначе возникает ошибка
@@ -86,8 +77,9 @@ def dbshell():
     local('docker exec -it mysql.allmychanges.com mysql -ppassword allmychanges')
 
 def get_db_from_production():
-#    local('scp clupea:/mnt/yandex.disk/backups/mysql/allmychanges/latest.sql.bz2 dumps/')
-#    local('bunzip2 dumps/latest.sql.bz2')
+    local('scp clupea:/mnt/yandex.disk/backups/mysql/allmychanges/latest.sql.bz2 dumps/')
+    local('rm -fr dumps/latest.sql')
+    local('bunzip2 dumps/latest.sql.bz2')
 #    local('docker exec -ti mysql.allmychanges.com bash')
     local('docker exec mysql.allmychanges.com /dumps/restore.sh')
 
@@ -97,6 +89,18 @@ def runserver():
           '/env/bin/python /app/manage.py '
           'runserver 0.0.0.0:8000'))
 
+def rungunicorn():
+    # sudo docker run --rm -ti -e MYSQL_HOST=192.241.207.244 -e DJANGO_SETTINGS_MODULE=allmychanges.settings.production -p 8000:8000 --entrypoint gunicorn edited:latest allmychanges.wsgi:application --bind 0.0.0.0:8000 --access-logfile -
+    local(_get_docker_command(
+        'runserver.command.allmychanges.com',
+        debug=False,
+        ports=['8000:8000'])
+          + (
+              'gunicorn '
+              'allmychanges.wsgi:application '
+            '--bind 0.0.0.0:8000 '
+              '--access-logfile -'))
+
 def rqworker():
     local(_get_docker_command('rqworker.command.allmychanges.com') + (
         '/env/bin/python /app/manage.py '
@@ -104,8 +108,13 @@ def rqworker():
         'default '
         'preview '))
 
-def bash():
-    local(_get_docker_command('bash.command.allmychanges.com') + 'bash')
+def bash(args=''):
+    if args == 'edit':
+        rm = False
+    else:
+        rm = True
+
+    local(_get_docker_command('bash.command.allmychanges.com', rm=rm) + 'bash')
 
 def tail_errors():
     local("tail -f logs/django-root.log | jq 'if (.[\"@fields\"].level == \"WARNING\" or .[\"@fields\"].level == \"ERROR\") then . else 0 end | objects'")
@@ -115,7 +124,11 @@ def watch_on_static():
 
 
 def manage(args=''):
-    name = 'manage.command.allmychanges.com' + args.replace(' ', '_')
+    if len(args) < 40:
+        hashed_args = re.sub(ur'[ \:/]+', '_', args)
+    else:
+        hashed_args = '.long.command'
+    name = 'manage.command.allmychanges.com' + hashed_args
     local(_get_docker_command(name) +
         '/env/bin/python /app/manage.py ' + args)
 
@@ -154,20 +167,22 @@ def create_database():
     manage('migrate')
 
 def start():
+    # до выполнения надо создать сеть amch
+    # docker network create amch
     containers = _get_docker_containers()
     if 'mysql.allmychanges.com' in containers:
         local('docker start mysql.allmychanges.com')
     else:
-        local('docker run --name mysql.allmychanges.com -v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
+        local('docker run --net amch --name mysql.allmychanges.com -v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
         print 'Waiting for mysql start'
         time.sleep(30)
         local('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
-        local('docker run --rm -it -v `pwd`:/app --link mysql.allmychanges.com allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
+        local('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
 
     if 'redis.allmychanges.com' in containers:
         local('docker start redis.allmychanges.com')
     else:
-        local('docker run --name redis.allmychanges.com -d redis')
+        local('docker run --net amch --name redis.allmychanges.com -d redis')
 
 
 def stop():

@@ -31,6 +31,21 @@ bower modules
 Как запустить всё под Docker
 ----------------------------
 
+### Новая дока
+
+Это все про запуск новой инсталяции в деве под 1.9 докером.
+
+```
+# это скопирует снапшот базы с прода
+fab create_database
+# в одной консоли
+fab runserver
+# во второй консоли
+fab rqworker
+```
+
+### Устаревшая дока
+
 
 ```
 docker run --name mysql.allmychanges.com -e MYSQL_ROOT_PASSWORD=password -d mysql

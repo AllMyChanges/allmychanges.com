@@ -1,5 +1,9 @@
-env/
-dumps/
-node_modules/
-bower_components/
-fake/
+env
+dumps
+node_modules
+bower_components
+fake
+tmp
+logs
+secure_settings.py
+load-tests

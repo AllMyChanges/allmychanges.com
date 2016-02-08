@@ -1,4 +1,4 @@
-django>=1.6,<1.7
+django>=1.8,<1.9
 South
 djangorestframework<3.0.0
 drf-extensions
@@ -35,10 +35,12 @@ orderedset
 closeio
 # чтобы показывать прогресс-бары в консольных утилитках
 clint
+# чтобы собирать статистику по производительности
+newrelic
 
 MySQL-python
 # начиная с версии 0.10 oauth-toolkit не поддерживает Django 1.6
-django-oauth-toolkit<0.10
+django-oauth-toolkit
 django-markdown2
 django-sendmail-backend
 
@@ -54,6 +56,9 @@ feedparser
 
 # for storing rich data about preview and changelog settings
 jsonfield
+
+# to draw progressbars
+tqdm
 
 #git+git://github.com/svetlyak40wt/django-oauth-toolkit
 #git+git://github.com/svetlyak40wt/logster.git@allmychanges

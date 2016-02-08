@@ -44,9 +44,14 @@ def send_email_using_template(address, subject, template, **context):
 class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
 
+    def add_arguments(self, parser):
+        parser.add_argument('to_email')
+        parser.add_argument('template')
+
     def handle(self, *args, **options):
         # this will disable cssutil's logger
-        to_email, template = args
+        to_email = options.get('to_email')
+        template = options.get('template')
 
         cssutils_logger = logging.getLogger('CSSUTILS')
         cssutils_logger.level = logging.ERROR

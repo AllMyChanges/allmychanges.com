@@ -1,6 +1,11 @@
 from nose.tools import eq_
 
-from allmychanges.version import compare_versions, reorder_versions
+from allmychanges.version import (
+    compare_versions,
+    reorder_versions,
+    is_wrong_order,
+    has_hole,
+    find_branches)
 from allmychanges.models import Version
 from allmychanges.tests.utils import refresh
 
@@ -40,3 +45,58 @@ def test_reorder_versions():
     eq_(0, v3.order_idx)
     eq_(1, v1.order_idx)
     eq_(2, v2.order_idx)
+
+
+def test_find_branches_primitive():
+    versions = []
+    branches = []
+    eq_(branches, find_branches(versions))
+
+    versions = ['0.1.0']
+    branches = ['0.1.0']
+    eq_(branches, find_branches(versions))
+
+
+def test_find_branches_simple():
+    versions = ['0.1.0', '0.1.1']
+    branches = ['0.1.1']
+    eq_(branches, find_branches(versions))
+
+
+def test_find_branches():
+    versions = ['0.1.0', '0.1.1', '0.2.0', '0.3.0', '0.3.1']
+    branches = ['0.1.1', '0.3.1']
+    eq_(branches, find_branches(versions))
+
+
+def test_wrong_order_primitive():
+    versions = []
+    new_versions = ['0.1.0']
+    eq_(False, is_wrong_order(versions, new_versions))
+
+
+def test_wrong_order_simple():
+    versions = ['0.1.0']
+    new_versions = ['0.1.1', '0.1.2', '0.2.0']
+    eq_(False, is_wrong_order(versions, new_versions))
+
+def test_wrong_order_bad():
+    versions = ['0.1.0']
+    new_versions = ['0.2.0', '0.4.0'] # 0.3.0 is absent
+    eq_(True, is_wrong_order(versions, new_versions))
+
+    versions = ['0.1.0']
+    new_versions = ['0.1.2'] # 0.1.1 is absent
+    eq_(True, is_wrong_order(versions, new_versions))
+
+
+def test_wrong_order_complex():
+    versions = ['1.8.4', '1.9.0']
+    new_versions = ['1.8.5', '1.9.1', '1.9.2']
+    eq_(False, is_wrong_order(versions, new_versions))
+
+
+def test_hole():
+    eq_(False, has_hole(['0.1.0', '0.2.0']))
+    eq_(False, has_hole(['0.1.0', '0.1.1', '0.2.0']))
+    eq_(True, has_hole(['0.2.0', '0.4.0']))

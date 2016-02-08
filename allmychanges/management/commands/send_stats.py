@@ -32,11 +32,11 @@ def get_stats_from_file():
 def get_stats():
     stats = get_stats_from_file()
 
-    from rq import (use_connection,
-                    Queue)
+    import django_rq
 
-    use_connection()
-    for queue in Queue.all():
+    queues = django_rq.queues.get_queues(*django_rq.settings.QUEUES.keys())
+
+    for queue in queues:
         stats['queue.{0}.jobs'.format(queue.name)] = queue.count
 
 

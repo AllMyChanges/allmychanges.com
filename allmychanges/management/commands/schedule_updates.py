@@ -12,13 +12,15 @@ class Command(LogMixin, BaseCommand):
         special_keywords = ['reschedule', 'full']
         reschedule = True if args and 'reschedule' in args else False
         full = True if args and 'full' in args else False
-        packages = [name for name in args if name not in special_keywords]
-        
+        packages = [name
+                    for name in args
+                    if name not in special_keywords]
+
         if full:
             if packages:
-                Version.objects.filter(changelog__packages__name__in=packages).delete()
+                Version.objects.filter(changelog__name__in=packages).delete()
             else:
                 Version.objects.all().delete()
-                
+
         schedule_updates.delay(reschedule=reschedule,
                                packages=packages)

@@ -1,7 +1,7 @@
 import os
 from .default import *  # nopep8
 
-
+ENVIRONMENT = 'production'
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 

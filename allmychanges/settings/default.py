@@ -4,6 +4,7 @@ import MySQLdb.cursors
 
 here = lambda * x: os.path.join(os.path.abspath(os.path.dirname(__file__)), *x)
 
+ENVIRONMENT = 'default'
 PROJECT_ROOT = here('..', '..')
 root = lambda * x: os.path.join(os.path.abspath(PROJECT_ROOT), *x)
 
@@ -22,11 +23,12 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'allmychanges_' + CURRENT_USER.replace('-', '_'),
-        'USER': 'allmychanges',
-        'PASSWORD': 'allmychanges',
-        'HOST': '',
-        'PORT': '',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'allmychanges_' + CURRENT_USER.replace('-', '_')),
+        'USER': os.environ.get('MYSQL_USER', 'allmychanges'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'allmychanges'),
+        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        'PORT': int(os.environ.get('MYSQL_PORT', 3306)),
+        'OPTIONS': {'connect_timeout': 3},
 #        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
@@ -88,7 +90,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = root('static')
+STATIC_ROOT = root('allmychanges', 'static')
 SNAPSHOTS_ROOT = os.path.join(STATIC_ROOT, 'shots')
 
 
@@ -150,7 +152,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
 
-    'south',
+#    'south',
     'rest_framework',
     'django_rq',
     'django_extensions',
@@ -167,6 +169,8 @@ INSTALLED_APPS = (
     'oauth2_provider',
     'compressor',
 )
+
+#oauth2_provider
 
 AUTH_USER_MODEL = 'allmychanges.User'
 
