@@ -243,11 +243,15 @@ TWITTER_CREDS = None
 UNRELEASED_KEYWORDS = set([
     'unreleased',
     'under development',
+    'in development',
     'not released yet',
     'not yet released',
     'release date.*to be decided',
     'release date.*to be determined',
+    'no release date',
     'in-progress',
+    'work in progress',
+    'upcoming',
 ])
 
 HTTP_USER_AGENT = 'AllMyChanges.com Bot'
