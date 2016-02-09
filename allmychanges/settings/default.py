@@ -123,6 +123,7 @@ MIDDLEWARE_CLASSES = (
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'allmychanges.middleware.TurnOffCSRFProtectionIfOAuthenticated',
     'allmychanges.middleware.LightUserMiddleware',
+    'allmychanges.middleware.ServedByMiddleware',
     'twiggy_goodies.django.LogMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

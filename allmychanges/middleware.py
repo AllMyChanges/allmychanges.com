@@ -26,3 +26,11 @@ class LightUserMiddleware(object):
                 response.set_cookie('light_user_id', light_user_id)
 
         return response
+
+
+class ServedByMiddleware(object):
+    """This view adds a header X-Served-By: backend.hostname.com
+    """
+    def process_response(self, request, response):
+        response['X-Served-By'] = request.META.get('SERVER_NAME', 'unknown')
+        return response
