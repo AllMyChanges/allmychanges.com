@@ -7,6 +7,11 @@ ENVIRONMENT = 'development'
 DEBUG = os.environ.get('DEBUG', 'no') == 'yes'
 TEMPLATE_DEBUG = DEBUG
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 METRIKA_ID = '24627125'
 ANALYTICS_ID = 'UA-49927178-2'

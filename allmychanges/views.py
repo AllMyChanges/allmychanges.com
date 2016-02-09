@@ -469,14 +469,18 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
             login_to_track = True
             already_tracked = False
 
-        package_data = get_package_data_for_template(
-            changelog,
-            filter_args,
-            100,
-            None,
-            code_version=code_version,
-            ordering=('-order_idx',),
-            show_unreleased=not self.request.GET.get('snap'))
+        key = 'project-view:{0}'.format(changelog.id)
+        package_data = cache.get(key)
+        if not package_data:
+            package_data = get_package_data_for_template(
+                changelog,
+                filter_args,
+                100,
+                None,
+                code_version=code_version,
+                ordering=('-order_idx',),
+                show_unreleased=not self.request.GET.get('snap'))
+            cache.set(key, package_data, HOUR)
 
         result['package'] = package_data
         result['login_to_track'] = login_to_track
