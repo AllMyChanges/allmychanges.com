@@ -101,6 +101,9 @@ SEND_DIGEST_CHOICES = (
     ('never', 'Never'))
 
 
+RSS_HASH_LENGH = 32
+
+
 class User(AbstractBaseUser):
     """
     A fully featured User model with admin-compliant permissions that uses
@@ -132,7 +135,7 @@ class User(AbstractBaseUser):
     webhook_url = models.URLField(max_length=2000,
                                   default='',
                                   blank=True)
-    rss_hash = models.CharField(max_length=32,
+    rss_hash = models.CharField(max_length=RSS_HASH_LENGH,
                                 unique=True,
                                 blank=True,
                                 null=True)
@@ -195,7 +198,7 @@ class User(AbstractBaseUser):
 
     def save(self, *args, **kwargs):
         if self.rss_hash is None:
-            self.rss_hash = sha1(self.username + settings.SECRET_KEY).hexdigest()
+            self.rss_hash = sha1(self.username + settings.SECRET_KEY).hexdigest()[:RSS_HASH_LENGH]
         return super(User, self).save(*args, **kwargs)
 
 

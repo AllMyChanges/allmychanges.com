@@ -1,4 +1,5 @@
 env
+env-to-remove
 dumps
 node_modules
 bower_components
@@ -7,3 +8,4 @@ tmp
 logs
 secure_settings.py
 load-tests
+.git

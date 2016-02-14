@@ -1,0 +1,12 @@
+# в версии 0.12.0 сломали прерывание процесса по Ctrl+C
+# https://github.com/pyinvoke/invoke/issues/327
+# а в версиях 0.11 по Ctrl+C прерывается сам Invoke, а дочерний
+# процесс остается работать.
+# как надо всё делает только invoke==0.10.1
+
+invoke==0.10.1
+
+docker-py
+pip-tools
+
+-e git+https://github.com/svetlyak40wt/40wt-common-tasks#egg=40wt-common-tasks
