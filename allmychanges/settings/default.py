@@ -145,6 +145,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'allmychanges',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -158,7 +159,6 @@ INSTALLED_APPS = (
     'django_rq',
     'django_extensions',
 
-    'allmychanges',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

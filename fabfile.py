@@ -51,6 +51,7 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
 def compile_wheels():
     local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
+
 def build_docker_image(version):
     assert version
     tag = 'localhost:5000/allmychanges.com:' + version
