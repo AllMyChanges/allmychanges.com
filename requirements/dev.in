@@ -1,4 +1,4 @@
--r requirements.in
+-r production.in
 
 pdbpp
 nose
