@@ -48,3 +48,5 @@ nosetests.xml
 /tmp/
 /wheelhouse/
 /load-tests/
+/.env
+/env-to-remove/
