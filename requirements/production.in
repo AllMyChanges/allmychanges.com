@@ -14,7 +14,7 @@ docutils
 markdown
 lxml
 gunicorn
-python-social-auth<0.2
+python-social-auth
 anyjson<0.4
 times
 premailer

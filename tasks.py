@@ -191,9 +191,15 @@ def runserver():
     # сейчас почему-то сломано завершение процесса по Ctrl-C
     # следим за этим в https://github.com/pyinvoke/invoke/issues/315
     # и https://github.com/pyinvoke/invoke/issues/327
-    manage('runserver 0.0.0.0:8000',
+    manage('runserver 0.0.0.0:80',
            name='runserver.command.allmychanges.com',
-           ports=['8000:8000'])
+           ports=['80:80'])
+
+
+@task
+def rqworker():
+    manage('rqworker default preview',
+           name='rqworker.command.allmychanges.com')
 
 
 @task
@@ -207,5 +213,10 @@ def drop_database():
         pty=True)
     create_database()
 
+@task
+def bash():
+    command = _get_docker_command('bash') + 'bash'
+    print command
+    run(command, pty=True)
 
 make_dashed_aliases(locals().values())
