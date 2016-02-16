@@ -1167,7 +1167,7 @@ class IssuesView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(IssuesView, self).get_context_data(**kwargs)
-        queryset = Issue.objects.order_by('-id')
+        queryset = Issue.objects.order_by('-importance')
 
         form = IssuesFilterForm(self.request.GET)
 

@@ -20,6 +20,7 @@ from twiggy_goodies.threading import log
 
 from allmychanges.validators import URLValidator
 from allmychanges.downloaders.utils import normalize_url
+from allmychanges.issues import calculate_issue_importance
 from allmychanges.utils import (
     split_filenames,
     parse_search_list,
@@ -577,7 +578,7 @@ class Issue(models.Model):
                                         help_text='Comma-separated list of versions, related to this issue')
     email = models.CharField(max_length=100, blank=True, null=True)
     page = models.CharField(max_length=100, blank=True, null=True)
-#    importance = models.IntegerField(db_index=True, blank=True, default=0)
+    importance = models.IntegerField(db_index=True, blank=True, default=0)
 
     def __repr__(self):
         return """
@@ -586,6 +587,16 @@ Issue(changelog={self.changelog},
       comment={self.comment},
       created_at={self.created_at},
       resolved_at={self.resolved_at})""".format(self=self).strip()
+
+    def save(self, *args, **kwargs):
+        if not self.importance:
+            self.importance = calculate_issue_importance(
+                num_trackers=self.changelog.trackers.count()
+                             if self.changelog
+                             else 0,
+                user=self.user,
+                light_user=self.light_user)
+        return super(Issue, self).save(*args, **kwargs)
 
     @staticmethod
     def merge(user, light_user):

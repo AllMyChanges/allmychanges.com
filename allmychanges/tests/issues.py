@@ -1,8 +1,13 @@
 from nose.tools import eq_
 from allmychanges.changelog_updater import update_changelog_from_raw_data3
-from allmychanges.models import Changelog
+from allmychanges.models import (
+    Changelog,
+    User,
+    Issue)
 from allmychanges.env import Environment
 from allmychanges.utils import first
+from allmychanges.issues import calculate_issue_importance
+from allmychanges.tests.utils import create_user
 
 
 def v(**kwargs):
@@ -171,3 +176,25 @@ def test_lesser_versions_autoresolve():
     # and it should be resolved automatically
     assert issue.resolved_at is not None
     eq_('Autoresolved', issue.comments.all()[0].message)
+
+
+def test_issue_importance():
+    # it should be called on issue creation
+    c = lambda **kwargs: Issue.objects.create(**kwargs)
+    eq_(1, c(changelog=None, user=None).importance)
+
+    user = create_user('art')
+    eq_(10, c(changelog=None, user=user).importance)
+
+    # and now we'll test the logic of function it self
+
+    # when no trackers and issue is automatic
+    eq_(1, calculate_issue_importance(
+        num_trackers=0, user=None, light_user=None))
+    # each tracker adds 1 to the final value
+    eq_(6, calculate_issue_importance(
+        num_trackers=5, user=None, light_user=None))
+    # if issue is reported by registered user, then
+    # value is multiplied by 10
+    eq_(6, calculate_issue_importance(
+        num_trackers=5, user=None, light_user=None))
