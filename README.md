@@ -229,3 +229,32 @@ inv restore-db
 [homebrew]: http://brew.sh
 [cask]: http://caskroom.io
 [autoenv]: https://github.com/kennethreitz/autoenv
+
+
+Как создавать и накатывать миграции
+-----------------------------------
+
+Создавать:
+```
+inv manage makemigrations
+```
+
+Накатывать:
+```
+inv manage migrate
+```
+
+Как запускать тесты
+-------------------
+
+Очень просто:
+
+```
+inv test
+```
+
+Бывает так же полезно запускать не все тесты, а только сфейлившиеся:
+
+```
+inv test --failed
+```
