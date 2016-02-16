@@ -203,6 +203,12 @@ def rqworker():
 
 
 @task
+def shell():
+    manage('shell_plus',
+           name='shell.command.allmychanges.com')
+
+
+@task
 def create_database():
     run('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges',
         pty=True)
