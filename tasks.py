@@ -207,6 +207,15 @@ def shell():
     manage('shell_plus',
            name='shell.command.allmychanges.com')
 
+@task
+def test(failed=False):
+    command = ['/env/bin/nosetests']
+    if failed:
+        command.append('--failed')
+
+    run(_get_docker_command('tests.command.allmychanges.com') +
+        ' '.join(command))
+
 
 @task
 def create_database():
