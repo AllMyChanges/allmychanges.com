@@ -105,7 +105,7 @@ def find_branches(versions):
     return [item.vstring for item in result]
 
 
-def is_wrong_order(versions, new_versions):
+def is_version_update_has_wrong_order(versions, new_versions):
     """Checks if new versions are out of order or there
     is something suspicious.
     If new_versions growth like:
@@ -115,17 +115,88 @@ def is_wrong_order(versions, new_versions):
     Or if it is update to existing branches, like
     when we have 0.2.0 and 0.3.4 versions of the library
     and suddenly 0.2.1 and 0.3.5 patch releases are out.
+
+    Arguments versions and new_versions should be ordered.
     """
-    return False
+    branches = find_branches(versions)
+    if not branches:
+        return False
+
+    tip = branches[-1]
+
+    def find_branch_for_version(v):
+        for branch in branches:
+            if on_same_branch(branch, v):
+                return branch
+        return tip
+
+    chunks = groupby(new_versions, find_branch_for_version)
+    chunks = [[key] + list(values)
+              for key, values
+              in chunks]
+
+    some_chunk_has_hole = any(map(has_hole, chunks))
+    return some_chunk_has_hole
+
+
+def follows(left, right):
+    """Checks if right version can follow right after the left version.
+
+    Should return True for (0.1.0 and 0.1.1)
+    but False for (0.1.0 and 0.1.2)
+    """
+    left = LooseVersion(left)
+    right = LooseVersion(right)
+    some_part_was_incremented = False
+
+    for left_item, right_item in zip(
+            left.version,
+            right.version):
+        difference = right_item - left_item
+
+        if some_part_was_incremented and right_item != 0:
+            # if there was higher part's increment, then right part
+            # should be equal to zero
+            return False
+
+        if difference > 1:
+            # if difference is too much
+            return False
+        elif difference < 0:
+            # left part is bigger than right
+            # then probably there was higher part's increment
+            # if not, then this is a wrong order
+            if not some_part_was_incremented:
+                return False
+        elif difference == 1:
+            some_part_was_incremented = True
+    return True
+
+
+def on_same_branch(left, right):
+    """Checks if left and right versions have difference only in the patch version
+
+    Should return True for (0.1.0 and 0.1.1)
+    but False for (0.1.0 and 0.2.0)
+    """
+    left = LooseVersion(left)
+    right = LooseVersion(right)
+    return left.version[:2] == right.version[:2]
 
 
 def has_hole(versions):
+    """Checks if each version in the list follows the previous one.
+    """
     if len(versions) < 2:
         return False
 
-    versions = map(LooseVersion, versions)
+    def compare(left, right):
+        """If right version follows the left, then
+        return right. Otherwise, return left.
+        """
+        if left is not None:
+            if follows(left, right):
+                return right
 
-    # we compare only first three numbers
-    tuples = [tuple(version.version[:3])
-              for version in versions]
-    return False
+    result = reduce(compare, versions)
+    return result is None
