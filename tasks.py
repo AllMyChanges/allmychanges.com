@@ -208,10 +208,12 @@ def shell():
            name='shell.command.allmychanges.com')
 
 @task
-def test(failed=False):
+def test(case='', failed=False):
     command = ['/env/bin/nosetests']
     if failed:
         command.append('--failed')
+
+    command.append(case)
 
     run(_get_docker_command('tests.command.allmychanges.com') +
         ' '.join(command))
