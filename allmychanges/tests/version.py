@@ -3,7 +3,7 @@ from nose.tools import eq_
 from allmychanges.version import (
     compare_versions,
     reorder_versions,
-    is_version_update_has_wrong_order,
+    version_update_has_wrong_order,
     has_hole,
     follows,
     on_same_branch,
@@ -74,43 +74,43 @@ def test_find_branches():
 def test_wrong_order_primitive():
     versions = []
     new_versions = ['0.1.0']
-    eq_(False, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(False, version_update_has_wrong_order(versions, new_versions))
 
 
 def test_wrong_order_simple():
     versions = ['0.1.0']
     new_versions = ['0.1.1', '0.1.2', '0.2.0']
-    eq_(False, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(False, version_update_has_wrong_order(versions, new_versions))
 
 
 def test_wrong_order_bad():
     versions = ['0.1.0']
     new_versions = ['0.2.0']
-    eq_(False, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(False, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['0.1.0']
     new_versions = ['0.1.1']
-    eq_(False, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(False, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['0.1.0']
     new_versions = ['0.1.2'] # 0.1.1 is absent
-    eq_(True, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(True, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['0.1.0']
     new_versions = ['0.3.0'] # 0.2.0 is absent
-    eq_(True, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(True, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['0.1.0']
     new_versions = ['0.2.1'] # 0.2.0 is absent
-    eq_(True, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(True, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['0.1.0']
     new_versions = ['0.2.0', '0.4.0'] # 0.3.0 is absent
-    eq_(True, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(True, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['0.1.0']
     new_versions = ['0.1.2'] # 0.1.1 is absent
-    eq_(True, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(True, version_update_has_wrong_order(versions, new_versions))
 
 
 def test_on_the_same_branch():
@@ -126,15 +126,15 @@ def test_on_the_same_branch():
 def test_wrong_order_complex():
     versions = ['1.8.0', '1.8.1', '1.9.0']
     new_versions = ['1.8.2', '1.9.1', '1.9.2']
-    eq_(False, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(False, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['1.8.0', '1.8.1', '1.9.0']
     new_versions = ['1.8.2', '1.9.1', '1.9.2', '1.10.0']
-    eq_(False, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(False, version_update_has_wrong_order(versions, new_versions))
 
     versions = ['1.8.0', '1.8.1', '1.9.0']
     new_versions = ['1.8.2', '1.9.2'] # version 1.9.1 is missing
-    eq_(True, is_version_update_has_wrong_order(versions, new_versions))
+    eq_(True, version_update_has_wrong_order(versions, new_versions))
 
 
 

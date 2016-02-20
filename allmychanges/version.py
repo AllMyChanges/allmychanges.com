@@ -105,7 +105,7 @@ def find_branches(versions):
     return [item.vstring for item in result]
 
 
-def is_version_update_has_wrong_order(versions, new_versions):
+def version_update_has_wrong_order(versions, new_versions):
     """Checks if new versions are out of order or there
     is something suspicious.
     If new_versions growth like:

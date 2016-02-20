@@ -38,18 +38,39 @@ def test_add_issue_if_we_found_more_than_one_new_version():
     changelog.versions.create(
         number='0.2.0', code_version='v2')
 
-    # but we are unaware about 0.3.0 and 0.4.0
+    # everything is ok here, 0.4.0 follows 0.3.0
+    # and 0.3.0 follows 0.2.0
     data = [v(version='0.2.0', content='', processed_content=''),
             v(version='0.3.0', content='', processed_content=''),
             v(version='0.4.0', content='', processed_content='')]
 
     update_changelog_from_raw_data3(changelog, data)
 
+    eq_(0, changelog.issues.count())
+
+
+def test_add_issue_if_we_found_more_than_one_new_version_and_they_have_bad_order():
+    changelog = Changelog.objects.create(
+        namespace='python', name='pip', source='test')
+
+    # we already know about one version
+    changelog.versions.create(
+        number='0.2.0', code_version='v2')
+
+    # it is strange, that version 1.2.3 follows 0.3.0
+    # and there is no 1.2.2 in the database
+    data = [v(version='0.2.0', content='', processed_content=''),
+            v(version='0.3.0', content='', processed_content=''),
+            v(version='1.2.3', content='', processed_content='')]
+
+    update_changelog_from_raw_data3(changelog, data)
+
     eq_(['too-many-new-versions'],
         [i.type for i in changelog.issues.all()])
     i = first(changelog.issues)
-    eq_(['0.3.0', '0.4.0'],
+    eq_(['0.3.0', '1.2.3'],
         i.get_related_versions())
+
 
 
 def test_add_issue_only_if_there_are_already_some_versions():

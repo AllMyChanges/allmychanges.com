@@ -12,10 +12,11 @@ from allmychanges.utils import (
 from allmychanges.exceptions import (
     UpdateError)
 from allmychanges import chat
-from allmychanges.version import reorder_versions
+from allmychanges.version import (
+    reorder_versions,
+    version_update_has_wrong_order)
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
-from django.utils.encoding import force_str
 
 
 def has_tzinfo(obj):
@@ -87,7 +88,8 @@ def update_changelog_from_raw_data3(obj, raw_data):
     else:
         # now new versions contains only those version numbers which were
         # not discovered yet
-        if len(new_versions) > 1 and hasattr(obj, 'create_issue'):
+        if hasattr(obj, 'create_issue') and \
+           version_update_has_wrong_order(current_versions, new_versions):
             obj.create_issue(type='too-many-new-versions',
                              comment='I found {related_versions}',
                              related_versions=new_versions)
