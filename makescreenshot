@@ -84,7 +84,11 @@ class Browser(QObject):
 
 	def _kill_xvfb(self):
 		pid = int(open(self.pidfile).read().strip())
-		os.kill(pid, signal.SIGINT)
+                try:
+		        os.kill(pid, signal.SIGINT)
+                except:
+                        # sometimes xvfb exits itself, but it is is OK
+                        pass
 
 	def _request(self, url):
 		'''
