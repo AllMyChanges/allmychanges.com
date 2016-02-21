@@ -208,10 +208,12 @@ def shell():
            name='shell.command.allmychanges.com')
 
 @task
-def test(case='', failed=False):
+def test(case='', failed=False, verbose=False):
     command = ['/env/bin/nosetests']
-    if failed:
-        command.append('--failed')
+
+    for name in ('verbose', 'failed'):
+        if locals().get(name):
+            command.append('--' + name)
 
     command.append(case)
 
