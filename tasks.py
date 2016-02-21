@@ -261,4 +261,10 @@ def restore_db():
     run('docker exec mysql.allmychanges.com /dumps/restore.sh')
 
 
+@task
+def build_static():
+    """Build static javascript and css files."""
+    run('node_modules/.bin/gulp')
+
+
 make_dashed_aliases(locals().values())
