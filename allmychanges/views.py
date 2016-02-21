@@ -423,12 +423,12 @@ class LoginView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(LoginView, self).get_context_data(**kwargs)
-        result['next'] = self.request.GET.get('next', reverse('digest'))
+        result['next'] = self.request.GET.get('next', reverse('track-list'))
         return result
 
     def get(self, request, **kwargs):
         if request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('digest'))
+            return HttpResponseRedirect(reverse('track-list'))
         return super(LoginView, self).get(request, **kwargs)
 
 
@@ -1454,6 +1454,8 @@ class TrackListView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(TrackListView, self).get_context_data(**kwargs)
+        context['menu_tracked_projects'] = True
+
         if self.request.user.is_authenticated():
             changelogs = list(self.request.user.changelogs.exclude(name=None).order_by('namespace', 'name'))
         else:

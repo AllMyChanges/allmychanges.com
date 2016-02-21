@@ -47924,15 +47924,6 @@ componentHandler.register({
 	                        null,
 	                        React.createElement(
 	                            'a',
-	                            { href: '/account/track-list/' },
-	                            'Track list'
-	                        )
-	                    ),
-	                    React.createElement(
-	                        'li',
-	                        null,
-	                        React.createElement(
-	                            'a',
 	                            { href: '/logout/?next=/' },
 	                            'Logout'
 	                        )
