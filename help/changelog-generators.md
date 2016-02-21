@@ -21,6 +21,8 @@ form.
   automatically generates changelog from your tags, issues, labels and pull requests on GitHub.
 * [lalitkapoor/github-changes](https://github.com/lalitkapoor/github-changes) – transforms
   closed GitHub issues into a changelog.
+* [changelogapp](https://github.com/samholmes1337/changelog) – command line utility to update
+  changelog data in json file and to generate a nice formatted markdown file.
 
 <a name="feedback"></a>
 Want to add a generator to the list?
