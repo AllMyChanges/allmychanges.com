@@ -37,5 +37,6 @@ RUN /env/bin/pip install -e /app
 
 ENV PATH=/env/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+COPY ./configs/.pdbrc.py /root/
 
 #ENTRYPOINT ["./manage.py"]
