@@ -137,8 +137,7 @@ def test_wrong_order_complex():
     eq_(True, version_update_has_wrong_order(versions, new_versions))
 
 
-
-def test_hole():
+def test_follows():
     eq_(True, follows('0.1.0', '0.1.1'))
     eq_(True, follows('0.1.0', '0.2.0'))
     eq_(True, follows('0.1.1', '0.2.0'))
@@ -147,7 +146,11 @@ def test_hole():
     eq_(False, follows('0.1.0', '0.2.1'))
     eq_(False, follows('0.2.0', '0.1.0'))
     eq_(False, follows('0.1.1', '0.1.0'))
+    eq_(True, follows('1.0.0-rc1', '1.0.0-rc2'))
+    eq_(False, follows('1.0.0-rc1', '1.0.0-rc3'))
 
+
+def test_hole():
     eq_(False, has_hole(['0.1.0', '0.2.0']))
     eq_(False, has_hole(['0.1.0', '0.1.1', '0.2.0']))
     eq_(True, has_hole(['0.2.0', '0.4.0']))

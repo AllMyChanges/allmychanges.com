@@ -1,3 +1,8 @@
+1.1.0 (Unreleased)
+==================
+
+* Fixed error when comparing version like 0.1.2-rc3.
+
 1.0.1 (2016-02-21)
 ==================
 

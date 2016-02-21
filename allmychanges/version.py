@@ -152,6 +152,18 @@ def follows(left, right):
     for left_item, right_item in zip(
             left.version,
             right.version):
+
+        # for versions like 0.1.2-rc3 there will be
+        # such parts: (0, 1, 2, '-', 'rc', 3)
+        # and here we want to ignore parts which are
+        # the same in left and right version
+        if isinstance(left_item, basestring) \
+           or isinstance(right_item, basestring):
+            if left_item == right_item:
+                continue
+            else:
+                return False
+
         difference = right_item - left_item
 
         if some_part_was_incremented and right_item != 0:
