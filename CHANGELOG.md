@@ -1,3 +1,8 @@
+1.0.1 (2016-02-21)
+==================
+
+* Fixed another place where snapshots are generated.
+
 1.0.0 (2016-02-21)
 ==================
 
