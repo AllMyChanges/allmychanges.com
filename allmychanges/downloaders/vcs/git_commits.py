@@ -54,7 +54,7 @@ def download(source, **params):
 
         if path:
             env = Environment(dirname=path)
-            versions = get_versions_from_vcs(env)
+            versions = list(get_versions_from_vcs(env))
 
             with open(os.path.join(path, 'versions.amchenvs'), 'w') as f:
                 f.write(serialize_envs(versions))

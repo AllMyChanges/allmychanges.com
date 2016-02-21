@@ -73,8 +73,7 @@ def _download(source, **params):
                     response = do(
                         'bash -c \'cd {path} && git fetch\''.format(
                             path=cache_dir),
-                        timeout=5 * 60,
-                        shell=True)
+                        timeout=5 * 60)
                     if response.status_code != 0:
                         if os.path.exists(cache_dir):
                             shutil.rmtree(cache_dir)
