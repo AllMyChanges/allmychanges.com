@@ -50,6 +50,7 @@ from oauth2_provider.models import Application, AccessToken
 
 from allmychanges.utils import (HOUR,
                                 parse_ints,
+                                get_keys,
                                 join_ints)
 from allmychanges.downloaders.utils import normalize_url
 from allmychanges.downloaders import guess_downloaders
@@ -438,9 +439,10 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         return 'allmychanges/package.html'
 
     def last_modified(self, *args, **kwargs):
-        discovered_versions = Version.objects.filter(
-            changelog__namespace=kwargs['namespace'],
-            changelog__name=kwargs['name']).order_by('-discovered_at')
+        params = get_keys(kwargs, 'namespace', 'name', 'pk')
+        params = {'changelog__' + key: value
+                  for key, value in params.items()}
+        discovered_versions = Version.objects.filter(**params).order_by('-discovered_at')
         latest = list(discovered_versions[:1].values_list('discovered_at', flat=True))
         if latest:
             return latest[0]
@@ -456,10 +458,11 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
 
         filter_args = {'code_version': code_version}
 
+        params = get_keys(kwargs, 'namespace', 'name', 'pk')
+
         changelog = get_object_or_404(
             Changelog.objects.prefetch_related('versions'),
-            namespace=kwargs['namespace'],
-            name=kwargs['name'])
+            **params)
 
         already_tracked = False
         if self.request.user.is_authenticated():

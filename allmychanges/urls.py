@@ -96,6 +96,8 @@ urlpatterns = patterns(
     url(r'^p/new/$', AddNewView2.as_view(), name='add-new'),
 
     url(r'^p/$', CategoriesView.as_view(), name='categories'),
+    # this url should go before category view because it has more specifity
+    url(r'^p/(?P<pk>\d+)/$', ProjectView.as_view(), name='project-by-id'),
     url(r'^p/(?P<category>[^/]+?)/$', CategoryView.as_view(), name='category'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit-old/$', EditPackageView.as_view(), name='edit-package-old'),

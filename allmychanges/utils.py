@@ -416,6 +416,18 @@ def update_fields(obj, **kwargs):
     obj.save(update_fields=kwargs.keys())
 
 
+def get_keys(d, *keys):
+    """Takes a dict and returns a new dict
+    where only given keys are present.
+
+    If there is no some key in original dict,
+    then it will be absent in the resulting dict too.
+    """
+    return {key: value
+            for key, value in d.items()
+            if key in keys}
+
+
 def do(command, timeout=60):
     with log.fields(command=command):
         log.debug('Running command')
