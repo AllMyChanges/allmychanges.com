@@ -11,13 +11,18 @@ from allmychanges.downloaders import (
 class Command(LogMixin, BaseCommand):
     help = u"""Download package sources into a temporary directory."""
 
+    def add_arguments(self, parser):
+        parser.add_argument('url')
+        parser.add_argument('--search-list')
+
     def handle(self, *args, **options):
         os.environ['DEV_DOWNLOAD'] = 'yes'
+        source = options.get('url')
 
-        source = args[0]
-        if len(args) > 1:
+        search_list = options.get('search_list')
+        if search_list:
             search_list = [(item, None)
-                           for item in args[1].split(',')]
+                           for item in search_list.split(',')]
         else:
             search_list = []
 
