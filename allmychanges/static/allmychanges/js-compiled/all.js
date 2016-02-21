@@ -48283,7 +48283,7 @@ componentHandler.register({
 	                { action: '/search/', method: 'GET' },
 	                React.createElement('input', { type: 'search', name: 'q', ref: 'input',
 	                    className: 'magic-prompt__input',
-	                    placeholder: 'Search packages and namespaces' }),
+	                    placeholder: 'Search project or enter repo\'s URL' }),
 	                React.createElement('div', { className: 'input-spin-wrapper' }),
 	                React.createElement('input', { type: 'submit', className: 'button _good _large magic-prompt__submit', value: 'Search' })
 	            )

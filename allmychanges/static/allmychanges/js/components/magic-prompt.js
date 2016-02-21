@@ -75,7 +75,7 @@ module.exports = React.createClass({
                 <form action="/search/" method="GET">
                   <input type="search" name="q" ref="input" 
                          className="magic-prompt__input" 
-                         placeholder="Search packages and namespaces"/><div className="input-spin-wrapper"></div>
+                         placeholder="Search project or enter repo's URL"/><div className="input-spin-wrapper"></div>
                   <input type="submit" className="button _good _large magic-prompt__submit" value="Search"/>
                 </form>
             </div>
