@@ -132,6 +132,17 @@ def build_image(dev=True):
     print 'Built', tag
 
 
+@task
+def push_image():
+    tag = 'localhost:5000/allmychanges.com:' + VERSION
+    tag = tag.replace('-dev', '')
+
+    run('docker build -t {} .'.format(tag))
+    run('docker push ' + tag)
+    print 'Pushed', tag
+
+
+
 def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ['docker run',]
 
