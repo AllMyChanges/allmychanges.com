@@ -5,7 +5,7 @@ import time
 import math
 import datetime
 import random
-import subprocess
+import envoy
 import jsonfield
 
 from hashlib import md5, sha1
@@ -881,12 +881,20 @@ class Version(models.Model):
         filename = sha1(image_url).hexdigest() + '.png'
         full_path = os.path.join(settings.SNAPSHOTS_ROOT, filename)
 
-        subprocess.check_call([
-            settings.PROJECT_ROOT + '/makescreenshot',
-            '--width', '590',
-            '--height', '600',
-            image_url,
-            full_path])
+
+        result = envoy.run(
+            '{root}/makescreenshot --width 590 --height 600 {url} {path}'.format(
+                root=settings.PROJECT_ROOT,
+                url=image_url,
+                path=full_path))
+
+        if result.status_code != 0:
+            with log.fields(
+                    status_code=result.status_code,
+                    std_out=result.std_out,
+                    std_err=result.std_err):
+                log.error('Unable to make a screenshot')
+                raise RuntimeError('Unable to make a screenshot')
 
         with open(full_path, 'rb') as f:
             from requests_oauthlib import OAuth1
