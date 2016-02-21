@@ -1,5 +1,36 @@
-0.31.1-2 (unreleased)
-===================
+1.0.0 (2016-02-21)
+==================
+
+### Major changes
+
+* Page with "Digest" was deprecated, now you'll see a link to [the page](https://allmychanges.com/account/track-list/) with a list of your tracked projects.
+
+### Fixes
+
+* Fixed parser's super power to build changelog from git's commits.
+This is a huge improvement because some time ago, this feature was broken and we were unable to collect
+changelogs for some projects. Now we are back in business :)
+* Fixed `=====` in Google Play's release notes by using oneline format for markdown headers.
+* Fixed our tool which makes a changelog's screenshot each time you share an URL to twitter or facebook.
+
+### Minor changes
+
+* Changed placeholder's text in the magic prompt.
+* Added ability to view projects by id, using urls like `/p/54/`. But this is more for convenience during
+log viewing and troubleshooting sessions.
+* Added [changelogapp](https://github.com/samholmes1337/changelog) (nodejs command line utility) to a changelog [generators list](https://allmychanges.com/help/changelog-generators/).
+
+
+### And more
+
+We finally migrated to dockerized deployment. This opens following possibilities:
+
+* it will be easier to scale in case if somebody suddenly will share a link at <https://www.producthunt.com>;
+* it will be easier to create "enterprise" version of AllMyChanges which will be hosted by big companies in their intranets.
+* it will be easier to setup development environment for a new team member. We are not hiring! But you can join the team if you want to build something useful for community.
+
+In case, if you have any questions, write me to <mailto:sasha@allmychanges.com>.
+
 
 0.31.0 (2016-01-16)
 ==================
