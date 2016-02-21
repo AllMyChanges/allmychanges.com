@@ -50,7 +50,7 @@ def send_digest_to(user, period='day'):
                                        code_version='v2')
 
         for changelog in other_changes:
-            changelog['url'] = reverse('package', kwargs=dict(
+            changelog['url'] = reverse('project', kwargs=dict(
                 namespace=changelog['namespace'],
                 name=changelog['name']))
 

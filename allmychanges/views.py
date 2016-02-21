@@ -152,7 +152,7 @@ def get_package_data_for_template(changelog,
 
     if ordering:
         # if we are in this branch, then we probably
-        # rendering PackageView
+        # rendering ProjectView
         versions_queryset = versions_queryset.order_by(*ordering)
         versions_queryset = versions_queryset[:limit_versions]
         # now we'll pop up any unreleased versions
@@ -431,7 +431,7 @@ class LoginView(CommonContextMixin, TemplateView):
         return super(LoginView, self).get(request, **kwargs)
 
 
-class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
+class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
     def get_template_names(self):
         if self.request.GET.get('snap'):
             return 'allmychanges/package-snap.html'
@@ -446,7 +446,7 @@ class PackageView(CommonContextMixin, LastModifiedMixin, TemplateView):
             return latest[0]
 
     def get_context_data(self, **kwargs):
-        result = super(PackageView, self).get_context_data(**kwargs)
+        result = super(ProjectView, self).get_context_data(**kwargs)
 
         code_version = self.request.GET.get('code_version', 'v2')
         result['code_version'] = code_version
@@ -866,7 +866,7 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
         if changelogs.count() == 1:
             changelog = changelogs[0]
             raise ImmediateResponse(
-                HttpResponseRedirect(reverse('package', kwargs=dict(
+                HttpResponseRedirect(reverse('project', kwargs=dict(
                     name=changelog.name,
                     namespace=changelog.namespace))))
 
@@ -877,7 +877,7 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
                 changelog = Changelog.objects.get(source=normalized_url)
                 if changelog.name is not None:
                     raise ImmediateResponse(
-                        HttpResponseRedirect(reverse('package', kwargs=dict(
+                        HttpResponseRedirect(reverse('project', kwargs=dict(
                             name=changelog.name,
                             namespace=changelog.namespace))))
 
@@ -946,7 +946,7 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                 changelog = Changelog.objects.get(source=normalized_url)
                 if changelog.name is not None:
                     raise ImmediateResponse(
-                        HttpResponseRedirect(reverse('package', kwargs=dict(
+                        HttpResponseRedirect(reverse('project', kwargs=dict(
                             name=changelog.name,
                             namespace=changelog.namespace))))
                 UserHistoryLog.write(self.request.user,

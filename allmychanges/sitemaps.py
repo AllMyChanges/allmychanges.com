@@ -15,7 +15,7 @@ class PackagesSitemap(Sitemap):
         return version.discovered_at
 
     def location(self, obj):
-        url = reverse('package', kwargs=dict(
+        url = reverse('project', kwargs=dict(
             name=obj.name,
             namespace=obj.namespace))
         return url

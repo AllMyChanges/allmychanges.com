@@ -358,7 +358,7 @@ class Changelog(Downloadable, models.Model):
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
-        return reverse('package', kwargs=dict(
+        return reverse('project', kwargs=dict(
             namespace=self.namespace,
             name=self.name))
 

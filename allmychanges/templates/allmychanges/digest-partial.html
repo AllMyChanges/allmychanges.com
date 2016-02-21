@@ -2,7 +2,7 @@
   {% if changes %}
   <h2 class="grouped-changes-title">{{title}}</h2>
     {% if toc %}
-    <p>This digest contains info about {% for package in changes %}<a href="{% url 'package' namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}. See details below.</p>
+    <p>This digest contains info about {% for package in changes %}<a href="{% url 'project' namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}. See details below.</p>
       {% if other_changes %}
         <p>{% blocktrans count other_changes_count=other_changes|length %}Also, during the {{ second_period_name }} this package was released:{% plural %}Also, during the {{ second_period_name }} these {{other_changes_count}} packages were released:{% endblocktrans %} {% for package in other_changes %}<a href="{{package.url}}">{{package.namespace}}/{{package.name}}</a> ({% for v in package.versions %}<a href="{{package.url}}#{{v.number}}">{{v.number}}</a>{% if not forloop.last %}, {% endif %}{% endfor %}){% if not forloop.last %}, {% endif %}{% endfor %}.</p>
       {% endif %}
@@ -10,7 +10,7 @@
   <ul class="grouped-changes">
     {% for package in changes %}
     <li class="package-changes">
-      <h3 class="package-changes__package-title"><a href="{% url 'package' namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a></h3>
+      <h3 class="package-changes__package-title"><a href="{% url 'project' namespace=package.namespace name=package.name %}">{{package.namespace}}/{{package.name}}</a></h3>
       <ul class="package-changes__version">
         {% include "allmychanges/blocks/package-changes.html" %}
       </ul>

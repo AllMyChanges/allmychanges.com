@@ -43,7 +43,7 @@ from .views import (OldIndexView,
                     AddNewView2,
                     ProfileView,
                     TokenView,
-                    PackageView,
+                    ProjectView,
                     EditPackageView2,
                     EditPackageView)
 from .sitemaps import PackagesSitemap
@@ -100,7 +100,7 @@ urlpatterns = patterns(
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit-old/$', EditPackageView.as_view(), name='edit-package-old'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView2.as_view(), name='edit-package'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', PackageView.as_view(), name='package'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', ProjectView.as_view(), name='project'),
 
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
