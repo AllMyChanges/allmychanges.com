@@ -1,2 +1,0 @@
--i file://home/art/dist/
-

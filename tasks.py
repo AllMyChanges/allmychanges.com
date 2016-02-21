@@ -129,6 +129,7 @@ def build_wheels():
 def build_image(dev=True):
     tag = 'localhost:5000/allmychanges.com:' + VERSION
     run('docker build -t {0} .'.format(tag))
+    print 'Built', tag
 
 
 def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
