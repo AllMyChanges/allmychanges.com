@@ -29,7 +29,7 @@ def test_show_packages():
     user = create_user('art')
     changelog = Changelog.objects.create(namespace='python',
                                          name='pip',
-                                         source='https://github.com/pipa/pip',
+                                         source='https://github.com/pypa/pip',
                                          created_at=timezone.now())
     user.track(changelog)
 
@@ -59,7 +59,7 @@ def test_add_package():
     response = cl.post('/v1/changelogs/',
                        dict(namespace='python',
                             name='pip',
-                            source='https://github.com/pipa/pip',
+                            source='https://github.com/pypa/pip',
                             downloader='vcs.git'))
     check_status_code(201, response)
     eq_(1, Changelog.objects.count())
@@ -81,7 +81,7 @@ def test_put_does_not_affect_created_at_field():
                         '/v1/changelogs/{0}/'.format(changelog.id),
                         namespace='python',
                         name='pip',
-                        source='https://github.com/pipa/pip',
+                        source='https://github.com/pypa/pip',
                         downloader='vcs.git')
     check_status_code(200, response)
 
@@ -131,7 +131,7 @@ class TransactionTests(TestCase):
                 cl.post('/v1/changelogs/',
                         dict(namespace='python',
                              name='pip',
-                             source='https://github.com/pipa/pip'))
+                             source='https://github.com/pypa/pip'))
             except RuntimeError:
                 pass
 

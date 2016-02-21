@@ -44,7 +44,7 @@ def guess(source, discovered={}):
             # TODO: hmmm
             pass
         finally:
-            if os.path.exists(path):
+            if path and os.path.exists(path):
                 shutil.rmtree(path)
 
         return result
@@ -61,6 +61,11 @@ def download(source,
     """
     with log.name_and_fields('http', source=source):
         log.info('Downloading')
+
+        # don't try to download urls used in unittests
+        if source.startswith('test+'):
+            log.info('Skipping this test urls.')
+            return
 
         search_list = parse_search_list(search_list)
         ignore_list = split_filenames(ignore_list)

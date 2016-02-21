@@ -11,6 +11,12 @@ from twiggy_goodies.threading import log
 def guess(source, discovered={}):
     with log.name_and_fields('feed', source=source):
         log.info('Guessing')
+
+        # don't try to download urls used in unittests
+        if source.startswith('test+'):
+            log.info('Skipping this test urls.')
+            return
+
         result = defaultdict(dict)
 
         try:
@@ -29,7 +35,11 @@ def download(source, **params):
     with log.name_and_fields('feed', source=source):
         log.info('Downloading')
 
-        source = source.replace('rss+', '').replace('atom+', '').replace('feed+', '')
+        # don't try to download urls used in unittests
+        if source.startswith('test+'):
+            log.info('Skipping this test urls.')
+            return
+
         feed = feedparser.parse(source)
         path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
 

@@ -52,13 +52,13 @@ def test_preview():
 
     # теперь обновим preview на несуществующий источник
     response = cl.post(preview_url,
-                       data=anyjson.serialize(dict(source='another source',
+                       data=anyjson.serialize(dict(source='test+another source',
                                                    ignore_list='NEWS',
                                                    search_list='docs')),
                        content_type='application/json')
     eq_(200, response.status_code)
     preview = refresh(preview)
-    eq_('another source', preview.source)
+    eq_('test+another source', preview.source)
     eq_('NEWS', preview.ignore_list)
     eq_('docs', preview.search_list)
 

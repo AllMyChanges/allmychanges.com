@@ -53,6 +53,7 @@ def _download(source, **params):
         with cd(path):
             if not os.path.exists(cache_dir):
                 log.info('Cloning into cache dir')
+
                 response = do(
                     'git clone --quiet --bare {url} {path}'.format(
                         url=url,
@@ -65,6 +66,22 @@ def _download(source, **params):
                     raise RuntimeError('Bad status_code from git clone: {0}. '
                                        'Git\'s stderr: {1}'.format(
                                            response.status_code, response.std_err))
+            else:
+                if settings.ENVIRONMENT == 'unittest':
+                    log.info('Skipping git fetch for this project because we are in unittest environment')
+                else:
+                    response = do(
+                        'bash -c \'cd {path} && git fetch\''.format(
+                            path=cache_dir),
+                        timeout=5 * 60,
+                        shell=True)
+                    if response.status_code != 0:
+                        if os.path.exists(cache_dir):
+                            shutil.rmtree(cache_dir)
+                        raise RuntimeError('Bad status_code from git clone: {0}. '
+                                           'Git\'s stderr: {1}'.format(
+                                               response.status_code, response.std_err))
+
 
             log.info('Cloning from cache dir')
             response = do('git clone --quiet {url} {path}'.format(
