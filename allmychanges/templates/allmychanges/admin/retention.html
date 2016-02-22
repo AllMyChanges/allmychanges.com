@@ -5,6 +5,20 @@
 {% block html-title %}{{ title }} – {{ block.super }}{% endblock %}
 
 {% block content %}
+  <h1 class="page-header">{{ title }}</h1>
+
+  <h2 class="page-subheader">Retention</h2>
+
+  <div id="retention-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+  <h2 class="page-subheader">Churn and Retention</h2>
+
+  <div id="churn-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+{% endblock content %}
+
+
+{% block body-bottom %}
   <!--link href="{% static 'metricsgraphics/metricsgraphics.css' %}" rel="stylesheet"-->
   <!--script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js" charset="utf-8"></script-->
   <!--script src="{% static 'metricsgraphics/metricsgraphics.js' %}" type="text/javascript" charset="utf-8"></script-->
@@ -14,11 +28,7 @@
   <!-- But for admin page it is ok -->
   <script src="//cdn.jsdelivr.net/ramda/0.19/ramda.min.js"></script>
 
-  <h1 class="page-header">{{ title }}</h1>
 
-  <h2 class="page-subheader">Retention</h2>
-
-  <div id="retention-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
   <script>
     $(function () {
       var series = {{ data|safe }};
@@ -73,12 +83,9 @@
         series: series
     });
   });
-  </script>
+    </script>
 
-  <h2 class="page-subheader">Churn and Retention</h2>
-
-  <div id="churn-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-  <script>
+    <script>
     $(function () {
       var data = {{ churn_data|safe }};
       var x_labels = {{ churn_labels|safe }};
@@ -134,4 +141,4 @@
   });
   </script>
 
-{% endblock content %}
+{% endblock %}
