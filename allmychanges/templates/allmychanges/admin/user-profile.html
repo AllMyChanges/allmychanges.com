@@ -19,7 +19,11 @@
     {% endif %}
     <dt>Joined at</dt>
     <dd>{{ customer.date_joined }}</dd>
-    <dt>Send digests</dt>
+    <dt>Last login at</dt>
+    <dd>{{ customer.last_login }}</dd>
+    <dt>Tracks</dt>
+    <dd>{{ customer.tracked_changelogs }} ({{ customer.num_changelogs }})</dd>
+        <dt>Send digests</dt>
     <dd>{{ customer.send_digest }}</dd>
     {% if customer.slack_url %}
       <dt>Uses Slack</dt>

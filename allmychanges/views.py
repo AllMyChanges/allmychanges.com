@@ -802,6 +802,15 @@ class AdminUserProfileView(SuperuserRequiredMixin,
         user = User.objects.get(username=kwargs['username'])
         result['customer'] = user
 
+        def get_user_tracks(user):
+            tracks = user.changelogs.all().values_list('namespace', 'name')
+            tracks = sorted(list(tracks))
+            return map(u'{0[0]}/{0[1]}'.format, tracks)
+
+        tracked_changelogs = get_user_tracks(user)
+        user.tracked_changelogs = ', '.join(tracked_changelogs)
+        user.num_changelogs = len(tracked_changelogs)
+
         heatmap = get_user_actions_heatmap(
             user,
             only_active=self.request.GET.get('all') is None)
