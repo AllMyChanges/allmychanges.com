@@ -26,6 +26,11 @@
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     
     <link href="{% static 'allmychanges/css/allmychanges.css' %}" rel="stylesheet">
+
+    <script src="/static/allmychanges/js-compiled/all.min.js?v=1" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
     <!-- TODO: научиться использовать без bower link href="{% static 'bower_components/intro.js/introjs.css' %}" rel="stylesheet"-->
 
     <!-- <script src="https://fb.me/react-0.14.0.js"></script> -->
@@ -201,9 +206,6 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 <!-- /Google.Analytics counter -->
 {% endif %}
 
-<script src="/static/allmychanges/js-compiled/all.min.js?v=1" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
-<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
 <script type="text/javascript" async src="//platform.twitter.com/widgets.js"></script>
 
 {% if messages %}

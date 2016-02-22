@@ -1299,6 +1299,17 @@ class AdminDashboardView(SuperuserRequiredMixin,
         for user in users:
             user.auth_providers = user.social_auth.all().values_list('provider', flat=True)
         result['users'] = users
+        return result
+
+
+class AdminRetentionView(SuperuserRequiredMixin,
+                         CommonContextMixin,
+                         TemplateView):
+    template_name = 'allmychanges/admin/retention.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(AdminRetentionView, self).get_context_data(**kwargs)
+        result['title'] = 'Admin :: Retention Graphs'
 
         # calculating cohorts for retention graphs
         now = arrow.utcnow()

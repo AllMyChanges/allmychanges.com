@@ -5,12 +5,9 @@
 {% block html-title %}{{ title }} – {{ block.super }}{% endblock %}
 
 {% block content %}
-  <!--link href="{% static 'metricsgraphics/metricsgraphics.css' %}" rel="stylesheet"-->
-  <!--script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js" charset="utf-8"></script-->
-  <!--script src="{% static 'metricsgraphics/metricsgraphics.js' %}" type="text/javascript" charset="utf-8"></script-->
-  <script src="{% static 'highcharts/highcharts.js' %}" type="text/javascript" charset="utf-8"></script>
-
   <h1 class="page-header">{{ title }}</h1>
+
+  <p><a href="{% url 'admin-retention' %}">Retention Graphs</a></p>
 
   <h2 class="page-subheader">Users, joined in last two weeks</h2>
 
@@ -37,123 +34,5 @@
     <p>Nobody joined in last two weeks :(<br/>
     We need to work on Marketing!</p>
   {% endif %}
-
-  <h2 class="page-subheader">Retention</h2>
-
-  <div id="retention-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-  <script>
-    $(function () {
-      var series = {{ data|safe }};
-      var data_legend = R.map(R.prop('name'), series);
-
-    $('#retention-graph').highcharts({
-        chart: {
-            type: 'area'
-        },
-        title: {
-            text: 'Quater Cohorts Retention'
-        },
-        xAxis: {
-            categories: data_legend,
-            tickmarkPlacement: 'on',
-            title: {
-                text: 'Weeks in past'
-            }
-        },
-        yAxis: {
-            title: {
-                text: 'Active users'
-            },
-            labels: {
-                formatter: function () {
-                    return this.value;
-                }
-            }
-        },
-        tooltip: {
-            shared: true,
-            valueSuffix: ' user'
-        },
-        plotOptions: {
-            area: {
-                pointStart: - series[0].data.length,
-                stacking: 'normal',
-                lineColor: '#666666',
-                lineWidth: 1,
-                marker: {
-                    enabled: false,
-                    lineWidth: 1,
-                    lineColor: '#666666',
-                    states: {
-                        hover: {
-                            enabled: true
-                        }
-                    }
-                }
-            }
-        },
-        series: series
-    });
-  });
-  </script>
-
-  <h2 class="page-subheader">Churn and Retention</h2>
-
-  <div id="churn-graph" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-  <script>
-    $(function () {
-      var data = {{ churn_data|safe }};
-      var x_labels = {{ churn_labels|safe }};
-
-    $('#churn-graph').highcharts({
-        chart: {
-            type: 'area'
-        },
-        title: {
-            text: 'Churns and Resurrects in Monthly Auditory'
-        },
-        xAxis: {
-            type: 'datetime',
-            categories: x_labels,
-            tickmarkPlacement: 'on',
-            title: {
-                text: 'Date'
-            }
-        },
-        yAxis: {
-            title: {
-                text: 'Active users'
-            },
-            labels: {
-                formatter: function () {
-                    return this.value;
-                }
-            }
-        },
-        tooltip: {
-            shared: true,
-            valueSuffix: ' user'
-        },
-        plotOptions: {
-            area: {
-                stacking: 'normal',
-                lineColor: '#666666',
-                lineWidth: 1,
-                marker: {
-                    enabled: false,
-                    lineWidth: 1,
-                    lineColor: '#666666',
-                    states: {
-                        hover: {
-                            enabled: true
-                        }
-                    }
-                }
-            }
-        },
-        series: data,
-    });
-  });
-  </script>
 
 {% endblock content %}
