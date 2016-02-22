@@ -4,9 +4,9 @@
 
 {% block content %}
   <!-- для отображения загруженности ангажированности пользователя -->
-  <script src="/static/bower_components/d3/d3.js" type="text/javascript" charset="utf-8"></script>
-  <script src="/static/bower_components/cal-heatmap/cal-heatmap.js" type="text/javascript" charset="utf-8"></script>
-  <link rel="stylesheet" href="/static/bower_components/cal-heatmap/cal-heatmap.css" />
+  <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.5.2/cal-heatmap.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.5.2/cal-heatmap.css" />
 
   <h1 class="page-header">Info</h1>
 
@@ -33,24 +33,13 @@
   
   <h1 class="page-header">User activity</h1>
   <div id="cal-heatmap"></div>
-
   <script type="text/javascript">
-    var cal = new CalHeatMap();
     var activity_heat_map = {{activity_heat_map|safe}};
-    var year_ago = new Date();
-    year_ago.setFullYear(year_ago.getFullYear() - 1);
-    year_ago.setMonth(year_ago.getMonth() + 1);
-
-    cal.init({domain: 'month',
-              subDomain: 'day',
-              tooltip: true,
-              start: year_ago,
-              data: activity_heat_map});
   </script>
 
-    <h1 class="page-header">User history</h1>
-    <table class="user-history table">
-      <thead>
+  <h1 class="page-header">User history</h1>
+  <table class="user-history table">
+    <thead>
       <tr>
         <th>Created at</th>
         <th>Action</th>
@@ -58,9 +47,9 @@
         <th>Light ID</th>
         <th>Description</th>
       </tr>
-      </thead>
+    </thead>
 
-      <tbody>
+    <tbody>
       {% for item in log %}
       <tr class="table user-history__raw">
         <td>{{ item.created_at|timesince }}</td>
@@ -70,6 +59,6 @@
         <td>{{ item.description }}</td>
       </tr>
       {% endfor %}
-      </tbody>
-    </table>
+    </tbody>
+  </table>
 {% endblock content %}

@@ -51,6 +51,7 @@
 	__webpack_require__(257).render();
 	__webpack_require__(258).render();
 	__webpack_require__(260).render();
+	__webpack_require__(262);
 
 /***/ },
 /* 1 */
@@ -37551,6 +37552,28 @@
 	            { className: 'landing-page' },
 	            React.createElement(PackageSelector, { url: '/v1/landing-package-suggest/?limit=1&versions_limit=5' })
 	        );
+	    }
+	});
+
+/***/ },
+/* 262 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	$(document).ready(function () {
+	    if (window.activity_heat_map !== undefined) {
+
+	        var cal = new CalHeatMap();
+	        var year_ago = new Date();
+	        year_ago.setFullYear(year_ago.getFullYear() - 1);
+	        year_ago.setMonth(year_ago.getMonth() + 1);
+
+	        cal.init({ domain: 'month',
+	            subDomain: 'day',
+	            tooltip: true,
+	            start: year_ago,
+	            data: window.activity_heat_map });
 	    }
 	});
 
