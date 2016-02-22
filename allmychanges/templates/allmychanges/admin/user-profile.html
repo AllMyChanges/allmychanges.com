@@ -8,6 +8,29 @@
   <script src="/static/bower_components/cal-heatmap/cal-heatmap.js" type="text/javascript" charset="utf-8"></script>
   <link rel="stylesheet" href="/static/bower_components/cal-heatmap/cal-heatmap.css" />
 
+  <h1 class="page-header">Info</h1>
+
+  <dl class="user-contacts">
+    <dt>Username</dt>
+    <dd>{{ customer.username }}</dd>
+    {% if customer.email %}
+      <dt>Email</dt>
+      <dd><a target="_blank" href="https://mail.yandex.ru/?uid={{ settings.YANDEX_UID }}#search?request={{ customer.email|urlencode }}">{{ customer.email }}</a> <a target="_blank" href="https://mail.yandex.ru/?uid={{ settings.YANDEX_UID }}#compose?to={{ customer.email|urlencode }}&subject=A%20question%20from%20AllMyChanges%20founder"><i class="fa fa-envelope-o"></i></a></dd>
+    {% endif %}
+    <dt>Joined at</dt>
+    <dd>{{ customer.date_joined }}</dd>
+    <dt>Send digests</dt>
+    <dd>{{ customer.send_digest }}</dd>
+    {% if customer.slack_url %}
+      <dt>Uses Slack</dt>
+      <dd>Yes</dd>
+    {% endif %}
+    {% if customer.webhook_url %}
+      <dt>Uses Webhook</dt>
+      <dd>Yes</dd>
+    {% endif %}
+  </dl>
+  
   <h1 class="page-header">User activity</h1>
   <div id="cal-heatmap"></div>
 

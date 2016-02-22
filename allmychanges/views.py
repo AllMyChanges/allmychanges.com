@@ -800,6 +800,7 @@ class AdminUserProfileView(SuperuserRequiredMixin,
     def get_context_data(self, **kwargs):
         result = super(AdminUserProfileView, self).get_context_data(**kwargs)
         user = User.objects.get(username=kwargs['username'])
+        result['customer'] = user
 
         heatmap = get_user_actions_heatmap(
             user,
