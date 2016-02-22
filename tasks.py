@@ -8,11 +8,18 @@ from invoke import task, run
 #invoke.tasks.Task
 from common_tasks import (
     update_requirements,
-    make_dashed_aliases,
-    get_current_version)
+    make_dashed_aliases)
 
 
-VERSION = get_current_version() + '-dev'
+DEV_TAG = 'allmychanges.com:dev'
+
+
+def get_current_version():
+    """This helper returns a version number to be built before release.
+    """
+    with open('CURRENT_VERSION') as f:
+        first_line = f.readline()
+        return first_line.strip()
 
 
 def get_docker_client():
@@ -127,16 +134,14 @@ def build_wheels():
 
 @task
 def build_image(dev=True):
-    tag = 'localhost:5000/allmychanges.com:' + VERSION
+    tag = DEV_TAG
     run('docker build -t {0} .'.format(tag))
     print 'Built', tag
 
 
 @task
 def push_image():
-    tag = 'localhost:5000/allmychanges.com:' + VERSION
-    tag = tag.replace('-dev', '')
-
+    tag = 'localhost:5000/allmychanges.com:' + get_current_version()
     run('docker build -t {} .'.format(tag))
     run('docker push ' + tag)
     print 'Pushed', tag
@@ -147,9 +152,7 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ['docker run',]
 
     if image is None:
-        image = os.environ.get(
-            'IMAGE',
-            'localhost:5000/allmychanges.com:' + VERSION)
+        image = os.environ.get('IMAGE', DEV_TAG)
 
     if rm:
         command.append('--rm')
