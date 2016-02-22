@@ -2,12 +2,9 @@ import re
 
 from django.conf.urls import patterns, include, url
 
-from django.contrib import admin
 from django.conf import settings
 from django.views.generic.base import RedirectView
-from django.conf import settings
 
-admin.autodiscover()
 
 from .views import (OldIndexView,
                     IssuesView,
@@ -17,7 +14,7 @@ from .views import (OldIndexView,
                     IssueDetailView,
                     SleepView,
                     IndexView,
-                    UserHistoryView,
+                    AdminUserProfileView,
                     HumansView,
                     RenderView,
                     SearchView,
@@ -85,8 +82,6 @@ urlpatterns = patterns(
     url(r'^package-selector-versions/$', PackageSelectorVersionsView.as_view(), name='package-selector-versions'),
     url(r'^preview/(?P<pk>.*?)/$', PreviewView.as_view(), name='preview'),
 
-    url(r'^u/(?P<username>.*?)/', UserHistoryView.as_view(), name='user-history'),
-
     url(r'^issues/$', IssuesView.as_view(), name='issues'),
     url(r'^issues/(?P<pk>.*)/$', IssueDetailView.as_view(), name='issue-detail'),
 
@@ -107,8 +102,9 @@ urlpatterns = patterns(
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
     url(r'^v1/', include('allmychanges.api.urls')),
-    url(r'^admin/dashboard/$', AdminDashboardView.as_view(), name='admin-dashboard'),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/$', AdminDashboardView.as_view(), name='admin-dashboard'),
+    url(r'^admin/u/(?P<username>.*?)/', AdminUserProfileView.as_view(), name='admin-user-profile'),
+
     url(r'^favicon.ico/$', lambda x: redirect('/static/favicon.ico')),
     url(r'^django-rq/', include('django_rq.urls')),
     url(r'^logout/', 'django.contrib.auth.views.logout', name='logout'),

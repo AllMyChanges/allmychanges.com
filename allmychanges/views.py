@@ -792,13 +792,13 @@ class TokenView(LoginRequiredMixin, CommonContextMixin, FormView):
         return super(TokenView, self).form_valid(form)
 
 
-class UserHistoryView(SuperuserRequiredMixin,
-                      CommonContextMixin,
-                      TemplateView):
-    template_name = 'allmychanges/user-history.html'
+class AdminUserProfileView(SuperuserRequiredMixin,
+                           CommonContextMixin,
+                           TemplateView):
+    template_name = 'allmychanges/admin/user-profile.html'
 
     def get_context_data(self, **kwargs):
-        result = super(UserHistoryView, self).get_context_data(**kwargs)
+        result = super(AdminUserProfileView, self).get_context_data(**kwargs)
         user = User.objects.get(username=kwargs['username'])
 
         heatmap = get_user_actions_heatmap(
@@ -1260,7 +1260,7 @@ def get_cohort_stats(start_from, cohort):
 class AdminDashboardView(SuperuserRequiredMixin,
                          CommonContextMixin,
                          TemplateView):
-    template_name = 'allmychanges/admin-dashboard.html'
+    template_name = 'allmychanges/admin/dashboard.html'
 
     def get_context_data(self, **kwargs):
         result = super(AdminDashboardView, self).get_context_data(**kwargs)

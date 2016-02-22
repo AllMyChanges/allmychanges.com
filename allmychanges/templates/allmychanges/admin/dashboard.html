@@ -26,7 +26,7 @@
     {% for user in users %}
     <tr>
       <td>{{user.date_joined|timesince}}</td>
-      <td><a href="{% url 'user-history' username=user.username %}">{{user.username}}</a></td>
+      <td><a href="{% url 'admin-user-profile' username=user.username %}">{{user.username}}</a></td>
       <td>{{user.email}}</td>
       <td>{{user.num_changelogs}}</td>
       <td>{{user.auth_providers|join:", "}}</td>
