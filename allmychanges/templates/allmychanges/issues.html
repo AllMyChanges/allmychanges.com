@@ -25,7 +25,7 @@
           <td><a href="{{ current_url }}type={{ issue.type }}">{{ issue.type }}</a></td>
           <td><a href="{{ current_url }}namespace={{ issue.changelog.namespace }}&name={{ issue.changelog.name }}">{{ issue.changelog.namespace }}/{{ issue.changelog.name }}</a></td>
           <td>{{ issue.comment }}</td>
-          <td><a href="{{ current_url }}username={{ issue.user.username }}">{% firstof issue.user "" %}</a></td>
+          <td><a href="{% url 'admin-user-profile' username=issue.user.username %}">{% firstof issue.user "" %}</a></td>
           <td style="white-space: nowrap">{% if not issue.resolved_at %}<span class="resolve-button-container" data-issue-id="{{ issue.id }}"></span>{% endif %}<a class="button" href="{{ issue.changelog.get_absolute_url }}">View</a></td>
         </tr>
         {% endfor %}

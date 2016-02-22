@@ -807,9 +807,21 @@ class AdminUserProfileView(SuperuserRequiredMixin,
             tracks = sorted(list(tracks))
             return map(u'{0[0]}/{0[1]}'.format, tracks)
 
+        # show changelogs
         tracked_changelogs = get_user_tracks(user)
         user.tracked_changelogs = ', '.join(tracked_changelogs)
         user.num_changelogs = len(tracked_changelogs)
+
+        # show social profiles, used for authentication
+        user.auth_through = {}
+
+        auth_templates = {'twitter': ('Twitter', 'https://twitter.com/{username}'),
+                          'github': ('GitHub', 'https://github.com/{username}/')}
+        auth = user.social_auth.all().values_list('provider', flat=True)
+        for item in auth:
+            title, tmpl = auth_templates.get(item)
+            user.auth_through[title] = tmpl.format(username=user.username)
+
 
         heatmap = get_user_actions_heatmap(
             user,

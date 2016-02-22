@@ -23,8 +23,12 @@
     <dd>{{ customer.last_login }}</dd>
     <dt>Tracks</dt>
     <dd>{{ customer.tracked_changelogs }} ({{ customer.num_changelogs }})</dd>
-        <dt>Send digests</dt>
+    <dt>Send digests</dt>
     <dd>{{ customer.send_digest }}</dd>
+    {% for name, url in customer.auth_through.items %}
+      <dt>{{ name }}</dt>
+      <dd><a href="{{ url }}" target="_blank">{{ url }}</a></dd>
+    {% endfor %}
     {% if customer.slack_url %}
       <dt>Uses Slack</dt>
       <dd>Yes</dd>
