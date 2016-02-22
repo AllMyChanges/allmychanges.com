@@ -1,4 +1,4 @@
-1.1.0 (Unreleased)
+1.1.0-rc1 (Unreleased)
 ==================
 
 * Fixed error when comparing version like 0.1.2-rc3.
