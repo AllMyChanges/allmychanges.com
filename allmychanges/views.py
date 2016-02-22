@@ -11,8 +11,7 @@ import urllib
 import re
 import markdown2
 
-from itertools import groupby
-from operator import itemgetter
+from itertools import groupby, takewhile
 from hashlib import sha1
 from braces.views import (LoginRequiredMixin,
                           UserPassesTestMixin)
@@ -1254,6 +1253,7 @@ def expand_weeks(start, end):
         yield date
         date = date.replace(days=7)
 
+
 def get_cohort_stats(start_from, cohort):
     """Возвращает новый словарь, добавляя к когорте поле data.
     При этом data, это словарик, содержащий число активных пользователей
@@ -1264,18 +1264,27 @@ def get_cohort_stats(start_from, cohort):
     cohort_starts_at = cohort['date']
 
     date = start_from
+    history_log = UserHistoryLog.objects.filter(
+        user__in=cohort['users'],
+        action__in=ACTIVE_USER_ACTIONS,
+        created_at__range=(cohort_starts_at.date(), today.date()))
+
+    log_iterator = iter(history_log.order_by('created_at'))
+
     while date < today:
         next_date = date.replace(days=7)
         if date >= cohort_starts_at:
-            active_users = cohort['users'].filter(
-                history_log__action__in=ACTIVE_USER_ACTIONS,
-                history_log__created_at__range=(
-                    date.date(), next_date.date())) \
-                                          .distinct().count()
+            period_log_items = takewhile(
+                lambda item: item.created_at < next_date,
+                log_iterator)
+            period_uniq_uids = set(item.user_id for item in period_log_items)
+            active_users = len(period_uniq_uids)
+
         else:
             active_users = None
         stats.append(active_users)
         date = next_date
+
     return dict(cohort, data=stats)
 
 
