@@ -802,15 +802,21 @@ class AdminUserProfileView(SuperuserRequiredMixin,
         user = User.objects.get(username=kwargs['username'])
         result['customer'] = user
 
-        def get_user_tracks(user):
-            tracks = user.changelogs.all().values_list('namespace', 'name')
-            tracks = sorted(list(tracks))
-            return map(u'{0[0]}/{0[1]}'.format, tracks)
+        def format_names(changelogs):
+            values = list(changelogs.values_list('namespace', 'name'))
+            values.sort()
+            return map(u'{0[0]}/{0[1]}'.format, values)
 
         # show changelogs
-        tracked_changelogs = get_user_tracks(user)
+        tracked_changelogs = format_names(user.changelogs.all())
         user.tracked_changelogs = ', '.join(tracked_changelogs)
         user.num_changelogs = len(tracked_changelogs)
+
+        # moderated changelogs
+        user.moderated_changelogs_str = ', '.join(format_names(user.moderated_changelogs.all()))
+
+        # skips changelogs
+        user.skips_changelogs_str = ', '.join(format_names(user.skips_changelogs.all()))
 
         # calculate issues count
         user.opened_issues = user.issues.filter(resolved_at=None).count()

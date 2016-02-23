@@ -41,6 +41,14 @@
       <dt>Issues</dt>
       <dd><a href="{% url 'issues' %}?username={{ customer.username }}">opened – {{ customer.opened_issues }}</a>, <a href="{% url 'issues' %}?username={{ customer.username }}&resolved=1">resolved – {{ customer.resolved_issues }}</a></dd>
     {% endif %}
+    {% if customer.moderated_changelogs_str %}
+      <dt>Moderates</dt>
+      <dd>{{ customer.moderated_changelogs_str }}</dd>
+    {% endif %}
+    {% if customer.skips_changelogs_str %}
+      <dt>Skips</dt>
+      <dd>{{ customer.skips_changelogs_str }}</dd>
+    {% endif %}
 
     {% for key, field in customer.custom_fields.items %}
       <dt>{{ key }}</dt>
