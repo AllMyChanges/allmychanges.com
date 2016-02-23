@@ -1,0 +1,34 @@
+{% extends "allmychanges/new-base.html" %}
+
+{% block login-plate %}{% endblock %}
+
+{% block content %}
+  <h1 class="page-header">Custom fields for {{ customer.username }}</h1>
+
+  <form action="." method="POST">
+    <table>
+    {% for key, field in customer.custom_fields.items %}
+    <tr>
+      <td><label for="field-{{ key }}">{{ key }}</label></td>
+      <td colspan="2"><input type="text" name="field-{{ key }}" value="{{ field.value }}" /></td>
+    </tr>
+    {% endfor %}
+
+    <tr><td colspan="3">&nbsp;</td></tr>
+    <tr><td colspan="3"><label for="new-field-name">Add new field:</label></td></tr>
+    <tr>
+      <td><input type="text" name="new-field-name" /></td>
+      <td>
+        <select type="text" name="new-field-type">
+          {% for option in field_types %}
+          <option>{{ option }}</option>
+          {% endfor %}
+        </select>
+      </td>
+      <td><input type="text" name="new-field-value" /></td>
+    </tr>
+    <tr><td colspan="3" align="right"><input type="submit" /></td></tr>
+    </table>
+    {% csrf_token %}
+  </form>
+{% endblock content %}

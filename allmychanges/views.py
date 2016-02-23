@@ -853,6 +853,49 @@ class AdminUserProfileView(SuperuserRequiredMixin,
         return result
 
 
+class AdminUserProfileEditView(SuperuserRequiredMixin,
+                               CommonContextMixin,
+                               TemplateView):
+    template_name = 'allmychanges/admin/user-profile-edit.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(AdminUserProfileEditView, self).get_context_data(**kwargs)
+        user = User.objects.get(username=kwargs['username'])
+        result['customer'] = user
+        result['field_types'] = ['email', 'url', 'text']
+        return result
+
+    def post(self, request, **kwargs):
+        data = request.POST
+        user = User.objects.get(username=kwargs['username'])
+
+        new_field_name = data.get('new-field-name')
+        new_field_type = data.get('new-field-type')
+        new_field_value = data.get('new-field-value')
+
+        user_changed = False
+
+        if new_field_name and new_field_value and new_field_type:
+            user.custom_fields[new_field_name] = dict(
+                type=new_field_type,
+                value=new_field_value)
+            user_changed = True
+
+        prefix = 'field-'
+        for key, value in request.POST.items():
+            if key.startswith(prefix):
+                field_name = key[len(prefix):]
+                old_value = user.custom_fields[field_name]['value']
+                if old_value != value:
+                    user.custom_fields[field_name]['value'] = value
+                    user_changed = True
+
+        if user_changed:
+            user.save(update_fields=('custom_fields',))
+
+        return HttpResponseRedirect(reverse('admin-user-profile', kwargs=kwargs))
+
+
 class ImmediateResponse(BaseException):
     def __init__(self, response):
         self.response = response

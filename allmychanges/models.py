@@ -140,6 +140,10 @@ class User(AbstractBaseUser):
                                 unique=True,
                                 blank=True,
                                 null=True)
+    custom_fields = jsonfield.JSONField(
+        default={},
+        help_text='Custom fields such like "Location" or "SecondEmail".',
+        blank=True)
 
     objects = UserManager()
 

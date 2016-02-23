@@ -8,7 +8,7 @@
   <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.5.2/cal-heatmap.min.js"></script>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.5.2/cal-heatmap.css" />
 
-  <h1 class="page-header">Info</h1>
+  <h1 class="page-header">Info <a class="text-index" href="{% url 'admin-user-profile-edit' username=customer.username %}"><i class="fa fa-pencil"></i></a></h1>
 
   <dl class="user-contacts">
     <dt>Username</dt>
@@ -37,6 +37,20 @@
       <dt>Uses Webhook</dt>
       <dd>Yes</dd>
     {% endif %}
+
+    {% for key, field in customer.custom_fields.items %}
+      <dt>{{ key }}</dt>
+      {% if field.type == 'email' %}
+        <dd><a target="_blank" href="https://mail.yandex.ru/?uid={{ settings.YANDEX_UID }}#search?request={{ field.value|urlencode }}">{{ field.value }}</a> <a target="_blank" class="text-index" href="https://mail.yandex.ru/?uid={{ settings.YANDEX_UID }}#compose?to={{ field.value|urlencode }}&subject=A%20question%20from%20AllMyChanges%20founder"><i class="fa fa-envelope-o"></i></a></dd>
+      {% endif %}
+      {% if field.type == 'url' %}
+        <dd><a target="_blank" href="{{ field.value }}">{{ field.value }}</a></dd>
+      {% endif %}
+      {% if field.type == 'text' %}
+        <dd>{{ field.value }}</dd>
+      {% endif %}
+    {% endfor %}
+
   </dl>
   
   <h1 class="page-header">User activity</h1>

@@ -364,6 +364,11 @@ a:hover {
   margin-bottom: 16px;
   font-family: pragmatica-web-condensed, sans-serif;
 }
+.text-index {
+  font-size: 0.5em;
+  position: relative;
+  top: -0.7em;
+}
 .nowrap {
   white-space: nowrap;
 }
