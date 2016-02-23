@@ -903,9 +903,9 @@ class ImmediateResponse(BaseException):
 
 
 class ImmediateMixin(object):
-    def get(self, *args, **kwargs):
+    def dispatch(self, *args, **kwargs):
         try:
-            return super(ImmediateMixin, self).get(*args, **kwargs)
+            return super(ImmediateMixin, self).dispatch(*args, **kwargs)
         except ImmediateResponse as e:
             return e.response
 
@@ -1112,6 +1112,34 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
 
 class EditPackageView2(EditPackageView):
     template_name = 'allmychanges/edit-package2.html'
+
+
+class SynonymsView(ImmediateMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/synonyms.html'
+
+    def _get_changelog_and_check_rights(self, **kwargs):
+        changelog = Changelog.objects.get(namespace=kwargs['namespace'],
+                                          name=kwargs['name'])
+
+        if not changelog.editable_by(self.request.user,
+                                     self.request.light_user):
+            raise ImmediateResponse(
+                HttpResponse('Access denied', status=403))
+
+        return changelog
+
+
+    def get_context_data(self, **kwargs):
+        context = super(SynonymsView, self).get_context_data(**kwargs)
+        context['changelog'] = self._get_changelog_and_check_rights(**kwargs)
+        return context
+
+    def post(self, request, **kwargs):
+        changelog = self._get_changelog_and_check_rights(**kwargs)
+        synonym = request.POST.get('synonym')
+        changelog.add_synonym(synonym)
+        return HttpResponseRedirect(reverse('synonyms', kwargs=kwargs))
+
 
 
 

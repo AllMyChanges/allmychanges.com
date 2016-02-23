@@ -1,0 +1,27 @@
+{% extends "allmychanges/new-base.html" %}
+{% load md2 %}
+{% load allmychanges_tags %}
+
+
+{% block html-title %}{{ changelog.namespace }}/{{ changelog.name }}'s synonyms {{ block.super }}{% endblock %}
+
+{% block content %}
+
+
+<h1 class="page-header">{{ changelog.namespace }}/{{ changelog.name }}'s synonyms <a class="text-index" href="{% url 'project' namespace=changelog.namespace name=changelog.name %}"><i class="fa fa-reply"></i></a></h1>
+
+<ul class="synonyms-list">
+  {% for synonym in changelog.synonyms.all %}
+  <li>{{ synonym.source }}</li>
+  {% endfor %}
+</ul>
+
+<h2 class="page-subheader">Add new</h2>
+
+<form class="new-synonym-form" action="." method="POST">
+  {% csrf_token %}
+  <input class="text" name="synonym" />
+  <input type="submit" />
+</form>
+
+{% endblock content %}

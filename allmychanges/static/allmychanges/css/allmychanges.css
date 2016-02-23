@@ -1456,6 +1456,9 @@ a:hover {
   height: 50%;
   max-height: 100px;
 }
+.synonyms-list {
+  list-style-position: inside;
+}
 .track-button {
   position: relative;
   display: inline-block;
