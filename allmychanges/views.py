@@ -39,6 +39,7 @@ from allmychanges.models import (Version,
                                  Changelog,
                                  User,
                                  UserHistoryLog,
+                                 SourceSynonym,
                                  Preview)
 from allmychanges.churn import get_user_actions_heatmap
 from allmychanges import chat
@@ -915,8 +916,45 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(SearchView, self).get_context_data(**kwargs)
-
         q = self.request.GET.get('q').strip()
+
+        # first, try to find q among source urls
+        if '://' in q:
+            # then might be it is a URL?
+            normalized_url, _, _ = normalize_url(q, for_checkout=False)
+            try:
+                changelog = Changelog.objects.get(source=normalized_url)
+                if changelog.name is not None:
+                    raise ImmediateResponse(
+                        HttpResponseRedirect(reverse('project', kwargs=dict(
+                            name=changelog.name,
+                            namespace=changelog.namespace))))
+
+            except Changelog.DoesNotExist:
+                pass
+
+        # next, try to find q among synonyms
+        synonyms = SourceSynonym.objects.all().values_list('changelog_id', 'source')
+        for changelog_id, pattern in synonyms:
+            if re.match(pattern, q) is not None:
+                changelog = Changelog.objects.get(pk=changelog_id)
+                raise ImmediateResponse(
+                    HttpResponseRedirect(reverse('project', kwargs=dict(
+                        name=changelog.name,
+                        namespace=changelog.namespace))))
+
+
+        # if q is looks like an URL and we come to this point,
+        # then user entered an unknown url and we need to redirect
+        # him to a page where he could tune parser and add a new project
+        if '://' in q:
+            raise ImmediateResponse(
+                    HttpResponseRedirect(reverse('add-new') \
+                                         + '?' \
+                                         + urllib.urlencode({'url': normalized_url})))
+
+
+        # finally, try to find exact match by namespace and name
         if '/' in q:
             namespace, name = q.split('/', 1)
         elif ' ' in q:
@@ -937,24 +975,6 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
                     name=changelog.name,
                     namespace=changelog.namespace))))
 
-        if '://' in q:
-            # then might be it is a URL?
-            normalized_url, _, _ = normalize_url(q, for_checkout=False)
-            try:
-                changelog = Changelog.objects.get(source=normalized_url)
-                if changelog.name is not None:
-                    raise ImmediateResponse(
-                        HttpResponseRedirect(reverse('project', kwargs=dict(
-                            name=changelog.name,
-                            namespace=changelog.namespace))))
-
-            except Changelog.DoesNotExist:
-                pass
-
-            raise ImmediateResponse(
-                    HttpResponseRedirect(reverse('add-new') \
-                                         + '?' \
-                                         + urllib.urlencode({'url': normalized_url})))
 
         context.update(params)
         context['changelogs'] = changelogs

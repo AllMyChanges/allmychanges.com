@@ -552,6 +552,17 @@ class Changelog(Downloadable, models.Model):
                 print 'OK, now I need to sleep {0} seconds because of GitHub\'s rate limit.'.format(to_sleep)
                 time.sleep(to_sleep)
 
+    def add_synonym(self, synonym):
+        """Just a shortcut."""
+        self.synonyms.create(source=synonym)
+
+
+
+class SourceSynonym(models.Model):
+    changelog = models.ForeignKey(Changelog, related_name='synonyms')
+    created_at = models.DateTimeField(default=timezone.now)
+    source = URLField(unique=True)
+
 
 class ChangelogTrack(models.Model):
     user = models.ForeignKey(User)
