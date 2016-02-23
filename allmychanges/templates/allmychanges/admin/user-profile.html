@@ -37,6 +37,10 @@
       <dt>Uses Webhook</dt>
       <dd>Yes</dd>
     {% endif %}
+    {% if customer.opened_issues or customer.resolved_issues %}
+      <dt>Issues</dt>
+      <dd><a href="{% url 'issues' %}?username={{ customer.username }}">opened – {{ customer.opened_issues }}</a>, <a href="{% url 'issues' %}?username={{ customer.username }}&resolved=1">resolved – {{ customer.resolved_issues }}</a></dd>
+    {% endif %}
 
     {% for key, field in customer.custom_fields.items %}
       <dt>{{ key }}</dt>

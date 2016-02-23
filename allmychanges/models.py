@@ -583,7 +583,10 @@ class Issue(models.Model):
                                   related_name='issues',
                                   blank=True,
                                   null=True)
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(User,
+                             related_name='issues',
+                             blank=True,
+                             null=True)
     light_user = models.CharField(max_length=40, blank=True, null=True)
     type = models.CharField(max_length=40)
     comment = models.TextField()
