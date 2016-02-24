@@ -574,11 +574,17 @@ class Changelog(Downloadable, models.Model):
 
     def merge_into(self, to_ch):
         # move trackers
+        to_ch_trackers = set(to_ch.trackers.values_list('id', flat=True))
+
         for user in self.trackers.all():
-            ChangelogTrack.objects.create(user=user, changelog=to_ch)
-            action = 'moved-during-merge'
-            action_description = 'User was moved from changelog:{0}'.format(self.id)
-            UserHistoryLog.write(user, '', action, action_description)
+            if user.id not in to_ch_trackers:
+                ChangelogTrack.objects.create(user=user, changelog=to_ch)
+                action = 'moved-during-merge'
+                action_description = 'User was moved from {0}/{1} to changelog:{2}'.format(
+                    self.namespace,
+                    self.name,
+                    to_ch.id)
+                UserHistoryLog.write(user, '', action, action_description)
 
         # move issues
         for issue in self.issues.all():
