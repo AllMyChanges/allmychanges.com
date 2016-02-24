@@ -1139,6 +1139,12 @@ a:hover {
 .logo__link:hover {
   color: #d9042b;
 }
+.merge-project-form label {
+  margin-right: 1em;
+}
+.merge-project-form > p {
+  margin-bottom: 1em;
+}
 .modal-popup {
   position: fixed;
   left: 0;

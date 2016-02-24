@@ -33,6 +33,7 @@ from allmychanges.tasks import (
     update_preview_task,
     update_changelog_task)
 
+from allmychanges.exceptions import SynonymError
 
 MARKUP_CHOICES = (
     ('markdown', 'markdown'),
@@ -554,8 +555,41 @@ class Changelog(Downloadable, models.Model):
 
     def add_synonym(self, synonym):
         """Just a shortcut."""
-        self.synonyms.create(source=synonym)
+        if self.synonyms.filter(source=synonym).count() == 0:
+            # if this synonym already bound to some another project
+            # then raise exception
+            found = list(SourceSynonym.objects.filter(source=synonym))
+            if found:
+                with log.fields(changelog_id=self.pk,
+                                another_changelog_id=found[0].changelog_id):
+                    raise SynonymError('Synonym already bound to a changelog')
 
+            found = list(Changelog.objects.filter(source=synonym))
+            if found:
+                with log.fields(changelog_id=self.pk,
+                                another_changelog_id=found[0].pk):
+                    raise SynonymError('Synonym matches a changelog\'s source')
+
+            self.synonyms.create(source=synonym)
+
+    def merge_into(self, to_ch):
+        # move trackers
+        for user in self.trackers.all():
+            ChangelogTrack.objects.create(user=user, changelog=to_ch)
+            action = 'moved-during-merge'
+            action_description = 'User was moved from changelog:{0}'.format(self.id)
+            UserHistoryLog.write(user, '', action, action_description)
+
+        # move issues
+        for issue in self.issues.all():
+            issue.changelog = to_ch
+            issue.save(update_fields=('changelog',))
+
+        # remove itself
+        Changelog.objects.filter(pk=self.pk).delete()
+
+        # add synonym
+        to_ch.add_synonym(self.source)
 
 
 class SourceSynonym(models.Model):

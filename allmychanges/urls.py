@@ -7,6 +7,7 @@ from django.views.generic.base import RedirectView
 
 
 from .views import (OldIndexView,
+                    MergeProjectView,
                     IssuesView,
                     HelpView,
                     TrackListView,
@@ -101,6 +102,9 @@ urlpatterns = patterns(
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit-old/$', EditPackageView.as_view(), name='edit-package-old'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$', EditPackageView2.as_view(), name='edit-package'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/merge/$',
+        MergeProjectView.as_view(),
+        name='merge-project'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', ProjectView.as_view(), name='project'),
 
 

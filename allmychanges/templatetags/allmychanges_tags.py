@@ -2,6 +2,7 @@ import re
 import anyjson
 
 from django import template
+from django.utils.safestring import mark_safe
 
 
 register = template.Library()
@@ -49,3 +50,16 @@ def site_url(request):
         # probably called from email sender
         return 'https://allmychanges.com'
     return request.build_absolute_uri('/').rstrip('/')
+
+
+@register.filter
+def project_name(changelog):
+    return u'{0.namespace}/{0.name}'.format(changelog)
+
+
+@register.filter
+def project_link(changelog):
+    link = u'<a href="{0}">{1}</a>'.format(
+        changelog.get_absolute_url(),
+        project_name(changelog))
+    return mark_safe(link)

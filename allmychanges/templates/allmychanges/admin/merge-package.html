@@ -1,0 +1,23 @@
+{% extends "allmychanges/new-base.html" %}
+{% load allmychanges_tags %}
+
+{% block content %}
+<form class="merge-project-form" action="." method="POST">
+  <p>
+    <input type="text" name="from_changelog" placeholder="Enter namespace/name" value="{{ from_changelog_str }}"/>
+    {% if error %}<span class="error">{{ error }}</span>{% endif %}
+  </p>
+  {% if show_agreed %}
+  <p>Hey! Do you really want to merge {{ from_changelog|project_link }} to {{ to_changelog|project_link }}?</p>
+
+  <p>After this operation, {{ from_changelog|project_link }} will be deleted and all it's {{ from_changelog.trackers.count }} trackers and {{ from_changelog.issues.count }} issues will be moved to {{ to_changelog|project_link }}.</p>
+    
+  <p>If you understand all consecuences, mark this checkbox and press "Submit" button again.</p>
+  <p><label for="agreed">Agreed:</label><input type="checkbox" name="agreed" value="yes" /></p>
+  {% endif %}
+  
+  <p><input type="submit" /></p>
+  {% csrf_token %}
+</form>
+{% endblock content %}
+

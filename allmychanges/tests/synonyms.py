@@ -1,11 +1,12 @@
 # coding: utf-8
 
-from nose.tools import eq_
+from nose.tools import eq_, assert_raises
 from django.test import Client
 from django.core.urlresolvers import reverse
 from urllib import urlencode
 
 from allmychanges.models import Changelog
+from allmychanges.exceptions import SynonymError
 from allmychanges.tests.utils import create_user
 
 
@@ -107,3 +108,33 @@ def test_only_moderator_can_add_synonyms():
     eq_(response.status_code, 200)
     response = cl.post(url, dict(synonym='new-synonym'))
     eq_(response.status_code, 302)
+
+
+def test_when_we_try_to_add_synonym_twice_no_error_raised():
+    changelog = Changelog.objects.create(namespace='javascript',
+                                         name='nodejs',
+                                         source='https://github.com/nodejs/node')
+    changelog.add_synonym('node')
+    changelog.add_synonym('node')
+
+
+def test_when_we_try_to_add_synonym_bound_to_another_changelog_error_raised():
+    Changelog.objects.create(namespace='foo',
+                                   name='foo',
+                                   source='foo')
+    bar = Changelog.objects.create(namespace='bar',
+                                   name='bar',
+                                   source='bar')
+    assert_raises(SynonymError, bar.add_synonym, 'foo')
+
+
+
+def test_impossible_to_create_synonym_which_matches_to_existing_project_source():
+    changelog = Changelog.objects.create(
+        namespace='javascript',
+        name='nodejs',
+        source='https://github.com/nodejs/node')
+
+    assert_raises(SynonymError,
+                  changelog.add_synonym,
+                  'https://github.com/nodejs/node')

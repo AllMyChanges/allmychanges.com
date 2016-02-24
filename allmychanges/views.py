@@ -1124,6 +1124,58 @@ class EditPackageView2(EditPackageView):
     template_name = 'allmychanges/edit-package2.html'
 
 
+class MergeProjectView(SuperuserRequiredMixin,
+                       CommonContextMixin,
+                       TemplateView):
+    template_name = 'allmychanges/admin/merge-package.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MergeProjectView, self).get_context_data(**kwargs)
+        to_changelog = Changelog.objects.get(**kwargs)
+        context['to_changelog'] = to_changelog
+        return context
+
+    def post(self, request, **kwargs):
+        context = self.get_context_data(**kwargs)
+        from_changelog = request.POST.get('from_changelog')
+        to_changelog = context['to_changelog']
+
+        context['from_changelog_str'] = from_changelog
+
+        agreed = request.POST.get('agreed')
+
+        if from_changelog.count('/') != 1:
+            context['error'] = 'Please, use format "namespace/name".'
+
+        try:
+            namespace, name = from_changelog.split('/', 1)
+            from_changelog = Changelog.objects.get(
+                namespace=namespace,
+                name=name)
+        except Changelog.DoesNotExist:
+            context['error'] = 'Changelog not found.'
+        else:
+            context['from_changelog'] = from_changelog
+
+        if 'error' not in context:
+            if to_changelog.pk == from_changelog.pk:
+                context['error'] = 'This is the same project, choose another.'
+
+        if 'error' not in context:
+            if agreed is None:
+                context['show_agreed'] = True
+            else:
+                with log.name_and_fields('changelog-merge',
+                                         from_changelog=from_changelog.pk,
+                                         to_changelog=to_changelog.pk):
+                    log.info('Merging changelogs')
+                    from_changelog.merge_into(to_changelog)
+                    project_url = reverse('project', kwargs=kwargs)
+                    return HttpResponseRedirect(project_url)
+
+            return self.render_to_response(context)
+
+
 class SynonymsView(ImmediateMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/synonyms.html'
 
