@@ -373,7 +373,7 @@ class Changelog(Downloadable, models.Model):
 
         if user.is_authenticated():
             # Any changelog could be edited by me
-            if user.username == 'svetlyak40wt':
+            if user.username in settings.SUPERUSERS:
                 return True
 
             if moderators or light_moderators:

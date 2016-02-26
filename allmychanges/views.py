@@ -453,7 +453,7 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         code_version = self.request.GET.get('code_version', 'v2')
         result['code_version'] = code_version
 
-        if self.request.user.is_authenticated() and self.request.user.username == 'svetlyak40wt':
+        if self.request.user.is_authenticated() and self.request.user.username in settings.SUPERUSERS:
             result['show_issues'] = True
 
         filter_args = {'code_version': code_version}
