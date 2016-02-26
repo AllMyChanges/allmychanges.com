@@ -60,7 +60,7 @@ from allmychanges.downloaders import guess_downloaders
 class SuperuserRequiredMixin(UserPassesTestMixin):
     raise_exception = True
     def get_test_func(self):
-        return lambda user: user.username == 'svetlyak40wt'
+        return lambda user: user.username in settings.SUPERUSERS
 
 
 class CommonContextMixin(object):

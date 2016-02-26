@@ -262,6 +262,7 @@ GOOGLE_PLAY_PASSWORD = None
 
 # people who can edit and sed templates
 ADVANCED_EDITORS = set(['svetlyak40wt', 'Bugagazavr'])
+SUPERUSERS = set(['svetlyak40wt', 'vovanbo'])
 
 
 if True:
