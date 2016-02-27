@@ -120,8 +120,12 @@ class User(AbstractBaseUser):
     timezone = models.CharField(max_length=100,
                                 choices=TIMEZONE_CHOICES,
                                 default='UTC')
-    changelogs = models.ManyToManyField('Changelog', through='ChangelogTrack',
+    changelogs = models.ManyToManyField('Changelog',
+                                        through='ChangelogTrack',
                                         related_name='trackers')
+    feed_versions = models.ManyToManyField('Version',
+                                           through='FeedItem',
+                                           related_name='users')
     skips_changelogs = models.ManyToManyField('Changelog', through='ChangelogSkip',
                                               related_name='skipped_by')
     moderated_changelogs = models.ManyToManyField('Changelog', through='Moderator',
@@ -976,6 +980,10 @@ class Version(models.Model):
         return full_path
 
 
+class FeedItem(models.Model):
+    user = models.ForeignKey(User)
+    version = models.ForeignKey(Version)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 ACTIVE_USER_ACTIONS = (
