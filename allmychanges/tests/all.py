@@ -16,7 +16,6 @@ from allmychanges.parsing.pipeline import (
 from allmychanges.models import (Version,
                                  User,
                                  Changelog,
-                                 DESCRIPTION_LENGTH,
                                  Preview)
 from allmychanges.utils import (
     dt_in_window,
@@ -326,17 +325,14 @@ def test_digest_for_today_includes_changes_from_last_9am():
     today = datetime.datetime(2014, 1, 1, 9, 0, tzinfo=timezone.UTC()) # 9am
     one_day = datetime.timedelta(1)
     one_minute = datetime.timedelta(0, 60)
-    code_version = 'v1'
 
     foo = Changelog.objects.create(namespace='test', name='foo', source='foo')
     foo.versions.create(number='0.1.0',
-                        discovered_at=today - one_day - one_minute,
-                        code_version=code_version)
+                        discovered_at=today - one_day - one_minute)
 
     bar = Changelog.objects.create(namespace='test', name='bar', source='bar')
     bar.versions.create(number='0.3.0',
-                        discovered_at=today - one_day,
-                        code_version=code_version)
+                        discovered_at=today - one_day)
 
     user.track(foo)
     user.track(bar)
@@ -501,22 +497,18 @@ def test_digest_does_not_include_preview_versions():
     today = datetime.datetime(2014, 1, 1, 9, 0, tzinfo=timezone.UTC()) # 9am
     week = datetime.timedelta(7)
     day = datetime.timedelta(1)
-    code_version = 'v2'
 
     foo = Changelog.objects.create(namespace='test', name='foo', source='foo')
     foo.versions.create(number='0.1.0',
-                        discovered_at=today - week,
-                        code_version=code_version)
+                        discovered_at=today - week)
 
     preview = Preview.objects.create(changelog=foo)
     preview.versions.create(changelog=foo,
                             number='0.1.0',
-                            discovered_at=today,
-                            code_version=code_version)
+                            discovered_at=today)
 
     digest = get_digest_for(Changelog.objects.filter(pk=foo.pk),
-                            after_date=today - day,
-                            code_version=code_version)
+                            after_date=today - day)
 
     eq_(0, len(digest))
 

@@ -193,10 +193,10 @@ def test_package_suggest_ignores_tracked_packages():
     cl = Client()
     thebot = Changelog.objects.create(name='thebot', namespace='python',
                                       source='http://github.com/svetlyak40wt/thebot')
-    thebot.versions.create(number='0.1.0', discovered_at=timezone.now(), code_version='v2')
+    thebot.versions.create(number='0.1.0', discovered_at=timezone.now())
     fields = Changelog.objects.create(name='fields', namespace='python',
                                       source='http://github.com/svetlyak40wt/django-fields')
-    fields.versions.create(number='0.1.0', discovered_at=timezone.now(), code_version='v2')
+    fields.versions.create(number='0.1.0', discovered_at=timezone.now())
 
     user = create_user('art')
     user.track(thebot)

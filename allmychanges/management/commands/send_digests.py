@@ -24,8 +24,7 @@ def send_digest_to(user, period='day'):
     second_period_name = 'week' if period == 'day' else 'month'
 
     today_changes = get_digest_for(user.changelogs,
-                                   after_date=period_ago,
-                                   code_version='v2')
+                                   after_date=period_ago)
 
     if today_changes:
         # if True, then this digest includes only our own changelog
@@ -46,8 +45,7 @@ def send_digest_to(user, period='day'):
 
         other_changes = get_digest_for(user.changelogs,
                                        before_date=period_ago,
-                                       after_date=second_period_ago,
-                                       code_version='v2')
+                                       after_date=second_period_ago)
 
         for changelog in other_changes:
             changelog['url'] = reverse('project', kwargs=dict(

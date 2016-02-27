@@ -21,8 +21,7 @@ def test_dont_add_issue_if_we_found_only_one_new_version():
         namespace='python', name='pip', source='test')
 
     # we already know about one version
-    changelog.versions.create(
-        number='0.2.0', code_version='v2')
+    changelog.versions.create(number='0.2.0')
 
     # we discovered a new 0.3.0 version
     # and this is OK.
@@ -40,8 +39,7 @@ def test_add_issue_if_we_found_more_than_one_new_version():
         namespace='python', name='pip', source='test')
 
     # we already know about one version
-    changelog.versions.create(
-        number='0.2.0', code_version='v2')
+    changelog.versions.create(number='0.2.0')
 
     # everything is ok here, 0.4.0 follows 0.3.0
     # and 0.3.0 follows 0.2.0
@@ -59,8 +57,7 @@ def test_add_issue_if_we_found_more_than_one_new_version_and_they_have_bad_order
         namespace='python', name='pip', source='test')
 
     # we already know about one version
-    changelog.versions.create(
-        number='0.2.0', code_version='v2')
+    changelog.versions.create(number='0.2.0')
 
     # it is strange, that version 1.2.3 follows 0.3.0
     # and there is no 1.2.2 in the database

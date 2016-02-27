@@ -91,7 +91,7 @@ def test_update_package_preview_versions():
     def first_lines(versions):
         return map(first_line, versions)
 
-    versions = preview.versions.filter(code_version='v2')
+    versions = preview.versions.all()
 
     eq_([
         '<ul>',
@@ -103,7 +103,7 @@ def test_update_package_preview_versions():
     preview.save()
     preview.schedule_update()
 
-    versions = preview.versions.filter(code_version='v2')
+    versions = preview.versions.all()
     eq_([u'<h1>0.1.1</h1>', u'<h1>0.1.0</h1>'],
         first_lines(versions))
 

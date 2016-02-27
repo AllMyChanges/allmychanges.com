@@ -874,10 +874,6 @@ class VersionManager(models.Manager):
         return super(VersionManager, self).get_query_set().order_by('-id')
 
 
-CODE_VERSIONS = [
-    ('v1', 'Old parser'),
-    ('v2', 'New parser')]
-
 
 class Version(models.Model):
     changelog = models.ForeignKey(Changelog,
@@ -896,7 +892,6 @@ class Version(models.Model):
     unreleased = models.BooleanField(default=False)
     discovered_at = models.DateTimeField(blank=True, null=True)
     last_seen_at = models.DateTimeField(blank=True, null=True)
-    code_version = models.CharField(max_length=255, choices=CODE_VERSIONS)
     filename = models.CharField(max_length=1000,
                                 help_text=('Source file where this version was found'),
                                 blank=True, null=True)

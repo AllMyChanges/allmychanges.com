@@ -21,7 +21,7 @@ def test_update_package_using_full_pipeline():
 
     update_preview_or_changelog(changelog)
 
-    versions = list(changelog.versions.filter(code_version='v2'))
+    versions = list(changelog.versions.all())
     eq_(2, len(versions))
     eq_('<ul>\n<li>Some bugfix.</li>\n</ul>',
         versions[0].raw_text)

@@ -71,12 +71,10 @@ def update_changelog_from_raw_data3(obj, raw_data):
     from allmychanges.models import Changelog
     from allmychanges.tasks import notify_users_about_new_versions, post_tweet
 
-    code_version = 'v2'
     now = timezone.now()
 
     current_versions = SortedSet(
-        obj.versions.filter(
-            code_version=code_version).values_list('number',flat=True))
+        obj.versions.values_list('number',flat=True))
 
     discovered_versions = SortedSet(item.version
                                     for item in raw_data)
@@ -129,11 +127,9 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
     new_versions_ids = []
     for raw_version in raw_data:
-        with log.fields(version_number=raw_version.version,
-                        code_version=code_version):
+        with log.fields(version_number=raw_version.version):
             version, created = obj.versions.get_or_create(
-                number=raw_version.version,
-                code_version=code_version)
+                number=raw_version.version)
             if created:
                 new_versions_ids.append(version.id)
 

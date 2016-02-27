@@ -62,12 +62,9 @@ def get_stats():
     stats['db.active-users.month'] = User.objects.active_users(30).count()
     stats['db.active-users.year'] = User.objects.active_users(365).count()
 
-    stats['db.versions.v1-vcs'] = Version.objects.filter(code_version='v1', changelog__filename=None).count()
-    stats['db.versions.v1'] = Version.objects.filter(code_version='v1').exclude(changelog__filename=None).count()
-    stats['db.versions.v2'] = Version.objects.filter(code_version='v2', preview_id=None).count()
+    stats['db.versions.v2'] = Version.objects.filter(preview_id=None).count()
 
-    stats['db.versions.v1-unreleased'] = Version.objects.filter(code_version='v1', unreleased=True).exclude(changelog__filename=None).count()
-    stats['db.versions.v2-unreleased'] = Version.objects.filter(code_version='v2', unreleased=True).count()
+    stats['db.versions.v2-unreleased'] = Version.objects.filter(unreleased=True).count()
     stats['db.users-with-emails'] = User.objects.exclude(email=None).count()
 
     num_users = User.objects.all().count()
@@ -87,11 +84,7 @@ def get_stats():
     now = timezone.now()
     minute_ago = now - datetime.timedelta(0, 60)
 
-    stats['crawler.discovered.v1.count'] = Version.objects.filter(
-        code_version='v1',
-        discovered_at__gte=minute_ago).count()
     stats['crawler.discovered.v2.count'] = Version.objects.filter(
-        code_version='v2',
         discovered_at__gte=minute_ago).count()
 
     # if package wasn't updated within 10 minutes from planned time

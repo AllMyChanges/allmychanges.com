@@ -141,7 +141,6 @@ def get_package_data_for_template(changelog,
                                   filter_args,
                                   limit_versions,
                                   after_date,
-                                  code_version='v1',
                                   ordering=None,
                                   show_unreleased=True):
     name = changelog.name
@@ -214,8 +213,7 @@ def get_package_data_for_template(changelog,
 def get_digest_for(changelogs,
                    before_date=None,
                    after_date=None,
-                   limit_versions=5,
-                   code_version='v1'):
+                   limit_versions=5):
     """Before date and after date are inclusive."""
     # search packages which have changes after given date
 
@@ -223,7 +221,6 @@ def get_digest_for(changelogs,
     # because they are not interesting
     # probably we should make it a user preference
     filter_args = {'unreleased': False,
-                   'code_version': code_version,
                    'preview_id': None}
 
     if before_date and after_date:
@@ -240,7 +237,7 @@ def get_digest_for(changelogs,
 
     changes = [get_package_data_for_template(
         changelog, filter_args, limit_versions,
-        after_date, code_version)
+        after_date)
                for changelog in changelogs]
 
     return changes
@@ -267,12 +264,10 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
     def get_cache_params(self, *args, **kwargs):
         user = self.request.user
 
-        code_version = self.request.GET.get('code_version', 'v2')
-        cache_key = 'digest-{username}-{packages}-{changes}-{code_version}'.format(
+        cache_key = 'digest-{username}-{packages}-{changes}'.format(
             username=user.username,
             packages=user.changelogs.count(),
-            changes=Version.objects.filter(changelog__trackers=user).count(),
-            code_version=code_version)
+            changes=Version.objects.filter(changelog__trackers=user).count(),)
 
         if self.request.GET:
             cache_key += ':'
@@ -289,28 +284,22 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         day_ago = now - one_day
         week_ago = now - datetime.timedelta(7)
         month_ago = now - datetime.timedelta(31)
-        code_version = self.request.GET.get('code_version', 'v2')
 
-        result['code_version'] = code_version
         result['current_user'] = self.request.user
 
 
         changelogs = self.request.user.changelogs
 
         result['today_changes'] = get_digest_for(changelogs,
-                                                 after_date=day_ago,
-                                                 code_version=code_version)
+                                                 after_date=day_ago)
         result['week_changes'] = get_digest_for(changelogs,
                                                 before_date=day_ago,
-                                                after_date=week_ago,
-                                                code_version=code_version)
+                                                after_date=week_ago)
         result['month_changes'] = get_digest_for(changelogs,
                                                  before_date=week_ago,
-                                                 after_date=month_ago,
-                                                 code_version=code_version)
+                                                 after_date=month_ago)
         result['ealier_changes'] = get_digest_for(changelogs,
-                                                  before_date=month_ago,
-                                                  code_version=code_version)
+                                                  before_date=month_ago)
 
         result['no_packages'] = changelogs \
                                  .exclude(namespace='web', name='allmychanges') \
@@ -358,9 +347,7 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
         one_day = datetime.timedelta(1)
         day_ago = now - one_day
         week_ago = now - datetime.timedelta(7)
-        code_version = self.request.GET.get('code_version', 'v2')
 
-        result['code_version'] = code_version
         result['current_user'] = self.request.user
 
         changelogs = Changelog.objects.filter(pk__in=self.changelogs)
@@ -371,18 +358,15 @@ class LandingDigestView(CachedMixin, CommonContextMixin, TemplateView):
                 # we only return results if all changelogs are ready
                 result['long_changes'] = get_digest_for(
                     changelogs,
-                    after_date=now - datetime.timedelta(365 * 5),
-                    code_version=code_version)
+                    after_date=now - datetime.timedelta(365 * 5))
         else:
             result['today_changes'] = get_digest_for(
                 changelogs,
-                after_date=day_ago,
-                code_version=code_version)
+                after_date=day_ago)
             result['week_changes'] = get_digest_for(
                 changelogs,
                 before_date=day_ago,
-                after_date=week_ago,
-                code_version=code_version)
+                after_date=week_ago)
         return result
 
     def get(self, *args, **kwargs):
@@ -450,13 +434,8 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
     def get_context_data(self, **kwargs):
         result = super(ProjectView, self).get_context_data(**kwargs)
 
-        code_version = self.request.GET.get('code_version', 'v2')
-        result['code_version'] = code_version
-
         if self.request.user.is_authenticated() and self.request.user.username in settings.SUPERUSERS:
             result['show_issues'] = True
-
-        filter_args = {'code_version': code_version}
 
         params = get_keys(kwargs, 'namespace', 'name', 'pk')
 
@@ -477,10 +456,9 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         if not package_data:
             package_data = get_package_data_for_template(
                 changelog,
-                filter_args,
+                {},
                 100,
                 None,
-                code_version=code_version,
                 ordering=('-order_idx',),
                 show_unreleased=not self.request.GET.get('snap'))
             cache.set(key, package_data, HOUR)
@@ -1236,8 +1214,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
         else:
             obj = preview
 
-        code_version = 'v2'
-        filter_args = {'code_version': code_version}
+        filter_args = {}
         if self.preview.updated_at is not None:
             filter_args['preview'] = self.preview
         else:
@@ -1247,8 +1224,7 @@ class PreviewView(CachedMixin, CommonContextMixin, TemplateView):
             obj,
             filter_args,
             10,
-            None,
-            code_version=code_version)
+            None)
 
         has_results = len(package_data['versions'])
 

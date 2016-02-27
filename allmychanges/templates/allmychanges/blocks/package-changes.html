@@ -13,19 +13,11 @@
   {% else %}
 
   {% for section in version.sections %}
-    {% if version.code_version == 'v1' %}
-      {% if section.notes %}<p class="package-version__notes">{{section.notes|process_cve|capfirst|markdown}}</p>{% endif %}
-    {% else %}
-      {% if section.notes %}<div class="package-version__notes">{{section.notes|safe}}</div>{% endif %}
-    {% endif %}
+    {% if section.notes %}<div class="package-version__notes">{{section.notes|safe}}</div>{% endif %}
   {% if section.items %}
   <ul class="package-version__items">
     {% for item in section.items %}
-    {% if version.code_version == 'v1' %}
-      <li class="package-version__section-item"><span class="changelog-item-type changelog-item-type_{{item.type}}">{{item.type|slice:":3"}}</span> {{item.text|process_cve|capfirst|markdown}}</li>
-    {% else %}
       <li class="package-version__section-item">{{item.text|safe}}</li>
-    {% endif %}
     {% endfor %}
   </ul>
   {% endif %}
