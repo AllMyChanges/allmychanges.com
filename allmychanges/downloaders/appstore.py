@@ -261,10 +261,10 @@ def download(source, **params):
                     notes = notes.replace(u'•', u'*') # because of vk.com mothefuckers
                     notes = notes.replace(u'★', u'*') # because of temple run motherfuckers
                     text = u"""
-    {version} ({date})
-    ==============
+## {version} ({date})
+==============
 
-    {notes}
+{notes}
                     """.strip().format(version=version,
                                        date=date,
                                        notes=notes)
