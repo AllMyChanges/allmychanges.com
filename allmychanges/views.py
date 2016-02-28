@@ -464,7 +464,10 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
 
         key = 'project-view:{0}'.format(changelog.id)
         package_data = cache.get(key)
-        if not package_data:
+
+        if not package_data \
+           or self.request.user.is_superuser: # TODO: сделать чтобы кэш экспарился как надо
+
             package_data = get_package_data_for_template(
                 changelog,
                 {},
