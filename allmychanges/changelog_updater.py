@@ -68,7 +68,7 @@ def fill_missing_dates2(raw_data):
 def update_changelog_from_raw_data3(obj, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
-    from allmychanges.models import Changelog
+    from allmychanges.models import Changelog, FeedItem, Version
     from allmychanges.tasks import notify_users_about_new_versions, post_tweet
 
     now = timezone.now()
@@ -125,27 +125,49 @@ def update_changelog_from_raw_data3(obj, raw_data):
             num_discovered_versions=len(discovered_versions),
             num_new_versions=len(new_versions))
 
+    if hasattr(obj, 'trackers'):
+        trackers = list(obj.trackers.all())
+        def add_to_feeds(version):
+            for tracker in trackers:
+                tracker.add_feed_item(version)
+    else:
+        add_to_feeds = lambda version: None
+
     new_versions_ids = []
     for raw_version in raw_data:
         with log.fields(version_number=raw_version.version):
-            version, created = obj.versions.get_or_create(
-                number=raw_version.version)
+            try:
+                version = obj.versions.get(number=raw_version.version)
+                old_version_was_not_released = version.unreleased
+                created = False
+            except Version.DoesNotExist:
+                version = obj.versions.create(number=raw_version.version)
+                # old version was not found, this is the same as if
+                # it was not released
+                old_version_was_not_released = True
+                created = True
+
+            version.unreleased = getattr(raw_version, 'unreleased', False)
+            version.filename = getattr(raw_version, 'filename', None)
+            version.date = getattr(raw_version, 'date', None)
+            version.raw_text = raw_version.content
+
+            version.processed_text = raw_version.processed_content
+
+            if version.discovered_at is None:
+                version.discovered_at = getattr(raw_version, 'discovered_at', now)
+
+            version.last_seen_at = now
+            version.save()
+
             if created:
+                # every new version should be added to users' feeds
                 new_versions_ids.append(version.id)
 
-        version.unreleased = getattr(raw_version, 'unreleased', False)
-        version.filename = getattr(raw_version, 'filename', None)
-        version.date = getattr(raw_version, 'date', None)
-        version.raw_text = raw_version.content
+            this_version_released = not version.unreleased
+            if old_version_was_not_released and this_version_released:
+                add_to_feeds(version)
 
-        version.processed_text = raw_version.processed_content
-
-        if version.discovered_at is None:
-            version.discovered_at = getattr(raw_version, 'discovered_at', now)
-
-        version.last_seen_at = now
-
-        version.save()
 
     reorder_versions(list(obj.versions.all()))
 

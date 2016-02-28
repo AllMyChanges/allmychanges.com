@@ -137,57 +137,69 @@ from django.core.cache import cache
 
 
 def get_package_data_for_template(changelog,
-                                  filter_args,
-                                  limit_versions,
-                                  after_date,
+                                  filter_args={},
+                                  limit_versions=None,
+                                  after_date=None,
                                   ordering=None,
-                                  show_unreleased=True):
+                                  show_unreleased=True,
+                                  versions=None):
+    """
+    Returns data, prepared for rendering in template.
+
+    Argument version could be passed to show explicitly
+    given versions. If it is not specified, then
+    latest N versions will be fetched from the database.
+    """
     name = changelog.name
     namespace = changelog.namespace
+    prepared_versions = []
 
-    versions = []
-    versions_queryset = changelog.versions.filter(**filter_args)
-    # this allows to reduce number of queries in 5 times
+    if versions is None:
+        versions_queryset = changelog.versions.filter(**filter_args)
+        # this allows to reduce number of queries in 5 times
 
-    if ordering:
-        # if we are in this branch, then we probably
-        # rendering ProjectView
-        versions_queryset = versions_queryset.order_by(*ordering)
-        versions_queryset = versions_queryset[:limit_versions]
-        # now we'll pop up any unreleased versions
-        normal_versions = []
-        unreleased_versions = []
-        for idx, version in enumerate(versions_queryset):
-            if version.unreleased:
-                unreleased_versions.append(version)
+        if ordering:
+            # if we are in this branch, then we probably
+            # rendering ProjectView
+            versions_queryset = versions_queryset.order_by(*ordering)
+            versions_queryset = versions_queryset[:limit_versions]
+            # now we'll pop up any unreleased versions
+            normal_versions = []
+            unreleased_versions = []
+            for idx, version in enumerate(versions_queryset):
+                if version.unreleased:
+                    unreleased_versions.append(version)
+                else:
+                    normal_versions.append(version)
+
+            if show_unreleased:
+                versions_queryset = unreleased_versions + normal_versions
             else:
-                normal_versions.append(version)
-
-        if show_unreleased:
-            versions_queryset = unreleased_versions + normal_versions
+                # we need this to hide unreleased versions from screenshots
+                versions_queryset = normal_versions
         else:
-            # we need this to hide unreleased versions from screenshots
-            versions_queryset = normal_versions
-    else:
-        versions_queryset = versions_queryset[:limit_versions]
+            versions_queryset = versions_queryset[:limit_versions]
 
-    for version in versions_queryset:
+        versions = list(versions_queryset)
+
+    for version in versions:
         if after_date is not None and version.date is not None \
            and version.date < after_date.date():
             show_discovered_as_well = True
         else:
             show_discovered_as_well = False
 
-        versions.append(dict(id=version.id,
-                             number=version.number,
-                             date=version.date,
-                             discovered_at=version.discovered_at.date(),
-                             last_seen_at=version.last_seen_at,
-                             show_discovered_as_well=show_discovered_as_well,
-                             filename=version.filename,
-                             processed_text=version.processed_text,
-                             unreleased=version.unreleased,
-                             tweet_id=version.tweet_id))
+        prepared_versions.append(
+            dict(id=version.id,
+                 number=version.number,
+                 date=version.date,
+                 discovered_at=version.discovered_at.date(),
+                 last_seen_at=version.last_seen_at,
+                 show_discovered_as_well=show_discovered_as_well,
+                 filename=version.filename,
+                 processed_text=version.processed_text,
+                 unreleased=version.unreleased,
+                 tweet_id=version.tweet_id))
 
     latest_version = changelog.latest_version() \
                      if isinstance(changelog, Changelog) else None
@@ -205,7 +217,7 @@ def get_package_data_for_template(changelog,
                       obj=changelog,
                       tweet_id=latest_version.tweet_id if latest_version else None,
                   ),
-                  versions=versions)
+                  versions=prepared_versions)
     return result
 
 

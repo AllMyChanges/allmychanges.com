@@ -13,18 +13,19 @@ class Command(LogMixin, BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('url')
-        parser.add_argument('--search-list')
+        parser.add_argument('--search-list', default='')
+        parser.add_argument('--recursive', default=False, action='store_true')
 
     def handle(self, *args, **options):
         os.environ['DEV_DOWNLOAD'] = 'yes'
         source = options.get('url')
 
         search_list = options.get('search_list')
-        if search_list:
-            search_list = [(item, None)
-                           for item in search_list.split(',')]
-        else:
-            search_list = []
+        # if search_list:
+        #     search_list = [(item, None)
+        #                    for item in search_list.split(',')]
+        # else:
+        #     search_list = []
 
         if '+' in source:
             downloader_name, source = source.split('+', 1)
@@ -37,7 +38,12 @@ class Command(LogMixin, BaseCommand):
                 print 'Please choose one of downloaders:', \
                     ','.join(d['name'] for d in downloaders)
                 return
-            downloader_name = downloaders[0]
+            downloader_name = downloaders[0]['name']
 
         downloader = get_downloader(downloader_name)
-        print downloader(source, search_list=search_list)
+
+        params = dict(search_list=search_list)
+        if options.get('recursive'):
+            params['recursive'] = True
+
+        print downloader(source, **params)

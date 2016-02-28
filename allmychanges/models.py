@@ -120,8 +120,19 @@ class User(AbstractBaseUser):
     timezone = models.CharField(max_length=100,
                                 choices=TIMEZONE_CHOICES,
                                 default='UTC')
-    changelogs = models.ManyToManyField('Changelog', through='ChangelogTrack',
+    changelogs = models.ManyToManyField('Changelog',
+                                        through='ChangelogTrack',
                                         related_name='trackers')
+    feed_versions = models.ManyToManyField('Version',
+                                           through='FeedItem',
+                                           related_name='users')
+    feed_sent_id = models.IntegerField(
+        default=0,
+        help_text='Keeps position in feed items already sent in digest emails')
+    last_digest_sent_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text='Date when last email digest was sent')
     skips_changelogs = models.ManyToManyField('Changelog', through='ChangelogSkip',
                                               related_name='skipped_by')
     moderated_changelogs = models.ManyToManyField('Changelog', through='Moderator',
@@ -205,6 +216,9 @@ class User(AbstractBaseUser):
             ChangelogSkip.objects.create(
                 user=self,
                 changelog=changelog)
+
+    def add_feed_item(self, version):
+        return FeedItem.objects.create(user=self, version=version)
 
     def save(self, *args, **kwargs):
         if self.rss_hash is None:
@@ -980,6 +994,10 @@ class Version(models.Model):
         return full_path
 
 
+class FeedItem(models.Model):
+    user = models.ForeignKey(User)
+    version = models.ForeignKey(Version, related_name='feed_items')
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 ACTIVE_USER_ACTIONS = (

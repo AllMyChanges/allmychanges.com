@@ -19,3 +19,5 @@ from .postprocessors import *
 from .extract_version import *
 from .api2 import *
 from .synonyms import *
+from .update_changelog import *
+from .digest import *

@@ -11,6 +11,8 @@ from allmychanges.tests.utils import create_user
 
 
 def v(**kwargs):
+    kwargs.setdefault('content', '')
+    kwargs.setdefault('processed_content', '')
     env = Environment()
     env._data.update(kwargs)
     return env
@@ -25,8 +27,8 @@ def test_dont_add_issue_if_we_found_only_one_new_version():
 
     # we discovered a new 0.3.0 version
     # and this is OK.
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -43,9 +45,9 @@ def test_add_issue_if_we_found_more_than_one_new_version():
 
     # everything is ok here, 0.4.0 follows 0.3.0
     # and 0.3.0 follows 0.2.0
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='0.4.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -61,9 +63,9 @@ def test_add_issue_if_we_found_more_than_one_new_version_and_they_have_bad_order
 
     # it is strange, that version 1.2.3 follows 0.3.0
     # and there is no 1.2.2 in the database
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='1.2.3', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='1.2.3')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -82,9 +84,9 @@ def test_add_issue_only_if_there_are_already_some_versions():
     # there isnt' any versions in the changelog
     # but we found three new versions
     # possible, this package was added few seconds ago
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='0.4.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -99,9 +101,9 @@ def test_add_issue_if_subsequent_discovery_found_less_versions():
         namespace='python', name='pip', source='test')
 
     # first discovery found 3 versions
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='0.4.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -110,7 +112,7 @@ def test_add_issue_if_subsequent_discovery_found_less_versions():
 
 
     # second discovery found only one versions
-    data = [v(version='0.2.0', content='', processed_content='')]
+    data = [v(version='0.2.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -122,7 +124,7 @@ def test_add_issue_if_subsequent_discovery_found_less_versions():
 
     # now we check that subsequent discoveries don't
     # create new issues until we resolve this one
-    data = [v(version='0.2.0', content='', processed_content='')]
+    data = [v(version='0.2.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -135,9 +137,9 @@ def test_two_or_more_lesser_versions_issue_could_be_added_for_different_versions
         namespace='python', name='pip', source='test')
 
     # first discovery found 3 versions
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='0.4.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -145,12 +147,12 @@ def test_two_or_more_lesser_versions_issue_could_be_added_for_different_versions
         [i.type for i in changelog.issues.all()])
 
     # second discovery found only two versions
-    data = [v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.3.0'),
+            v(version='0.4.0')]
     update_changelog_from_raw_data3(changelog, data)
 
     # and second time we discovered only 0.4.0
-    data = [v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.4.0')]
     update_changelog_from_raw_data3(changelog, data)
 
     # this should create two issues
@@ -165,9 +167,9 @@ def test_lesser_versions_autoresolve():
         namespace='python', name='pip', source='test')
 
     # first discovery found 3 versions
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='0.4.0')]
 
     update_changelog_from_raw_data3(changelog, data)
 
@@ -175,14 +177,14 @@ def test_lesser_versions_autoresolve():
         [i.type for i in changelog.issues.all()])
 
     # second discovery found only two versions
-    data = [v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.3.0'),
+            v(version='0.4.0')]
     update_changelog_from_raw_data3(changelog, data)
 
     # and now we again discovered all three versions
-    data = [v(version='0.2.0', content='', processed_content=''),
-            v(version='0.3.0', content='', processed_content=''),
-            v(version='0.4.0', content='', processed_content='')]
+    data = [v(version='0.2.0'),
+            v(version='0.3.0'),
+            v(version='0.4.0')]
     update_changelog_from_raw_data3(changelog, data)
 
     # this should create one issues
