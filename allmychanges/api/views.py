@@ -480,6 +480,9 @@ class ChangelogViewSet(HandleExceptionMixin,
                              'this permanent, please, login or sign up as soon '
                              'as possible.')
 
+        # after changelog settings were updated
+        # most probably we want to update it's versions too
+        self.object.resume()
 
         if self.request.method == 'PUT':
             UserHistoryLog.write(self.request.user,
