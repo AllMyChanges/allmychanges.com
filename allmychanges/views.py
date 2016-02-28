@@ -53,14 +53,13 @@ from allmychanges.utils import (HOUR,
                                 get_keys,
                                 join_ints)
 from allmychanges.downloaders.utils import normalize_url
-from allmychanges.downloaders import guess_downloaders
 
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
     raise_exception = True
     def get_test_func(self):
-        return lambda user: user.username in settings.SUPERUSERS
+        return lambda user: user.is_superuser
 
 
 class CommonContextMixin(object):
@@ -434,7 +433,7 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
     def get_context_data(self, **kwargs):
         result = super(ProjectView, self).get_context_data(**kwargs)
 
-        if self.request.user.is_authenticated() and self.request.user.username in settings.SUPERUSERS:
+        if self.request.user.is_superuser:
             result['show_issues'] = True
 
         params = get_keys(kwargs, 'namespace', 'name', 'pk')

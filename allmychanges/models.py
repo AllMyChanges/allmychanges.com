@@ -155,6 +155,10 @@ class User(AbstractBaseUser):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
+    @property
+    def is_superuser(self):
+        return self.username in settings.SUPERUSERS
+
     def does_track(self, changelog):
         """Check if this user tracks given changelog."""
         return self.changelogs.filter(pk=changelog.id).exists()
@@ -373,7 +377,7 @@ class Changelog(Downloadable, models.Model):
 
         if user.is_authenticated():
             # Any changelog could be edited by me
-            if user.username in settings.SUPERUSERS:
+            if user.is_superuser:
                 return True
 
             if moderators or light_moderators:
