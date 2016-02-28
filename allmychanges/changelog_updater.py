@@ -129,9 +129,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
         trackers = list(obj.trackers.all())
         def add_to_feeds(version):
             for tracker in trackers:
-                FeedItem.objects.create(
-                    user=tracker,
-                    version=version)
+                tracker.add_feed_item(version)
     else:
         add_to_feeds = lambda version: None
 
