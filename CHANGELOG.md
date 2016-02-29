@@ -4,6 +4,7 @@
 * Fixed error when comparing versions like 0.1.2-rc3.
 * Added support for one number versions, but these
 should be prefixed with `v`, like `v15`.
+* Allowed `sup` and `small` html tags in changelog markup.
 
 1.0.1 (2016-02-21)
 ==================
