@@ -13,6 +13,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
+from django.core.urlresolvers import reverse
 from django.core.cache import cache
 #from south.modelsinspector import add_introspection_rules
 
@@ -380,7 +381,6 @@ class Changelog(Downloadable, models.Model):
 
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
         return reverse('project', kwargs=dict(
             namespace=self.namespace,
             name=self.name))
@@ -650,6 +650,10 @@ class Issue(models.Model):
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(blank=True, null=True)
+    resolved_by = models.ForeignKey(User,
+                                    related_name='resolved_issues',
+                                    blank=True,
+                                    null=True)
     related_versions = models.TextField(default='', blank=True,
                                         help_text='Comma-separated list of versions, related to this issue')
     email = models.CharField(max_length=100, blank=True, null=True)
@@ -700,9 +704,11 @@ Issue(changelog={self.changelog},
 
     def resolve(self, user):
         self.resolved_at = timezone.now()
-        self.save(update_fields=('resolved_at',))
-        chat.send(('Issue <https://allmychanges.com/issues/{issue_id}/|#{issue_id}> '
+        self.resolved_by = user
+        self.save(update_fields=('resolved_at', 'resolved_by'))
+        chat.send(('Issue <{url}|#{issue_id}> '
                    'for {namespace}/{name} was resolved by {username}.').format(
+            url=reverse('issue-detail', kwargs=dict(pk=self.id)),
             issue_id=self.id,
             namespace=self.changelog.namespace,
             name=self.changelog.name,
