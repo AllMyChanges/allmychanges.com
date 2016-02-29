@@ -1,7 +1,9 @@
-1.1.0-rc1 (Unreleased)
+1.1.0 (Unreleased)
 ==================
 
-* Fixed error when comparing version like 0.1.2-rc3.
+* Fixed error when comparing versions like 0.1.2-rc3.
+* Added support for one number versions, but these
+should be prefixed with `v`, like `v15`.
 
 1.0.1 (2016-02-21)
 ==================
