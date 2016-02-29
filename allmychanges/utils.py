@@ -18,6 +18,7 @@ from functools import wraps
 from django.conf import settings
 from django.utils.encoding import force_text
 from twiggy_goodies.threading import log
+from django.core.urlresolvers import reverse as django_reverse
 
 
 MINUTE = 60
@@ -440,3 +441,9 @@ def do(command, timeout=60):
         with log.fields(**params):
             log.debug('Command execution was finished')
         return result
+
+
+def reverse(view_name, *args, **kwargs):
+    return django_reverse(view_name,
+                          args=args,
+                          kwargs=kwargs)

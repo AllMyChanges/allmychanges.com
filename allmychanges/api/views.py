@@ -6,7 +6,6 @@ from django.utils import timezone
 from django.db.models import Q, Count
 from django import forms
 from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.utils.encoding import force_str
 from itertools import islice
 from urllib import urlencode
@@ -39,6 +38,7 @@ from allmychanges.utils import (
     count,
     parse_ints,
     join_ints,
+    reverse,
     update_fields)
 from allmychanges.source_guesser import guess_source
 
@@ -138,7 +138,7 @@ class SearchAutocomplete1View(viewsets.ViewSet):
                         type='namespace',
                         namespace=namespace,
                         url=reverse('category',
-                                    kwargs=dict(category=namespace))))
+                                    category=namespace)))
 
 
             namespace, name = None, q
@@ -173,7 +173,7 @@ class SearchAutocomplete2View(viewsets.ViewSet):
                 sources.add(changelog.source)
                 resource_uri = request.build_absolute_uri(
                     reverse('changelog-detail',
-                            kwargs=dict(pk=changelog.pk)))
+                            pk=changelog.pk))
                 results.append(dict(type='package',
                                     namespace=changelog.namespace,
                                     name=changelog.name,
@@ -198,7 +198,7 @@ class SearchAutocomplete2View(viewsets.ViewSet):
                         dict(type='namespace',
                              namespace=namespace,
                              url=reverse('category',
-                                         kwargs=dict(category=namespace))))
+                                         category=namespace)))
 
 
             add_changelogs(Changelog.objects.filter(name__icontains=name)
@@ -239,7 +239,7 @@ class SearchAutocompleteView(viewsets.ViewSet):
                 sources.add(changelog.source)
                 resource_uri = request.build_absolute_uri(
                     reverse('changelog-detail',
-                            kwargs=dict(pk=changelog.pk)))
+                            pk=changelog.pk))
                 results.append(dict(type='package',
                                     namespace=changelog.namespace,
                                     name=changelog.name,
@@ -265,7 +265,7 @@ class SearchAutocompleteView(viewsets.ViewSet):
                         dict(type='namespace',
                              namespace=namespace,
                              url=reverse('category',
-                                         kwargs=dict(category=namespace))))
+                                         category=namespace)))
 
 
             add_changelogs(Changelog.objects.filter(name__icontains=name)
@@ -688,17 +688,24 @@ class IssueViewSet(HandleExceptionMixin,
         if created:
             changelog = obj.changelog
             if changelog:
-                history_message = 'Created issue for <changelog:{0}>'.format(changelog.id)
+                history_message = 'Created issue for <changelog:{0}>'.format(
+                    changelog.id)
                 chat_message = (
                     'New issue was created for '
-                    '<https://allmychanges.com/issues/?id={pk}|{namespace}/{name}>.').format(
-                        pk=obj.id, namespace=changelog.namespace, name=changelog.name)
+                    '<https://allmychanges.com{issue_url}|'
+                    '{namespace}/{name}>.').format(
+                        issue_url=reverse('issue-detail', pk=obj.id),
+                        namespace=changelog.namespace,
+                        name=changelog.name)
             else:
                 history_message = 'Feedback was given at page "{0}"'.format(obj.page)
                 chat_message = (
-                    'Feedback was given for page {page} '
-                    '<https://allmychanges.com/issues/?id={pk}|#{pk}>.').format(
-                        pk=obj.id, page=obj.page)
+                    'Feedback was given for page '
+                    '<https://allmychanges.com{page}|{page}> '
+                    '<https://allmychanges.com{issue_url}|#{pk}>.').format(
+                        issue_url=reverse('issue-detail',
+                                          pk=obj.id),
+                        page=obj.page)
 
             UserHistoryLog.write(
                 self.request.user,
