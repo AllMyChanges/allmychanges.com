@@ -74,7 +74,10 @@ urlpatterns = patterns(
     url(r'^coming-soon/$', LandingView.as_view(landings=['coming-soon']), name='comint-soon'),
 
     url(r'^after-login/', AfterLoginView.as_view(), name='after-login'),
-    url(r'^first-steps/$', RedirectView.as_view(url='/first-steps/1/'), name='first-steps'),
+    url(r'^first-steps/$',
+        RedirectView.as_view(url='/first-steps/1/',
+                             permanent=False),
+        name='first-steps'),
     url(r'^first-steps/1/$', FirstStepView.as_view(), name='first-step'),
     url(r'^first-steps/2/$', SecondStepView.as_view(), name='second-step'),
     url(r'^verify-email/(?P<code>.*)/$', VerifyEmail.as_view(), name='verify-email'),

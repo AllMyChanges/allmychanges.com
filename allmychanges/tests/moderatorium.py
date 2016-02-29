@@ -11,9 +11,12 @@ from .utils import (create_user,
                     check_status_code)
 
 
+THEBOT_GITHUB_URL = 'http://github.com/svetlyak40wt/thebot'
+
+
 def test_light_user_becomes_a_moderator_after_changing_changelog():
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='http://github.com')
+        namespace='python', name='thebot', source=THEBOT_GITHUB_URL)
     cl = Client()
     check_status_code(200,
                       cl.put(reverse('changelog-detail',
@@ -48,7 +51,7 @@ def test_light_user_becomes_a_moderator_after_changing_changelog():
 
 def test_normal_user_becomes_a_moderator_after_changing_changelog():
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='http://github.com')
+        namespace='python', name='thebot', source=THEBOT_GITHUB_URL)
     create_user('art')
     cl = Client()
     cl.login(username='art', password='art')
@@ -90,7 +93,7 @@ def test_normal_user_becomes_a_moderator_after_changing_changelog():
 
 def test_merge_light_moderator():
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='http://github.com')
+        namespace='python', name='thebot', source=THEBOT_GITHUB_URL)
     changelog.light_moderators.create(light_user='12345')
 
     art = create_user('art')
@@ -104,7 +107,7 @@ def test_merge_light_moderator():
 
 def test_light_moderators_removed_after_24_hours():
     changelog = Changelog.objects.create(
-        namespace='python', name='pip', source='http://github.com')
+        namespace='python', name='thebot', source=THEBOT_GITHUB_URL)
     moderator = changelog.light_moderators.create(light_user='12345')
     moderator.created_at = timezone.now() - datetime.timedelta(1, 1)
     moderator.save()

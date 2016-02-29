@@ -33,7 +33,7 @@ from allmychanges.api.serializers import (
     ChangelogSerializer,
     IssueSerializer,
     VersionSerializer,
-)
+    TagSerializer)
 from allmychanges.utils import (
     count,
     parse_ints,
@@ -599,6 +599,20 @@ class PreviewViewSet(HandleExceptionMixin,
 
         return Response({'result': 'scheduled'})
 
+
+
+TAG_NAME_REGEX = ur'[a-z][a-z0-9-.]*[a-z0-9]'
+TAG_NAME_ERROR_MESSAGES = dict(
+    required='This field is required',
+    invalid=('Tag names should correspond to this '
+            'regular expression: "{}"').format(
+                TAG_NAME_REGEX))
+
+
+class TagNameForm(forms.Form):
+    name = forms.RegexField(TAG_NAME_REGEX,
+                            error_messages=TAG_NAME_ERROR_MESSAGES)
+
 # это пока нигде не используется, надо дорабатывать
 # и возможно переносить ручку в changelog/:id/versions
 
@@ -612,6 +626,57 @@ class VersionViewSet(HandleExceptionMixin,
 
     def get_queryset(self, *args, **kwargs):
         return Version.objects.all()
+
+    @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
+    def tag(self, request, pk=None):
+        form = TagNameForm(request.DATA)
+        if not form.is_valid():
+            return Response({'errors': form.errors},
+                            content_type='application/json',
+                            status=400)
+
+        name = form.cleaned_data['name']
+        version = self.get_object()
+        status = version.set_tag(request.user, name)
+        if status == 'created':
+            status_code = 201
+        else:
+            status_code = 200
+
+        return Response({'result': status},
+                        status=status_code,
+                        content_type='application/json')
+
+    @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
+    def untag(self, request, pk=None):
+        form = TagNameForm(request.DATA)
+        if not form.is_valid():
+            return Response({'errors': form.errors},
+                            content_type='application/json',
+                            status=400)
+
+        name = form.cleaned_data['name']
+        version = self.get_object()
+        version.remove_tag(request.user, name)
+        return Response(status=204)
+
+
+class TagViewSet(HandleExceptionMixin,
+                 DetailSerializerMixin,
+                 viewsets.ModelViewSet):
+    serializer_class = TagSerializer
+    serializer_detail_class = TagSerializer
+    permission_classes = [AuthenticationRequired]
+    paginate_by = 10
+
+    def get_queryset(self, *args, **kwargs):
+        queryset = self.request.user.tags.all()
+
+        if 'project_id' in self.request.GET:
+            queryset = queryset.filter(
+                version__changelog__id=self.request.GET['project_id'])
+
+        return queryset
 
 
 _error_messages = {'required': 'Please, fill this field'}

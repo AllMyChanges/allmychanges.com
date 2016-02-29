@@ -553,6 +553,8 @@ class BadgeView(View):
 
 
 class AfterLoginView(LoginRequiredMixin, RedirectView):
+    permanent = False
+
     def get_redirect_url(self, *args, **kwargs):
         user = self.request.user
 

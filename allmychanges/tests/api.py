@@ -56,12 +56,14 @@ def test_add_package():
     cl.login(username='art', password='art')
     eq_(0, Changelog.objects.count())
 
-    response = cl.post('/v1/changelogs/',
-                       dict(namespace='python',
-                            name='pip',
-                            source='https://github.com/pypa/pip',
-                            downloader='vcs.git'))
-    check_status_code(201, response)
+    post_json(
+        cl,
+        '/v1/changelogs/',
+        expected_code=201,
+        namespace='python',
+        name='pip',
+        source='https://github.com/pypa/pip',
+        downloader='vcs.git')
     eq_(1, Changelog.objects.count())
 
 
@@ -77,13 +79,14 @@ def test_put_does_not_affect_created_at_field():
     created_at = Changelog.objects.get(pk=changelog.pk).created_at
 
     time.sleep(1)
-    response = put_json(cl,
-                        '/v1/changelogs/{0}/'.format(changelog.id),
-                        namespace='python',
-                        name='pip',
-                        source='https://github.com/pypa/pip',
-                        downloader='vcs.git')
-    check_status_code(200, response)
+    put_json(
+        cl,
+        '/v1/changelogs/{0}/'.format(changelog.id),
+        expected_code=200,
+        namespace='python',
+        name='pip',
+        source='https://github.com/pypa/pip',
+        downloader='vcs.git')
 
     eq_(created_at, Changelog.objects.get(pk=changelog.pk).created_at)
 
@@ -102,12 +105,13 @@ def test_downloader_is_required_when_updating_changelog():
     changelog.save()
 
     # first try not changing source
-    response = put_json(cl,
-                        '/v1/changelogs/{0}/'.format(changelog.id),
-                        namespace='python',
-                        name='pip',
-                        source=source)
-    check_status_code(400, response)
+    put_json(
+        cl,
+        '/v1/changelogs/{0}/'.format(changelog.id),
+        expected_code=400,
+        namespace='python',
+        name='pip',
+        source=source)
     eq_('git', Changelog.objects.get(pk=changelog.pk).downloader)
 
 
@@ -128,10 +132,12 @@ class TransactionTests(TestCase):
         with mock.patch.object(Changelog.objects, 'get_queryset') as get_queryset:
             get_queryset.side_effect = RuntimeError
             try:
-                cl.post('/v1/changelogs/',
-                        dict(namespace='python',
-                             name='pip',
-                             source='https://github.com/pypa/pip'))
+                post_json(
+                    cl,
+                    '/v1/changelogs/',
+                    namespace='python',
+                    name='pip',
+                    source='https://github.com/pypa/pip')
             except RuntimeError:
                 pass
 
@@ -150,9 +156,12 @@ def test_authenticated_user_track_changelog():
     eq_(1, Changelog.objects.count())
     eq_(0, user.changelogs.count())
 
-    response = cl.post('/v1/changelogs/{0}/track/'.format(changelog.id))
-    check_status_code(200, response)
-    eq_({'result': 'ok'}, anyjson.deserialize(response.content))
+    data = post_json(
+        cl,
+        '/v1/changelogs/{0}/track/'.format(changelog.id),
+        expected_code=200)
+
+    eq_({'result': 'ok'}, data)
 
     eq_(1, user.changelogs.count())
 
@@ -176,14 +185,16 @@ def test_if_after_login_will_track_changelogs_from_cookie():
     cl = Client()
     changelog = Changelog.objects.create(source='http://github.com/svetlyak40wt/thebot')
 
-    response = cl.post(reverse('changelog-track', kwargs=dict(pk=changelog.id)))
-    eq_(200, response.status_code, response.content)
+    post_json(
+        cl,
+        reverse('changelog-track', kwargs=dict(pk=changelog.id)),
+        expected_code=200)
 
     user = create_user('art')
     cl.login(username='art', password='art')
     eq_(0, user.changelogs.count())
 
-    response = cl.get(reverse('after-login'))
+    cl.get(reverse('after-login'))
 
     eq_(1, user.changelogs.count())
     eq_('', cl.cookies['tracked-changelogs'].value)
@@ -214,11 +225,13 @@ def test_anonymous_can_create_an_issue_and_it_is_tied_to_his_light_user():
     cl = Client()
     thebot = Changelog.objects.create(name='thebot', namespace='python',
                                       source='http://github.com/svetlyak40wt/thebot')
-    response = cl.post(reverse('issues-list'),
-                       data={'changelog': thebot.id,
-                             'type': 'other',
-                             'comment': 'The test'})
-    check_status_code(201, response)
+    post_json(
+        cl,
+        reverse('issues-list'),
+        expected_code=201,
+        changelog=thebot.id,
+        type='other',
+        comment='The test')
 
     eq_(1, Issue.objects.count())
     issue = Issue.objects.all()[0]
@@ -238,11 +251,13 @@ def test_normal_user_can_create_an_issue_and_it_is_tied_to_him():
     cl.login(username='art', password='art')
 
     chat.clear_messages()
-    response = cl.post(reverse('issues-list'),
-                       data={'changelog': thebot.id,
-                             'type': 'other',
-                             'comment': 'The test'})
-    check_status_code(201, response)
+    post_json(
+        cl,
+        reverse('issues-list'),
+        expected_code=201,
+        changelog=thebot.id,
+        type='other',
+        comment='The test')
 
     eq_(1, Issue.objects.count())
     issue = Issue.objects.all()[0]
@@ -264,22 +279,24 @@ def test_nor_anonymous_nor_normal_user_are_unable_to_update_issue():
     thebot.add_to_moderators(moderator_bob)
     issue = thebot.issues.create(type='test', comment='some issue')
 
-    response = put_json(cl,
-                        reverse('issues-detail', kwargs=dict(pk=issue.pk)),
-                        changelog=thebot.id,
-                        type='other',
-                        comment='Changed')
-    check_status_code(403, response)
+    put_json(
+        cl,
+        reverse('issues-detail', kwargs=dict(pk=issue.pk)),
+        expected_code=403,
+        changelog=thebot.id,
+        type='other',
+        comment='Changed')
 
     user = create_user('art')
     cl.login(username='art', password='art')
 
-    response = put_json(cl,
-                        reverse('issues-detail', kwargs=dict(pk=issue.pk)),
-                        changelog=thebot.id,
-                        type='other',
-                        comment='Changed')
-    check_status_code(403, response)
+    put_json(
+        cl,
+        reverse('issues-detail', kwargs=dict(pk=issue.pk)),
+        expected_code=403,
+        changelog=thebot.id,
+        type='other',
+        comment='Changed')
 
     eq_(0, UserHistoryLog.objects.filter(
         user=user).count())
@@ -304,13 +321,15 @@ def test_rename_changelog_using_put():
     changelog.add_to_moderators(moderator_bob)
 
     cl.login(username='bob', password='bob')
-    response = put_json(cl,
-                        reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
-                        namespace='other-namespace',
-                        name='other',
-                        source=changelog.source,
-                        downloader='vcs.git')
-    check_status_code(200, response)
+
+    put_json(
+        cl,
+        reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
+        expected_code=200,
+        namespace='other-namespace',
+        name='other',
+        source=changelog.source,
+        downloader='vcs.git')
 
 
 def test_api_normalizes_source_url_on_create():
@@ -321,13 +340,14 @@ def test_api_normalizes_source_url_on_create():
     url = 'git://github.com/tadam/Ubic-Service-Plack.git'
     normalized_url = 'https://github.com/tadam/Ubic-Service-Plack'
 
-    response = post_json(cl,
-                         reverse('changelog-list'),
-                         namespace='test',
-                         name='package',
-                         source=url,
-                         downloader='vcs.git')
-    check_status_code(201, response)
+    post_json(
+        cl,
+        reverse('changelog-list'),
+        expected_code=201,
+        namespace='test',
+        name='package',
+        source=url,
+        downloader='vcs.git')
     ch = Changelog.objects.all()[0]
     eq_(normalized_url, ch.source)
 

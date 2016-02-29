@@ -6,6 +6,7 @@ from allmychanges.models import (
     Preview,
     Subscription,
     Version,
+    Tag,
     Changelog,
     Issue)
 from allmychanges.validators import URLValidator
@@ -129,6 +130,16 @@ class PreviewSerializer(ModelSerializer):
 class VersionSerializer(ModelSerializer):
     class Meta:
         model = Version
+
+
+class TagSerializer(ModelSerializer):
+    version_number = serializers.Field(source='version.number')
+
+    class Meta:
+        model = Tag
+        fields = (
+            'name',
+            'version_number')
 
 
 class IssueSerializer(ModelSerializer):

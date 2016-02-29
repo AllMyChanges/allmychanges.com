@@ -130,11 +130,11 @@ def test_when_preview_saved_versions_are_copied_to_changelog():
 
     response  = put_json(cl,
                          reverse('changelog-detail', kwargs=dict(pk=changelog.pk)),
+                         expected_code=200,
                          namespace=changelog.namespace,
                          name=changelog.name,
                          source='http://github.com/svetlyak40wt/django-fields',
                          downloader='git.vcs')
-    check_status_code(200, response)
 
     # versions now moved to the changelog
     eq_(3, changelog.versions.count())

@@ -999,6 +999,44 @@ class Version(models.Model):
                 self.save(update_fields=('tweet_id',))
         return full_path
 
+    def set_tag(self, user, name):
+        """Sets or updates tag with `name` on the version.
+        If tag was updated, returns 'updated'
+        otherwise, returns 'created'
+        """
+        params = dict(user=user, name=name)
+
+        existing_tag = Tag.objects.filter(
+            version__changelog=self.changelog,
+            **params)
+
+        update = existing_tag.count() > 0
+        if update:
+            existing_tag.delete()
+
+        self.tags.create(**params)
+
+        return 'updated' if update else 'created'
+
+
+    def remove_tag(self, user, name):
+        """Removes tag with `name` on the version.
+        """
+        Tag.objects.filter(
+            version__changelog=self.changelog,
+            user=user,
+            name=name).delete()
+
+
+class Tag(models.Model):
+    version = models.ForeignKey(Version, related_name='tags')
+    user = models.ForeignKey(User, related_name='tags')
+    # regex=ur'[a-z][a-z0-9-]*[a-z0-9]'
+    name = models.CharField(max_length=40)
+
+    class Meta:
+        unique_together = ('version', 'user', 'name')
+
 
 class FeedItem(models.Model):
     user = models.ForeignKey(User)

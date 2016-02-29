@@ -35,18 +35,34 @@ def json(response):
     return anyjson.deserialize(response.content)
 
 
-def put_json(cl, url, **data):
+def get_json(cl, url):
+    response = cl.get(url)
+    check_status_code(200, response)
+    return json(response)
+
+
+def put_json(cl, url, expected_code=None, **data):
     response = cl.put(url,
                       anyjson.serialize(data),
                       content_type='application/json')
-    return response
+
+    if expected_code is not None:
+        check_status_code(expected_code, response)
+
+    if response.content:
+        return json(response)
 
 
-def post_json(cl, url, **data):
+def post_json(cl, url, expected_code=None, **data):
     response = cl.post(url,
                        anyjson.serialize(data),
                        content_type='application/json')
-    return response
+
+    if expected_code is not None:
+        check_status_code(expected_code, response)
+
+    if response.content:
+        return json(response)
 
 
 def dt_eq(left_date, right_date, threshold=3):

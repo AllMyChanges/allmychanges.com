@@ -12,6 +12,7 @@ from allmychanges.api.views import (
     ChangelogViewSet,
     PreviewViewSet,
     VersionViewSet,
+    TagViewSet,
     IssueViewSet,
     ValidateChangelogName)
 
@@ -20,6 +21,7 @@ router = DefaultRouter()
 router.root_view_name = 'main-api-path'
 router.register(r'subscriptions', SubscriptionViewSet, base_name='repo')
 router.register(r'versions', VersionViewSet, base_name='version')
+router.register(r'tags', TagViewSet, base_name='tags')
 router.register(r'changelogs', ChangelogViewSet, base_name='changelog')
 router.register(r'previews', PreviewViewSet, base_name='preview')
 router.register(r'issues', IssueViewSet, base_name='issues')
