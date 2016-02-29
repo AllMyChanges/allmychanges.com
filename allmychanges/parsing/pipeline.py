@@ -720,6 +720,7 @@ def process_version_description(html):
                            u'article', # эти теги добавляются github release даунлоадером
                            u'h1', u'h2', u'h3', u'h4', u'h5', # headers are ok too
                            u'del', u'strike', u's',
+                           u'sup', u'small',
                            u'tt', # monospace
                            u'div', # dont see why it should be prohibited
                            u'span', # and spans too
@@ -733,6 +734,7 @@ def process_version_description(html):
                                  u'acronym': [u'title'],
                                  u'img': [u'src', u'width', u'height', u'title'],
                                  u'abbr': [u'title'],
+                                 u'sup': [u'id'],
                                  u'video': [u'width', u'height', u'controls', u'src'],
                                  u'object': [u'width', u'height', u'classid', u'codebase'],
                                  u'embed': [u'width', u'height', u'type', u'src', u'flashvars'],
