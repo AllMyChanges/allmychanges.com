@@ -706,7 +706,7 @@ Issue(changelog={self.changelog},
         self.resolved_at = timezone.now()
         self.resolved_by = user
         self.save(update_fields=('resolved_at', 'resolved_by'))
-        chat.send(('Issue <{url}|#{issue_id}> '
+        chat.send(('Issue <https://allmychanges.com{url}|#{issue_id}> '
                    'for {namespace}/{name} was resolved by {username}.').format(
             url=reverse('issue-detail', kwargs=dict(pk=self.id)),
             issue_id=self.id,
