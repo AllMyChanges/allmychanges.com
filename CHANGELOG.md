@@ -3,7 +3,14 @@
 
 * Fixed error when comparing versions like 0.1.2-rc3.
 * Added support for one number versions, but these
-should be prefixed with `v`, like `v15`.
+  should be prefixed with `v`, like `v15`.
+
+  This change made possible to parse release notes for
+  projects which use simple numbers for versioning.
+  Here are few examples:
+  
+  * Kodi: [original][Kodi-original] -> [parsed][Kodi-parsed].
+  
 * Allowed `sup` and `small` html tags in changelog markup.
 
 1.0.1 (2016-02-21)
@@ -1123,3 +1130,5 @@ There are plenty directions for approvement. Stay tuned.
 [spring-boot]: https://allmychanges.com/p/java/spring-boot/
 [spring-framework]: https://allmychanges.com/p/java/spring-framework/
 [openssh]: https://allmychanges.com/p/soft/openssh/
+[Kodi-original]: http://kodi.wiki/view/Kodi_v16_(Jarvis)_changelog
+[Kodi-parsed]: https://allmychanges.com/p/soft/Kodi/
