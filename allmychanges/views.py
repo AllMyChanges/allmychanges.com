@@ -811,8 +811,8 @@ class AdminUserProfileView(SuperuserRequiredMixin,
         user.skips_changelogs_str = ', '.join(format_names(user.skips_changelogs.all()))
 
         # calculate issues count
-        user.opened_issues = user.issues.filter(resolved_at=None).count()
-        user.resolved_issues = user.issues.exclude(resolved_at=None).count()
+        user.opened_issues_count = user.issues.filter(resolved_at=None).count()
+        user.resolved_issues_count = user.issues.exclude(resolved_at=None).count()
 
         # show social profiles, used for authentication
         user.auth_through = {}

@@ -39,7 +39,7 @@
     {% endif %}
     {% if customer.opened_issues or customer.resolved_issues %}
       <dt>Issues</dt>
-      <dd><a href="{% url 'issues' %}?username={{ customer.username }}">opened – {{ customer.opened_issues }}</a>, <a href="{% url 'issues' %}?username={{ customer.username }}&resolved=1">resolved – {{ customer.resolved_issues }}</a></dd>
+      <dd><a href="{% url 'issues' %}?username={{ customer.username }}">opened – {{ customer.opened_issues_count }}</a>, <a href="{% url 'issues' %}?username={{ customer.username }}&resolved=1">resolved – {{ customer.resolved_issues_count }}</a></dd>
     {% endif %}
     {% if customer.moderated_changelogs_str %}
       <dt>Moderates</dt>
