@@ -21,8 +21,8 @@ _months = _months \
 # вот эти штуки (?:[^.0-9]|$) в начале и конце,
 # нужны, чтобы мы не пытались искать даты в составе номеров версий
 RE_DATE_STR = r"""
-              # date shouldn't start with dot or alfanumeric or 'v' character
-              (?:[^.0-9v]|^)(?P<date>(
+              # date shouldn't start with dot or alfanumeric or 'v' or 'r' character
+              (?:[^.0-9vr]|^)(?P<date>(
               # 2009-05-23, 2009.05.23, 2009/05/23 but not 2009.05-23
               \num_year(?P<delimiter1>[./-])\d{1,2}(?P=delimiter1)\d{1,2} |
 
@@ -124,7 +124,8 @@ _version_regexes = [
 ]
 
 _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded by brackets
-                                     r'(?:v|v\.)?(?P<ver>(?:'
+                                     r'(?:r|v|v\.)?(?P<ver>(?:'  # version can have a prefix like v0.1.2 or v.0.1.2
+                                                                 # or r0.1.2
                                        r'(?:' # complex version
                                          r'(?:\d+(?:\.\d+)+(-[a-z0-9.]+[a-z0-9])?)'     # main part
                                          r'(-?(([a-zA-Z0-9.-]+[a-zA-Z0-9])|[a-zA-Z]))?' # rc1, beta2 or maybe -something123 like suffix or .BETA-123
@@ -133,11 +134,11 @@ _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded
                                        r')' # end of complex version
                                        r'|' # or
                                        r'(?:' # simple version
-                                         r'(?<= v)\d+' # versions with on number should be
-                                                       # prefixed with ' v'
+                                         r'(?<= (?:v|r))\d+' # versions with on number should be
+                                                       # prefixed with ' v' or ' r'
                                          r'|'
-                                         r'(?<=^v)\d+' # versions with on number should be
-                                                       # prefixed with '^v'
+                                         r'(?<=^(?:v|r))\d+' # versions with on number should be
+                                                       # prefixed with '^v' or '^r'
                                        r')'   # end of simple version
                                      r'))'))
                     for item in _version_regexes]

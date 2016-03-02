@@ -13,6 +13,7 @@ def test_good_lines():
     eq_(u'16', _extract_version(u'Release v16'))
     eq_(u'16', _extract_version(u'v16-foo'))
     eq_(u'16', _extract_version(u'v16_bar'))
+    eq_(u'2015', _extract_version(u'r2015'))
     eq_(u'16.0.1', _extract_version(u'v16.0.1'))
     eq_(u'1.2.2p1', _extract_version(u'1.2.2p1'))
     eq_(u'1.2.2p1', _extract_version(u'release 1.2.2p1'))
@@ -23,3 +24,4 @@ def test_good_lines():
     eq_('1.0a', _extract_version('Version 1.0a'))
     eq_('1.0.1k', _extract_version('Version 1.0.1k'))
     eq_('2015.1.21', _extract_version('v2015.1.21 (released 2015-1-21)'))
+    eq_('2015.1.21', _extract_version('r2015.1.21 (released 2015-1-21)'))
