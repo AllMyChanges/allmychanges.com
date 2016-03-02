@@ -9,6 +9,8 @@ def test_bad_lines():
 
 
 def test_good_lines():
+    eq_(u'17', _extract_version(u'view/Kodi_v17_(Krypton)_changelog.html'))
+    eq_(u'17', _extract_version(u'view/Kodi-v17-(Krypton)-changelog.html'))
     eq_(u'16', _extract_version(u'v16'))
     eq_(u'16', _extract_version(u'Release v16'))
     eq_(u'16', _extract_version(u'v16-foo'))

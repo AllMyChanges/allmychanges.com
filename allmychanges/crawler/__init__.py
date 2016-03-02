@@ -134,8 +134,9 @@ _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded
                                        r')' # end of complex version
                                        r'|' # or
                                        r'(?:' # simple version
-                                         r'(?<= (?:v|r))\d+' # versions with on number should be
+                                         r'(?<=[ _-](?:v|r))\d+' # versions with on number should be
                                                        # prefixed with ' v' or ' r'
+                                                       # or something like '_v' or '-v'
                                          r'|'
                                          r'(?<=^(?:v|r))\d+' # versions with on number should be
                                                        # prefixed with '^v' or '^r'
