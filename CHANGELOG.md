@@ -3,7 +3,7 @@
 
 * Fixed error when comparing versions like 0.1.2-rc3.
 * Added support for one number versions, but these
-  should be prefixed with `v`, like `v15`.
+  should be prefixed with `v` or `r`, like `v15` and `r2015.01.02`.
 
   This change made possible to parse release notes for
   projects which use simple numbers for versioning.
