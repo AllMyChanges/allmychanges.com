@@ -1765,3 +1765,6 @@ body.email {
 .table > tbody > tr > td:last-child {
   padding-right: 5px;
 }
+.table__column-centered {
+  text-align: center;
+}

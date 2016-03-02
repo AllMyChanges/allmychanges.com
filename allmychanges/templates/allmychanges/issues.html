@@ -3,6 +3,29 @@
 
 {% block content %}
   <h1 class="page-header">{{ title }}</h1>
+  {% if leaderboard %}
+  <h2 class="page-subheader">This week's best moderators</h2>
+
+  <table class="table" style="width: 40%">
+    <thead>
+      <tr>
+        <th>Place</th>
+        <th>Who</th>
+        <th>Resolved Issues</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for idx,username,number in leaderboard %}
+      <tr>
+        <td class="table__column-centered">{{ idx }}</td>
+        <td class="table__column-centered">{{ username }}</td>
+        <td class="table__column-centered">{{ number }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
   {% if issues %}
     <h2 class="page-subheader">Items from {{ skip }} to {{ to }} out of {{ total_issues }}. <a href="{% url 'issues' %}?page={{ next_page }}&page_size={{ page_size }}">Next page</a>{% if show_back_button %} <a href="{% url 'issues' %}">back</a>{% endif %}</h2>
     <table class="table">

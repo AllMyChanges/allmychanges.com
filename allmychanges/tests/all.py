@@ -19,6 +19,7 @@ from allmychanges.models import (Version,
                                  Preview)
 from allmychanges.utils import (
     dt_in_window,
+    change_weekday,
     first_sentences,
     discard_seconds)
 from allmychanges.downloaders.fake import download as fake_downloader
@@ -532,3 +533,17 @@ def test_first_sentences():
     eq_(u'Again!', first_sentences(u'Again! Blah minor.', max_length=7))
     eq_(u'Blah minor.', first_sentences(u'Blah minor.\nAgain!', max_length=11))
     eq_(u'Blah minor. Again!', first_sentences(u'Blah minor.\nAgain!\nAnd again.', max_length=20))
+
+
+def test_change_weekday():
+    # this date has weekday==2
+    now = datetime.datetime(2016, 3, 2)
+
+    eq_(now, change_weekday(now, now.weekday()))
+    eq_(datetime.datetime(2016, 3, 1), change_weekday(now, 1))
+    eq_(datetime.datetime(2016, 2, 29), change_weekday(now, 0))
+
+    eq_(datetime.datetime(2016, 3, 3), change_weekday(now, 3))
+    eq_(datetime.datetime(2016, 3, 4), change_weekday(now, 4))
+    eq_(datetime.datetime(2016, 3, 5), change_weekday(now, 5))
+    eq_(datetime.datetime(2016, 3, 6), change_weekday(now, 6))

@@ -48,10 +48,12 @@ from allmychanges.http import LastModifiedMixin
 
 from oauth2_provider.models import Application, AccessToken
 
-from allmychanges.utils import (HOUR,
-                                parse_ints,
-                                get_keys,
-                                join_ints)
+from allmychanges.utils import (
+    HOUR,
+    parse_ints,
+    get_keys,
+    change_weekday,
+    join_ints)
 from allmychanges.downloaders.utils import normalize_url
 
 
@@ -1380,6 +1382,29 @@ class IssuesView(CommonContextMixin, TemplateView):
         result['to'] = to
 
         result['issues'] = queryset[skip:to]
+
+        now = timezone.now()
+
+        leaderboard_size = 10
+
+        leaderboard = list(
+            Issue.objects \
+            .filter(resolved_at__gte=change_weekday(now, 0).date()) \
+            .exclude(resolved_by=None) \
+            .values_list('resolved_by', flat=True))
+
+        leaderboard.sort()
+        leaderboard = groupby(leaderboard, lambda item: item)
+        leaderboard = [(sum(1 for i in group), user_id)
+                       for user_id, group
+                       in leaderboard]
+        leaderboard.sort(reverse=True)
+        leaderboard = [(idx + 1, User.objects.get(id=user_id).username, count)
+                       for idx, (count, user_id)
+                       in enumerate(leaderboard[:leaderboard_size])]
+
+        result['leaderboard'] = leaderboard
+
         url = self.request.build_absolute_uri()
         if not '?' in url:
             url += '?'

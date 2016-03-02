@@ -10,6 +10,7 @@ import time
 import times
 import threading
 import lxml
+import datetime
 
 from lxml import html
 from contextlib import contextmanager
@@ -211,6 +212,16 @@ def discard_seconds(dt):
 def dt_in_window(tz, system_time, hour):
     local = times.to_local(system_time, tz)
     return local.hour == hour
+
+
+def change_weekday(dt, weekday):
+    """Returns a new dt where weekday is weekday.
+    if dt.weekday is greater than weekday, then it is decreased.
+    otherwise it is increased
+    """
+    if weekday < 0 or weekday > 6:
+        raise ValueError('Argument weekday should be integer in 0-6 range')
+    return dt - datetime.timedelta(dt.weekday() - weekday)
 
 
 def map_days(from_date, to_date, func):
