@@ -5,10 +5,14 @@ from allmychanges.crawler import _extract_version
 def test_bad_lines():
     eq_(None, _extract_version('des-cbc           3624.96k     5258.21k     5530.91k     5624.30k     5628.26k'))
     eq_(None, _extract_version('16'))
+    eq_(None, _extract_version('IPv6'))
 
 
 def test_good_lines():
     eq_(u'16', _extract_version(u'v16'))
+    eq_(u'16', _extract_version(u'Release v16'))
+    eq_(u'16', _extract_version(u'v16-foo'))
+    eq_(u'16', _extract_version(u'v16_bar'))
     eq_(u'16.0.1', _extract_version(u'v16.0.1'))
     eq_(u'1.2.2p1', _extract_version(u'1.2.2p1'))
     eq_(u'1.2.2p1', _extract_version(u'release 1.2.2p1'))

@@ -125,15 +125,21 @@ _version_regexes = [
 
 _version_regexes = [item.format(ver=(r'\(?' # version number could be surrounded by brackets
                                      r'(?:v|v\.)?(?P<ver>(?:'
-                                     r'\d+(?:\.\d+)+(-[a-z0-9.]+[a-z0-9])?'
-                                     r'|'
-                                     r'(?<=v)\d+' # versions with on number should be
-                                                  # prefixed with 'v'
-                                     r')'
-                                     r'(-?(([a-zA-Z0-9.-]+[a-zA-Z0-9])|[a-zA-Z]))?' # rc1, beta2 or maybe -something123 like suffix or .BETA-123
-                                                                       # or just 1.0.2a
-                                     r'(_\d+)?'                # or _12343 suffix like in the damn https://github.com/Test-More/TB2/blob/master/Changes
-                                     r')'))
+                                       r'(?:' # complex version
+                                         r'(?:\d+(?:\.\d+)+(-[a-z0-9.]+[a-z0-9])?)'     # main part
+                                         r'(-?(([a-zA-Z0-9.-]+[a-zA-Z0-9])|[a-zA-Z]))?' # rc1, beta2 or maybe -something123 like suffix or .BETA-123
+                                                                                        # or just 1.0.2a
+                                         r'(_\d+)?'                # or _12343 suffix like in the damn https://github.com/Test-More/TB2/blob/master/Changes
+                                       r')' # end of complex version
+                                       r'|' # or
+                                       r'(?:' # simple version
+                                         r'(?<= v)\d+' # versions with on number should be
+                                                       # prefixed with ' v'
+                                         r'|'
+                                         r'(?<=^v)\d+' # versions with on number should be
+                                                       # prefixed with '^v'
+                                       r')'   # end of simple version
+                                     r'))'))
                     for item in _version_regexes]
 
 
