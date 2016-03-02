@@ -3,8 +3,8 @@
 
 {% block content %}
   <h1 class="page-header">{{ title }}</h1>
-  <h2 class="page-subheader">{{ issues.count }} from {{ total_issues }}{% if show_back_button %} <a href="{% url "issues" %}">back</a>{% endif %}</h2>
   {% if issues %}
+    <h2 class="page-subheader">Items from {{ skip }} to {{ to }} out of {{ total_issues }}. <a href="{% url 'issues' %}?page={{ next_page }}&page_size={{ page_size }}">Next page</a>{% if show_back_button %} <a href="{% url 'issues' %}">back</a>{% endif %}</h2>
     <table class="table">
       <thead>
         <tr>

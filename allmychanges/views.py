@@ -1323,6 +1323,7 @@ class IndexView(CommonContextMixin, TemplateView):
 
 class IssuesFilterForm(forms.Form):
     resolved = forms.BooleanField(required=False)
+    page = forms.IntegerField(required=False)
     page_size = forms.IntegerField(required=False)
     namespace = forms.CharField(required=False)
     name = forms.CharField(required=False)
@@ -1343,6 +1344,7 @@ class IssuesView(CommonContextMixin, TemplateView):
         if not form.is_valid():
             raise Http404
 
+        page = form.cleaned_data['page'] or 1
         page_size = form.cleaned_data['page_size'] or 20
 
         if form.cleaned_data['resolved']:
@@ -1366,8 +1368,18 @@ class IssuesView(CommonContextMixin, TemplateView):
         if form.cleaned_data['from_user']:
             queryset = queryset.exclude(light_user__isnull=True)
 
-        result['total_issues'] = queryset.count()
-        result['issues'] = queryset[:page_size]
+        total_count = queryset.count()
+        skip = (page - 1) * page_size
+        to = skip + page_size
+        next_page = page + 1
+
+        result['total_issues'] = total_count
+        result['next_page'] = next_page
+        result['page_size'] = page_size
+        result['skip'] = skip
+        result['to'] = to
+
+        result['issues'] = queryset[skip:to]
         url = self.request.build_absolute_uri()
         if not '?' in url:
             url += '?'
