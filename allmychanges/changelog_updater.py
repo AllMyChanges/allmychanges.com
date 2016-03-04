@@ -4,6 +4,7 @@ import datetime
 import copy
 import shutil
 import arrow
+import time
 
 from django.utils import timezone
 from allmychanges.utils import (
@@ -68,8 +69,11 @@ def fill_missing_dates2(raw_data):
 def update_changelog_from_raw_data3(obj, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
-    from allmychanges.models import Changelog, FeedItem, Version
+    from allmychanges.models import Changelog
     from allmychanges.tasks import notify_users_about_new_versions, post_tweet
+
+    start_time = time.time()
+    log.info('Updating versions in database')
 
     now = timezone.now()
 
@@ -134,13 +138,17 @@ def update_changelog_from_raw_data3(obj, raw_data):
         add_to_feeds = lambda version: None
 
     new_versions_ids = []
+    all_old_versions = {v.number: v
+                        for v in obj.versions.all()}
+
     for raw_version in raw_data:
         with log.fields(version_number=raw_version.version):
-            try:
-                version = obj.versions.get(number=raw_version.version)
+            version = all_old_versions.get(raw_version.version)
+
+            if version is not None:
                 old_version_was_not_released = version.unreleased
                 created = False
-            except Version.DoesNotExist:
+            else:
                 version = obj.versions.create(number=raw_version.version)
                 # old version was not found, this is the same as if
                 # it was not released
@@ -176,6 +184,11 @@ def update_changelog_from_raw_data3(obj, raw_data):
             obj.id, new_versions_ids)
         post_tweet.delay(
             changelog_id=obj.id)
+
+
+    end_time = time.time()
+    with log.fields(update_time=end_time - start_time):
+        log.info('Versions in database were updated')
 
 from contextlib import contextmanager
 
