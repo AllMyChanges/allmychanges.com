@@ -92,7 +92,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
         # not discovered yet
         if hasattr(obj, 'create_issue') and \
            version_update_has_wrong_order(current_versions, new_versions):
-            obj.create_issue(type='too-many-new-versions',
+            obj.create_issue(type='some-versions-out-of-order',
                              comment='I found {related_versions}',
                              related_versions=new_versions)
 
