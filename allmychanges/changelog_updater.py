@@ -87,7 +87,11 @@ def update_changelog_from_raw_data3(obj, raw_data):
     if not current_versions:
         # for initial filling, we should set all missing dates to some values
         log.debug('Filling missing dates')
-        raw_data = fill_missing_dates2(raw_data)
+        try:
+            raw_data = fill_missing_dates2(raw_data)
+        except:
+            log.trace().error('Error in fill_missing_dates2')
+            raise
     else:
         # now new versions contains only those version numbers which were
         # not discovered yet
