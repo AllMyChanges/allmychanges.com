@@ -86,17 +86,20 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
     if not current_versions:
         # for initial filling, we should set all missing dates to some values
+        log.debug('Filling missing dates')
         raw_data = fill_missing_dates2(raw_data)
     else:
         # now new versions contains only those version numbers which were
         # not discovered yet
+        log.debug('Checking if new versions are out of order')
         if hasattr(obj, 'create_issue') and \
            version_update_has_wrong_order(current_versions, new_versions):
             obj.create_issue(type='some-versions-out-of-order',
-                             comment='I found {related_versions}',
+                             comment='Probably {related_versions} are out of order',
                              related_versions=new_versions)
 
     if hasattr(obj, 'discovery_history'):
+        log.debug('Checking if some "lesser-version-count" issues should be autoresolved')
         # first, we need to check if some old lesser-version-count issues
         # should be closed
         old_issues = obj.issues.filter(type='lesser-version-count',
@@ -137,12 +140,16 @@ def update_changelog_from_raw_data3(obj, raw_data):
     else:
         add_to_feeds = lambda version: None
 
+    log.debug('Selecting old versions from database')
     new_versions_ids = []
     all_old_versions = {v.number: v
                         for v in obj.versions.all()}
 
+    log.debug('Updating old versions one by one')
+
     for raw_version in raw_data:
         with log.fields(version_number=raw_version.version):
+            log.debug('Updating version')
             version = all_old_versions.get(raw_version.version)
 
             if version is not None:
@@ -177,8 +184,10 @@ def update_changelog_from_raw_data3(obj, raw_data):
                 add_to_feeds(version)
 
 
+    log.debug('Resoring versions in database')
     reorder_versions(list(obj.versions.all()))
 
+    log.debug('Creating tasks to notify users and post a tweet')
     if new_versions_ids and isinstance(obj, Changelog):
         notify_users_about_new_versions.delay(
             obj.id, new_versions_ids)
@@ -189,6 +198,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
     end_time = time.time()
     with log.fields(update_time=end_time - start_time):
         log.info('Versions in database were updated')
+
 
 from contextlib import contextmanager
 
