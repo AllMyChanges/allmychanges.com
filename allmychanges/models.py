@@ -219,6 +219,9 @@ class User(AbstractBaseUser):
                 changelog=changelog)
 
     def add_feed_item(self, version):
+        if self.send_digest == 'never':
+            return None
+
         return FeedItem.objects.create(user=self, version=version)
 
     def save(self, *args, **kwargs):
