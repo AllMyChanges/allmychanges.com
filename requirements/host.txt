@@ -5,8 +5,8 @@
 #    pip-compile host.in
 #
 -e git+https://github.com/svetlyak40wt/40wt-common-tasks#egg=40wt-common-tasks
-click==6.2                # via pip-tools
-docker-py==1.7.0
+click==6.3                # via pip-tools
+docker-py==1.7.2
 first==2.0.1              # via pip-tools
 invoke==0.10.1
 pip-tools==1.6
