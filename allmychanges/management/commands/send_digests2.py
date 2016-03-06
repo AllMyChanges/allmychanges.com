@@ -52,8 +52,7 @@ def send_digest_to(user, period='day'):
                 actual_subject = subject
 
             send_email(email,
-                       # TODO: убрать пометку experimental
-                       actual_subject + ' (experimental)',
+                       actual_subject,
                        'digest.html',
                        context=dict(current_user=user,
                                     today_changes=today_changes),
@@ -94,6 +93,4 @@ class Command(LogMixin, BaseCommand):
                              else 'weekly')
 
         for user in users:
-            # пока делаем так только для меня
-            if user.username == 'svetlyak40wt':
-                send_digest_to(user, period=self.period)
+            send_digest_to(user, period=self.period)
