@@ -69,7 +69,7 @@ def test_add_issue_if_we_found_more_than_one_new_version_and_they_have_bad_order
 
     update_changelog_from_raw_data3(changelog, data)
 
-    eq_(['too-many-new-versions'],
+    eq_(['some-versions-out-of-order'],
         [i.type for i in changelog.issues.all()])
     i = first(changelog.issues)
     eq_(['0.3.0', '1.2.3'],

@@ -1,3 +1,5 @@
+import random
+
 from nose.tools import eq_
 
 from allmychanges.version import (
@@ -66,8 +68,16 @@ def test_find_branches_simple():
 
 
 def test_find_branches():
-    versions = ['0.1.0', '0.1.1', '0.2.0', '0.3.0', '0.3.1']
-    branches = ['0.1.1', '0.3.1']
+    versions = ['0.1.0', '0.1.1', '0.2.0', '0.3.0', '0.3.1', '0.4.0']
+    branches = ['0.1.1', '0.3.1', '0.4.0']
+    eq_(branches, find_branches(versions))
+
+
+def test_find_branches_when_unsorted():
+    versions = ['0.1.0', '0.1.1', '0.2.0', '0.3.0', '0.3.1', '0.4.0']
+    random.shuffle(versions)
+
+    branches = ['0.1.1', '0.3.1', '0.4.0']
     eq_(branches, find_branches(versions))
 
 
