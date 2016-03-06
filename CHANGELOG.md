@@ -1,16 +1,34 @@
-1.1.0 (Unreleased)
+1.1.0 (2016-03-06)
 ==================
 
-* Fixed error when comparing versions like 0.1.2-rc3.
-* Added support for one number versions, but these
-  should be prefixed with `v` or `r`, like `v15` and `r2015.01.02`.
+### Big feature
 
-  This change made possible to parse release notes for
-  projects which use simple numbers for versioning.
-  Here are few examples:
+The main feature of this release, is a new way of collecting
+changes for email digests. Previously there was an issue with
+these digests. Some project maintainers keep a section with
+unreleased version's description in the changelog. Old algorithm
+discovered these versions but didn't sent them in an email when
+this version has been released.
+
+New algorithm, discovers the setuation, when known "unreleased"
+version becomes "released" and includes it into a next digest
+for every user who tracks the project.
+
+### Second feature
+
+Added support for one number versions, but these
+should be prefixed with `v` or `r`, like `v15` and `r2015.01.02`.
+
+This change made possible to parse release notes for
+projects which use simple numbers for versioning.
+Here are few examples:
   
-  * Kodi: [original][Kodi-original] -> [parsed][Kodi-parsed].
+* Kodi: [original][Kodi-original] -> [parsed][Kodi-parsed].
+* FAR: [original][FAR-original] -> [parsed][FAR-parsed].
   
+### Other changes
+
+* Fixed error when comparing versions like 0.1.2-rc3.
 * Allowed `sup` and `small` html tags in changelog markup.
 
 1.0.1 (2016-02-21)
@@ -1132,3 +1150,5 @@ There are plenty directions for approvement. Stay tuned.
 [openssh]: https://allmychanges.com/p/soft/openssh/
 [Kodi-original]: http://kodi.wiki/view/Kodi_v16_(Jarvis)_changelog
 [Kodi-parsed]: https://allmychanges.com/p/soft/Kodi/
+[FAR-original]: http://svn.code.sf.net/p/farmanager/code/trunk/unicode_far/changelog
+[FAR-parsed]: https://allmychanges.com/p/soft/FAR/
