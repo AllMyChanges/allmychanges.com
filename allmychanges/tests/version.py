@@ -74,9 +74,7 @@ def test_find_branches():
 
 
 def test_find_branches_when_unsorted():
-    versions = ['0.1.0', '0.1.1', '0.2.0', '0.3.0', '0.3.1', '0.4.0']
-    random.shuffle(versions)
-
+    versions = ['0.1.1', '0.1.0', '0.3.0', '0.2.0', '0.3.1', '0.4.0']
     branches = ['0.1.1', '0.3.1', '0.4.0']
     eq_(branches, find_branches(versions))
 

@@ -86,7 +86,7 @@ def find_branches(versions):
 
     # group versions by (major, minor) parts
     major_minor = lambda item: item.version[:2]
-    versions.sort(key=major_minor)
+    versions.sort()
     tip = last(versions)
     grouped = groupby(versions, key=major_minor)
 
