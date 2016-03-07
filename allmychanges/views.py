@@ -1195,7 +1195,9 @@ class SynonymsView(ImmediateMixin, CommonContextMixin, TemplateView):
     def post(self, request, **kwargs):
         changelog = self._get_changelog_and_check_rights(**kwargs)
         synonym = request.POST.get('synonym')
-        changelog.add_synonym(synonym)
+        with log.fields(synonym=synonym):
+            log.debug('Adding synonym')
+            changelog.add_synonym(synonym)
         return HttpResponseRedirect(reverse('synonyms', kwargs=kwargs))
 
 
