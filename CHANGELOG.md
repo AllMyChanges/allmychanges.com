@@ -1,3 +1,10 @@
+1.2.0 (unreleased)
+==================
+
+Algorithm which adds versions to the digest was significantly
+improved. Now it shouldn't add many old versions for a new or
+unpaused project.
+
 1.1.0 (2016-03-06)
 ==================
 

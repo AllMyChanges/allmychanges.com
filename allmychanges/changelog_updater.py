@@ -15,6 +15,7 @@ from allmychanges.exceptions import (
 from allmychanges import chat
 from allmychanges.version import (
     reorder_versions,
+    find_branches,
     version_update_has_wrong_order)
 from sortedcontainers import SortedSet
 from twiggy_goodies.threading import log
@@ -26,44 +27,6 @@ def has_tzinfo(obj):
 
 def add_tzinfo(obj):
     return arrow.get(obj).datetime
-
-
-def fill_missing_dates2(raw_data):
-    """Algorithm.
-
-    If first item has no date, then it is today.
-    If Nth item has date, then assume it is a current_date.
-    If Nth item has no date and we have current_date, then assume item's
-    date is current_date.
-    If Nth item has no date and we have no current_date, then assume, it
-    is a now() - month and act like we have it.
-    """
-    result = []
-    today = discard_seconds(timezone.now())
-    month = datetime.timedelta(30)
-    current_date = None
-
-    for idx, item in enumerate(reversed(raw_data)):
-        item = copy.deepcopy(item)
-        has_date = getattr(item, 'date', None)
-
-        if not has_date:
-            if idx == 0:
-                item.discovered_at = today
-            else:
-                if current_date is not None:
-                    item.discovered_at = current_date
-                else:
-                    item.discovered_at = today - month
-        else:
-            current_date = item.date
-            item.discovered_at = current_date
-
-        item.discovered_at = add_tzinfo(item.discovered_at)
-        result.append(item)
-
-    result.reverse()
-    return result
 
 
 def update_changelog_from_raw_data3(obj, raw_data):
@@ -78,21 +41,14 @@ def update_changelog_from_raw_data3(obj, raw_data):
     now = timezone.now()
 
     current_versions = SortedSet(
-        obj.versions.values_list('number',flat=True))
+        obj.versions.values_list('number', flat=True))
 
     discovered_versions = SortedSet(item.version
                                     for item in raw_data)
+    all_versions = current_versions | discovered_versions
     new_versions = discovered_versions - current_versions
 
-    if not current_versions:
-        # for initial filling, we should set all missing dates to some values
-        log.debug('Filling missing dates')
-        try:
-            raw_data = fill_missing_dates2(raw_data)
-        except:
-            log.trace().error('Error in fill_missing_dates2')
-            raise
-    else:
+    if current_versions:
         # now new versions contains only those version numbers which were
         # not discovered yet
         log.debug('Checking if new versions are out of order')
@@ -151,6 +107,13 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
     log.debug('Updating old versions one by one')
 
+    branches = set(find_branches(all_versions))
+
+    # a list to collect new discovered versions and
+    # versions which were unreleased but now have
+    # release date
+    released_versions = []
+
     for raw_version in raw_data:
         with log.fields(version_number=raw_version.version):
             log.debug('Updating version')
@@ -185,10 +148,28 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
             this_version_released = not version.unreleased
             if old_version_was_not_released and this_version_released:
-                add_to_feeds(version)
+                released_versions.append(version)
 
+    month_ago = now - datetime.timedelta(30)
+    num_possible_parents = len(branches)
 
-    log.debug('Resoring versions in database')
+    # if you change this algorithm, then please,
+    # update it's description in docs/feed-items.md
+    released_versions.reverse()
+
+    for version in released_versions:
+        if version.number in branches:
+            add_to_feeds(version)
+        else:
+            if version.date:
+                if version.date > month_ago:
+                    add_to_feeds(version)
+            else:
+                if num_possible_parents > 0:
+                    add_to_feeds(version)
+                    num_possible_parents -= 1
+
+    log.debug('Resorting versions in database')
     reorder_versions(list(obj.versions.all()))
 
     log.debug('Creating tasks to notify users and post a tweet')

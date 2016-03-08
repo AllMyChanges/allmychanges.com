@@ -24,8 +24,7 @@ from allmychanges.utils import (
     discard_seconds)
 from allmychanges.downloaders.fake import download as fake_downloader
 from allmychanges.changelog_updater import (
-    update_changelog_from_raw_data3,
-    fill_missing_dates2)
+    update_changelog_from_raw_data3)
 from allmychanges.parsing.pipeline import get_files
 from allmychanges.env  import Environment
 
@@ -211,48 +210,6 @@ def test_source_guesser():
              'https://bitbucket.org/antocuni/pdb',
              'https://raw.github.com/tony/tmuxp/master/doc/_static/tmuxp-dev-screenshot.png'],
             urls)
-
-
-
-def test_filling_missing_dates_when_there_arent_any_dates():
-    from datetime import timedelta
-    today = discard_seconds(timezone.now())
-    month = timedelta(30)
-    env = Environment()
-    item = lambda dt: env.push(discovered_at=dt)
-    eq_([item(today - month), item(today - month), item(today)],
-        fill_missing_dates2([env.push(), env.push(), env.push()]))
-
-
-def test_filling_missing_dates_when_there_are_gaps_between():
-    from datetime import timedelta
-    today = discard_seconds(timezone.now())
-    month = timedelta(30)
-    env = Environment()
-    env.type = 'version'
-
-    # Тут надо подумать, чему должен быть равен discovered_at если date=today
-    def item(dt, discovered_at=None):
-        if dt is None:
-            return env.push(discovered_at=discovered_at)
-        return env.push(date=dt, discovered_at=discovered_at)
-
-    first_date = today - timedelta(7)
-    last_date = today - 2 * month
-
-    eq_([item(None,last_date),
-         item(last_date, last_date),
-         item(None, first_date),
-         item(first_date, first_date),
-         item(None, today)],
-
-        fill_missing_dates2([
-            env.push(), # 0.1.0
-            item(last_date), # 0.2.0
-            env.push(), # 0.2.1
-            item(first_date), # 0.3.0
-            env.push(), # 0.4.0
-        ]))
 
 
 class UserTests(TestCase):
