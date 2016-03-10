@@ -1,11 +1,12 @@
 from nose.tools import eq_
 from allmychanges.changelog_updater import update_changelog_from_raw_data3
+from django.test import Client
 from allmychanges.models import (
     Changelog,
     User,
     Issue)
 from allmychanges.env import Environment
-from allmychanges.utils import first
+from allmychanges.utils import first, reverse
 from allmychanges.issues import calculate_issue_importance
 from allmychanges.tests.utils import create_user
 
@@ -218,3 +219,20 @@ def test_issue_importance():
     # value is multiplied by 10
     eq_(6, calculate_issue_importance(
         num_trackers=5, user=None, light_user=None))
+
+
+def test_redirect_to_project_issues():
+    name = 'pip'
+    namespace = 'python'
+
+    cl = Client()
+    url = reverse('project-issues', name=name, namespace=namespace)
+    response = cl.get(url)
+
+    expected_url = ('http://testserver/issues/?'
+                    'namespace={0}&name={1}&'
+                    'order=-id&resolved=any').format(
+                        namespace, name)
+
+    eq_(302, response.status_code)
+    eq_(expected_url, response['Location'])

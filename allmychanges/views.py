@@ -1334,6 +1334,7 @@ class IssuesFilterForm(forms.Form):
     type = forms.CharField(required=False)
     username = forms.CharField(required=False)
     from_user = forms.BooleanField(required=False)
+    order = forms.CharField(required=False)
 
 
 class IssuesView(CommonContextMixin, TemplateView):
@@ -1341,20 +1342,24 @@ class IssuesView(CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         result = super(IssuesView, self).get_context_data(**kwargs)
-        queryset = Issue.objects.order_by('-importance')
-
         form = IssuesFilterForm(self.request.GET)
 
         if not form.is_valid():
             raise Http404
 
+        order_by = form.cleaned_data['order'] or '-importance'
+        queryset = Issue.objects.order_by(order_by)
+
         page = form.cleaned_data['page'] or 1
         page_size = form.cleaned_data['page_size'] or 20
 
         if form.cleaned_data['resolved']:
-            queryset = queryset.exclude(resolved_at=None)
-            result['title'] = 'Resolved issues'
+            # if requested, show resolved issues or all
+            if form.cleaned_data['resolved'] != 'any':
+                queryset = queryset.exclude(resolved_at=None)
+                result['title'] = 'Resolved issues'
         else:
+            # by default, show only resolved issues
             queryset = queryset.filter(resolved_at=None)
             result['title'] = 'Issues'
 
@@ -1663,6 +1668,20 @@ class RenderView(View):
         response = HttpResponse(content, content_type='image/png')
         response['Content-Length'] = len(content)
         return response
+
+
+class ProjectIssuesView(RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, namespace, name):
+        params = (
+            ('namespace', namespace),
+            ('name', name),
+            ('order', '-id'),
+            ('resolved', 'any'),
+        )
+        encoded_params = urllib.urlencode(params)
+        return reverse('issues') + '?' + encoded_params
 
 
 class SleepView(RedirectView):

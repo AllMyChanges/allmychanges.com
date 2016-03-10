@@ -44,6 +44,7 @@ from .views import (OldIndexView,
                     ProfileView,
                     TokenView,
                     SynonymsView,
+                    ProjectIssuesView,
                     ProjectView,
                     EditPackageView2,
                     EditPackageView)
@@ -101,6 +102,7 @@ urlpatterns = patterns(
     # this url should go before category view because it has more specifity
     url(r'^p/(?P<pk>\d+)/$', ProjectView.as_view(), name='project-by-id'),
     url(r'^p/(?P<category>[^/]+?)/$', CategoryView.as_view(), name='category'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/issues/$', ProjectIssuesView.as_view(), name='project-issues'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/synonyms/$', SynonymsView.as_view(), name='synonyms'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit-old/$', EditPackageView.as_view(), name='edit-package-old'),
