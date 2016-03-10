@@ -5,6 +5,12 @@ Algorithm which adds versions to the digest was significantly
 improved. Now it shouldn't add many old versions for a new or
 unpaused project.
 
+Now we more precisely describe at
+[account's settings](http://dev.allmychanges.com/account/settings/)
+page, how often email notifications will be sent. Previously,
+some users were confused because switching digests to 'Never' turns
+off email notification completely and this wasn't obvious.
+
 1.1.0 (2016-03-06)
 ==================
 
