@@ -16,8 +16,6 @@ DATABASES['default'].update({
     'NAME': 'allmychanges',
 })
 
-BASE_URL = 'https://allmychanges.com'
-
 GRAPHITE_PREFIX = 'allmychanges'
 
 ALLOWED_HOSTS = ['allmychanges.com', 'localhost', 'new1.allmychanges.com']

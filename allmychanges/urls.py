@@ -8,6 +8,8 @@ from django.views.generic.base import RedirectView
 
 from .views import (OldIndexView,
                     MergeProjectView,
+                    TestSlackView,
+                    TestWebhookView,
                     IssuesView,
                     HelpView,
                     TrackListView,
@@ -129,6 +131,12 @@ urlpatterns = patterns(
     url(r'^for-ios/', LandingView.as_view(landings=['for-ios1']), name='landing-for-ios'),
 
     url(r'^account/settings/$', ProfileView.as_view(), name='account-settings'),
+    url(r'^account/settings/test-slack/$',
+        TestSlackView.as_view(),
+        name='test-slack'),
+    url(r'^account/settings/test-webhook/$',
+        TestWebhookView.as_view(),
+        name='test-webhook'),
     url(r'^account/track-list/', TrackListView.as_view(), name='track-list'),
     url(r'^account/token/', TokenView.as_view(), name='token'),
     url(r'^accounts/login/', LoginView.as_view(), name='login'),

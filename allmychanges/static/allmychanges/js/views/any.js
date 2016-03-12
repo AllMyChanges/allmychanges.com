@@ -5,6 +5,8 @@ var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
 var TrackButton = require('../components/track-button.js')
+var SlackURL = require('../components/slack-url.js')
+var WebhookURL = require('../components/webhook-url.js')
 var MagicPrompt = require('../components/magic-prompt.js')
 var Share = require('../components/share.js')
 var Notifications = require('../components/notifications.js')
@@ -65,6 +67,18 @@ module.exports = {
         $('.delete-button-container').each(function (idx, element) {
             React.render(
                 <DeleteButton version_id={element.dataset['versionId']}/>,
+                element);
+        });
+        $('.slack-url-container').each(function (idx, element) {
+            React.render(
+                    <SlackURL url={element.dataset['url']}
+                              error={element.dataset['error']}/>,
+                element);
+        });
+        $('.webhook-url-container').each(function (idx, element) {
+            React.render(
+                    <WebhookURL url={element.dataset['url']}
+                                error={element.dataset['error']}/>,
                 element);
         });
         $('.magic-prompt-container').each(function (idx, element) {

@@ -131,7 +131,11 @@
       </div>
       {% endblock footer %}
 
+      {% if settings.DEBUG %}
+      <script src="/static/allmychanges/js-compiled/all.js?v=1" type="text/javascript" charset="utf-8"></script>
+      {% else %}
       <script src="/static/allmychanges/js-compiled/all.min.js?v=1" type="text/javascript" charset="utf-8"></script>
+      {% endif %}
 
 
 {% block no-email-warning %}
@@ -214,7 +218,12 @@ var tracked_vars = {{ tracked_vars|json|safe }} || {};
 <script type="text/javascript">
 setTimeout(function() {
     {% for message in messages %}
-       PubSub.publish('show-info', '{{ message|escapejs }}');
+       console.log('message-level: ' + {{message.level}});
+       {% if message.level > 20 %}
+         PubSub.publish('show-warning', '{{ message|escapejs }}');
+       {% else %}
+         PubSub.publish('show-info', '{{ message|escapejs }}');
+       {% endif %}
     {% endfor %}
 }, 500);
 </script>

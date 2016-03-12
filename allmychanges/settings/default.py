@@ -50,6 +50,9 @@ def make_db_aliases():
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
 
+# url to build absolute urls against
+BASE_URL = 'https://allmychanges.com'
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Local time zone for this installation. Choices can be found here:
@@ -74,8 +77,6 @@ USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = True
-
-BASE_URL = 'http://skate.svetlyak.ru'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"

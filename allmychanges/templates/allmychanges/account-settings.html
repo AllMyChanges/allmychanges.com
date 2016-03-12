@@ -10,14 +10,14 @@
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">Email:</label></td>
         <td class="form__layout__right-column">
-          {{ form.email|add_class:"text-input profile-form__email-field" }}
+          {{ form.email|add_class:"mdl-textfield__input profile-form__email-field" }}
           <p class="form__layout__right-column form__help">We will mail you when new versions will be discovered.</p>
         </td>
       </tr>
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">How often:</label></td>
         <td class="form__layout__right-column">
-          {{ form.send_digest|add_class:"text-input profile-form__digest-field" }}
+          {{ form.send_digest|add_class:"mdl-textfield__input profile-form__digest-field" }}
           <ul class="form__layout__right-column form__help">
             <li><b>Every day</b> – you'll receive updates in the morning (only if some releases were discovered in previous day).</li>
             <li><b>Every week</b> – you'll receive updates on mondays (only if some releases were discovered during previous week).</li>
@@ -28,14 +28,17 @@
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">Timezone:</label></td>
         <td class="form__layout__right-column">
-          {{ form.timezone|add_class:"text-input profile-form__timezone-field" }}
+          {{ form.timezone|add_class:"mdl-textfield__input profile-form__timezone-field" }}
           <p class="form__help">Digests will be sent at 9:00 in given timezone.</p>
         </td>
       </tr>
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">Slack integration:</label></td>
         <td class="form__layout__right-column">
-          {{ form.slack_url|add_class:"text-input profile-form__slack-url" }}
+          <div class="slack-url-container profile-form__slack-url"
+               data-url="{{ form.slack_url.value }}"
+               data-error="{{ form.slack_url.errors|first }}"
+               />
           <p class="form__layout__right-column form__help">Enter Slack's URL here and we'll
 publish all discovered versions in that channel. Need help? Read <a href="{% url 'help' topic='slack/' %}">more about Slack</a> integration!</p>
         </td>
@@ -43,7 +46,10 @@ publish all discovered versions in that channel. Need help? Read <a href="{% url
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">WebHook integration:</label></td>
         <td class="form__layout__right-column">
-          {{ form.webhook_url|add_class:"text-input profile-form__webhook-url" }}
+          <div class="webhook-url-container"
+               data-url="{{ form.webhook_url.value }}"
+               data-error="{{ form.webhook_url.errors|first }}"
+               />
           <p class="form__layout__right-column form__help">Enter a webhook's URL here and we'll
 POST all discovered versions there. Need help? Read <a href="{% url 'help' topic='webhooks/' %}">more about using WebHooks</a> and about format of the posted data in our documentation.</p>
         </td>
@@ -51,7 +57,7 @@ POST all discovered versions there. Need help? Read <a href="{% url 'help' topic
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">RSS integration:</label></td>
         <td class="form__layout__right-column">
-          <input type="text" class="text-input" readonly="readonly" value="{{request|site_url}}{% url 'rss-feed' feed_hash=user.rss_hash %}"/>
+          <input type="text" class="mdl-textfield__input" readonly="readonly" value="{{request|site_url}}{% url 'rss-feed' feed_hash=user.rss_hash %}"/>
           <p class="form__layout__right-column form__help">Copy this URL into you favorite RSS reader.</p>
         </td>
       </tr>
@@ -60,9 +66,9 @@ POST all discovered versions there. Need help? Read <a href="{% url 'help' topic
         <td class="form__layout__right-column">
           {% if from_registration %}
             <input type="hidden" name="from_registration" value="yes"/>
-            <input type="submit" value="Proceed to the Digest" class="button _good _large"/>
+            <input type="submit" value="Proceed to the Digest" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"/>
           {% else %}
-            <input type="submit" value="Save changes" class="button _good _large"/>
+            <input type="submit" value="Save changes" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"/>
           {% endif %}
         </td>
       </tr>

@@ -44,6 +44,7 @@ from allmychanges.models import (Version,
 from allmychanges.churn import get_user_actions_heatmap
 from allmychanges import chat
 from allmychanges.notifications.email import send_email
+from allmychanges.notifications import slack, webhook
 from allmychanges.http import LastModifiedMixin
 
 from oauth2_provider.models import Application, AccessToken
@@ -732,13 +733,22 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
                              'User opened his profile settings')
         return super(ProfileView, self).get(*args, **kwargs)
 
-    def post(self, *args, **kwargs):
+    def form_valid(self, form):
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
                              'profile-update',
                              'User saved his profile settings')
-        messages.add_message(self.request, messages.INFO, 'Account settings were saved.')
-        return super(ProfileView, self).post(*args, **kwargs)
+        messages.add_message(self.request,
+                             messages.INFO,
+                             'Account settings were saved.')
+        return super(ProfileView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        messages.add_message(self.request,
+                             messages.ERROR,
+                             'There is some error in the form data.')
+        return super(ProfileView, self).form_invalid(form)
+
 
 
 class TokenForm(forms.Form):
@@ -1803,3 +1813,35 @@ class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
         else:
             result['title'] = 'All Categories'
         return result
+
+
+
+def _get_test_version(user, limit=10):
+    """Returns random version from N changelog updated recently.
+    """
+    changelogs = list(user.changelogs.all().order_by('-updated_at')[:limit])
+
+    if not changelogs:
+        changelogs = list(Changelog.objects.all().order_by('-updated_at')[:limit])
+
+    ch = random.choice(changelogs)
+    return ch.versions.latest('id')
+
+
+class TestSlackView(View):
+    def post(self, request, **kwargs):
+        version = _get_test_version(request.user)
+        slack.notify_about_version(
+            request.GET['url'],
+            version,
+            subject=u'This is the test of slack integration')
+        return HttpResponse('OK')
+
+
+class TestWebhookView(View):
+    def post(self, request, **kwargs):
+        version = _get_test_version(request.user)
+        webhook.notify_about_version(
+            request.GET['url'],
+            version)
+        return HttpResponse('OK')

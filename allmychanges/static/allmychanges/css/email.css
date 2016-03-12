@@ -281,6 +281,7 @@ a {
 }
 .form__layout__left-column {
   padding-bottom: 1.333333333333333em;
+  vertical-align: top;
 }
 .form__layout__right-column {
   padding-bottom: 1.333333333333333em;

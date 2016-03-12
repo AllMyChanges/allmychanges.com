@@ -38,6 +38,8 @@ ALLOWED_HOSTS = ['localhost',
                  'skate.svetlyak.ru',
                  'dev.allmychanges.com']
 
+BASE_URL = 'http://dev.allmychanges.com'
+
 
 SLACK_URLS = {}
 
