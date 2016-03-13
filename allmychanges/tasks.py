@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import time
-import anyjson
-import requests
 import datetime
 
 from django.db import transaction
@@ -14,7 +12,7 @@ from allmychanges.utils import (
     count,
     update_fields,
     first_sentences)
-from allmychanges.notifications import slack
+from allmychanges.notifications import slack, webhook
 from allmychanges.changelog_updater import update_preview_or_changelog
 from allmychanges import chat
 
@@ -204,7 +202,7 @@ def preview_test_task(preview_id, items):
             text = items[0]
             tail = items[1:]
 
-            preview.log.append({'text': items[0]})
+            preview.log.append({'text': text})
             preview.save(update_fields=('log',))
 
             if tail:
@@ -272,46 +270,32 @@ def notify_users_about_new_versions(changelog_id, version_ids):
         trackers = changelog.trackers.all()
 
         versions = list(Version.objects.filter(pk__in=version_ids))
-        slack_versions = u', '.join(
-            '<https://allmychanges.com{0}|{1}>'.format(
-                version.get_absolute_url(),
-                version.number)
-            for version in versions)
 
-        slack_text = u'Look, new {versions_form} of <{url}|{namespace}/{name}> {was_form} found: {versions}'.format(
-            url='https://allmychanges.com' + changelog.get_absolute_url(),
-            namespace=changelog.namespace,
-            name=changelog.name,
-            versions=slack_versions,
-            versions_form='version' + (len(version_ids) > 1 and u's' or u''),
-            was_form=(len(version_ids) > 1) and 'were' or 'was')
+        # first, add item to feeds
+        for version in versions:
+            for tracker in trackers:
+                try:
+                    tracker.add_feed_item(version)
+                except Exception:
+                    log.trace().error('Unable to add item to the feed')
 
-        webhook_data = None
-        for user in trackers:
-            if user.slack_url:
-                slack.send(url=user.slack_url, text=slack_text)
-            if user.webhook_url:
-                if webhook_data is None:
-                    def format_date(dt):
-                        if dt is not None:
-                            return dt.isoformat()
+                if tracker.slack_url:
+                    try:
+                        slack.notify_about_version(
+                            url=tracker.slack_url,
+                            version=version,
+                            changelog=changelog)
+                    except Exception:
+                        log.trace().error('Unable to send slack notification')
 
-                    webhook_data = dict(
-                        namespace=changelog.namespace,
-                        name=changelog.name,
-                        versions=[dict(number=version.number,
-                                       web_url='https://allmychanges.com' + version.get_absolute_url(),
-                                       content=version.processed_text,
-                                       released_at=format_date(version.date),
-                                       discovered_at=format_date(version.discovered_at))
-                                  for version in versions])
-                    webhook_data = anyjson.serialize(webhook_data)
-                requests.post(user.webhook_url,
-                              data=webhook_data,
-                              headers={'User-Agent': settings.HTTP_USER_AGENT,
-                                       'Content-Type': 'application/json'})
-
-
+                if tracker.webhook_url:
+                    try:
+                        webhook.notify_about_version(
+                            url=tracker.webhook_url,
+                            version=version,
+                            changelog=changelog)
+                    except Exception:
+                        log.trace().error('Unable to send webhook notification')
 
 
 def process_appstore_url(url):

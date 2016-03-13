@@ -101,7 +101,6 @@ def update_changelog_from_raw_data3(obj, raw_data):
         add_to_feeds = lambda version: None
 
     log.debug('Selecting old versions from database')
-    new_versions_ids = []
     all_old_versions = {v.number: v
                         for v in obj.versions.all()}
 
@@ -121,13 +120,11 @@ def update_changelog_from_raw_data3(obj, raw_data):
 
             if version is not None:
                 old_version_was_not_released = version.unreleased
-                created = False
             else:
                 version = obj.versions.create(number=raw_version.version)
                 # old version was not found, this is the same as if
                 # it was not released
                 old_version_was_not_released = True
-                created = True
 
             version.unreleased = getattr(raw_version, 'unreleased', False)
             version.filename = getattr(raw_version, 'filename', None)
@@ -142,10 +139,6 @@ def update_changelog_from_raw_data3(obj, raw_data):
             version.last_seen_at = now
             version.save()
 
-            if created:
-                # every new version should be added to users' feeds
-                new_versions_ids.append(version.id)
-
             this_version_released = not version.unreleased
             if old_version_was_not_released and this_version_released:
                 released_versions.append(version)
@@ -157,32 +150,39 @@ def update_changelog_from_raw_data3(obj, raw_data):
     # update it's description in docs/feed-items.md
     released_versions.reverse()
 
+    notify_about = []
+
+    # we notify only about "tips"
+    # or about versions with release date with in month from now()
+    # or about some recent versions (if there is no release date)
     for version in released_versions:
         if version.number in branches:
-            add_to_feeds(version)
+            notify_about.append(version)
         else:
             if version.date:
                 if version.date > month_ago:
-                    add_to_feeds(version)
+                    notify_about.append(version)
             else:
                 if num_possible_parents > 0:
-                    add_to_feeds(version)
+                    notify_about.append(version)
                     num_possible_parents -= 1
 
     log.debug('Resorting versions in database')
     reorder_versions(list(obj.versions.all()))
 
-    log.debug('Creating tasks to notify users and post a tweet')
-    if new_versions_ids and isinstance(obj, Changelog):
-        notify_users_about_new_versions.delay(
-            obj.id, new_versions_ids)
-        post_tweet.delay(
-            changelog_id=obj.id)
-
-
     end_time = time.time()
     with log.fields(update_time=end_time - start_time):
         log.info('Versions in database were updated')
+
+    if notify_about and isinstance(obj, Changelog):
+        log.debug('Creating task to notify users')
+        notify_users_about_new_versions.delay(
+            obj.id,
+            [v.id for v in notify_about])
+
+        log.debug('Creating task to post tweet about released version')
+        post_tweet.delay(
+            changelog_id=obj.id)
 
 
 from contextlib import contextmanager

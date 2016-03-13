@@ -6,12 +6,13 @@ import anyjson
 from django.conf import settings
 
 
-def notify_about_version(url, version):
+def notify_about_version(url, version, changelog=None):
     def format_date(dt):
         if dt is not None:
             return dt.isoformat()
 
-    changelog = version.changelog
+    if not changelog:
+        changelog = version.changelog
 
     webhook_data = dict(
         namespace=changelog.namespace,
