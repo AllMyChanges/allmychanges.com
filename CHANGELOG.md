@@ -1,15 +1,21 @@
-1.2.0 (unreleased)
+1.2.0 (2016-03-14)
 ==================
 
-Algorithm which adds versions to the digest was significantly
+* Algorithm which adds versions to the digest was significantly
 improved. Now it shouldn't add many old versions for a new or
 unpaused project.
 
-Now we more precisely describe at
-[account's settings](http://dev.allmychanges.com/account/settings/)
+* Now Slack and Webhook integrations can be tested by pressing
+"Test" button on the [account's settings][account-settings] page.
+
+* Also now we post full text of release notes to the Slack.
+
+* Now we more precisely describe at
+[account's settings][account-settings]
 page, how often email notifications will be sent. Previously,
 some users were confused because switching digests to 'Never' turns
 off email notification completely and this wasn't obvious.
+
 
 1.1.0 (2016-03-06)
 ==================
