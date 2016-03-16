@@ -87,10 +87,10 @@ def download(source, **params):
         release_date = response.docV2.details.appDetails.uploadDate
 
         content = u"""
-    ## {version} ({date})
+## {version} ({date})
 
-    {changes}
-    """.format(version=version,
+{changes}
+    """.strip().format(version=version,
                date=release_date,
                changes=changes)
 

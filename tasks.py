@@ -227,7 +227,7 @@ def dbshell():
     run('docker exec -it mysql.allmychanges.com mysql -ppassword allmychanges')
 
 
-@task
+@task(start_databases)
 def test(case='', failed=False, verbose=False):
     command = ['/env/bin/nosetests']
 

@@ -262,7 +262,6 @@ def download(source, **params):
                     notes = notes.replace(u'★', u'*') # because of temple run motherfuckers
                     text = u"""
 ## {version} ({date})
-==============
 
 {notes}
                     """.strip().format(version=version,
