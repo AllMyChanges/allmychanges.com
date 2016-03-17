@@ -380,6 +380,17 @@ def parse_search_list(text):
     Attribute patterns are used to filter already processed
     versions by attribute's value, for example by title.
     """
+    # TODO: at some point of time, all search lists will be
+    #       stored in the database as list, and this function
+    #       will be removed.
+    #       After the script `migrate_downloaders` running at
+    #       January 2016, some downloader_settings were converted
+    #       to contain search_list as a list. But after that,
+    #       all these projects were paused. After saving settings,
+    #       search_list is converted back to a string.
+    if isinstance(text, list):
+        return text
+
     def process(name):
         if is_not_http_url(name) \
            and is_not_attr_pattern(name) \
