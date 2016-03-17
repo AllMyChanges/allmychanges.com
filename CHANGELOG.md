@@ -1,3 +1,11 @@
+1.2.1 (2016-03-17)
+==================
+
+* Fixed urls and bold text representation in Slack notifications:  
+  ![](https://img-fotki.yandex.ru/get/67890/13558447.f/0_bc68a_c79b90d2_L.png)
+* Fixed issue with updating projects where release dates are known.
+* Fixed appstore and google play release notes headers.
+
 1.2.0 (2016-03-14)
 ==================
 
