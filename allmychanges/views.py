@@ -1819,8 +1819,9 @@ class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
 def _get_test_version(user, limit=10):
     """Returns random version from N changelog updated recently.
     """
-    changelogs = list(Changelog.objects.filter(name='angular.js'))
-#    changelogs = list(user.changelogs.all().order_by('-updated_at')[:limit])
+    # to check rich markup in messages
+    # changelogs = list(Changelog.objects.filter(name='angular.js'))
+    changelogs = list(user.changelogs.all().order_by('-updated_at')[:limit])
 
     if not changelogs:
         changelogs = list(Changelog.objects.all().order_by('-updated_at')[:limit])
