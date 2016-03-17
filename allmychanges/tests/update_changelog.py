@@ -64,11 +64,15 @@ class UpdaterTests(TestCase):
         eq_(1, self.user.feed_versions.count())
 
     def test_items_with_release_date_always_added_to_feed_if_not_older_than_month(self):
+        # here I intentionally get date instead of datetime,
+        # to check if algorithm can work with both
         now = timezone.now()
+        now_date = now.date()
+
         d = datetime.timedelta
         data = [v(version='0.1.0', date=now - d(42)),
-                v(version='0.1.1', date=now - d(21)),
-                v(version='0.1.2', date=now - d(7)),
+                v(version='0.1.1', date=now_date - d(21)),
+                v(version='0.1.2', date=now_date - d(7)),
                 v(version='0.1.3', date=now - d(1))]
 
         update_changelog_from_raw_data3(self.changelog, data)

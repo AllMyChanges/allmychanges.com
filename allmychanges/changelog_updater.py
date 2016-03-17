@@ -1,14 +1,13 @@
 # coding: utf-8
 
 import datetime
-import copy
 import shutil
 import arrow
 import time
 
 from django.utils import timezone
 from allmychanges.utils import (
-    discard_seconds,
+    ensure_has_timezone,
     update_fields)
 from allmychanges.exceptions import (
     UpdateError)
@@ -160,7 +159,7 @@ def update_changelog_from_raw_data3(obj, raw_data):
             notify_about.append(version)
         else:
             if version.date:
-                if version.date > month_ago:
+                if ensure_has_timezone(version.date) > month_ago:
                     notify_about.append(version)
             else:
                 if num_possible_parents > 0:

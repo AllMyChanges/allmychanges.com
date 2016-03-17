@@ -209,6 +209,27 @@ def discard_seconds(dt):
     return dt.datetime
 
 
+def ensure_datetime(dt):
+    """Returns `datetime` object even if `date` was passed as argument.
+
+    This function is useful for comparison in places, where we
+    not sure if both arguments have same date type.
+    """
+    if isinstance(dt, datetime.date):
+        return datetime.datetime.fromordinal(dt.toordinal())
+    else:
+        assert isinstance(dt, datetime.datetime)
+    return dt
+
+
+def ensure_has_timezone(dt):
+    dt = ensure_datetime(dt)
+    if dt.tzinfo is None:
+        dt = arrow.get(dt)
+        dt = dt.to('UTC').datetime
+    return dt
+
+
 def dt_in_window(tz, system_time, hour):
     local = times.to_local(system_time, tz)
     return local.hour == hour
