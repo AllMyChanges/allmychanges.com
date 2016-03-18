@@ -18,6 +18,11 @@ def test_convert_links():
 
     eq_(expected, convert_md_links(text))
 
+    text = '[Full Changelog](https://github.com/omab/python-social-auth/compare/v0.2.13...v0.2.14)'
+    expected = '<https://github.com/omab/python-social-auth/compare/v0.2.13...v0.2.14|Full Changelog>'
+
+    eq_(expected, convert_md_links(text))
+
 
 def test_convert_bolds():
     text =      '* **$parse:** Copy `inputs` for expressions with expensive checks'

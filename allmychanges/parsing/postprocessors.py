@@ -3,11 +3,23 @@
 import re
 
 
+ESCAPED_SLASH = '%ESCAPED_SLASH%'
+
+
 def _process_rule(line):
     line = line.strip()
     if line.startswith('s/'):
-        rule = line[2:].split('/')
-        return re.compile(rule[0], re.MULTILINE), rule[1]
+        line = line[2:]
+        # replace escaped slashes
+        line = line.replace(ur'\/', ESCAPED_SLASH)
+        rule = line.split('/')
+        # replace slashes back and unescape them
+        rule = [item.replace(ESCAPED_SLASH, ur'/')
+                for item in rule]
+
+        what_to_replace = rule[0]
+        replacement = rule[1]
+        return re.compile(what_to_replace, re.MULTILINE), replacement
 
 
 def sed(rules):
