@@ -15,7 +15,7 @@ from allmychanges.utils import first_sentences
 
 def convert_md_links(text):
     return re.sub(
-        ur'\[(?P<text>\S+?)\]\((?P<link>\S+?)\)',
+        ur'\[(?P<text>\S.*\S?)\]\((?P<link>\S+?)\)',
         u'<\g<link>|\g<text>>',
         text)
 
