@@ -43,14 +43,12 @@ from .views import (OldIndexView,
                     ChangeLogView,
                     PreviewView,
                     AddNewView,
-                    AddNewView2,
                     ProfileView,
                     TokenView,
                     SynonymsView,
                     ProjectIssuesView,
                     ProjectView,
-                    EditProjectView,
-                    EditPackageView)
+                    EditProjectView)
 from .sitemaps import PackagesSitemap
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
@@ -98,28 +96,37 @@ urlpatterns = patterns(
 
     url(r'^help/(?P<topic>.*)$', HelpView.as_view(), name='help'),
 
-    url(r'^p/new-old/$', AddNewView.as_view(), name='add-new-old'),
-    url(r'^p/new/$', AddNewView2.as_view(), name='add-new'),
+    url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
 
     url(r'^p/$', CategoriesView.as_view(), name='categories'),
-    # this url should go before category view because it has more specifity
-    url(r'^p/(?P<pk>\d+)/$', ProjectView.as_view(), name='project-by-id'),
+
+    # these two urls should go before category view
+    # because it has more specifity
+    url(r'^p/(?P<pk>\d+)/$',
+        ProjectView.as_view(),
+        name='project-by-id'),
     url(r'^p/(?P<pk>\d+)/edit/$',
         EditProjectView.as_view(),
         name='edit-project-by-id'),
     url(r'^p/(?P<category>[^/]+?)/$', CategoryView.as_view(), name='category'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/issues/$', ProjectIssuesView.as_view(), name='project-issues'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/synonyms/$', SynonymsView.as_view(), name='synonyms'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$', BadgeView.as_view(), name='badge'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit-old/$', EditPackageView.as_view(), name='edit-package-old'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/issues/$',
+        ProjectIssuesView.as_view(),
+        name='project-issues'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/synonyms/$',
+        SynonymsView.as_view(),
+        name='synonyms'),
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/badge/$',
+        BadgeView.as_view(),
+        name='badge'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/edit/$',
         EditProjectView.as_view(),
         name='edit-package'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/merge/$',
         MergeProjectView.as_view(),
         name='merge-project'),
-    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$', ProjectView.as_view(), name='project'),
-
+    url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$',
+        ProjectView.as_view(),
+        name='project'),
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
     url(r'^v1/', include('allmychanges.api.urls')),

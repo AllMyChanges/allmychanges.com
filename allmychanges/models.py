@@ -260,7 +260,6 @@ class Downloadable(object):
 
         params.update(self.downloader_settings or {})
 
-        print 'Calling "{0}" with params {1}'.format(downloader, params)
         download = get_downloader(downloader)
         return download(self.source,
                         **params)

@@ -138,7 +138,6 @@ def schedule_updates(reschedule=False, packages=[]):
 #@transaction.atomic
 @wait_chat_threads
 def update_preview_task(preview_id):
-    print 'Update preview task'
     with log.fields(preview_id=preview_id):
         log.info('Starting task')
         try:
@@ -149,19 +148,10 @@ def update_preview_task(preview_id):
                       channel='tasks')
 
             if not preview.downloader:
-                print 'No downloader for preview, guessing...'
                 preview.set_processing_status('Guessing downloaders')
                 downloaders = list(guess_downloaders(preview.source))
-                print ''
-                print 'Guessed downloaders:'
-                for d in downloaders:
-                    print d
-                print ''
                 update_fields(preview, downloaders=downloaders)
             else:
-                print ''
-                print 'We know downloader for preview, don\'t need to guess'
-                print ''
                 downloaders = [{'name': preview.downloader}]
 
 
@@ -169,7 +159,6 @@ def update_preview_task(preview_id):
                 num_downloaders = len(downloaders)
 
                 for idx, downloader in enumerate(downloaders):
-                    print 'trying', downloader
                     last_downloader = idx == (num_downloaders - 1)
                     ignore_problem = True if not last_downloader else False
 

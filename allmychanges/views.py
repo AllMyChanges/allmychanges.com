@@ -999,7 +999,7 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
 
 
 class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/add-new.html'
+    template_name = 'allmychanges/tune-project.html'
 
     def get_context_data(self, **kwargs):
         context = super(AddNewView, self).get_context_data(**kwargs)
@@ -1095,15 +1095,11 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
-class AddNewView2(AddNewView):
-    template_name = 'allmychanges/add-new2.html'
-
-
-class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/edit-package.html'
+class EditProjectView(ImmediateMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/tune-project.html'
 
     def get_context_data(self, **kwargs):
-        context = super(EditPackageView, self).get_context_data(**kwargs)
+        context = super(EditProjectView, self).get_context_data(**kwargs)
         params = get_keys(kwargs, 'namespace', 'name', 'pk')
         changelog = Changelog.objects.get(**params)
 
@@ -1124,10 +1120,6 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
             context['can_edit_xslt'] = True
 
         return context
-
-
-class EditProjectView(EditPackageView):
-    template_name = 'allmychanges/edit-package2.html'
 
 
 class MergeProjectView(SuperuserRequiredMixin,
@@ -1332,7 +1324,7 @@ class IndexView(CommonContextMixin, TemplateView):
         if self.request.user.is_authenticated():
             return ['allmychanges/login-index.html']
 
-        return ['allmychanges/new-index.html']
+        return ['allmychanges/index.html']
 
 
 class IssuesFilterForm(forms.Form):
