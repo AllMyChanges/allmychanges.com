@@ -792,8 +792,8 @@ class LightModerator(models.Model):
 
 
 class Moderator(models.Model):
-    changelog = models.ForeignKey(Changelog)
-    user = models.ForeignKey(User)
+    changelog = models.ForeignKey(Changelog, related_name='+')
+    user = models.ForeignKey(User, related_name='+')
     created_at = models.DateTimeField(auto_now_add=True)
     from_light_user = models.CharField(max_length=40, blank=True, null=True)
 
