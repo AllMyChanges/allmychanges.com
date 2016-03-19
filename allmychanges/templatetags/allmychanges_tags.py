@@ -4,6 +4,7 @@ import anyjson
 from django import template
 from django.utils.safestring import mark_safe
 
+from allmychanges.utils import reverse
 
 register = template.Library()
 
@@ -63,3 +64,17 @@ def project_link(changelog):
         changelog.get_absolute_url(),
         project_name(changelog))
     return mark_safe(link)
+
+
+@register.filter
+def admin_user_links(users):
+    """Outputs html fragment, with usernames linked to
+    user profiles in admin interface."""
+    def get_link(user):
+        username = user.username
+        return u'<a href="{0}">{1}</a>'.format(
+            reverse('admin-user-profile',
+                    username=username),
+            username)
+    fragment = u', '.join(map(get_link, users))
+    return mark_safe(fragment)

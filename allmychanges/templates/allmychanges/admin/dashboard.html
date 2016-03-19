@@ -7,7 +7,10 @@
 {% block content %}
   <h1 class="page-header">{{ title }}</h1>
 
-  <p><a href="{% url 'admin-retention' %}">Retention Graphs</a></p>
+  <ul>
+    <li><a href="{% url 'admin-retention' %}">Retention Graphs</a></li>
+    <li><a href="{% url 'admin-unsuccessful' %}">There are {{unsuccessful_urls_count}} unsuccessful urls</a></li>
+  </ul>
 
   <h2 class="page-subheader">Users, joined in last two weeks</h2>
 

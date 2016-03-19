@@ -10,6 +10,7 @@ import jsonfield
 
 from hashlib import md5, sha1
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
@@ -134,9 +135,11 @@ class User(AbstractBaseUser):
         blank=True,
         null=True,
         help_text='Date when last email digest was sent')
-    skips_changelogs = models.ManyToManyField('Changelog', through='ChangelogSkip',
+    skips_changelogs = models.ManyToManyField('Changelog',
+                                              through='ChangelogSkip',
                                               related_name='skipped_by')
-    moderated_changelogs = models.ManyToManyField('Changelog', through='Moderator',
+    moderated_changelogs = models.ManyToManyField('Changelog',
+                                                  through='Moderator',
                                                   related_name='moderators')
 
     # notification settings
@@ -288,6 +291,9 @@ class Downloadable(object):
 class ChangelogManager(models.Manager):
     def only_active(self):
         return self.all().filter(paused_at=None).exclude(name=None)
+
+    def unsuccessful(self):
+        return self.all().filter(Q(name=None) | Q(namespace=None))
 
 
 class Changelog(Downloadable, models.Model):

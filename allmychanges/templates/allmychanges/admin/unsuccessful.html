@@ -1,0 +1,41 @@
+{% extends "allmychanges/new-base.html" %}
+{% load staticfiles allmychanges_tags %}
+
+
+{% block html-title %}{{ title }} – {{ block.super }}{% endblock %}
+
+{% block content %}
+  <h1 class="page-header">{{ title }}</h1>
+
+  {% if objects %}
+  <table class="table">
+    <tr>
+      <th>Date Added</th>
+      <th>Source</th>
+      <th>Moderators</th>
+      <th>Actions</th>
+    </tr>
+    {% for obj in objects %}
+    <tr>
+      <td>{{obj.created_at|timesince}}</td>
+      <td>{{obj.source}}</td>
+      <td>{{obj.moderators.all|admin_user_links}}</td>
+      <td>
+        <form action="{% url 'edit-project-by-id' pk=obj.pk %}" method="GET">
+          <input type="submit" value="Tune" />
+          {% csrf_token %}
+        </form>
+        <form action="." method="POST">
+          <input type="hidden" name="source" value="{{ obj.source }}" />
+          <input type="submit" value="Delete" />
+          {% csrf_token %}
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>Everything is OK!</p>
+  {% endif %}
+
+{% endblock content %}

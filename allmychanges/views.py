@@ -1104,8 +1104,8 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(EditPackageView, self).get_context_data(**kwargs)
-        changelog = Changelog.objects.get(namespace=kwargs['namespace'],
-                                          name=kwargs['name'])
+        params = get_keys(kwargs, 'namespace', 'name', 'pk')
+        changelog = Changelog.objects.get(**params)
 
         preview = changelog.create_preview(
             user=self.request.user if self.request.user.is_authenticated() else None,
@@ -1126,7 +1126,7 @@ class EditPackageView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
-class EditPackageView2(EditPackageView):
+class EditProjectView(EditPackageView):
     template_name = 'allmychanges/edit-package2.html'
 
 
@@ -1507,7 +1507,48 @@ class AdminDashboardView(SuperuserRequiredMixin,
         for user in users:
             user.auth_providers = user.social_auth.all().values_list('provider', flat=True)
         result['users'] = users
+
+        # count urls which weren't added as a projects
+        count = Changelog.objects.unsuccessful().count()
+        result['unsuccessful_urls_count'] = count
+
         return result
+
+
+class DeleteBySourceForm(forms.Form):
+    source = forms.CharField(required=True, widget=forms.HiddenInput)
+
+
+class AdminUnsuccessfulView(
+        SuperuserRequiredMixin,
+        CommonContextMixin,
+        TemplateView):
+    """Shows urls which users tried to add to the service, but give up and
+    didn't finish tuning.
+    """
+
+    template_name = 'allmychanges/admin/unsuccessful.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(AdminUnsuccessfulView, self).get_context_data(**kwargs)
+        result['title'] = 'Unsuccessful URLs'
+
+        # count urls which weren't added as a projects
+        changelogs = Changelog.objects.unsuccessful().order_by('-created_at')
+
+        changelogs = changelogs.prefetch_related('moderators')
+        result['objects'] = changelogs
+
+        return result
+
+    def post(self, request, **kwargs):
+        form = DeleteBySourceForm(request.POST)
+
+        if form.is_valid():
+            source = form.cleaned_data['source']
+            Changelog.objects.filter(source=source).delete()
+
+        return HttpResponseRedirect(reverse('admin-unsuccessful'))
 
 
 class AdminRetentionView(SuperuserRequiredMixin,
