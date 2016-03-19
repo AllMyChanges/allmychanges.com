@@ -23,7 +23,6 @@
       <td>
         <form action="{% url 'edit-project-by-id' pk=obj.pk %}" method="GET">
           <input type="submit" value="Tune" />
-          {% csrf_token %}
         </form>
         <form action="." method="POST">
           <input type="hidden" name="source" value="{{ obj.source }}" />
