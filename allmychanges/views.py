@@ -1869,7 +1869,8 @@ class TestSlackView(View):
         slack.notify_about_version(
             request.GET['url'],
             version,
-            subject=u'This is the test of slack integration')
+            subject=u'This is the test of slack integration',
+        )
         return HttpResponse('OK')
 
 

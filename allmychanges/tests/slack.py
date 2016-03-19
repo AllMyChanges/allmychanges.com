@@ -23,6 +23,10 @@ def test_convert_links():
 
     eq_(expected, convert_md_links(text))
 
+    text = '  * **$route:** allow route reload to be prevented ([2f0a50b5](https://github.com/angular/angular.js/commit/2f0a50b526c5d0263879d3e845866e1af6fd9791), [#9824](https://github.com/angular/angular.js/issues/9824), [#13894](https://github.com/angular/angular.js/issues/13894))'
+    expected = '  * **$route:** allow route reload to be prevented (<https://github.com/angular/angular.js/commit/2f0a50b526c5d0263879d3e845866e1af6fd9791|2f0a50b5>, <https://github.com/angular/angular.js/issues/9824|#9824>, <https://github.com/angular/angular.js/issues/13894|#13894>)'
+    eq_(expected, convert_md_links(text))
+
 
 def test_convert_bolds():
     text =      '* **$parse:** Copy `inputs` for expressions with expensive checks'
