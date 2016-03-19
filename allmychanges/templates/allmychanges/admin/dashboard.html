@@ -16,17 +16,21 @@
     <tr>
       <th>Date Joined</th>
       <th>Username</th>
+      <th>Name</th>
       <th>Email</th>
       <th>Track Changelogs</th>
       <th>Auth</th>
+      <th>Contacted</th>
     </tr>
     {% for user in users %}
     <tr>
       <td>{{user.date_joined|timesince}}</td>
       <td><a href="{% url 'admin-user-profile' username=user.username %}">{{user.username}}</a></td>
+      <td>{{user.custom_fields.Name.value}}</td>
       <td>{{user.email}}</td>
       <td>{{user.num_changelogs}}</td>
       <td>{{user.auth_providers|join:", "}}</td>
+      <td>{{user.custom_fields.Contacted.value}}</td>
     </tr>
     {% endfor %}
   </table>
