@@ -73,15 +73,13 @@ def download(source,
         # raise RuntimeError()
         DEFAULT_UPPER_LIMIT = 100
         UPPER_LIMITS = {
-            'rechttp+http://www.postgresql.org/docs/devel/static/release.html': 1000,
-            'rechttp+http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
-            'rechttp+https://enterprise.github.com/releases': 1000,
-            'rechttp+https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
-            'rechttp+https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
+            'http://www.postgresql.org/docs/devel/static/release.html': 1000,
+            'http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
+            'https://enterprise.github.com/releases': 1000,
+            'https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
+            'https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
+            'http://www.zabbix.com': 1000,
         }
-        UPPER_LIMITS.update(
-            (key.replace('rechttp+', ''), value)
-            for key, value in UPPER_LIMITS.items())
         upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
         base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
