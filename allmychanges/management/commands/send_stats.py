@@ -55,6 +55,7 @@ def get_stats():
 
     stats['db.tracks.count'] = ChangelogTrack.objects.count()
     stats['db.changelogs'] = Changelog.objects.count()
+    stats['db.unsuccessful.count'] = Changelog.objects.unsuccessful().count()
 
     stats['db.users'] = User.objects.count()
     stats['db.active-users.day'] = User.objects.active_users(1).count()
