@@ -92,17 +92,22 @@ def strip_outer_tag(text):
     return rec(items)
 
 
+def is_filename_pattern(line):
+    return not (is_http_url(line) or is_attr_pattern(line))
+
+
 def get_files(env, walk=os.walk):
     """
     Uses: env.ignore_list, env.search_list and env.dirname.
     """
 
+    ignore_list = filter(is_filename_pattern, env.ignore_list)
     ignore_list = [re.compile('^' + item + '.*$')
-                   for item in env.ignore_list
-                   if not (is_http_url(item) or is_attr_pattern(item))]
+                   for item in ignore_list]
+
     search_list = [(re.compile('^' + item + '.*$'), markup)
                    for item, markup in env.search_list
-                   if not (is_http_url(item) or is_attr_pattern(item))]
+                   if is_filename_pattern(item)]
 
     def in_ignore_list(filename):
         for pattern in ignore_list:
@@ -138,12 +143,6 @@ def get_files(env, walk=os.walk):
 
             with log.name_and_fields('get_files',
                                      filename=rel_filename):
-                # TODO: перенести эту проверку внутрь за ignore и search
-                if ext not in EXTENSIONS_TO_CHECK \
-                   and not filename_looks_like_a_changelog(low_filename):
-#                    log.debug('Skipped because extension not in ' + ','.join(EXTENSIONS_TO_CHECK))
-                    continue
-
                 if not in_ignore_list(rel_filename):
                     attrs = dict(type='filename',
                                  filename=full_filename)
@@ -158,7 +157,9 @@ def get_files(env, walk=os.walk):
                             log.debug('Skipped because not match to search list.')
 
                     else:
-                        yield env.push(**attrs)
+                        if ext in EXTENSIONS_TO_CHECK \
+                           or filename_looks_like_a_changelog(low_filename):
+                            yield env.push(**attrs)
                 else:
                     log.debug('Skipped because matches to ignore list.')
 
@@ -1124,9 +1125,18 @@ def _processing_pipe(processors,
     versions = filter_versions_by_attribute(versions,
                                             search_list=search_list,
                                             ignore_list=ignore_list)
-    # now we'll select a source with maximum number of versions
-    # but not the root directory
-    versions = filter_versions_by_source(versions)
+
+    has_filenames_in_search_list = sum(
+        1
+        for item, markup in search_list
+        if is_filename_pattern(item))
+
+    # we only need to filter versions by source if
+    # user didn't set search list explicitly
+    if not has_filenames_in_search_list:
+        # now we'll select a source with maximum number of versions
+        # but not the root directory
+        versions = filter_versions_by_source(versions)
 
     # using customized comparison we make versions which
     # have less metadata go first
