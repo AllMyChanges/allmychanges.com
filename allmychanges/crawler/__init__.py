@@ -165,6 +165,7 @@ COMMON_SUFFIXES_STR = ur"""
   .rst      |
   .md       |
   .markdown |
+  .php      |
 $"""
 RE_COMMON_SUFFIXES = re.compile(COMMON_SUFFIXES_STR, re.VERBOSE)
 

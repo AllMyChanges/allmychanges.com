@@ -590,15 +590,17 @@ get_file_content = itemgetter('content')
 
 def get_markup(filename, content):
     filename = filename.lower()
+    extension = filename.rsplit(u'.', 1)[-1]
+
     content_head = content[:1000].lower().strip()
 
-    if filename.endswith('.rst'):
+    if extension == 'rst':
         return 'rst'
 
-    if filename.endswith('.md'):
+    if extension == 'md':
         return 'markdown'
 
-    if filename.endswith('.html') or filename.endswith('.htm'):
+    if extension in ['html', 'htm', 'php']:
         return 'html'
 
     if ':func:`' in content \
