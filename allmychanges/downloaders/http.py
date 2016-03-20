@@ -69,8 +69,11 @@ def download(source,
             log.info('Skipping this test urls.')
             return
 
-        search_list = parse_search_list(search_list)
-        ignore_list = split_filenames(ignore_list)
+        if isinstance(search_list, basestring):
+            search_list = parse_search_list(search_list)
+
+        if isinstance(ignore_list, basestring):
+            ignore_list = split_filenames(ignore_list)
 
         # raise RuntimeError()
         DEFAULT_UPPER_LIMIT = 100
