@@ -116,6 +116,17 @@ def start_databases():
         run('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
         run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
 
+
+    if 'postgres.allmychanges.com' in containers:
+        run('docker start postgres.allmychanges.com')
+    else:
+        run('docker run --net amch --name postgres.allmychanges.com -v `pwd`/dumps:/dumps -e POSTGRES_PASSWORD=password -d postgres')
+        print 'Waiting for postgres start'
+        # time.sleep(30)
+        # run('docker exec -it postgres.allmychanges.com postgresadmin -ppassword create allmychanges')
+        # run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
+
+
     if 'redis.allmychanges.com' in containers:
         run('docker start redis.allmychanges.com')
     else:
@@ -251,6 +262,35 @@ def drop_database():
     run('docker exec -it mysql.allmychanges.com mysqladmin -ppassword drop allmychanges',
         pty=True)
     create_database()
+
+
+@task
+def create_postgres():
+    # https://hub.docker.com/_/postgres/
+    # how to run psql
+    # $
+
+    run('docker exec -it postgres.allmychanges.com postgresadmin -ppassword create allmychanges',
+        pty=True)
+
+@task
+def drop_postgres():
+    run('docker exec -it postgres.allmychanges.com postgresadmin -ppassword drop allmychanges',
+        pty=True)
+    create_postgres()
+
+
+@task
+def connect_to_postgres():
+    run(('docker run -it '
+         '--net amch '
+         '--rm postgres '
+         'sh -c \'exec psql '
+         '-h postgres.allmychanges.com '
+         '-p 5432 '
+         '-U postgres\''),
+        pty=True)
+
 
 @task
 def bash():
