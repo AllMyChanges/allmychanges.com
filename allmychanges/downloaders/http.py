@@ -9,6 +9,7 @@ import os
 import re
 import lxml
 
+from operator import itemgetter
 from cgi import parse_header
 from collections import defaultdict
 from django.conf import settings
@@ -72,6 +73,9 @@ def download(source,
         if isinstance(search_list, basestring):
             search_list = parse_search_list(search_list)
 
+        search_list = map(itemgetter(0), search_list)
+        search_list = filter(is_http_url, search_list)
+
         if isinstance(ignore_list, basestring):
             ignore_list = split_filenames(ignore_list)
 
@@ -91,10 +95,6 @@ def download(source,
 
         queue = [source]
         already_seen = set()
-
-        search_list = [item
-                       for item, parser_name in search_list
-                       if is_http_url(item)]
 
         if not recursive:
             limit_urls = 1
