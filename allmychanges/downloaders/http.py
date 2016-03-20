@@ -80,7 +80,7 @@ def download(source,
             'https://enterprise.github.com/releases': 1000,
             'https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
             'https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
-            'http://www.zabbix.com': 1000,
+            'http://www.zabbix.com': 10000,
         }
         upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
