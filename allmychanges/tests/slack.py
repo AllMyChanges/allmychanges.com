@@ -5,6 +5,7 @@ from nose.tools import eq_
 from allmychanges.notifications.slack import (
     convert_md_links,
     convert_md_bolds,
+    convert_md_images,
 )
 
 
@@ -26,6 +27,16 @@ def test_convert_links():
     text = '  * **$route:** allow route reload to be prevented ([2f0a50b5](https://github.com/angular/angular.js/commit/2f0a50b526c5d0263879d3e845866e1af6fd9791), [#9824](https://github.com/angular/angular.js/issues/9824), [#13894](https://github.com/angular/angular.js/issues/13894))'
     expected = '  * **$route:** allow route reload to be prevented (<https://github.com/angular/angular.js/commit/2f0a50b526c5d0263879d3e845866e1af6fd9791|2f0a50b5>, <https://github.com/angular/angular.js/issues/9824|#9824>, <https://github.com/angular/angular.js/issues/13894|#13894>)'
     eq_(expected, convert_md_links(text))
+
+
+def test_convert_images():
+    text = 'This is an image: ![](https://img-fotki.yandex.ru/get/67890/13558447.f/0_bc68a_c79b90d2_L.png) right?'
+    expected = 'This is an image: https://img-fotki.yandex.ru/get/67890/13558447.f/0_bc68a_c79b90d2_L.png right?'
+    eq_(expected, convert_md_images(text))
+
+    text = 'This is an image: ![with title](https://img-fotki.yandex.ru/get/67890/13558447.f/0_bc68a_c79b90d2_L.png) right?'
+    expected = 'This is an image: https://img-fotki.yandex.ru/get/67890/13558447.f/0_bc68a_c79b90d2_L.png right?'
+    eq_(expected, convert_md_images(text))
 
 
 def test_convert_bolds():

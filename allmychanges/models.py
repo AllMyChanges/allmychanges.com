@@ -291,6 +291,9 @@ class ChangelogManager(models.Manager):
     def only_active(self):
         return self.all().filter(paused_at=None).exclude(name=None)
 
+    def good(self):
+        return self.all().exclude(Q(name=None) | Q(namespace=None))
+
     def unsuccessful(self):
         return self.all().filter(Q(name=None) | Q(namespace=None))
 
@@ -901,9 +904,11 @@ class Preview(Downloadable, models.Model):
 
 
 class VersionManager(models.Manager):
-    def get_query_set(self):
-        # TODO: rename after migration to Django 1.6
-        return super(VersionManager, self).get_query_set().order_by('-id')
+    def released(self):
+        return self.exclude(unreleased=True)
+
+    def unreleased(self):
+        return self.filter(unreleased=True)
 
 
 

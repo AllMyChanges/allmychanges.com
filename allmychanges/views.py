@@ -1853,14 +1853,17 @@ def _get_test_version(user, limit=10):
     """Returns random version from N changelog updated recently.
     """
     # to check rich markup in messages
-    # changelogs = list(Changelog.objects.filter(name='angular.js'))
-    changelogs = list(user.changelogs.all().order_by('-updated_at')[:limit])
+    # changelogs = Changelog.objects.filter(name='angular.js')
+    # changelogs = Changelog.objects.filter(namespace='web', name='allmychanges')
+    changelogs = user.changelogs.good()
 
     if not changelogs:
-        changelogs = list(Changelog.objects.all().order_by('-updated_at')[:limit])
+        changelogs = Changelog.objects.good()
+
+    changelogs = list(changelogs.order_by('-updated_at')[:limit])
 
     ch = random.choice(changelogs)
-    return ch.versions.latest('id')
+    return ch.versions.released().latest('id')
 
 
 class TestSlackView(View):

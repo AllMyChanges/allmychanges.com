@@ -27,6 +27,13 @@ def convert_md_bolds(text):
         text)
 
 
+def convert_md_images(text):
+    return re.sub(
+        ur'!\[(?P<text>\S.*?\S)?\]\((?P<link>\S+?)\)',
+        u'\g<link>',
+        text)
+
+
 def notify_about_version(url,
                          version,
                          changelog=None,
@@ -37,6 +44,7 @@ def notify_about_version(url,
     text = re.sub(ur'^## (.*)', ur'*\1*', text, flags=re.MULTILINE)
     text = re.sub(ur'^#{3,5} (.*)', ur'_\1_', text, flags=re.MULTILINE)
     text = convert_md_links(text)
+    text = convert_md_images(text)
     text = convert_md_bolds(text)
 
     if not changelog:
@@ -45,6 +53,23 @@ def notify_about_version(url,
     version_url = settings.BASE_URL + version.get_absolute_url()
     project_url = settings.BASE_URL + changelog.get_absolute_url()
 
+# These comments are for debug
+# and can be removed when I decide what to do with images
+# which aren't displayed in attachments
+
+ #    text = """
+
+ # http://placehold.it/300x250
+
+ # """ + text
+
+#     text = """*Usual* text with image:
+
+# http://placehold.it/300x210
+
+# Next line"""
+    # send(url, text)
+    # return
     send_as_attachment(
         url,
         subject,

@@ -1,3 +1,21 @@
+1.2.2 (2016-03-20)
+==================
+
+## All About Slack
+
+* Now Slack notifications are sent as attachments and large release notes are hidden under the "Show more..." link:
+  ![](https://img-fotki.yandex.ru/get/69681/13558447.f/0_bc856_fbdbb295_L.png)
+* Allowed whitespaces in a link description when preparing notification for Slack.
+* Now images are presented as urls when posting notification to Slack. 
+
+## Minor Changes
+
+* It is possible to escaped slashes in `sed` changelog preprocessor's rules.
+  This way, some items in the text can be replaced with urls. For example,
+  this feature was used to link GitHub's and Launchpad's issue numbers
+  to their actual pages for [python/lxml](https://allmychanges.com/p/python/lxml/).
+
+
 1.2.1 (2016-03-17)
 ==================
 
