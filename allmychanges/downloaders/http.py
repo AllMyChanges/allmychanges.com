@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import logging
 import requests
 import urlparse
 import shutil
@@ -54,6 +55,7 @@ def download(source,
              recursive=False,
              search_list='',
              ignore_list='',
+             report_back=lambda message: None,
              **params):
     """
     Param `recursive=False` needed to emulate http_downloader which fetches
@@ -83,8 +85,8 @@ def download(source,
         upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
 
         base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
-        base_url = source.replace('rechttp+', '')
-        queue = [base_url]
+
+        queue = [source]
         already_seen = set()
 
         search_list = [item
@@ -101,10 +103,10 @@ def download(source,
                                    for item in search_list]
             else:
                 limit_urls = 10
-                if base_url.endswith('/'):
-                    search_patterns = ['^' + base_url + '.*$']
+                if source.endswith('/'):
+                    search_patterns = ['^' + source + '.*$']
                 else:
-                    search_patterns = ['^' + base_url.rsplit('/', 1)[0] + '/.*$']
+                    search_patterns = ['^' + source.rsplit('/', 1)[0] + '/.*$']
 
         search_patterns = map(re.compile, search_patterns)
 
@@ -162,6 +164,8 @@ def download(source,
             response = requests.get(url, headers={'User-Agent': settings.HTTP_USER_AGENT})
             filename = filename_from(response)
 
+            report_back(u'Fetching {0}'.format(url))
+
             if os.environ.get('DEV_DOWNLOAD', None):
                 print 'Fetching', url, '->', filename
 
@@ -212,7 +216,10 @@ def download(source,
                                'Please, specify one or more URL '
                                'patterns in search list to extend '
                                'this limit up to {upper_limit}. Use regexes.')
-                raise DownloaderWarning(message.format(upper_limit=upper_limit))
+
+                message = message.format(upper_limit=upper_limit)
+                report_back(message, logging.ERROR)
+                raise DownloaderWarning(message)
 
         except DownloaderWarning:
             raise

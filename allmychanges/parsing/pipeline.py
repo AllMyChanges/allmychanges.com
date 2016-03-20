@@ -6,6 +6,7 @@ import tempfile
 import shutil
 import envoy
 import lxml.html
+import logging
 
 from lxml import etree
 from operator import itemgetter
@@ -994,7 +995,12 @@ def print_tree(env):
 
 
 
-def _processing_pipe(processors, root, ignore_list=[], search_list=[], xslt=''):
+def _processing_pipe(processors,
+                     root,
+                     ignore_list=[],
+                     search_list=[],
+                     xslt='',
+                     report_back=lambda message, level=logging.INFO: None):
     def print_(item):
         t = item.type
         def get_content(content):
@@ -1074,6 +1080,7 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[], xslt=''):
         shutil.rmtree(root_env.cache['tmp-dir'])
 
     if not versions:
+        report_back('No chunks which looks like a version were found')
         return []
 
     def compare_version_metadata(left, right):
@@ -1106,6 +1113,11 @@ def _processing_pipe(processors, root, ignore_list=[], search_list=[], xslt=''):
     # grouped2 = [(key, len(value)) for key, value in grouped1]
 
     # print '\n'.join(map('{0[0]}: {0[1]}'.format, sorted(grouped2)))
+
+    num_before_filtering = len(versions)
+    report_back(
+        'Num chunks which looks like versions: {0}'.format(
+            num_before_filtering))
 
     versions = filter_versions_by_attribute(versions,
                                             search_list=search_list,

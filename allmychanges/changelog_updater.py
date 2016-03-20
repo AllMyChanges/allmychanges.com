@@ -208,11 +208,12 @@ def update_preview_or_changelog(obj, downloader=None, ignore_problem=False):
     downloader_name = downloader if isinstance(downloader, basestring) else downloader['name']
 
     try:
-#        with pdb_enabled():
         obj.set_processing_status(
             'Downloading data using "{0}" downloader'.format(
                 downloader_name))
-        path = obj.download(downloader)
+        path = obj.download(
+            downloader,
+            report_back=obj.set_processing_status)
     except UpdateError as e:
         problem = u', '.join(e.args)
         log.trace().error('Unable to update changelog')
@@ -228,10 +229,13 @@ def update_preview_or_changelog(obj, downloader=None, ignore_problem=False):
             try:
                 from allmychanges.parsing.pipeline import processing_pipe
                 obj.set_processing_status('Searching versions')
-                versions = processing_pipe(path,
-                                           obj.get_ignore_list(),
-                                           obj.get_search_list(),
-                                           obj.xslt)
+                versions = processing_pipe(
+                    path,
+                    obj.get_ignore_list(),
+                    obj.get_search_list(),
+                    obj.xslt,
+                    report_back=obj.set_processing_status,
+                )
                 if versions:
                     # TODO: тут надо бы сохранять целиком downloader, как dict
                     # чтобы вместе с параметрами

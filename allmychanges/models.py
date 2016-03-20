@@ -7,6 +7,7 @@ import datetime
 import random
 import envoy
 import jsonfield
+import logging
 
 from hashlib import md5, sha1
 from django.db import models
@@ -247,9 +248,14 @@ class Downloadable(object):
     to update attribute `downloader` if needed and then to
     download repository into a temporary directory.
     """
-    def download(self, downloader):
+    def download(self, downloader,
+                 report_back=lambda message, level=logging.INFO: None):
         """This method fetches repository into a temporary directory
         and returns path to this directory.
+
+        It can report about downloading status using callback `report_back`.
+        Everything what will passed to `report_back`, will be displayed to
+        the end user in a processing log on a "Tune" page.
         """
 
         if isinstance(downloader, dict):
@@ -262,6 +268,7 @@ class Downloadable(object):
 
         download = get_downloader(downloader)
         return download(self.source,
+                        report_back=report_back,
                         **params)
 
     # A mixin to get/set ignore and check lists on a model.
@@ -484,7 +491,7 @@ class Changelog(Downloadable, models.Model):
         self.updated_at = timezone.now()
         self.save(update_fields=changed_fields)
 
-    def set_processing_status(self, status):
+    def set_processing_status(self, status, level=logging.INFO):
         self.processing_status = status[:PROCESSING_STATUS_LENGTH]
         self.updated_at = timezone.now()
         self.save(update_fields=('processing_status',
@@ -880,7 +887,7 @@ class Preview(Downloadable, models.Model):
         self.save(update_fields=changed_fields)
 
 
-    def set_processing_status(self, status):
+    def set_processing_status(self, status, level=logging.INFO):
         self.log.append(status)
         self.processing_status = status[:PROCESSING_STATUS_LENGTH]
         self.updated_at = timezone.now()

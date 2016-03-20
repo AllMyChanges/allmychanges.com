@@ -48,7 +48,7 @@ def test_preview():
 
     # проверим, что у preview есть поле log, и оно список
     preview = refresh(preview)
-    eq_(5, len(preview.log))
+    eq_(6, len(preview.log))
 
     # теперь обновим preview на несуществующий источник
     response = cl.post(preview_url,
