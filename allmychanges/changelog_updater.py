@@ -91,14 +91,6 @@ def update_changelog_from_raw_data3(obj, raw_data):
             num_discovered_versions=len(discovered_versions),
             num_new_versions=len(new_versions))
 
-    if hasattr(obj, 'trackers'):
-        trackers = list(obj.trackers.all())
-        def add_to_feeds(version):
-            for tracker in trackers:
-                tracker.add_feed_item(version)
-    else:
-        add_to_feeds = lambda version: None
-
     log.debug('Selecting old versions from database')
     all_old_versions = {v.number: v
                         for v in obj.versions.all()}
