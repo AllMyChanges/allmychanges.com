@@ -15,7 +15,6 @@ from django.db.models import Q
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
-from django.core.urlresolvers import reverse
 from django.core.cache import cache
 #from south.modelsinspector import add_introspection_rules
 
@@ -32,6 +31,7 @@ from allmychanges import chat
 from allmychanges.downloaders import (
     get_downloader)
 
+from allmychanges.utils import reverse
 from allmychanges.tasks import (
     update_preview_task,
     update_changelog_task)
@@ -79,14 +79,27 @@ class UserManager(BaseUserManager):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
 
-        chat.send('New user <https://allmychanges.com/u/{0}/history/|{0}> with email "{1}" (from create)'.format(kwargs.get('username'), email))
+        username = kwargs.get('username')
+        url = settings.BASE_URL + reverse('admin-user-profile',
+                                          username=username)
+        chat.send(('New user <{url}|{username}> '
+                   'with email "{email}" (from create)').format(
+            url=url,
+            username=username,
+            email=email))
         return super(UserManager, self).create(*args, **kwargs)
 
     def create_user(self, username, email=None, password=None, **extra_fields):
         if email and self.filter(email=email).count() > 0:
             raise ValueError('User with email "{0}" already exists'.format(email))
 
-        chat.send('New user <https://allmychanges.com/u/{0}/history/|{0}> with email "{1}" (from create_user)'.format(username, email))
+        url = settings.BASE_URL + reverse('admin-user-profile',
+                                          username=username)
+        chat.send(('New user <{url}|{username}> '
+                   'with email "{email}" (from create_user)').format(
+            url=url,
+            username=username,
+            email=email))
         return self._create_user(username, email, password,
                                  **extra_fields)
 
@@ -399,9 +412,9 @@ class Changelog(Downloadable, models.Model):
 
 
     def get_absolute_url(self):
-        return reverse('project', kwargs=dict(
-            namespace=self.namespace,
-            name=self.name))
+        return reverse('project',
+                       namespace=self.namespace,
+                       name=self.name)
 
     def editable_by(self, user, light_user=None):
         light_moderators = set(self.light_moderators.values_list('light_user', flat=True))
@@ -726,7 +739,7 @@ Issue(changelog={self.changelog},
         self.save(update_fields=('resolved_at', 'resolved_by'))
         chat.send(('Issue <https://allmychanges.com{url}|#{issue_id}> '
                    'for {namespace}/{name} was resolved by {username}.').format(
-            url=reverse('issue-detail', kwargs=dict(pk=self.id)),
+            url=reverse('issue-detail', pk=self.id),
             issue_id=self.id,
             namespace=self.changelog.namespace,
             name=self.changelog.name,
