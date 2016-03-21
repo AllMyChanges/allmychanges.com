@@ -1,4 +1,9 @@
-1.4.0 (unreleased)
+1.5.0 (unreleased)
+==================
+
+* API returns `changelog` field for tags.
+
+1.4.0 (2016-03-21)
 ==================
 
 ## Some parser improvements
