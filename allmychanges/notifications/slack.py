@@ -74,6 +74,10 @@ def notify_about_version(url,
         url,
         subject,
         text,
+        fallback=u'Version {v} of {namespace}/{name} was released.'.format(
+            v=version.number,
+            namespace=changelog.namespace,
+            name=changelog.name),
         fields=[
             dict(title='Project',
                  value=u'<{0}|{1}/{2}>'.format(
@@ -98,18 +102,18 @@ def send(url, text):
     requests.post(url, data=anyjson.serialize(data))
 
 
-def send_as_attachment(url, subject, text, fields=[]):
+def send_as_attachment(url, subject, text, fields=[], fallback=''):
     # https://api.slack.com/docs/formatting/builder?msg=%7B%22attachments%22%3A%5B%7B%22text%22%3A%22Some%20*text*%20in%20%3Chttp%3A%2F%2Fexample.com%7CMarkdown%3E%22%7D%5D%2C%22username%22%3A%22AllMyChanges.com%22%7D
     data = {
         'attachments': [
             {
                 'pretext': subject,
                 'fields': fields,
+                'fallback': fallback,
                 'mrkdwn_in': ['pretext', 'fields'],
             },
             {
                 'pretext': 'Release Notes:',
-                'fallback': first_sentences(text, 1000),
                 'text': text,
                 'mrkdwn_in': ['text'],
             }

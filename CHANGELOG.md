@@ -18,7 +18,11 @@ Some parser improvements were made to make it possible to parse
   by recursive HTTP downloader.
 * Now all `.php` files considered as having `html` markup.
 * Now if there is a "search list" given by user, then files discovery
-  mechanism does not takes place.
+mechanism does not takes place.
+
+## Other changes
+
+* Fixed regression – text "NO FALLBACK DEFINED" in Slack's notifications.
 
 1.3.0 (2016-03-20)
 ==================
