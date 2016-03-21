@@ -490,3 +490,11 @@ def reverse(view_name, *args, **kwargs):
     return django_reverse(view_name,
                           args=args,
                           kwargs=kwargs)
+
+
+def pdb_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        import pdb; pdb.set_trace()  # DEBUG
+        return func(*args, **kwargs)
+    return wrapper
