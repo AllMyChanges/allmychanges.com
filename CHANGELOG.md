@@ -1,3 +1,17 @@
+1.4.0 (unreleased)
+==================
+
+## Some parser improvements
+
+Some parser improvements were made to make it possible to parse
+[Zabbix's release notes](https://allmychanges.com/p/soft/zabbix/):
+
+* Now "Tune" page reports to the user which HTML pages were downloaded
+  by recursive HTTP downloader.
+* Now all `.php` files considered as having `html` markup.
+* Now if there is a "search list" given by user, then files discovery
+  mechanism does not takes place.
+
 1.3.0 (2016-03-20)
 ==================
 
