@@ -1,7 +1,10 @@
 1.5.0 (unreleased)
 ==================
 
-* API returns `changelog` field for tags.
+## API Changes
+
+* Now we return `changelog` field for tags.
+* It is possible to filter versions by changelog's namespace, name and version number.
 
 1.4.0 (2016-03-21)
 ==================

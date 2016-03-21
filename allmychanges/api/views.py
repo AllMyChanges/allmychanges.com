@@ -34,6 +34,7 @@ from allmychanges.api.serializers import (
     IssueSerializer,
     VersionSerializer,
     TagSerializer)
+
 from allmychanges.utils import (
     count,
     parse_ints,
@@ -625,7 +626,13 @@ class VersionViewSet(HandleExceptionMixin,
 
 
     def get_queryset(self, *args, **kwargs):
-        return Version.objects.all()
+        params = {
+            key: self.request.GET[key]
+            for key in ('changelog__namespace',
+                        'changelog__name',
+                        'number')
+            if key in self.request.GET}
+        return Version.objects.filter(**params)
 
     @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
     def tag(self, request, pk=None):
