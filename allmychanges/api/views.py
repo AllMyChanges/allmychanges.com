@@ -416,6 +416,8 @@ class ChangelogViewSet(HandleExceptionMixin,
     model = Changelog
 
     def get_queryset(self, *args, **kwargs):
+        # TODO: decide if we want to show all changelogs to
+        #       not authenticated users
         if self.request.GET.get('tracked', 'False') == 'True':
             if self.request.user.is_authenticated():
                 return self.request.user.changelogs.all()
@@ -426,6 +428,7 @@ class ChangelogViewSet(HandleExceptionMixin,
             namespace = self.request.GET.get('namespace')
             name = self.request.GET.get('name')
             source = self.request.GET.get('source')
+            id__in = self.request.GET.get('id__in')
 
             if namespace is not None:
                 queryset = queryset.filter(namespace=namespace)
@@ -435,6 +438,10 @@ class ChangelogViewSet(HandleExceptionMixin,
                 normalized_source, _, _ = normalize_url(source,
                                                         for_checkout=False)
                 queryset = queryset.filter(source=normalized_source)
+            if id__in is not None:
+                ids = map(int, id__in.split(','))
+                queryset = queryset.filter(id__in=ids)
+
             return queryset
 
     def get_object(self, *args, **kwargs):

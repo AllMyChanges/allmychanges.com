@@ -5,6 +5,7 @@
 
 * Now we return `changelog` field for tags.
 * It is possible to filter versions by changelog's namespace, name and version number.
+* Now changelogs can be filtered by keyword `id__in`.
 
 1.4.0 (2016-03-21)
 ==================
