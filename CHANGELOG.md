@@ -7,6 +7,10 @@
 * It is possible to filter versions by changelog's namespace, name and version number.
 * Now changelogs can be filtered by keyword `id__in`.
 
+## Fixes
+
+* Fixed usage of symbols like `#` in namespace or project's name. Thanks to @hawkunsh for report about this problem.
+
 1.4.0 (2016-03-21)
 ==================
 

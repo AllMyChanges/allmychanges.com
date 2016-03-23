@@ -400,8 +400,8 @@ module.exports = React.createClass({
     },
     validate_namespace_and_name: function () {
         // validating namespace and name @package_settings.validate_namespace_and_name
-        $.get('/v1/validate-changelog-name/?namespace=' + this.state.namespace
-              + '&name=' + this.state.name + '&changelog_id=' + this.props.changelog_id)
+        $.get('/v1/validate-changelog-name/?namespace=' + encodeURIComponent(this.state.namespace)
+              + '&name=' + encodeURIComponent(this.state.name) + '&changelog_id=' + this.props.changelog_id)
             .success(function (data) {
                 var namespace_error = '';
                 var name_error = '';
