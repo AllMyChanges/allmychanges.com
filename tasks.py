@@ -212,7 +212,7 @@ def manage(args, ports=[], name=None):
     run(command, pty=True)
 
 
-@task
+@task(start_databases)
 def runserver():
     # сейчас почему-то сломано завершение процесса по Ctrl-C
     # следим за этим в https://github.com/pyinvoke/invoke/issues/315
@@ -222,13 +222,13 @@ def runserver():
            ports=['80:80'])
 
 
-@task
+@task(start_databases)
 def rqworker():
     manage('rqworker default preview',
            name='rqworker.command.allmychanges.com')
 
 
-@task
+@task(start_databases)
 def shell():
     manage('shell_plus',
            name='shell.command.allmychanges.com')
