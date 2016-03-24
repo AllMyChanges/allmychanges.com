@@ -9,7 +9,10 @@
 
 ## Fixes
 
-* Fixed usage of symbols like `#` in namespace or project's name. Thanks to @hawkunsh for report about this problem.
+* Fixed usage of symbols like `#` in namespace or project's name.
+  Thanks to @hawkunsh for report about this problem.
+* Fixed guessing html page encoding when there is Content-Type header without
+  charset, and meta tag in html page with charset.
 
 1.4.0 (2016-03-21)
 ==================

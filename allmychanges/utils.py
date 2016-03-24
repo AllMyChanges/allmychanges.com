@@ -1,4 +1,6 @@
 # coding: utf-8
+
+import requests
 import arrow
 import os
 import re
@@ -322,16 +324,20 @@ def trace(func):
 
 def get_text_from_response(response):
     """Returns text from response, replacing
-    default encoding with utf-8.
-    we need this because when `requests` library
-    unable to discover response encoding from headers,
-    it pretends it is a latin-1, but many text
-    on the internet now is utf-8, like
+    default encoding with gussed from source or with utf-8.
+    we need this because sometimes `requests` library
+    when discovering response encoding from headers,
+    pretends it is a latin-1, but many text
+    on the internet use meta tags or just is utf-8, like
     Code's changelog for example:
     http://panic.com/jp/coda/releasenotes.html
     """
     if response.encoding == 'ISO-8859-1':
-        response.encoding = 'utf-8'
+        guessed = requests.utils.get_encodings_from_content(response.content)
+        if guessed:
+            response.encoding = guessed[0]
+        else:
+            response.encoding = 'utf-8'
     return response.text
 
 
