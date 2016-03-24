@@ -444,24 +444,25 @@ module.exports = React.createClass({
     },
     update_downloader: function (downloader) {
         // Updating downloader @package_settings.update_downloader
-        var current_downloader = R.find(
-            R.propEq('name', downloader),
-            this.state.downloaders);
+        if (downloader != this.state.downloader) {
+            // Old downloader [this.state.downloader] new - [downloader] @package_settings.update_downloader
+            var downloader_params = R.find(
+                R.propEq('name', downloader),
+                this.state.downloaders);
         
-        var params = {'downloader': downloader};
+            var params = {'downloader': downloader};
         
-        if (downloader) {
             params = R.merge(
                 params,
                 {
-                    'namespace': this.state.namespace || current_downloader.changelog.namespace || '',
-                    'name': this.state.name || current_downloader.changelog.name || '',
-                    'description': this.state.description || current_downloader.changelog.description || ''
+                    'namespace': this.state.namespace || downloader_params.changelog.namespace || '',
+                    'name': this.state.name || downloader_params.changelog.name || '',
+                    'description': this.state.description || downloader_params.changelog.description || ''
                 }
             );
             this.schedule_validation();
+            this.setState(params);
         }
-        this.setState(params);
     },
     wait_for_preview: function () {
         // waiting for preview results @package_settings.wait_for_preview
@@ -470,8 +471,7 @@ module.exports = React.createClass({
                 // received [data] about preview state @package_settings.wait_for_preview
                 this.setState({'log': data.log,
                                'status': data.status,
-                               'downloaders': data.downloaders,
-                               'downloader': data.downloader},
+                               'downloaders': data.downloaders},
                               () => {
                                   this.update_downloader(data.downloader);
                               });
