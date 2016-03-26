@@ -40,6 +40,8 @@ from allmychanges.utils import (
     parse_ints,
     join_ints,
     reverse,
+    project_slack_name,
+    user_slack_name,
     update_fields)
 from allmychanges.source_guesser import guess_source
 
@@ -507,9 +509,10 @@ class ChangelogViewSet(HandleExceptionMixin,
 
         if user.is_authenticated():
             user.track(changelog)
-            chat.send(('Package <https://allmychanges.com{url}> was tracked by {username}.').format(
-                url=changelog.get_absolute_url(),
-                username=user.username))
+            chat.send(('Project {project} '
+                       'was tracked by {user}.').format(
+                           project=project_slack_name(changelog),
+                           user=user_slack_name(user)))
         else:
             action_description = 'Anonymous user tracked changelog:{0}'.format(changelog.id)
             UserHistoryLog.write(None, self.request.light_user, 'track', action_description)
@@ -517,9 +520,10 @@ class ChangelogViewSet(HandleExceptionMixin,
             tracked_changelogs = set(parse_ints(request.COOKIES.get('tracked-changelogs', '')))
             tracked_changelogs.add(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
-            chat.send(('Package <https://allmychanges.com{url}> was tracked by {light_user}.').format(
-                url=changelog.get_absolute_url(),
-                light_user=request.light_user))
+            chat.send(('Project {project} '
+                       'was tracked by {light_user}.').format(
+                           project=project_slack_name(changelog),
+                           light_user=request.light_user))
         return response
 
     @detail_route(methods=['post'], permission_classes=[])
@@ -530,9 +534,9 @@ class ChangelogViewSet(HandleExceptionMixin,
 
         if user.is_authenticated():
             user.untrack(changelog)
-            chat.send(('Package <https://allmychanges.com{url}> was untracked by {username}.').format(
-                url=changelog.get_absolute_url(),
-                username=user.username))
+            chat.send(('Project {project} was untracked by {user}.').format(
+                project=project_slack_name(changelog),
+                user=user_slack_name(user)))
         else:
             action_description = 'Anonymous user untracked changelog:{0}'.format(changelog.id)
             UserHistoryLog.write(None, self.request.light_user, 'untrack', action_description)
@@ -541,8 +545,8 @@ class ChangelogViewSet(HandleExceptionMixin,
             tracked_changelogs.remove(pk)
             response.set_cookie('tracked-changelogs', join_ints(tracked_changelogs))
 
-            chat.send(('Package <https://allmychanges.com{url}> was untracked by {light_user}.').format(
-                url=changelog.get_absolute_url(),
+            chat.send(('Project {project} was untracked by {light_user}.').format(
+                project=project_slack_name(changelog),
                 light_user=request.light_user))
         return response
 
@@ -557,9 +561,9 @@ class ChangelogViewSet(HandleExceptionMixin,
 
         if user.is_authenticated():
             user.skip(changelog)
-            chat.send(('Package <https://allmychanges.com{url}> was skipped by {username}.').format(
-                url=changelog.get_absolute_url(),
-                username=user.username))
+            chat.send(('Project {project} was skipped by {user}.').format(
+                project=project_slack_name(changelog),
+                user=user_slack_name(user)))
         else:
             action_description = 'Anonymous user skipped changelog:{0}'.format(changelog.id)
             UserHistoryLog.write(None, self.request.light_user, 'skip', action_description)
@@ -568,8 +572,8 @@ class ChangelogViewSet(HandleExceptionMixin,
             skipped_changelogs.add(pk)
             response.set_cookie('skipped-changelogs', join_ints(skipped_changelogs))
 
-            chat.send(('Package <https://allmychanges.com{url}> was skipped by {light_user}.').format(
-                url=changelog.get_absolute_url(),
+            chat.send(('Project {project} was skipped by {light_user}.').format(
+                project=project_slack_name(changelog),
                 light_user=request.light_user))
         return response
 

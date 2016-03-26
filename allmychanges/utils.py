@@ -511,11 +511,30 @@ def project_name(ch):
     return u'{0.namespace}/{0.name}'.format(ch)
 
 
-def project_linked_name(ch):
+def project_html_name(ch):
     """Returns a link to the project's page.
     Project's name contains namespace and name.
     and escaped.
     """
     name = escape(project_name(ch))
-    url = reverse('project-by-id', pk=ch.id)
+    url = settings.BASE_URL + reverse('project-by-id', pk=ch.id)
     return u'<a href="{url}">{name}</a>'.format(**locals())
+
+
+def project_slack_name(ch):
+    """Returns a link to a project in Slack's markup.
+    Project's name contains namespace and name.
+    and escaped.
+    """
+    name = escape(project_name(ch))
+    url = settings.BASE_URL + reverse('project-by-id', pk=ch.id)
+    return u'<{url}|{name}>'.format(**locals())
+
+
+def user_slack_name(user):
+    """Returns a link to a user's profile in Slack's markup.
+    """
+    name = escape(user.username)
+    url = settings.BASE_URL + reverse('admin-user-profile',
+                                      username=user.username)
+    return u'<{url}|{name}>'.format(**locals())

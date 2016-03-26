@@ -54,7 +54,7 @@ from allmychanges.utils import (
     reverse,
     get_keys,
     change_weekday,
-    project_linked_name,
+    project_html_name,
     join_ints)
 from allmychanges.downloaders.utils import normalize_url
 
@@ -813,14 +813,14 @@ class AdminUserProfileView(SuperuserRequiredMixin,
             try:
                 pk = match.group('pk')
                 ch = Changelog.objects.get(pk=pk)
-                return project_linked_name(ch)
+                return project_html_name(ch)
             except Changelog.DoesNotExist:
                 return 'Not Found'
 
         def format_names(changelogs):
             values = list(changelogs)
             values.sort(key=lambda ch: (ch.namespace, ch.name))
-            return map(project_linked_name, values)
+            return map(project_html_name, values)
 
         # show changelogs
         tracked_changelogs = format_names(user.changelogs.all())
