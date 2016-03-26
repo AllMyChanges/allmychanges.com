@@ -55,6 +55,7 @@ from allmychanges.utils import (
     get_keys,
     change_weekday,
     project_html_name,
+    user_slack_name,
     join_ints)
 from allmychanges.downloaders.utils import normalize_url
 
@@ -327,7 +328,8 @@ class DigestView(LoginRequiredMixin, CachedMixin, CommonContextMixin, TemplateVi
         return result
 
     def get(self, *args, **kwargs):
-        chat.send('User {0} trying to view a digest'.format(self.request.user.username),
+        chat.send(u'User {user} trying to view a digest'.format(
+            user=user_slack_name(self.request.user)),
                   channel='tasks')
         UserHistoryLog.write(self.request.user,
                              self.request.light_user,
@@ -1064,10 +1066,11 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                     icon=icon)
 
                 if user:
-                    chat.send('Wow, user {0} added new changelog with url: <{1}>'.format(
-                        user.username, normalized_url))
+                    chat.send('Wow, user {user} added project with url: <{url}>'.format(
+                        user=user_slack_name(user),
+                        url=normalized_url))
                 else:
-                    chat.send('Wow, light user {0} added new changelog with url: <{1}>'.format(
+                    chat.send('Wow, light user {0} added project with url: <{1}>'.format(
                         self.request.light_user, normalized_url))
 
                 UserHistoryLog.write(self.request.user,
