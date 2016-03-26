@@ -22,7 +22,7 @@
     <dt>Last login at</dt>
     <dd>{{ customer.last_login }}</dd>
     <dt>Tracks</dt>
-    <dd>{{ customer.tracked_changelogs }} ({{ customer.num_changelogs }})</dd>
+    <dd>{{ customer.tracked_changelogs|safe }} ({{ customer.num_changelogs }})</dd>
     <dt>Send digests</dt>
     <dd>{{ customer.send_digest }}</dd>
     {% for name, url in customer.auth_through.items %}
@@ -43,11 +43,11 @@
     {% endif %}
     {% if customer.moderated_changelogs_str %}
       <dt>Moderates</dt>
-      <dd>{{ customer.moderated_changelogs_str }}</dd>
+      <dd>{{ customer.moderated_changelogs_str|safe }}</dd>
     {% endif %}
     {% if customer.skips_changelogs_str %}
       <dt>Skips</dt>
-      <dd>{{ customer.skips_changelogs_str }}</dd>
+      <dd>{{ customer.skips_changelogs_str|safe }}</dd>
     {% endif %}
 
     {% for key, field in customer.custom_fields.items %}
@@ -90,7 +90,7 @@
         <td>{{ item.action }}</td>
         <td>{{ item.user }}</td>
         <td>{{ item.light_user }}</td>
-        <td>{{ item.description }}</td>
+        <td>{{ item.description|safe }}</td>
       </tr>
       {% endfor %}
     </tbody>

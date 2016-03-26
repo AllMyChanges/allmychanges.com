@@ -26,7 +26,6 @@ from django.db.models import Count
 from django.conf import settings
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
 from django import forms
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from twiggy_goodies.threading import log
@@ -52,8 +51,10 @@ from oauth2_provider.models import Application, AccessToken
 from allmychanges.utils import (
     HOUR,
     parse_ints,
+    reverse,
     get_keys,
     change_weekday,
+    project_linked_name,
     join_ints)
 from allmychanges.downloaders.utils import normalize_url
 
@@ -808,10 +809,18 @@ class AdminUserProfileView(SuperuserRequiredMixin,
         user = User.objects.get(username=kwargs['username'])
         result['customer'] = user
 
+        def transform_changelog_mention(match):
+            try:
+                pk = match.group('pk')
+                ch = Changelog.objects.get(pk=pk)
+                return project_linked_name(ch)
+            except Changelog.DoesNotExist:
+                return 'Not Found'
+
         def format_names(changelogs):
-            values = list(changelogs.values_list('namespace', 'name'))
-            values.sort()
-            return map(u'{0[0]}/{0[1]}'.format, values)
+            values = list(changelogs)
+            values.sort(key=lambda ch: (ch.namespace, ch.name))
+            return map(project_linked_name, values)
 
         # show changelogs
         tracked_changelogs = format_names(user.changelogs.all())
@@ -854,16 +863,9 @@ class AdminUserProfileView(SuperuserRequiredMixin,
                                       .prefetch_related('user') \
                                       .order_by('-id')[:limit]
 
-        def get_changelog_url(match):
-            try:
-                ch = Changelog.objects.get(pk=match.group('pk'))
-                return ch.get_absolute_url()
-            except:
-                return 'Not Found'
-
         def process_description(text):
             return re.sub(ur'changelog:(?P<pk>\d+)',
-                          get_changelog_url,
+                          transform_changelog_mention,
                           text)
         for item in result['log']:
             item.description = process_description(item.description)
@@ -910,7 +912,7 @@ class AdminUserProfileEditView(SuperuserRequiredMixin,
         if user_changed:
             user.save(update_fields=('custom_fields',))
 
-        return HttpResponseRedirect(reverse('admin-user-profile', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('admin-user-profile', **kwargs))
 
 
 class ImmediateResponse(BaseException):
@@ -942,9 +944,9 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
                 changelog = Changelog.objects.get(source=normalized_url)
                 if changelog.name is not None:
                     raise ImmediateResponse(
-                        HttpResponseRedirect(reverse('project', kwargs=dict(
+                        HttpResponseRedirect(reverse('project',
                             name=changelog.name,
-                            namespace=changelog.namespace))))
+                            namespace=changelog.namespace)))
 
             except Changelog.DoesNotExist:
                 pass
@@ -955,9 +957,9 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
             if re.match(pattern, q) is not None:
                 changelog = Changelog.objects.get(pk=changelog_id)
                 raise ImmediateResponse(
-                    HttpResponseRedirect(reverse('project', kwargs=dict(
+                    HttpResponseRedirect(reverse('project',
                         name=changelog.name,
-                        namespace=changelog.namespace))))
+                        namespace=changelog.namespace)))
 
 
         # if q is looks like an URL and we come to this point,
@@ -987,9 +989,9 @@ class SearchView(ImmediateMixin, CommonContextMixin, TemplateView):
         if changelogs.count() == 1:
             changelog = changelogs[0]
             raise ImmediateResponse(
-                HttpResponseRedirect(reverse('project', kwargs=dict(
+                HttpResponseRedirect(reverse('project',
                     name=changelog.name,
-                    namespace=changelog.namespace))))
+                    namespace=changelog.namespace)))
 
 
         context.update(params)
@@ -1049,9 +1051,9 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
                 changelog = Changelog.objects.get(source=normalized_url)
                 if changelog.name is not None:
                     raise ImmediateResponse(
-                        HttpResponseRedirect(reverse('project', kwargs=dict(
+                        HttpResponseRedirect(reverse('project',
                             name=changelog.name,
-                            namespace=changelog.namespace))))
+                            namespace=changelog.namespace)))
                 UserHistoryLog.write(self.request.user,
                                      self.request.light_user,
                                      'package-create',
@@ -1168,7 +1170,7 @@ class MergeProjectView(SuperuserRequiredMixin,
                                          to_changelog=to_changelog.pk):
                     log.info('Merging changelogs')
                     from_changelog.merge_into(to_changelog)
-                    project_url = reverse('project', kwargs=kwargs)
+                    project_url = reverse('project', **kwargs)
                     return HttpResponseRedirect(project_url)
 
             return self.render_to_response(context)
@@ -1200,7 +1202,7 @@ class SynonymsView(ImmediateMixin, CommonContextMixin, TemplateView):
         with log.fields(synonym=synonym):
             log.debug('Adding synonym')
             changelog.add_synonym(synonym)
-        return HttpResponseRedirect(reverse('synonyms', kwargs=kwargs))
+        return HttpResponseRedirect(reverse('synonyms', **kwargs))
 
 
 

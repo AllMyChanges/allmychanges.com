@@ -20,6 +20,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.utils.encoding import force_text
+from django.utils.html import escape
 from twiggy_goodies.threading import log
 from django.core.urlresolvers import reverse as django_reverse
 
@@ -504,3 +505,17 @@ def pdb_decorator(func):
         import pdb; pdb.set_trace()  # DEBUG
         return func(*args, **kwargs)
     return wrapper
+
+
+def project_name(ch):
+    return u'{0.namespace}/{0.name}'.format(ch)
+
+
+def project_linked_name(ch):
+    """Returns a link to the project's page.
+    Project's name contains namespace and name.
+    and escaped.
+    """
+    name = escape(project_name(ch))
+    url = reverse('project-by-id', pk=ch.id)
+    return u'<a href="{url}">{name}</a>'.format(**locals())
