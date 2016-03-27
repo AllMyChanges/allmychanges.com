@@ -440,8 +440,11 @@ class ChangelogViewSet(HandleExceptionMixin,
                 normalized_source, _, _ = normalize_url(source,
                                                         for_checkout=False)
                 queryset = queryset.filter(source=normalized_source)
+
             if id__in is not None:
-                ids = map(int, id__in.split(','))
+                ids = id__in.split(',')
+                ids = filter(None, ids)
+                ids = map(int, ids)
                 queryset = queryset.filter(id__in=ids)
 
             return queryset
