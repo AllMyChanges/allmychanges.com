@@ -14,6 +14,7 @@ import threading
 import lxml
 import datetime
 
+from html2text import HTML2Text
 from lxml import html
 from contextlib import contextmanager
 from functools import wraps
@@ -538,3 +539,10 @@ def user_slack_name(user):
     url = settings.BASE_URL + reverse('admin-user-profile',
                                       username=user.username)
     return u'<{url}|{name}>'.format(**locals())
+
+
+def html2md(html):
+    h = HTML2Text()
+#    import pdb; pdb.set_trace()  # DEBUG
+    h.wrap_links = False
+    return h.handle(html)

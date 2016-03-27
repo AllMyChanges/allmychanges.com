@@ -2,7 +2,6 @@
 import os
 import re
 from dateutil.parser import parse as date_parser
-from html2text import html2text
 
 
 #RE_DATE = re.compile(r'(.*\s|\s?|.*\()(?P<date>\d{1,4}[.-]+\d{1,4}[.-]+\d{1,4})')

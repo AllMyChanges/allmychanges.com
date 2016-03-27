@@ -3,10 +3,10 @@
 import re
 import requests
 import anyjson
-import html2text
+
 from django.conf import settings
 
-from allmychanges.utils import first_sentences
+from allmychanges.utils import html2md
 
 
 # These functions convert from markdown to
@@ -15,7 +15,7 @@ from allmychanges.utils import first_sentences
 
 def convert_md_links(text):
     return re.sub(
-        ur'\[(?P<text>\S.*?\S)\]\((?P<link>\S+?)\)',
+        ur'\[(?P<text>.*?)\]\((?P<link>\S+?)\)',
         u'<\g<link>|\g<text>>',
         text)
 
@@ -38,7 +38,7 @@ def notify_about_version(url,
                          version,
                          changelog=None,
                          subject=u'New Version Released'):
-    markdown_text = html2text.html2text(version.processed_text)
+    markdown_text = html2md(version.processed_text)
 
     text = re.sub(ur'^  \* ', ur'- ', markdown_text, flags=re.MULTILINE)
     text = re.sub(ur'^## (.*)', ur'*\1*', text, flags=re.MULTILINE)

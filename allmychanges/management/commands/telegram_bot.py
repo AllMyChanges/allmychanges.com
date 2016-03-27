@@ -1,13 +1,10 @@
 # coding: utf-8
 import re
-import os.path
 import requests
-import time
 import datetime
 import anyjson
 
-from html2text import html2text
-from allmychanges.utils import first_sentences
+from allmychanges.utils import html2md
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 from allmychanges.models import Changelog
@@ -98,7 +95,7 @@ def default_handler(message, query):
             version = ch.latest_version()
             if version:
                 limit = 2000
-                no_html = html2text(version.processed_text)
+                no_html = html2md(version.processed_text)
                 if len(no_html) > limit:
                     snippet = no_html[:limit] + u'\n...'
                 else:
