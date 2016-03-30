@@ -65,7 +65,7 @@ def check_versions():
     API_KEY = '6456641e554ff23dcdc8'
     VERSIONEYE_SERVER = 'https://www.versioneye.com'
     PRJ_REQUIREMENTS_TXT = (
-        ('56506b4253ef5f000c000c71', 'requirements.txt'),
+        ('56506b4253ef5f000c000c71', 'requirements/production.txt'),
         ('56506bdcd91d82000a000e0c', 'package.json'),)
 
     for project, filename in PRJ_REQUIREMENTS_TXT:
@@ -96,6 +96,41 @@ def check_versions():
                            dep,
                            'has security issues'
                            if dep['security_vulnerabilities'] else '')
+
+
+@task
+def send_to_amch():
+    import requirements
+    import tablib
+
+    with open('requirements/production.txt') as f:
+        lines = f.readlines()
+        lines = (line.split('#', 1)[0] for line in lines)
+        lines = (line.strip() for line in lines)
+        reqs = '\n'.join(lines)
+
+    parsed = requirements.parse(reqs)
+    data = tablib.Dataset()
+    data.headers = ['namespace', 'name', 'version', 'tag']
+
+    def extract_version(specs):
+        for spec, version in specs:
+            if spec == '==':
+                return version
+        return ''
+
+    for item in parsed:
+        data.append(
+            (
+                'python',
+                item.name,
+                extract_version(item.specs),
+                'allmychanges.com'
+            )
+        )
+
+    with open('amch-data.csv', 'w') as f:
+        f.write(data.csv)
 
 
 @task
