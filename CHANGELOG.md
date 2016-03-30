@@ -13,6 +13,8 @@
   Thanks to @hawkunsh for report about this problem.
 * Fixed guessing html page encoding when there is Content-Type header without
   charset, and meta tag in html page with charset.
+* Fixed html to markdown processing. It shouldn't break long links now.
+  This fixes some issues in Slack notifications where some links appeared broken.
 
 1.4.0 (2016-03-21)
 ==================
