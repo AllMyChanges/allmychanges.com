@@ -14,8 +14,8 @@ def check_status_code(desired_code, response):
     eq_(desired_code,
         response.status_code,
         'Status code {0} != {1}, content: {2}'.format(
-            response.status_code,
             desired_code,
+            response.status_code,
             response.content))
 
 

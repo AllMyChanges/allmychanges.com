@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, UserManager as BaseUserManager
 from django.core.cache import cache
+
 #from south.modelsinspector import add_introspection_rules
 
 from twiggy_goodies.threading import log
@@ -312,7 +313,8 @@ class ChangelogManager(models.Manager):
         return self.all().filter(paused_at=None).exclude(name=None)
 
     def good(self):
-        return self.all().exclude(Q(name=None) | Q(namespace=None))
+        return self.all().exclude(
+            Q(name=None) | Q(namespace=None) | Q(source=''))
 
     def unsuccessful(self):
         return self.all().filter(Q(name=None) | Q(namespace=None))
@@ -320,7 +322,7 @@ class ChangelogManager(models.Manager):
 
 class Changelog(Downloadable, models.Model):
     objects = ChangelogManager()
-    source = URLField(unique=True)
+    source = URLField(unique=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     # TODO: remove
     processing_started_at = models.DateTimeField(blank=True, null=True)
@@ -577,7 +579,6 @@ class Changelog(Downloadable, models.Model):
     def clean(self):
         super(Changelog, self).clean()
         self.source, _, _ = normalize_url(self.source, for_checkout=False)
-
 
     def update_description_from_source(self, fall_asleep_on_rate_limit=False):
         # right now this works only for github urls

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers, fields, exceptions
 from rest_framework_extensions.fields import ResourceUriField
+from django.core.exceptions import ValidationError
 
 from allmychanges.models import (
     Preview,
@@ -80,7 +81,7 @@ class ChangelogSerializer(ModelSerializer):
     updated_at = serializers.Field(source='updated_at')
     next_update_at = serializers.Field(source='next_update_at')
     latest_version = serializers.Field(source='latest_version')
-    downloader = serializers.WritableField(required=True)
+    downloader = serializers.WritableField(required=False)
     downloader_settings = JSONField(required=False)
     downloaders = JSONField(required=False)
 
@@ -106,6 +107,13 @@ class ChangelogSerializer(ModelSerializer):
             'downloader_settings',
             'downloaders',
         )
+
+    def validate(self, attrs):
+        # we need to check this to ensure that correct downloader was
+        # choosen by user at the "Tune&Preview" stage.
+        if attrs.get('source') and not attrs.get('downloader'):
+            raise ValidationError('Downloader is required when source field is not empty')
+        return attrs
 
 
 class PreviewSerializer(ModelSerializer):
