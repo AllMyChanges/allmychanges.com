@@ -19891,7 +19891,7 @@
 	                    React.createElement(
 	                        'p',
 	                        null,
-	                        'Now, to receive notifications about future updates, you need to login via:'
+	                        'Now, to receive notifications about it\\\'s future releases, you need to create account by signing in using:'
 	                    ),
 	                    React.createElement(
 	                        'p',
