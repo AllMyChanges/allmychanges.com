@@ -205,7 +205,10 @@ def test_extract_date():
     eq_(date(2013, 3, 29), _extract_date('Fri Mar 29, 2013'))
 
     # from https://github.com/alex/django-taggit/blob/develop/CHANGELOG.txt
-    eq_(date(2014, 8, 10), _extract_date('10.08.2014'))
+    # we consider that first number is a month
+    # all dates which use day in first position, should be normalized
+    # by sed expressions
+    eq_(date(2014, 10, 8), _extract_date('10.08.2014'))
 
 
 def test_url_normalization():

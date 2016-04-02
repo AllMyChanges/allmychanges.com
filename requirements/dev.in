@@ -1,6 +1,9 @@
 -r production.in
 
-pdbpp
+# improved debugger
+# pdbpp
+trepan
+
 nose
 unittest-asserts
 nosedjango

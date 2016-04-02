@@ -232,8 +232,13 @@ def _extract_date(line):
     """Return date that is in line"""
     for date_str in RE_DATE.finditer(line):
         try:
+            # in 2.5.2 release of dateutil, they broke
+            # parsing of dates like 2015-02-06 when dayfirst=True
+            # and I turned it off. If dates in some projects
+            # use strange datetime format, then it should be fixed
+            # by "sed" expression.
             parsed = date_parser(date_str.group('date'),
-                                 dayfirst=True)
+                                 dayfirst=False)
             return parsed.date()
         except Exception:
             continue

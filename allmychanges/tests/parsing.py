@@ -255,13 +255,15 @@ def test_extract_metadata_ignores_unreleased_keywords_if_date_was_found_ealier()
     env.type = 'almost_version'
     v = lambda **kwargs: env.push(**kwargs)
 
-    eq_([v(type='prerender_items',
-           title='1.0 (2015-02-06)',
-           date=datetime.date(2015, 2, 6),
-           content='unreleased')],
-        extract_metadata(
-            v(title='1.0 (2015-02-06)',
-              content='unreleased')))
+    expected = [v(type='prerender_items',
+                  title='1.0 (2015-02-06)',
+                  date=datetime.date(2015, 2, 6),
+                  content='unreleased')]
+    version = v(title='1.0 (2015-02-06)', content='unreleased')
+
+    result = list(extract_metadata(version))
+
+    eq_(expected, result)
 
 
 
