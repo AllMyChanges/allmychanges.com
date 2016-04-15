@@ -99,7 +99,7 @@ def check_versions():
 
 
 @task
-def send_to_amch():
+def push_to_amch():
     import requirements
     import tablib
 
@@ -131,6 +131,9 @@ def send_to_amch():
 
     with open('amch-data.csv', 'w') as f:
         f.write(data.csv)
+
+    run('amch push --filename amch-data.csv', pty=True)
+#    run('rm -fr amch-data.csv')
 
 
 @task
