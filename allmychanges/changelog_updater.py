@@ -197,6 +197,11 @@ def update_preview_or_changelog(obj, downloader=None, ignore_problem=False):
     path = None
     found = False
     downloader = downloader or obj.downloader
+
+    if downloader is None:
+        log.info('Downloader is None, unable to fetch data')
+        return
+
     downloader_name = downloader if isinstance(downloader, basestring) else downloader['name']
 
     try:

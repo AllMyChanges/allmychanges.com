@@ -151,6 +151,7 @@ def migrate(ch):
                 log.info(('No downloader or downloaders '
                           'and original downloader is "{0}"').format(
                               ch.downloader))
+                return 'no downloader'
         else:
             log.info('Seems that changelog already migrated')
             return 'already was migrated'

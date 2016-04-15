@@ -206,19 +206,23 @@ def preview_test_task(preview_id, items):
 @job('default', timeout=600)
 @transaction.atomic
 @wait_chat_threads
-def update_changelog_task(source):
-    with log.fields(source=source):
+def update_changelog_task(changelog_id):
+    with log.fields(changelog_id=changelog_id):
         log.info('Starting task')
         processing_started_at = timezone.now()
         error = True
         error_description = None
-
+        changelog = None
         try:
             from .models import Changelog
-            chat.send('Updating changelog with source: {0}'.format(source),
+            changelog = Changelog.objects.get(id=changelog_id)
+
+            chat.send(('Updating changelog with '
+                       'id {id} and source: {source}').format(
+                           source=changelog.source,
+                           id=changelog_id),
                       channel='tasks')
 
-            changelog = Changelog.objects.get(source=source)
             update_preview_or_changelog(changelog)
 
             changelog.last_update_took = (timezone.now() - processing_started_at).seconds
@@ -229,7 +233,7 @@ def update_changelog_task(source):
             error_description = unicode(e)
             log.trace().error('Error during changelog update')
         finally:
-            if error or changelog.status == 'error':
+            if changelog and (error or changelog.status == 'error'):
                 changelog.paused_at = timezone.now()
                 changelog.create_issue('auto-paused',
                                        comment=u'Paused because of error: "{0}"'.format(

@@ -322,7 +322,7 @@ class ChangelogManager(models.Manager):
 
 class Changelog(Downloadable, models.Model):
     objects = ChangelogManager()
-    source = URLField(unique=True, blank=True)
+    source = URLField(db_index=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     # TODO: remove
     processing_started_at = models.DateTimeField(blank=True, null=True)
@@ -565,9 +565,9 @@ class Changelog(Downloadable, models.Model):
                 self.versions.all().delete()
 
             if async:
-                update_changelog_task.delay(self.source)
+                update_changelog_task.delay(self.id)
             else:
-                update_changelog_task(self.source)
+                update_changelog_task(self.id)
 
     def resume(self):
         self.paused_at = None
