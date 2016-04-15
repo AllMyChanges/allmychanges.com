@@ -1817,7 +1817,7 @@ class CategoryView(CachedMixin, CommonContextMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         result = super(CategoryView, self).get_context_data(**kwargs)
         category = kwargs['category']
-        changelogs = Changelog.objects.only_active().filter(namespace=category)
+        changelogs = Changelog.objects.good().filter(namespace=category)
         result.update({
             'changelogs': changelogs,
             'menu_catalogue': True,
@@ -1835,7 +1835,7 @@ class CategoriesView(CachedMixin, CommonContextMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         result = super(CategoriesView, self).get_context_data(**kwargs)
-        categories = sorted(set(Changelog.objects.only_active().values_list('namespace', flat=True)))
+        categories = sorted(set(Changelog.objects.good().values_list('namespace', flat=True)))
         # иногда категория бывает не задана и тогда возникает пятисотка
         categories = filter(None, categories)
         categories = sorted(categories)

@@ -16,7 +16,7 @@ class Command(LogMixin, BaseCommand):
                                        name=name)
             v = ch.latest_version()
         else:
-            for ch in Changelog.objects.only_active():
+            for ch in Changelog.objects.good():
                 v = ch.latest_version()
                 if v is not None and not v.tweet_id:
                     break

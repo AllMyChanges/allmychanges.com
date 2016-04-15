@@ -48,12 +48,12 @@ def find_changelog(query):
                 return queryset.filter(name=name)
         return queryset
 
-    active = Changelog.objects.only_active()
+    queryset = Changelog.objects.good()
 
-    querysets = [by_name(by_namespace(active)),
-                 by_name(by_namespace(active), fuzzy=True),
-                 by_name(by_namespace(active, fuzzy=True), fuzzy=True),
-                 by_namespace(active, fuzzy=True, query=query)]
+    querysets = [by_name(by_namespace(queryset)),
+                 by_name(by_namespace(queryset), fuzzy=True),
+                 by_name(by_namespace(queryset, fuzzy=True), fuzzy=True),
+                 by_namespace(queryset, fuzzy=True, query=query)]
     for queryset in querysets:
         changelogs = list(queryset)
         if changelogs:

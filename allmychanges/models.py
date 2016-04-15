@@ -310,11 +310,17 @@ class Downloadable(object):
 
 class ChangelogManager(models.Manager):
     def only_active(self):
-        return self.all().filter(paused_at=None).exclude(name=None)
+        # active changelog is good and not paused
+        queryset = self.good()
+        return queryset.filter(paused_at=None)
 
     def good(self):
+        # good changelog should have namespace, name, source and downloader
         return self.all().exclude(
-            Q(name=None) | Q(namespace=None) | Q(source=''))
+            Q(name=None) |
+            Q(namespace=None) |
+            Q(downloader=None) |
+            Q(source=''))
 
     def unsuccessful(self):
         return self.all().filter(Q(name=None) | Q(namespace=None))

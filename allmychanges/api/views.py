@@ -364,7 +364,7 @@ class LandingPackageSuggestView(viewsets.ViewSet):
         for ns in skipped_namespaces:
             scores[ns] -= 1
 
-        changelog_ids = list(Changelog.objects.only_active() \
+        changelog_ids = list(Changelog.objects.good() \
                                       .exclude(name='allmychanges') \
                                       .annotate(num_trackers=Count('trackers')) \
                                       .values_list('id', 'namespace', 'num_trackers'))

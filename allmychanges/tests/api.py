@@ -202,11 +202,15 @@ def test_if_after_login_will_track_changelogs_from_cookie():
 
 def test_package_suggest_ignores_tracked_packages():
     cl = Client()
-    thebot = Changelog.objects.create(name='thebot', namespace='python',
-                                      source='http://github.com/svetlyak40wt/thebot')
+    thebot = Changelog.objects.create(name='thebot',
+                                      namespace='python',
+                                      source='http://github.com/svetlyak40wt/thebot',
+                                      downloader='git')
     thebot.versions.create(number='0.1.0', discovered_at=timezone.now())
-    fields = Changelog.objects.create(name='fields', namespace='python',
-                                      source='http://github.com/svetlyak40wt/django-fields')
+    fields = Changelog.objects.create(name='fields',
+                                      namespace='python',
+                                      source='http://github.com/svetlyak40wt/django-fields',
+                                      downloader='git')
     fields.versions.create(number='0.1.0', discovered_at=timezone.now())
 
     user = create_user('art')
