@@ -148,11 +148,12 @@ def start_databases():
     if 'mysql.allmychanges.com' in containers:
         run('docker start mysql.allmychanges.com')
     else:
-        run('docker run --net amch --name mysql.allmychanges.com -v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
+        run('docker run --net amch --name mysql.allmychanges.com '
+            '-v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
         print 'Waiting for mysql start'
         time.sleep(30)
         run('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
-        run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
+        run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb')
 
 
     if 'postgres.allmychanges.com' in containers:
