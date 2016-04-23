@@ -4,7 +4,7 @@
 {% block content %}
 
 {% if title %}
-  <h1 class="page-header {% if step3 %}first-step__header{% endif %}">{{ title }}</h1>
+  <h1 class="page-header {% if step3 %}first-step__header{% endif %}">{{ title }} <form action="{% url 'delete-project' pk=changelog.id %}" method="POST" class="form _inline"><input type="submit" value="Delete" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent"/>{% csrf_token %}</form></h1>
 {% endif %}
 
 {% if changelog %}

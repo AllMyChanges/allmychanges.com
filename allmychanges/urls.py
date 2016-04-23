@@ -48,6 +48,7 @@ from .views import (OldIndexView,
                     SynonymsView,
                     ProjectIssuesView,
                     ProjectView,
+                    DeleteProjectView,
                     EditProjectView)
 from .sitemaps import PackagesSitemap
 from django.shortcuts import redirect
@@ -108,6 +109,9 @@ urlpatterns = patterns(
     url(r'^p/(?P<pk>\d+)/edit/$',
         EditProjectView.as_view(),
         name='edit-project-by-id'),
+    url(r'^p/(?P<pk>\d+)/delete/$',
+        DeleteProjectView.as_view(),
+        name='delete-project'),
     url(r'^p/(?P<category>[^/]+?)/$', CategoryView.as_view(), name='category'),
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/issues/$',
         ProjectIssuesView.as_view(),

@@ -1163,6 +1163,21 @@ class EditProjectView(ImmediateMixin, CommonContextMixin, TemplateView):
         return context
 
 
+class DeleteProjectView(ImmediateMixin, CommonContextMixin, View):
+    def post(self, request, **kwargs):
+        params = get_keys(kwargs, 'namespace', 'name', 'pk')
+        changelog = get_object_or_404(Changelog, **params)
+
+        # only superusers and moderator can delete changelog
+        if not changelog.editable_by(self.request.user,
+                                     self.request.light_user):
+            raise ImmediateResponse(
+                HttpResponse('Access denied', status=403))
+
+        Changelog.objects.filter(pk=changelog.pk).delete()
+        return HttpResponseRedirect(reverse('track-list') + '#projects-to-tune')
+
+
 class MergeProjectView(SuperuserRequiredMixin,
                        CommonContextMixin,
                        TemplateView):
