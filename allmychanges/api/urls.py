@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+from django.conf.urls import include, url
+
 from rest_framework_extensions.routers \
     import ExtendedDefaultRouter as DefaultRouter
 
@@ -14,6 +17,7 @@ from allmychanges.api.views import (
     VersionViewSet,
     TagViewSet,
     IssueViewSet,
+    UserView,
     ValidateChangelogName)
 
 
@@ -33,4 +37,7 @@ router.register(r'landing-package-suggest', LandingPackageSuggestView, base_name
 router.register(r'validate-changelog-name', ValidateChangelogName, base_name='validate-changelog-name')
 
 
-urlpatterns = router.urls
+urlpatterns = [
+    url(r'^user/$', UserView.as_view()),
+    url(r'^', include(router.urls)),
+]

@@ -15,6 +15,8 @@ you'll see a full list of projects which should be finalized.
 * Now we return `changelog` field for tags.
 * It is possible to filter versions by changelog's namespace, name and version number.
 * Now changelogs can be filtered by keyword `id__in`.
+* Handle `/user/` was added to check if you are authenticated or not. In case if
+not, it returns 401 HTTP status code.
 
 ## Fixes
 

@@ -11,7 +11,7 @@ from itertools import islice
 from urllib import urlencode
 from collections import defaultdict
 
-from rest_framework import viewsets, mixins, permissions
+from rest_framework import views, viewsets, mixins, permissions
 from rest_framework.exceptions import ParseError
 from rest_framework_extensions.mixins import DetailSerializerMixin
 from rest_framework_extensions.decorators import action
@@ -753,6 +753,27 @@ class MessagesView(viewsets.ViewSet):
                  'tags': m.tags,
                  'message': m.message} for m in storage]
         return Response(msgs)
+
+
+class UserView(views.APIView):
+    """Returns information about current user.
+
+    For now, it is only his username.
+
+    If user is not authenticated, then it returns 401 UNAUTHORIZED
+    """
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            data = dict(
+                username=request.user.username,
+            )
+            return Response(data)
+        else:
+            data = dict(
+                message='Requires authentication',
+            )
+            return Response(data, 401)
+
 
 
 class IssueViewSet(HandleExceptionMixin,
