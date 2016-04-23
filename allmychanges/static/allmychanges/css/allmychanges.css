@@ -1209,7 +1209,10 @@ a:hover {
     padding: 5px 10px 5px 10px;
   }
 }
-.notifications__link {
+.notifications a {
+  color: #fff;
+}
+.notifications a:hover {
   color: #fff;
 }
 .notifications__info {

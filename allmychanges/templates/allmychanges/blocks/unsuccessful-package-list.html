@@ -1,0 +1,11 @@
+  <ul class="packages-list">
+    {% for ch in unsuccessful %}
+      <li>
+        <a class="packages-list__title" href="{% url 'edit-project-by-id' pk=ch.pk %}">{% if ch.namespace and ch.name %}{{ch.namespace}}/{{ ch.name }}{% else %}{{ ch.source }}{% endif %}</a>
+        <p class="packages-list__description">
+          {% if not ch.description %}No description.{% endif %}
+          {% if not ch.source %}No source.{% endif %}
+        </p>
+      </li>
+    {% endfor %}
+  </ul>

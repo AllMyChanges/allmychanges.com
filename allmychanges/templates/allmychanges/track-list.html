@@ -1,16 +1,26 @@
 {% extends "allmychanges/base.html" %}
 
 {% block content %}
-  <h1 class="page-header">You are tracking these packages</h1>
-
   {% if changelogs %}
-    {% include "allmychanges/blocks/package-list.html" with show_namespace=1 %}
+    <h1 class="page-header">You are tracking these projects</h1>
 
-    {% if suggest_namespaces %}
-      <p>Hmm, you are following only few projects. Go and find more packages about {% for namespace in suggest_namespaces %}{% if not forloop.first %}{% if not forloop.last %}, {% else %} and {% endif %}{% endif %}<a href="{% url 'category' category=namespace %}">{{namespace}}</a>{% endfor %}.</p>
-    {% endif %}
-  {% else %}
-    <p>Hmm, there isn't any packages in your track list. Go and follow some in the <a href="{% url 'categories' %}">Catalogue</a>.</p>
+    {% include "allmychanges/blocks/package-list.html" with show_namespace=1 %}
   {% endif %}
-  
+
+  {% if unsuccessful %}
+    <a name="projects-to-tune"></a>  
+    <h1 class="page-header">Projects to tune</h1>
+    <h2 class="page-subheader">
+      These projects aren't tuned yet.
+      Click on project to tune it. Otherwise, you will not receive any updates.
+    </h2>
+    {% include "allmychanges/blocks/unsuccessful-package-list.html" %}
+  {% endif %}
+
+  {% if suggest_namespaces %}
+      <p>Hmm, you are following only few projects. Go and find more projects about {% for namespace in suggest_namespaces %}{% if not forloop.first %}{% if not forloop.last %}, {% else %} and {% endif %}{% endif %}<a href="{% url 'category' category=namespace %}">{{namespace}}</a>{% endfor %}.</p>
+  {% else %}
+    <p>Hmm, there isn't any project in your track list. Go and follow some in the <a href="{% url 'categories' %}">Catalogue</a>.</p>
+  {% endif %}
+
 {% endblock content %}

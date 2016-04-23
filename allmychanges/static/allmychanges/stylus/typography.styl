@@ -7,6 +7,22 @@ a {
   }
 }
 
+pseudo-link() {
+  color: light-red-color;
+
+  // underscore text
+  text-decoration: none;
+  border-bottom: 1px dashed;
+  // and make it a little bit close to text
+  line-height: 0.98em;
+  cursor: pointer;
+  
+  &:hover {
+    color: dark-red-color;
+  }
+}
+
+
 .page-header {
     font-size: 27px;
     line-height: 30px;

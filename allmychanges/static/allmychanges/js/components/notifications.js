@@ -7,7 +7,6 @@ module.exports = React.createClass({
     componentDidMount: function() {
         PubSub.subscribe('show-info', this.newItem);
         PubSub.subscribe('show-warning', this.newItem);
-        $(document).trigger('notifications-mounted');
     },
     newItem: function (msg, data) {
         this.counter += 1;
@@ -30,20 +29,21 @@ module.exports = React.createClass({
     },
     render: function() {
         var notifications;
-        var closeItem2 = function (item_id) {
-            return function() {
+        var closeItem2 = (item_id) => {
+            return () => {
                 // closing item [item_id] @notifications
                 var items = this.state.items;
                 items = _.filter(items, function(item) {return item.id != item_id});
                 this.setState({items: items});
-            }.bind(this);
-        }.bind(this);
+            };
+        };
 
         if (this.state.show) {
-            notifications = _.map(this.state.items,
-                                function(item) {
-                                        return <li className={"notifications__item notifications__" + item.class} key={item.id}><div className="notifications__close-button" onClick={closeItem2(item.id)}>+</div>{item.text}</li>
-                                });
+            var format_item = (item) => {
+                return <li className={"notifications__item notifications__" + item.class} key={item.id}><div className="notifications__close-button" onClick={closeItem2(item.id)}>+</div><span dangerouslySetInnerHTML={{__html: item.text}}></span></li>
+            }
+            
+            notifications = _.map(this.state.items, format_item);
         }
         return  (<ul className="notifications">{notifications}</ul>);
     }

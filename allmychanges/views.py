@@ -44,6 +44,7 @@ from allmychanges.churn import get_user_actions_heatmap
 from allmychanges import chat
 from allmychanges.notifications.email import send_email
 from allmychanges.notifications import slack, webhook
+from allmychanges.source_guesser import guess_source
 from allmychanges.http import LastModifiedMixin
 
 from oauth2_provider.models import Application, AccessToken
@@ -59,6 +60,28 @@ from allmychanges.utils import (
     join_ints)
 from allmychanges.downloaders.utils import normalize_url
 
+
+def show_not_tuned_warning(request):
+    """Show a little warning about projects which are not tuned
+    """
+    if request.user.is_authenticated():
+        unsuccessful = request.user.changelogs.unsuccessful().count()
+
+        if unsuccessful:
+            if unsuccessful > 2:
+                message = ('You have {num} not tuned projects. '
+                           'Please '
+                           '<a href="{url}">tune them</a>!')
+            else:
+                message = ('You have one not tuned project.'
+                           'Please '
+                           '<a href="{url}">finish it\'s tuning</a>!')
+
+
+            url = reverse('track-list') + '#projects-to-tune'
+            message = message.format(num=unsuccessful, url=url)
+
+            messages.warning(request, message)
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
@@ -464,6 +487,8 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         if self.request.user.is_authenticated():
             login_to_track = False
             already_tracked = self.request.user.does_track(changelog)
+
+            show_not_tuned_warning(self.request)
         else:
             login_to_track = True
             already_tracked = False
@@ -523,6 +548,7 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
                              self.request.light_user,
                              'package-view',
                              u'User opened changelog:{0}'.format(changelog.pk))
+
         return result
 
 
@@ -741,15 +767,13 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
                              self.request.light_user,
                              'profile-update',
                              'User saved his profile settings')
-        messages.add_message(self.request,
-                             messages.INFO,
-                             'Account settings were saved.')
+        messages.info(self.request,
+                      'Account settings were saved.')
         return super(ProfileView, self).form_valid(form)
 
     def form_invalid(self, form):
-        messages.add_message(self.request,
-                             messages.ERROR,
-                             'There is some error in the form data.')
+        messages.error(self.request,
+                       'There is some error in the form data.')
         return super(ProfileView, self).form_invalid(form)
 
 
@@ -1115,7 +1139,19 @@ class EditProjectView(ImmediateMixin, CommonContextMixin, TemplateView):
         if changelog.versions.count() == 0:
             preview.schedule_update()
 
+        namespace = changelog.namespace
+        name = changelog.name
+
         context['changelog'] = changelog
+        context['title'] = '{0}/{1}'.format(
+            namespace or 'unknown',
+            name or 'unknown')
+
+        if not changelog.source:
+            context['guessed_sources'] = guess_source(namespace, name)
+        else:
+            context['guessed_sources'] = []
+
         context['preview'] = preview
         context['mode'] = 'edit'
         context['can_edit'] = changelog.editable_by(self.request.user,
@@ -1750,13 +1786,24 @@ class TrackListView(CommonContextMixin, TemplateView):
         context['menu_tracked_projects'] = True
 
         if self.request.user.is_authenticated():
-            changelogs = list(self.request.user.changelogs.exclude(name=None).order_by('namespace', 'name'))
+            queryset = self.request.user.changelogs
+            ordered = lambda q: q.order_by('namespace', 'name')
+
+            changelogs = list(ordered(queryset.good()))
+            unsuccessful = list(ordered(queryset.unsuccessful()))
+
+            show_not_tuned_warning(self.request)
         else:
             changelogs = []
+            unsuccessful = []
+
         context['changelogs'] = changelogs
+        context['unsuccessful'] = unsuccessful
+
         if len(changelogs) <= 7:
             namespaces = sorted(set(ch.namespace for ch in changelogs))
             context['suggest_namespaces'] = namespaces
+
         return context
 
 

@@ -323,7 +323,11 @@ class ChangelogManager(models.Manager):
             Q(source=''))
 
     def unsuccessful(self):
-        return self.all().filter(Q(name=None) | Q(namespace=None))
+        return self.all().filter(
+            Q(name=None) |
+            Q(namespace=None) |
+            Q(downloader=None) |
+            Q(source=''))
 
 
 class Changelog(Downloadable, models.Model):

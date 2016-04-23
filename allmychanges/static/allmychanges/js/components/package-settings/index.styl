@@ -1,4 +1,4 @@
-
+@require "../../../stylus/typography"
 
 .changelog-settings {
     &__tune-panel {
@@ -46,5 +46,33 @@
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
         vertical-align: bottom;
+    }
+}
+
+/* these links are shown under the source url's input
+on "tune" page when there is no source url.
+*/
+.guessed-sources {
+    > ul {
+        display: inline-block;
+        margin-left: 0.6em;
+        margin-bottom: 1em;
+        
+        > li {
+            list-style: none;
+            display: inline-block;
+            
+            > a {
+                pseudo-link();
+            }
+            &:after {
+                content: ",";
+                margin-right: 0.5em;
+            }
+            &:last-child:after {
+                content: ".";
+                margin-right: 0;
+            }
+        }
     }
 }

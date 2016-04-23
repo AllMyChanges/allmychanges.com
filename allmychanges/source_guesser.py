@@ -54,9 +54,10 @@ def _python_guesser(name):
         return results
 
     results = check_page('https://pypi.python.org/pypi/' + name)
-    # sort results so that urls which include package's name come first
-    results.sort(key=lambda item: name in item,
-                 reverse=True)
+    # show only urls which include package's name
+    results = filter(lambda item: name in item, results)
+    # sort results so that shorter urls come first
+    results.sort(key=len)
     return results
 
 

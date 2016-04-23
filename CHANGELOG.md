@@ -1,6 +1,15 @@
 1.5.0 (unreleased)
 ==================
 
+## Major Changes
+
+Now it is possible to add changelogs without name or source url, but
+their tuning should be finished before they will be crawled by robot.
+
+Also, on every project's page, you'll see a warning message if you have
+some projects which are not tuned. Following a link in the message,
+you'll see a full list of projects which should be finalized.
+
 ## API Changes
 
 * Now we return `changelog` field for tags.
@@ -15,6 +24,10 @@
   charset, and meta tag in html page with charset.
 * Fixed html to markdown processing. It shouldn't break long links now.
   This fixes some issues in Slack notifications where some links appeared broken.
+
+## Internal
+
+* Database migration required.
 
 1.4.0 (2016-03-21)
 ==================

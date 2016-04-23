@@ -284,7 +284,7 @@ module.exports = React.createClass({
                 headers: {'X-CSRFToken': $.cookie('csrftoken')}})
             .success(this.update_preview_callback);
     },
-    change_source: function() {
+    source_was_changed: function() {
         this.setState(
             {'downloader': null},
             this.apply_settings);
@@ -508,6 +508,22 @@ module.exports = React.createClass({
                      value={this.state.source}
                      onChange={this.on_field_change}/>);
 
+        if (this.props.guessed_sources.length > 0) {
+            var make_source = (url, idx) => {
+                var change_source = () => {
+                    this.setState({'source': url});
+                    this.source_was_changed();
+                }
+                return <li key={idx}><a onClick={change_source}>{ url }</a></li>;
+            }
+            var guessed_sources = this.props.guessed_sources.map(make_source);
+            content.push(
+                    <div className="guessed-sources">
+                      You can also try these urls as sources:
+                      <ul>{ guessed_sources }</ul>
+                    </div>);
+        }
+
         var tabs = [];
         var tab_panels = [];
 
@@ -606,7 +622,7 @@ module.exports = React.createClass({
             }
             
             if (this.preview.source != this.state.source) {
-                content.push(<TunePanel>{render_change_source_plate(this.change_source)}</TunePanel>);
+                content.push(<TunePanel>{render_change_source_plate(this.source_was_changed)}</TunePanel>);
             } else {
                 if (this.state.downloaders.length == 0) {
                     content.push(<TunePanel>{render_no_downloaders_plate()}</TunePanel>);

@@ -47868,6 +47868,9 @@ componentHandler.register({
 	            var downloader_settings = element.dataset['downloaderSettings'];
 	            downloader_settings = JSON.parse(downloader_settings);
 
+	            var guessed_sources = element.dataset['guessedSources'];
+	            guessed_sources = JSON.parse(guessed_sources);
+
 	            React.render(React.createElement(PackageSettings, {
 	                preview_id: element.dataset['previewId'],
 	                changelog_id: element.dataset['changelogId'],
@@ -47880,6 +47883,7 @@ componentHandler.register({
 	                search_list: element.dataset['searchList'],
 	                ignore_list: element.dataset['ignoreList'],
 	                xslt: element.dataset['xslt'],
+	                guessed_sources: guessed_sources,
 	                mode: element.dataset['mode'] }), element);
 	        });
 	    }
@@ -48534,7 +48538,6 @@ componentHandler.register({
 	    componentDidMount: function componentDidMount() {
 	        PubSub.subscribe('show-info', this.newItem);
 	        PubSub.subscribe('show-warning', this.newItem);
-	        $(document).trigger('notifications-mounted');
 	    },
 	    newItem: function newItem(msg, data) {
 	        this.counter += 1;
@@ -48556,20 +48559,22 @@ componentHandler.register({
 	        return { show: false, items: [] };
 	    },
 	    render: function render() {
+	        var _this = this;
+
 	        var notifications;
-	        var closeItem2 = (function (item_id) {
-	            return (function () {
+	        var closeItem2 = function closeItem2(item_id) {
+	            return function () {
 	                UserStory.log(["closing item [item_id=", item_id, "]"], ["notifications"]);
-	                var items = this.state.items;
+	                var items = _this.state.items;
 	                items = _.filter(items, function (item) {
 	                    return item.id != item_id;
 	                });
-	                this.setState({ items: items });
-	            }).bind(this);
-	        }).bind(this);
+	                _this.setState({ items: items });
+	            };
+	        };
 
 	        if (this.state.show) {
-	            notifications = _.map(this.state.items, function (item) {
+	            var format_item = function format_item(item) {
 	                return React.createElement(
 	                    'li',
 	                    { className: "notifications__item notifications__" + item['class'], key: item.id },
@@ -48578,9 +48583,11 @@ componentHandler.register({
 	                        { className: 'notifications__close-button', onClick: closeItem2(item.id) },
 	                        '+'
 	                    ),
-	                    item.text
+	                    React.createElement('span', { dangerouslySetInnerHTML: { __html: item.text } })
 	                );
-	            });
+	            };
+
+	            notifications = _.map(this.state.items, format_item);
 	        }
 	        return React.createElement(
 	            'ul',
@@ -49012,7 +49019,7 @@ componentHandler.register({
 	            contentType: 'application/json',
 	            headers: { 'X-CSRFToken': $.cookie('csrftoken') } }).success(this.update_preview_callback);
 	    },
-	    change_source: function change_source() {
+	    source_was_changed: function source_was_changed() {
 	        this.setState({ 'downloader': null }, this.apply_settings);
 	    },
 	    apply_settings: function apply_settings() {
@@ -49212,6 +49219,35 @@ componentHandler.register({
 	            value: this.state.source,
 	            onChange: this.on_field_change }));
 
+	        if (this.props.guessed_sources.length > 0) {
+	            var make_source = function make_source(url, idx) {
+	                var change_source = function change_source() {
+	                    _this4.setState({ 'source': url });
+	                    _this4.source_was_changed();
+	                };
+	                return React.createElement(
+	                    'li',
+	                    { key: idx },
+	                    React.createElement(
+	                        'a',
+	                        { onClick: change_source },
+	                        url
+	                    )
+	                );
+	            };
+	            var guessed_sources = this.props.guessed_sources.map(make_source);
+	            content.push(React.createElement(
+	                'div',
+	                { className: 'guessed-sources' },
+	                'You can also try these urls as sources:',
+	                React.createElement(
+	                    'ul',
+	                    null,
+	                    guessed_sources
+	                )
+	            ));
+	        }
+
 	        var tabs = [];
 	        var tab_panels = [];
 
@@ -49314,7 +49350,7 @@ componentHandler.register({
 	                content.push(React.createElement(
 	                    TunePanel,
 	                    null,
-	                    render_change_source_plate(this.change_source)
+	                    render_change_source_plate(this.source_was_changed)
 	                ));
 	            } else {
 	                if (this.state.downloaders.length == 0) {
@@ -61804,7 +61840,7 @@ componentHandler.register({
 
 
 	// module
-	exports.push([module.id, ".changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 300px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 300px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -15px;\n  margin-left: -20px;\n  width: 40px;\n  height: 15px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n  vertical-align: bottom;\n}\n", ""]);
+	exports.push([module.id, "a {\n  color: #d9042b;\n}\na:hover {\n  color: #6b0c22;\n}\n.page-header {\n  font-size: 27px;\n  line-height: 30px;\n  margin-bottom: 30px;\n  margin-top: 30px;\n  font-family: proxima-nova, sans-serif;\n}\n.page-subheader {\n  margin-top: 25px;\n  margin-bottom: 16px;\n  font-family: pragmatica-web-condensed, sans-serif;\n}\n.text-index {\n  font-size: 0.5em;\n  position: relative;\n  top: -0.7em;\n}\n.changelog-settings__tune-panel {\n  max-width: 800px;\n}\n.changelog-settings__tune {\n  transition: all 0.2s ease-in;\n}\n.changelog-settings__tune .react-tabs [role=tab][aria-selected=true] {\n  background: rgba(255,255,255,0.9);\n}\n@media (min-height: 300px) {\n  .changelog-settings__tune {\n    position: fixed;\n    bottom: 0;\n    box-shadow: 0px 0px 20px #808080;\n  }\n}\n@media (max-height: 300px) {\n  .changelog-settings__tune {\n    position: relative;\n    box-shadow: 0px -3px 10px #808080;\n    margin-top: 20px;\n  }\n  .changelog-settings__collapse-button {\n    display: none;\n  }\n}\n.changelog-settings__collapse-button {\n  border: 0;\n  background: #fff;\n  position: absolute;\n  left: 50%;\n  top: -15px;\n  margin-left: -20px;\n  width: 40px;\n  height: 15px;\n  box-shadow: 0px -3px 5px #808080;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n  vertical-align: bottom;\n}\n/* these links are shown under the source url's input\non \"tune\" page when there is no source url.\n*/\n.guessed-sources > ul {\n  display: inline-block;\n  margin-left: 0.6em;\n  margin-bottom: 1em;\n}\n.guessed-sources > ul > li {\n  list-style: none;\n  display: inline-block;\n}\n.guessed-sources > ul > li > a {\n  color: #d9042b;\n  text-decoration: none;\n  border-bottom: 1px dashed;\n  line-height: 0.98em;\n  cursor: pointer;\n}\n.guessed-sources > ul > li > a:hover {\n  color: #6b0c22;\n}\n.guessed-sources > ul > li:after {\n  content: \",\";\n  margin-right: 0.5em;\n}\n.guessed-sources > ul > li:last-child:after {\n  content: \".\";\n  margin-right: 0;\n}\n", ""]);
 
 	// exports
 

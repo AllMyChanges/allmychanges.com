@@ -106,6 +106,9 @@ module.exports = {
             var downloader_settings = element.dataset['downloaderSettings'];
             downloader_settings = JSON.parse(downloader_settings);
             
+            var guessed_sources = element.dataset['guessedSources'];
+            guessed_sources = JSON.parse(guessed_sources);
+            
             React.render(
                 <PackageSettings
                      preview_id={element.dataset['previewId']}
@@ -119,6 +122,7 @@ module.exports = {
                      search_list={element.dataset['searchList']}
                      ignore_list={element.dataset['ignoreList']}
                      xslt={element.dataset['xslt']}
+                     guessed_sources={guessed_sources}
                      mode={element.dataset['mode']}/>,
                 element);
         });

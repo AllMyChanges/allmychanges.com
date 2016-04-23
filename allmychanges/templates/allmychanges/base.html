@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     
-    <link href="{% static 'allmychanges/css/allmychanges.css' %}?v=4" rel="stylesheet">
+    <link href="{% static 'allmychanges/css/allmychanges.css' %}?v=5" rel="stylesheet">
 
     <script type="text/javascript" src="//use.typekit.net/qyd4ddd.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
@@ -131,27 +131,28 @@
       </div>
       {% endblock footer %}
 
+
       {% if settings.DEBUG %}
       <script src="/static/allmychanges/js-compiled/all.js" type="text/javascript" charset="utf-8"></script>
       {% else %}
-      <script src="/static/allmychanges/js-compiled/all.min.js?v=4" type="text/javascript" charset="utf-8"></script>
+      <script src="/static/allmychanges/js-compiled/all.min.js?v=5" type="text/javascript" charset="utf-8"></script>
       {% endif %}
 
 
-{% block no-email-warning %}
-    {% if user.is_authenticated and not user.email %}
-        <script type="text/javascript">
-          $(document).bind(
-            'notifications-mounted',
-            function () {
-              PubSub.publish('show-warning',
-                ['To receive notifications about new versions, please ',
-                 React.createElement("a", {href: "{% url "account-settings" %}#notifications", "className": "notifications__link"}, "setup email"),
-                '.']);
-          });
-        </script>
-    {% endif %}
-{% endblock %}
+      {% block no-email-warning %}
+        {% comment %}
+          This block should go after the all.js file.
+          Otherwise, message will not be processed.
+        {% endcomment %}
+      
+        {% if user.is_authenticated and not user.email %}
+          <script type="text/javascript">
+            PubSub.publish('show-warning',
+                           'To receive notifications about new versions, please <a href="{% url 'account-settings' %}#notifications">setup email</a>.');
+          </script>
+        {% endif %}
+      {% endblock %}
+
 
 
 {% if settings.METRIKA_ID %}
