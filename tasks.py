@@ -155,15 +155,16 @@ def start_databases():
         run('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
         run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb')
 
+    # Commented while I'm not experimenting with postgres
 
-    if 'postgres.allmychanges.com' in containers:
-        run('docker start postgres.allmychanges.com')
-    else:
-        run('docker run --net amch --name postgres.allmychanges.com -v `pwd`/dumps:/dumps -e POSTGRES_PASSWORD=password -d postgres')
-        print 'Waiting for postgres start'
-        # time.sleep(30)
-        # run('docker exec -it postgres.allmychanges.com postgresadmin -ppassword create allmychanges')
-        # run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
+    # if 'postgres.allmychanges.com' in containers:
+    #     run('docker start postgres.allmychanges.com')
+    # else:
+    #     run('docker run --net amch --name postgres.allmychanges.com -v `pwd`/dumps:/dumps -e POSTGRES_PASSWORD=password -d postgres')
+    #     print 'Waiting for postgres start'
+    #     # time.sleep(30)
+    #     # run('docker exec -it postgres.allmychanges.com postgresadmin -ppassword create allmychanges')
+    #     # run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb --migrate')
 
 
     if 'redis.allmychanges.com' in containers:
