@@ -204,12 +204,9 @@ def test_source_guesser():
         response = mock.Mock()
         response.content = content
         requests.get.return_value = response
-        urls = guess_source('python', 'test')
+        urls = guess_source('python', 'pdb')
 
-        eq_(['https://github.com/alex/django-filter',
-             'https://bitbucket.org/antocuni/pdb',
-             'https://raw.github.com/tony/tmuxp/master/doc/_static/tmuxp-dev-screenshot.png'],
-            urls)
+        eq_(['https://bitbucket.org/antocuni/pdb'], urls)
 
 
 class UserTests(TestCase):
