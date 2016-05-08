@@ -546,3 +546,9 @@ def html2md(html):
 #    import pdb; pdb.set_trace()  # DEBUG
     h.wrap_links = False
     return h.handle(html)
+
+
+def get_one_or_none(queryset, **kwargs):
+    result = list(queryset.filter(**kwargs)[:1])
+    if result:
+        return result[0]

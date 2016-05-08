@@ -4,8 +4,14 @@ from nose.tools import eq_
 from operator import itemgetter
 from django.test import Client
 from ..utils import create_user, get_json, post_json
-from allmychanges.models import Changelog
+from allmychanges.models import Changelog, Tag
 from unittest import TestCase
+from hamcrest import (
+    assert_that,
+    contains,
+    has_properties,
+    equal_to,
+)
 
 
 def attr_or_item_getter(name, default=None):
@@ -26,13 +32,13 @@ class TestUserTags(TestCase):
         self.user = create_user('art')
         self.cl.login(username='art', password='art')
 
-        changelog = Changelog.objects.create(namespace='python',
+        self.changelog = Changelog.objects.create(namespace='python',
                                            name='pip',
                                            source='https://github.com/some/url')
         self.versions = []
 
         for i in range(10):
-            v = changelog.versions.create(number='0.1.{0}'.format(i))
+            v = self.changelog.versions.create(number='0.1.{0}'.format(i))
             self.versions.append(v)
 
     def test_if_no_tags_return_empty_list(self):
@@ -97,9 +103,10 @@ class TestUserTags(TestCase):
 
         post_json(
             self.cl,
-            '/v1/versions/{}/tag/'.format(version.pk),
+            '/v1/changelogs/{}/tag/'.format(self.changelog.pk),
             expected_code=201,
-            name='blah')
+            name='blah',
+            version=version.number)
 
         eq_(['blah'],
             map(get_names, version.tags.all()))
@@ -110,7 +117,7 @@ class TestUserTags(TestCase):
 
         post_json(
             self.cl,
-            '/v1/versions/{}/untag/'.format(version.pk),
+            '/v1/changelogs/{}/untag/'.format(self.changelog.pk),
             expected_code=204,
             name='foo')
 
@@ -118,17 +125,44 @@ class TestUserTags(TestCase):
         eq_([],
             map(get_names, version.tags.all()))
 
-    def test__untag_of_unknown_tag_is_ok(self):
+    def test_untag_of_unknown_tag_is_ok(self):
         version = self.versions[3]
         version.set_tag(self.user, 'foo') # here we have 'foo' tag
 
         # but remove 'bar' tag
         post_json(
             self.cl,
-            '/v1/versions/{}/untag/'.format(version.pk),
+            '/v1/changelogs/{}/untag/'.format(self.changelog.pk),
             expected_code=204,
             name='bar')
 
         # and foo tag is still there
         eq_(['foo'],
             map(get_names, version.tags.all()))
+
+
+    def test_unknown_version_can_be_tagged_and_assigned_to_version_later(self):
+        # checking if we can create a tag with version which is not known
+        self.changelog.set_tag(self.user, 'blah', '0.2.0')
+
+        # this tag should be set on changelog
+        # but have no version assigned
+        all_tags = list(self.changelog.tags.all())
+        assert_that(
+            all_tags,
+            contains(
+                has_properties(
+                    name='blah',
+                    version=None,
+                )
+            )
+        )
+        # after we create the version with this number
+        version = self.changelog.versions.create(
+            number='0.2.0'
+        )
+        # this version should have this tag
+        tag = Tag.objects.get(pk=all_tags[0].pk)
+        assert_that(
+            tag.version,
+            equal_to(version))

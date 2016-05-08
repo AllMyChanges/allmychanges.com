@@ -2,6 +2,7 @@
 import re
 import random
 
+from django.db import transaction
 from django.utils import timezone
 from django.db.models import Q, Count
 from django import forms
@@ -60,7 +61,23 @@ class AccessDenied(APIException):
     default_detail = 'You are not allowed to perform this action'
 
 
-from django.db import transaction
+TAG_NAME_REGEX = ur'[a-z][a-z0-9-.]*[a-z0-9]'
+TAG_NAME_ERROR_MESSAGES = dict(
+    required='This field is required',
+    invalid=('Tag names should correspond to this '
+            'regular expression: "{}"').format(
+                TAG_NAME_REGEX))
+
+
+class TagForm(forms.Form):
+    name = forms.RegexField(TAG_NAME_REGEX,
+                            error_messages=TAG_NAME_ERROR_MESSAGES)
+    version = forms.CharField()
+
+
+class UntagForm(forms.Form):
+    name = forms.RegexField(TAG_NAME_REGEX,
+                            error_messages=TAG_NAME_ERROR_MESSAGES)
 
 
 class HandleExceptionMixin(object):
@@ -581,6 +598,41 @@ class ChangelogViewSet(HandleExceptionMixin,
         return response
 
 
+    @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
+    def tag(self, request, pk=None):
+        form = TagForm(request.DATA)
+        if not form.is_valid():
+            return Response({'errors': form.errors},
+                            content_type='application/json',
+                            status=400)
+
+        name = form.cleaned_data['name']
+        version_number = form.cleaned_data['version']
+        changelog = self.get_object()
+        status = changelog.set_tag(request.user, name, version_number)
+        if status == 'created':
+            status_code = 201
+        else:
+            status_code = 200
+
+        return Response({'result': status},
+                        status=status_code,
+                        content_type='application/json')
+
+    @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
+    def untag(self, request, pk=None):
+        form = UntagForm(request.DATA)
+        if not form.is_valid():
+            return Response({'errors': form.errors},
+                            content_type='application/json',
+                            status=400)
+
+        name = form.cleaned_data['name']
+        changelog = self.get_object()
+        changelog.remove_tag(request.user, name)
+        return Response(status=204)
+
+
 class PreviewViewSet(HandleExceptionMixin,
                      DetailSerializerMixin,
                      viewsets.ModelViewSet):
@@ -616,18 +668,6 @@ class PreviewViewSet(HandleExceptionMixin,
 
 
 
-TAG_NAME_REGEX = ur'[a-z][a-z0-9-.]*[a-z0-9]'
-TAG_NAME_ERROR_MESSAGES = dict(
-    required='This field is required',
-    invalid=('Tag names should correspond to this '
-            'regular expression: "{}"').format(
-                TAG_NAME_REGEX))
-
-
-class TagNameForm(forms.Form):
-    name = forms.RegexField(TAG_NAME_REGEX,
-                            error_messages=TAG_NAME_ERROR_MESSAGES)
-
 # это пока нигде не используется, надо дорабатывать
 # и возможно переносить ручку в changelog/:id/versions
 
@@ -648,38 +688,6 @@ class VersionViewSet(HandleExceptionMixin,
             if key in self.request.GET}
         return Version.objects.filter(**params)
 
-    @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
-    def tag(self, request, pk=None):
-        form = TagNameForm(request.DATA)
-        if not form.is_valid():
-            return Response({'errors': form.errors},
-                            content_type='application/json',
-                            status=400)
-
-        name = form.cleaned_data['name']
-        version = self.get_object()
-        status = version.set_tag(request.user, name)
-        if status == 'created':
-            status_code = 201
-        else:
-            status_code = 200
-
-        return Response({'result': status},
-                        status=status_code,
-                        content_type='application/json')
-
-    @detail_route(methods=['post'], permission_classes=[AuthenticationRequired])
-    def untag(self, request, pk=None):
-        form = TagNameForm(request.DATA)
-        if not form.is_valid():
-            return Response({'errors': form.errors},
-                            content_type='application/json',
-                            status=400)
-
-        name = form.cleaned_data['name']
-        version = self.get_object()
-        version.remove_tag(request.user, name)
-        return Response(status=204)
 
 
 class TagViewSet(HandleExceptionMixin,

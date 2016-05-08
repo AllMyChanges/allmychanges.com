@@ -27,6 +27,7 @@ from allmychanges.issues import calculate_issue_importance
 from allmychanges.utils import (
     split_filenames,
     parse_search_list,
+    get_one_or_none,
 )
 from allmychanges import chat
 from allmychanges.downloaders import (
@@ -657,6 +658,33 @@ class Changelog(Downloadable, models.Model):
         # add synonym
         to_ch.add_synonym(self.source)
 
+    def set_tag(self, user, name, version_number):
+        """Sets or updates tag with `name` on the version.
+        If tag was updated, returns 'updated'
+        otherwise, returns 'created'
+        """
+        params = dict(user=user, name=name)
+
+        existing_tag = self.tags.filter(
+            **params)
+
+        update = existing_tag.count() > 0
+        if update:
+            existing_tag.delete()
+
+        version = get_one_or_none(self.versions, number=version_number)
+        self.tags.create(version=version,
+                         version_number=version_number,
+                         **params)
+
+        return 'updated' if update else 'created'
+
+
+    def remove_tag(self, user, name):
+        """Removes tag with `name` on the version.
+        """
+        self.tags.filter(user=user, name=name).delete()
+
 
 class SourceSynonym(models.Model):
     changelog = models.ForeignKey(Changelog, related_name='synonyms')
@@ -935,6 +963,20 @@ class Preview(Downloadable, models.Model):
 
 
 class VersionManager(models.Manager):
+    use_for_related_fields = True
+
+    def create(self, *args, **kwargs):
+        obj = super(VersionManager, self).create(*args, **kwargs)
+        changelog = kwargs.get('changelog')
+
+        if changelog:
+            # associate free tags with this new version
+            number = kwargs['number']
+            for tag in changelog.tags.filter(version_number=number):
+                tag.version = obj
+                tag.save(update_fields=('version',))
+        return obj
+
     def released(self):
         return self.exclude(unreleased=True)
 
@@ -1044,42 +1086,35 @@ class Version(models.Model):
         return full_path
 
     def set_tag(self, user, name):
-        """Sets or updates tag with `name` on the version.
-        If tag was updated, returns 'updated'
-        otherwise, returns 'created'
+        """Convenience method to set tag on just this version.
         """
-        params = dict(user=user, name=name)
-
-        existing_tag = Tag.objects.filter(
-            version__changelog=self.changelog,
-            **params)
-
-        update = existing_tag.count() > 0
-        if update:
-            existing_tag.delete()
-
-        self.tags.create(**params)
-
-        return 'updated' if update else 'created'
-
-
-    def remove_tag(self, user, name):
-        """Removes tag with `name` on the version.
-        """
-        Tag.objects.filter(
-            version__changelog=self.changelog,
-            user=user,
-            name=name).delete()
+        self.changelog.set_tag(user, name, self.number)
 
 
 class Tag(models.Model):
-    version = models.ForeignKey(Version, related_name='tags')
+    # this field shouldn't be blank or null
+    # but I have to make it so, because otherwise
+    # DB migrations wasn't possible
+    changelog = models.ForeignKey(Changelog,
+                                  blank=True,
+                                  null=True,
+                                  related_name='tags')
+    # tag may be tied to a version in the database,
+    # but in some cases, we may don't have parsed version
+    # with given number
+    version = models.ForeignKey(Version,
+                                blank=True,
+                                null=True,
+                                related_name='tags')
     user = models.ForeignKey(User, related_name='tags')
     # regex=ur'[a-z][a-z0-9-]*[a-z0-9]'
     name = models.CharField(max_length=40)
+    # we have not any restrictions on the format of this field
+    # this could be any string even something like 'latest'
+    version_number = models.CharField(max_length=40)
 
     class Meta:
-        unique_together = ('version', 'user', 'name')
+        unique_together = ('changelog', 'user', 'name')
 
 
 class FeedItem(models.Model):

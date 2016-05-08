@@ -141,14 +141,17 @@ class VersionSerializer(ModelSerializer):
 
 
 class TagSerializer(ModelSerializer):
-    version_number = serializers.Field(source='version.number')
-    changelog = serializers.Field(source='version.changelog.id')
+    changelog = serializers.Field(source='changelog.id')
+    version = serializers.Field(source='version.id')
 
     class Meta:
         model = Tag
-        fields = ('name',
-                  'version_number',
-                  'changelog')
+        fields = (
+            'name',
+            'version_number',
+            'changelog',
+            'version',
+        )
 
 
 class IssueSerializer(ModelSerializer):
