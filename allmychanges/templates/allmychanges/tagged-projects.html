@@ -1,0 +1,26 @@
+{% extends "allmychanges/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  {% if projects %}
+    <h1 class="page-header">These projects were tagged with "{{ name }}" and have updates</h1>
+    <ul class="tagged-projects-list">
+      {% for project in projects %}
+        <li><a href="{% url 'project-by-id' pk=project.id %}">{{ project.name }}</a> – you've tagged {{ project.version_number }} {% if project.fresh_versions_count %}{% blocktrans count counter=project.fresh_versions_count %} and there is {{ counter }} newer version{% plural %} and there are {{ counter }} newer versions{% endblocktrans %}{% else %}{% if version_id %} and it is latest version{% else %} and allmychanges does not know this version number yet{% endif %}{% endif %}.</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if unknown %}
+    <h1 class="page-header">For these projects we didn't discover tagged versions</h1>
+    <ul class="tagged-projects-list">
+      {% for project in unknown %}
+        <li><a href="{% url 'project-by-id' pk=project.id %}">{{ project.name }}</a> – you've tagged {{ project.version_number }}.</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+    
+  {% if not projects and not unknown %}
+    <p>You have no projects, tagged with "{{ name }}" or they have no updates..</p>
+  {% endif %}
+{% endblock content %}

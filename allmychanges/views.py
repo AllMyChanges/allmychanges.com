@@ -1822,6 +1822,99 @@ class TrackListView(CommonContextMixin, TemplateView):
         return context
 
 
+class TagListView(LoginRequiredMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/tag-list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TagListView, self).get_context_data(**kwargs)
+        context['menu_tags'] = True
+
+        all_tags = self.request.user.tags.all()
+
+        def get_fresh_versions_count(tag):
+            """Returns number of versions larger than tagged version number.
+            """
+            tagged_version = tag.version
+            if tagged_version is not None:
+                cnt = tag.changelog.versions.released().filter(
+                    order_idx__gt=tagged_version.order_idx
+                ).count()
+                return cnt
+            else:
+                return 0
+
+        # this contains information about tags, grouped by name
+        tags = {}
+        for tag in all_tags:
+            name = tag.name
+            if name not in tags:
+                tags[name] = dict(
+                    name=name,
+                    fresh_versions_count=get_fresh_versions_count(tag)
+                )
+            else:
+                tags[name]['fresh_versions_count'] += \
+                    get_fresh_versions_count(tag)
+
+        context['tags'] = tags.values()
+
+        return context
+
+
+class TaggedProjectsView(LoginRequiredMixin, CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/tagged-projects.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TaggedProjectsView, self).get_context_data(**kwargs)
+
+        tags = self.request.user.tags.filter(name=kwargs['name'])
+        if not tags:
+            raise Http404
+
+        def get_fresh_versions_count(tag):
+            """Returns number of versions larger than tagged version number.
+            """
+            tagged_version = tag.version
+            if tagged_version is not None:
+                cnt = tag.changelog.versions.released().filter(
+                    order_idx__gt=tagged_version.order_idx
+                ).count()
+                return cnt
+            else:
+                return 0
+
+        projects = []
+        unknown = []
+
+        for tag in tags:
+            changelog = tag.changelog
+            version = tag.version
+            count = get_fresh_versions_count(tag)
+
+            data = dict(
+                name=changelog.get_display_name(),
+                id=changelog.id,
+                fresh_versions_count=count,
+                version_id=version.id if version else None,
+                version_number=tag.version_number,
+            )
+
+            if version:
+                # right now we show only outdated tags
+                # probably, will add an option to show all
+                if count > 0:
+                    projects.append(data)
+            else:
+                unknown.append(data)
+
+
+        context['name'] = kwargs['name']
+        context['projects'] = projects
+        context['unknown'] = unknown
+
+        return context
+
+
 class RssFeedView(View):
     def get(self, *args, **kwargs):
         rss_hash = kwargs.get('feed_hash')

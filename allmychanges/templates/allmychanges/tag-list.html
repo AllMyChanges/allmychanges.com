@@ -1,0 +1,15 @@
+{% extends "allmychanges/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  {% if tags %}
+    <h1 class="page-header">You've tagged some projects with these tags:</h1>
+    <ul class="tags-list">
+      {% for tag in tags %}
+        <li><a href="{% url 'tagged-projects' name=tag.name %}">{{ tag.name }}</a> – {% if tag.fresh_versions_count %}{% blocktrans count counter=tag.fresh_versions_count %}{{ counter }} update is waiting for review.{% plural %}{{ counter }} updates are waiting for review.{% endblocktrans %}{% else %}no updates.{% endif %}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have no tags yet. Use command line tool to make some.</p>  
+  {% endif %}
+{% endblock content %}

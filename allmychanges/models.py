@@ -408,6 +408,11 @@ class Changelog(Downloadable, models.Model):
         if versions:
             return versions[0]
 
+    def get_display_name(self):
+        return u'{0}/{1}'.format(
+            self.namespace,
+            self.name)
+
     @staticmethod
     def create_uniq_name(namespace, name):
         """Returns a name which is unique in given namespace.
