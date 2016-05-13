@@ -464,17 +464,30 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
 
     def last_modified(self, *args, **kwargs):
         params = get_keys(kwargs, 'namespace', 'name', 'pk')
-        params = {'changelog__' + key: value
-                  for key, value in params.items()}
-        discovered_versions = Version.objects.filter(**params).order_by('-discovered_at')
-        latest = list(discovered_versions[:1].values_list('discovered_at', flat=True))
-        if latest:
-            return latest[0]
+        changelog = Changelog.objects.get(**params)
+        discovered_versions = changelog.versions.order_by('-discovered_at')
+
+        # get time of last discovered version
+        times = list(discovered_versions[:1].values_list('discovered_at', flat=True))
+
+        if self.request.user.is_authenticated():
+            # and time of last created tag
+            # otherwise, when new tag was added,
+            # user won't see it on a page
+            tags = self.request.user.tags \
+                                    .filter(changelog=changelog) \
+                                    .order_by('-created_at')
+            last_tags_times = tags[:1].values_list('created_at', flat=True)
+            times.extend(last_tags_times)
+
+        if times:
+            return max(times)
 
     def get_context_data(self, **kwargs):
         result = super(ProjectView, self).get_context_data(**kwargs)
+        user = self.request.user
 
-        if self.request.user.is_superuser:
+        if user.is_superuser:
             result['show_issues'] = True
 
         params = get_keys(kwargs, 'namespace', 'name', 'pk')
@@ -484,20 +497,25 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
             **params)
 
         already_tracked = False
-        if self.request.user.is_authenticated():
+        if user.is_authenticated():
             login_to_track = False
-            already_tracked = self.request.user.does_track(changelog)
+            already_tracked = user.does_track(changelog)
 
             show_not_tuned_warning(self.request)
+
+            # fetch tags for versions which are in the database
+            # we will add them to the context later
+            tags = list(user.tags.filter(changelog=changelog).exclude(version=None))
         else:
             login_to_track = True
             already_tracked = False
+            tags = []
 
         key = 'project-view:{0}'.format(changelog.id)
         package_data = cache.get(key)
 
         if not package_data \
-           or self.request.user.is_superuser: # TODO: сделать чтобы кэш экспарился как надо
+           or user.is_superuser: # TODO: сделать чтобы кэш экспарился как надо
 
             package_data = get_package_data_for_template(
                 changelog,
@@ -507,6 +525,23 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
                 ordering=('-order_idx',),
                 show_unreleased=not self.request.GET.get('snap'))
             cache.set(key, package_data, HOUR)
+
+        # now enrich data with previosly fetched tags
+        # each tag has name and a link to all projects
+        # tagged with the same tag
+        versions_map = {v['id']: v for v in package_data['versions']}
+
+        for tag in tags:
+            tag_version = tag.version_id
+            if tag_version in versions_map:
+                version = versions_map[tag_version]
+                version.setdefault('tags', [])
+                version['tags'].append(
+                    dict(
+                        name=tag.name,
+                        uri=reverse('tagged-projects', name=tag.name),
+                    )
+                )
 
         result['package'] = package_data
         result['login_to_track'] = login_to_track

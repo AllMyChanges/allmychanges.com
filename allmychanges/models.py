@@ -1117,6 +1117,7 @@ class Tag(models.Model):
     # we have not any restrictions on the format of this field
     # this could be any string even something like 'latest'
     version_number = models.CharField(max_length=40)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('changelog', 'user', 'name')
