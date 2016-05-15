@@ -73,7 +73,7 @@
     {% if show_issues and issues.count %}
       <dt>Issues:</dt>
       <dd><a href="/issues/?namespace={{package.namespace|urlencode}}&amp;name={{package.name|urlencode}}">{{issues.count}}</a></dd>
-    {% endif %}
+      {% endif %}
       <dt>Versions:</dt>
       <dd>
 
@@ -81,7 +81,7 @@
 <div class="version-links-container">
   <ul class="version-links">
     {% for version in package.versions %}
-      <li class="version-links__item version-links__item-{{ version.number|replace_dots }}"><a href="#{{ version.number }}">{{ version.number }}</a></li>
+      <li class="version-links__item version-links__item-{{ version.number|replace_dots }}"><a href="#{{ version.number }}">{{ version.number }}{% if version.tags %} ({% for tag in version.tags %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</a></li>
     {% endfor %}
   </ul>
       <!-- START buttons -->

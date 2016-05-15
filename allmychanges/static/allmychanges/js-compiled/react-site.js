@@ -39024,7 +39024,7 @@
 
 	    $('.version-links__item a').click(function (ev) {
 	      ev.preventDefault();
-	      var version = $(this).text();
+	      var version = $(this).text().split(' ')[0];
 	      var section_top = $('[name="' + version + '"]').position().top;
 
 	      var top = section_top - (version_links_height + 20);
