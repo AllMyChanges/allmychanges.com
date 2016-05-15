@@ -1920,6 +1920,7 @@ class TaggedProjectsView(LoginRequiredMixin, CommonContextMixin, TemplateView):
 
         projects = []
         unknown = []
+        no_updates = []
 
         for tag in tags:
             changelog = tag.changelog
@@ -1939,6 +1940,8 @@ class TaggedProjectsView(LoginRequiredMixin, CommonContextMixin, TemplateView):
                 # probably, will add an option to show all
                 if count > 0:
                     projects.append(data)
+                else:
+                    no_updates.append(data)
             else:
                 unknown.append(data)
 
@@ -1946,6 +1949,7 @@ class TaggedProjectsView(LoginRequiredMixin, CommonContextMixin, TemplateView):
         context['name'] = kwargs['name']
         context['projects'] = projects
         context['unknown'] = unknown
+        context['no_updates'] = no_updates
 
         return context
 
