@@ -24,7 +24,7 @@
     "ramda": "^0.18.0",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
-    "react-mdl": "^0.15.0",
+    "react-mdl": "^1.5.4",
     "react-tabs": "git+https://github.com/svetlyak40wt/react-tabs.git",
     "stream-combiner2": "^1.1.1",
     "style-loader": "^0.12.4",

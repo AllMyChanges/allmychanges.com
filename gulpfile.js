@@ -47,7 +47,10 @@ gulp.task('webpack', function() {
 });
 
 gulp.task('css', function() {
-    return gulp.src('allmychanges/static/allmychanges/stylus/{allmychanges,email}.styl')
+    return gulp.src([
+        'allmychanges/static/allmychanges/stylus/{allmychanges,email}.styl',
+        'node_modules/react-mdl/extra/material.min.css'
+    ])
         .pipe(stylus())
         .pipe(gulp.dest("allmychanges/static/allmychanges/css/"));
 });

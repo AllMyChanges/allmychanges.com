@@ -61,7 +61,7 @@ class AccessDenied(APIException):
     default_detail = 'You are not allowed to perform this action'
 
 
-TAG_NAME_REGEX = ur'[a-z][a-z0-9-.]*[a-z0-9]'
+TAG_NAME_REGEX = ur'^[a-z][a-z0-9-.]{,38}[a-z0-9]$'
 TAG_NAME_ERROR_MESSAGES = dict(
     required='This field is required',
     invalid=('Tag names should correspond to this '
@@ -704,6 +704,10 @@ class TagViewSet(HandleExceptionMixin,
         if 'project_id' in self.request.GET:
             queryset = queryset.filter(
                 version__changelog__id=self.request.GET['project_id'])
+
+        if 'version_id' in self.request.GET:
+            queryset = queryset.filter(
+                version__id=self.request.GET['version_id'])
 
         return queryset
 

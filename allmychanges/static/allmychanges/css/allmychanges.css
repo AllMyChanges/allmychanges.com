@@ -1775,3 +1775,19 @@ body.email {
 .table__column-centered {
   text-align: center;
 }
+.material-icons.md-18 {
+  font-size: 18px;
+  line-height: 18px;
+}
+.mdl-button--fab.md-18 {
+  font-size: 18px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+}
+.mdl-button--fab.md-18 .material-icons {
+  font-size: 18px;
+  line-height: 18px;
+  width: 18px;
+  transform: translate(-9px, -9px);
+}

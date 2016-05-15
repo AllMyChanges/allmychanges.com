@@ -4,6 +4,7 @@ var LoginMenu = require('../components/login-menu.js')
 var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
+var TagButton = require('../components/tag-button')
 var TrackButton = require('../components/track-button.js')
 var SlackURL = require('../components/slack-url.js')
 var WebhookURL = require('../components/webhook-url.js')
@@ -67,6 +68,13 @@ module.exports = {
         $('.delete-button-container').each(function (idx, element) {
             React.render(
                 <DeleteButton version_id={element.dataset['versionId']}/>,
+                element);
+        });
+        $('.tag-button-container').each(function (idx, element) {
+            React.render(
+                <TagButton version_id={element.dataset['versionId']}
+                           version_number={element.dataset['versionNumber']}
+                           project_id={element.dataset['projectId']}/>,
                 element);
         });
         $('.slack-url-container').each(function (idx, element) {
