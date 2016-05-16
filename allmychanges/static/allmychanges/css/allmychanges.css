@@ -1015,6 +1015,9 @@ a:hover {
 .version-links-container .track-button__message {
   display: none;
 }
+.version-links-container__hidden {
+  display: none;
+}
 .version-links-container__sticky {
   box-sizing: border-box;
   width: 100%;
@@ -1041,6 +1044,9 @@ a:hover {
     padding-left: 95px;
     padding-right: 95px;
   }
+}
+.version-links-container__sticky .version-links-container__hidden {
+  display: block;
 }
 .version-links-container .version-links {
   list-style: none;
