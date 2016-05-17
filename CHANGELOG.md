@@ -1,7 +1,99 @@
 1.5.0 (unreleased)
 ==================
 
-## Major Changes
+## The Big Deal
+
+We are constantly working on improving AllMyChanges' usability.
+The one thing which was really missing in our service is ability
+to mark some versions as "used in that project". Services like
+VersionEye or Gemnasium bind everything to what they call
+"projects" – first you create a project then push it's requirements
+and track updates.
+
+But in AllMyChanges we went another way – we let you to track any
+release notes and to tag them as you wish. "Tag" can designate
+a project you are working on, an environment, or a hostname. In
+other words, "tag" is everything what is makes sence for you use cases.
+
+### What You Can Do With Tags
+
+First of all, tags are remainders which helps you to remember which version
+you are using. This also helps you to decide if you need to upgrade
+to a newer version.
+
+To make it more convenient, we've added two new pages. One shows
+[all tags you've created](https://allmychanges.com/account/tags/)
+and number of new versions in all release notes tagged by these
+tags. This page is useful to overview all you project or environments
+and see how outdated they are.
+
+Other page let you go deeper and investigate details about release
+notes, tagged by single tag. This way you will see this libraries
+are outdated and require more attention. And of cause, you can go deeper
+and dive into their release notes to check if you need to upgrade right
+now or there are some backward incompatibilities.
+
+### How To Tag Versions
+
+Project versions can be tagged in three ways:
+
+First and simpliest – on the web, by pushing "Tag" button besides
+version number in release notes.
+
+Second – using command line client `amch`. This is as easy as:
+
+```
+amch tag django 1.8.2 allmychanges.com
+```
+
+Here we tag `1.8.2` version of `django` with tag `allmychanges.com`.
+
+And finally, third and recommended way is to build automated
+syncronization process which uses `amch` command line tool to
+upload used versions and to tag them in batch mode.
+
+Command `amch` can be used to import data from csv format, which
+should look like that:
+
+```
+namespace,name,version,tag
+python,alabaster,0.7.7,allmychanges.com
+python,anyjson,0.3.3,allmychanges.com
+python,argparse,1.4.0,allmychanges.com
+python,args,0.1.0,allmychanges.com
+```
+
+To create such csv from Python's `requirements.txt` file, we've
+created a simple utility [pip2amch][], which can be used like that:
+
+```
+pip2amch --tag my-project requirements.txt | amch push
+```
+
+Here `pip2amch` will take a `requirements.txt` file and output
+to stdout csv data in a format required by `amch` command.
+Next, `amch` pushed data to the AllMyChanges and tags all versions,
+specified in input data.
+
+This way, you'll have these versions fixed in allmychanges. If you are
+working in other ecosystem, you can easily (or not, depending on your
+package manager) write your own requirements parser and use it instead
+of `pip2amch`. This is how AllMyChanges differs from Gemnasium and
+VersionEye – they parse requirements only for a limited number of platforms
+and make you deal only with projects having those requirements.
+
+### What now?
+
+As some API handles were changed, it is recommended to update `amch`
+command line client to the latest version. If you are a python developer
+install [pip2amch][] and automate requirements pushing to AllMyChanges,
+otherwise, write a tool, similar to `pip2amch` and again, automate :)
+
+Use tags to check is one of your working environments have outdated
+requirements or libraries.
+
+
+## Other Major Changes
 
 Now it is possible to add changelogs without name or source url, but
 their tuning should be finished before they will be crawled by robot.
@@ -26,10 +118,7 @@ not, it returns 401 HTTP status code.
   charset, and meta tag in html page with charset.
 * Fixed html to markdown processing. It shouldn't break long links now.
   This fixes some issues in Slack notifications where some links appeared broken.
-
-## Internal
-
-* Database migration required.
+* Sticky version plate was made more predictable. All known bugs were fixed.
 
 1.4.0 (2016-03-21)
 ==================
@@ -1248,3 +1337,4 @@ There are plenty directions for approvement. Stay tuned.
 [Kodi-parsed]: https://allmychanges.com/p/soft/Kodi/
 [FAR-original]: http://svn.code.sf.net/p/farmanager/code/trunk/unicode_far/changelog
 [FAR-parsed]: https://allmychanges.com/p/soft/FAR/
+[pip2amch]: https://github.com/AllMyChanges/pip2amch
