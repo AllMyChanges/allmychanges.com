@@ -240,7 +240,6 @@ def update_preview_or_changelog(obj, downloader=None, ignore_problem=False):
                     obj.set_processing_status('Updating database')
                     update_changelog_from_raw_data3(obj, versions)
                 else:
-                    print 'raising Update Error'
                     raise UpdateError('Changelog not found')
 
                 found = True
