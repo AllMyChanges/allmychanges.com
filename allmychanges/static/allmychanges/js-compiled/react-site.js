@@ -35661,7 +35661,7 @@
 	            content.push(React.createElement(
 	                'div',
 	                { className: 'guessed-sources' },
-	                'You can also try these urls as sources:',
+	                'You can try these urls as sources:',
 	                React.createElement(
 	                    'ul',
 	                    null,

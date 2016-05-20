@@ -519,7 +519,7 @@ module.exports = React.createClass({
             var guessed_sources = this.props.guessed_sources.map(make_source);
             content.push(
                     <div className="guessed-sources">
-                      You can also try these urls as sources:
+                      You can try these urls as sources:
                       <ul>{ guessed_sources }</ul>
                     </div>);
         }
