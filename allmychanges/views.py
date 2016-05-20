@@ -1074,8 +1074,6 @@ class AddNewView(ImmediateMixin, CommonContextMixin, TemplateView):
             if 'step3' in self.request.GET:
                 context['title'] = 'Step 3 of 3'
                 context['step3'] = True
-            else:
-                context['title'] = 'Add new'
         else:
             normalized_url, _, _ = normalize_url(url, for_checkout=False)
 
