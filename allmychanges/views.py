@@ -535,8 +535,8 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
             tag_version = tag.version_id
             if tag_version in versions_map:
                 version = versions_map[tag_version]
-                version.setdefault('tags', [])
-                version['tags'].append(
+                version.setdefault('user_tags', [])
+                version['user_tags'].append(
                     dict(
                         name=tag.name,
                         uri=reverse('tagged-projects', name=tag.name),
