@@ -450,6 +450,12 @@ class Changelog(Downloadable, models.Model):
                 return light_user in light_moderators
         return True
 
+    def is_unsuccessful(self):
+        return self.name is None or \
+               self.namespace is None or \
+               self.downloader is None or \
+               not self.source
+
     def is_moderator(self, user, light_user=None):
         light_moderators = set(self.light_moderators.values_list('light_user', flat=True))
         moderators = set(self.moderators.values_list('id', flat=True))
