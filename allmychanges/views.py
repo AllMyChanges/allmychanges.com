@@ -464,7 +464,7 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
 
     def last_modified(self, *args, **kwargs):
         params = get_keys(kwargs, 'namespace', 'name', 'pk')
-        changelog = Changelog.objects.get(**params)
+        changelog = get_object_or_404(Changelog, **params)
         discovered_versions = changelog.versions.order_by('-discovered_at')
 
         # get time of last discovered version
