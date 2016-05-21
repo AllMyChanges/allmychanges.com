@@ -317,9 +317,10 @@ def init_logging(filename, logstash=False):
 
     if logstash:
         add_emitters(('all-to-logstash',
-                     levels.DEBUG,
-                     lambda msg: not is_stats(msg),
-                     LogstashOutput('salmon.svetlyak.ru', 6543)))
+                      levels.DEBUG,
+                      lambda msg: not is_stats(msg),
+                      # candidus
+                      LogstashOutput('95.213.191.176', 6543)))
 
     add_emitters(('stats',
                  levels.DEBUG,
