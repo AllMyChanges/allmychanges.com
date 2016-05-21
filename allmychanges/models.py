@@ -977,16 +977,12 @@ class VersionManager(models.Manager):
     use_for_related_fields = True
 
     def create(self, *args, **kwargs):
-        obj = super(VersionManager, self).create(*args, **kwargs)
+        version = super(VersionManager, self).create(*args, **kwargs)
         changelog = kwargs.get('changelog')
 
         if changelog:
-            # associate free tags with this new version
-            number = kwargs['number']
-            for tag in changelog.tags.filter(version_number=number):
-                tag.version = obj
-                tag.save(update_fields=('version',))
-        return obj
+            version.associate_with_free_tags()
+        return version
 
     def released(self):
         return self.exclude(unreleased=True)
@@ -1100,6 +1096,12 @@ class Version(models.Model):
         """Convenience method to set tag on just this version.
         """
         self.changelog.set_tag(user, name, self.number)
+
+    def associate_with_free_tags(self):
+        # associate free tags with this version
+        for tag in self.changelog.tags.filter(version_number=self.number):
+            tag.version = self
+            tag.save(update_fields=('version',))
 
 
 class Tag(models.Model):

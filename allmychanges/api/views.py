@@ -495,6 +495,7 @@ class ChangelogViewSet(HandleExceptionMixin,
                     version.preview = None
                     version.changelog = self.object
                     version.save()
+                    version.associate_with_free_tags()
 
         result = self.object.add_to_moderators(self.request.user,
                                                self.request.light_user)
