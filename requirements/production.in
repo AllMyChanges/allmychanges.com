@@ -4,7 +4,7 @@ djangorestframework<3.0.0
 drf-extensions
 django-extensions
 django-debug-toolbar
-requests>=2.7.0,<2.8.0
+requests>=2.10.0,<2.11.0
 envoy
 graphitesend
 rq
