@@ -1,3 +1,10 @@
+1.5.1 (Unreleased)
+==================
+
+## Fixes
+
+* Now links to tagged project contains anchor name to open right tagged version.
+
 1.5.0 (2016-05-22)
 ==================
 
