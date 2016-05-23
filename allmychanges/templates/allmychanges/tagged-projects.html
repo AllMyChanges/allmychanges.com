@@ -8,7 +8,7 @@
     <h1 class="page-subheader">These projects have updates</h1>
     <ul class="tagged-projects-list">
       {% for project in projects %}
-        <li><a href="{% url 'project-by-id' pk=project.id %}">{{ project.name }}</a> – you've tagged {{ project.version_number }} {% if project.fresh_versions_count %}{% blocktrans count counter=project.fresh_versions_count %} and there is {{ counter }} newer version{% plural %} and there are {{ counter }} newer versions{% endblocktrans %}{% else %}and it is latest version{% endif %}.</li>
+        <li><a href="{% url 'project-by-id' pk=project.id %}#{{ name }}">{{ project.name }}</a> – you've tagged {{ project.version_number }} {% if project.fresh_versions_count %}{% blocktrans count counter=project.fresh_versions_count %} and there is {{ counter }} newer version{% plural %} and there are {{ counter }} newer versions{% endblocktrans %}{% else %}and it is latest version{% endif %}.</li>
       {% endfor %}
     </ul>
   {% endif %}
@@ -17,7 +17,7 @@
     <h1 class="page-subheader">These projects are up to date</h1>
     <ul class="tagged-projects-list">
       {% for project in no_updates %}
-        <li><a href="{% url 'project-by-id' pk=project.id %}">{{ project.name }}</a> – you've tagged {{ project.version_number }}.</li>
+        <li><a href="{% url 'project-by-id' pk=project.id %}#{{ name }}">{{ project.name }}</a> – you've tagged {{ project.version_number }}.</li>
       {% endfor %}
     </ul>
   {% endif %}
@@ -26,7 +26,7 @@
     <h1 class="page-subheader">For these we didn't have versions in our DB</h1>
     <ul class="tagged-projects-list">
       {% for project in unknown %}
-        <li><a href="{% url 'project-by-id' pk=project.id %}">{{ project.name }}</a> – you've tagged {{ project.version_number }}.</li>
+        <li><a href="{% url 'project-by-id' pk=project.id %}#{{ name }}">{{ project.name }}</a> – you've tagged {{ project.version_number }}.</li>
       {% endfor %}
     </ul>
   {% endif %}
