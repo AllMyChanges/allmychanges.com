@@ -53,7 +53,7 @@ module.exports = React.createClass({
                    comment: comment},
             success: function(data) {
                 this.setState({show_popup: false});
-                PubSub.publish('show-info', 'Thank you for reporing about the issue. We\'ll fix it as soon as possible.');
+                PubSub.publish('show-info', 'Thank you for reporting about the issue. We\'ll fix it as soon as possible.');
             }.bind(this),
             error: function(xhr, status, err) {
                 console.error(this.props.url, status, err.toString());
