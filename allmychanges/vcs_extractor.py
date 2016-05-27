@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import anyjson
 import envoy
 import os
@@ -7,6 +9,7 @@ import sys
 import itertools
 import string
 import operator
+
 
 from collections import defaultdict
 from orderedset import OrderedSet
@@ -192,7 +195,7 @@ def python_version_extractor_worker(path, queue):
 
                 sys.modules['distutils.core'] = FakeSetuptools()
                 sys.modules['setuptools'] = FakeSetuptools()
-                sys.path.insert(0, path)
+                sys.path.insert(0, os.getcwd())
 
                 try:
                     from setup import setup
@@ -522,16 +525,66 @@ def extract_changelog_from_vcs(path):
     return results
 
 
-import operator
 from collections import deque
+
+
+
+def iterate_over_commits(tree, start_hash, upto=None):
+    """Returns iterable over all hashes in the tree,
+    starting from `start_hash` and up to `upto`.
+
+    When merge commit encountered, algorithm first iterates
+    the left branch until a fork point, then right branch
+    until a fork point, and continues from the fork point.
+
+    Notice! This algorithm does not work with tries where
+    more than 2 branches are merged in 1 point.
+    """
+
+    current_hash = start_hash
+    while current_hash and current_hash != upto:
+        yield current_hash
+        item = tree[current_hash]
+        parents = item['parents']
+        num_parents = len(parents)
+
+        if num_parents > 1:
+            fork_point = find_fork_point(tree, *parents)
+
+            # yield both branches
+            for parent in parents:
+                for commit in iterate_over_commits(
+                        tree,
+                        parent,
+                        upto=fork_point):
+                    yield commit
+
+            # then jump to fork point
+            current_hash = fork_point
+        elif num_parents == 1:
+            current_hash = parents[0]
+        else:
+            current_hash = None
+
+
+def find_fork_point(tree, left, right):
+    """Returns a single parent commit common for two branches
+    designated by `left` and `right` hashes.
+    """
+
+    left_ancestors = set(iterate_over_commits(tree, left))
+    for hash in iterate_over_commits(tree, right):
+        if hash in left_ancestors:
+            return hash
+
 
 def mark_version_bumps(tree):
     bumps = []
     queue = deque()
     processed = set()
-    commit = tree['root']
 
     def add_bump(hash, version, date):
+#        print 'add', hash[:7], version
         found = None
         for idx, bump in enumerate(bumps):
             if bump[1] == version:
@@ -544,9 +597,23 @@ def mark_version_bumps(tree):
         else:
             bumps.append((hash, version, commit['date']))
 
+    queue.extend(
+        map(
+            tree.get,
+            iterate_over_commits(
+                tree,
+                tree['root']['hash']
+            )
+        )
+    )
+
+    commit = queue.popleft()
+
     while commit:
         hash = commit['hash']
+
         if hash not in processed:
+#            print hash[:7]
             stop_at_hash_if_needed(hash)
 
             version = commit['version']
@@ -554,11 +621,13 @@ def mark_version_bumps(tree):
                 parents = map(tree.get, commit['parents'])
                 # if history was limited, then some parents could be unavailable
                 parents = filter(None, parents)
+
+                # if all parents have different version, then
+                # this version was incremented in this commit
                 if not any(map(lambda parent: parent['version'] == version,
                    parents)):
                     add_bump(hash, version, commit['date'])
 
-                queue.extend(parents)
             processed.add(hash)
         try:
             commit = queue.popleft()

@@ -64,10 +64,33 @@ class Command(LogMixin, BaseCommand):
         if options['bumps']:
             bumps = mark_version_bumps(commits)
             for bump in bumps:
-                print bump, commits[bump]['version']
+                print bump[:7], commits[bump]['version']
 
             print 'Num commits:', len(commits) - 1
             print 'Num version extractions:', num_extractions[0]
         else:
-            for commit in commits.values():
-                print commit['hash'], commit['version']
+            printed = set()
+            bumps = mark_version_bumps(commits)
+
+            def print_(commit):
+                h = commit['hash']
+                if h not in printed:
+                    for parent in commit['parents']:
+                        print_(commits[parent])
+
+                    print h[:7], commit['version'],
+
+                    if h in bumps:
+                        print '[bump]',
+
+                    print commit['message'].split('\n')[0][:30].encode('utf-8')
+
+                    printed.add(h)
+
+
+            print_(commits['root'])
+
+            # while commit:
+            #     commit = commit['parent']
+            # for commit in commits.values():
+            #     print commit['hash'], commit['version']

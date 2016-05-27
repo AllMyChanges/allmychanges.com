@@ -1,16 +1,16 @@
 # coding: utf-8
 import datetime
-import re
 
 from nose.tools import eq_
 from asserts import sparse_check
-from allmychanges.env import Environment
 from allmychanges.parsing.pipeline import vcs_processing_pipe
 from allmychanges.vcs_extractor import (
     mark_version_bumps,
     process_vcs_message,
     _normalize_version_numbers2,
     write_vcs_versions_bin_helper,
+    iterate_over_commits,
+    find_fork_point,
     group_versions)
 
 
@@ -132,6 +132,150 @@ def test_mark_version_bumps_when_there_are_gaps():
     _normalize_version_numbers2(tree)
     bumps = mark_version_bumps(tree)
     eq_(['2'], bumps)
+
+
+def test_iterate_over_commits():
+    # Here we use such tree
+    # * 7 (2)
+    # |\
+    # | * 6 (1)
+    # * | 5 (2)
+    # * | 4 (2)
+    # * | 3 (2)
+    # |/
+    # * 2 (1)
+    # * 1 (None)
+
+    tree = _build_tree(
+        tree={
+            '7': {'version': '2',  'parents': ['5', '6']},
+            '6': {'version': '1',  'parents': ['2']},
+            '5': {'version': '2',  'parents': ['4']},
+            '4': {'version': '2',  'parents': ['3']},
+            '3': {'version': '2',  'parents': ['2']},
+            '2': {'version': '1',  'parents': ['1']},
+            '1': {'version': None, 'parents': []},
+        },
+        root='7',
+    )
+    result = list(iterate_over_commits(tree, '5'))
+    eq_(['5', '4', '3', '2', '1'], result)
+
+    result = list(iterate_over_commits(tree, '6'))
+    eq_(['6', '2', '1'], result)
+
+    # check `upto` parameter
+    result = list(iterate_over_commits(tree, '5', upto='2'))
+    eq_(['5', '4', '3'], result)
+
+    # check how merge commits are iterated
+    result = list(iterate_over_commits(tree, '7'))
+    eq_(['7', '5', '4', '3', '6', '2', '1'], result)
+
+
+def test_find_fork_point():
+    # Here we use such tree
+    # * 9
+    # |\
+    # | * 8
+    # * | 7
+    # * | 6
+    # * | 5
+    # |/
+    # * 4
+    # |\
+    # | * 3
+    # |/
+    # * 2
+    # * 1
+
+    tree = _build_tree(
+        tree={
+            '9': {'version': '1', 'parents': ['7', '8']},
+            '8': {'version': '1', 'parents': ['4']},
+            '7': {'version': '1', 'parents': ['6']},
+            '6': {'version': '1', 'parents': ['5']},
+            '5': {'version': '1', 'parents': ['4']},
+            '4': {'version': '1', 'parents': ['2', '3']},
+            '3': {'version': '1', 'parents': ['2']},
+            '2': {'version': '1', 'parents': ['1']},
+            '1': {'version': '1', 'parents': []},
+        },
+        root='9',
+    )
+    # this should not break because there are other merge
+    # commits below '4' hash
+    eq_('4', find_fork_point(tree, '6', '8'))
+
+
+def test_mark_version_bumps_outputs_bumps_in_right_order():
+    # По мотивам разбирательства с обработкой python/imagesize.
+
+    # Проблема с отсутствием 0.7.0 заключается в том, что bumps
+    # формируются не в том порядке:
+
+    # 1 0354c84 0.5.0
+    # 2 151e458 0.6.0
+    # 4 8bb3a11 0.7.1
+    # 3 cd9c06a 0.7.0
+
+    # А должно быть так:
+    # 1 0354c84 0.5.0
+    # 2 151e458 0.6.0
+    # 3 cd9c06a 0.7.0
+    # 4 8bb3a11 0.7.1
+
+    #  *   68319d5 - Merge pull request #1 from xantares/py2a3 (5 weeks ago) <Yoshiki Shibukawa>
+    #  |\
+    #  | * 9be8ec8 - Use the same code for Python 2/3 (8 weeks ago) <Michel Zou>
+    #  * | c073040 - add build status badge (5 weeks ago) <Yoshiki Shibukawa>
+    #  * | 9ee206e - update readme (5 weeks ago) <Yoshiki Shibukawa>
+    # 4* | 8bb3a11 - (0.7.1) update travis setting to add Python3.3 (5 weeks ago) <Yoshiki Shibukawa>
+    #  * | 0750993 - add jpeg2000 test data (5 weeks ago) <Yoshiki Shibukawa>
+    #  * | ce4de68 - add travis setting (5 weeks ago) <Yoshiki Shibukawa>
+    #  |/
+    # 3* cd9c06a - (0.7.0) catch struct.error (4 months ago) <Yoshiki Shibukawa>
+    # 2* 151e458 - (0.6.0) remove fallback feature to PIL, add JPEG2000 support (4 months ago) <Yoshiki Shibukawa>
+    #  * efdd3d3 - fix README (4 months ago) <Yoshiki Shibukawa>
+    # 1* 0354c84 - (0.5.0) first version (4 months ago) <Yoshiki Shibukawa>
+
+    # Версии тут проставлены так, как они менялись в setup.py,
+    # что немного не соответствует тегам в гите, так как 0.7.1 тег поставлен на
+    # коммит 68319d5. Но это никак не влияет на суть.
+
+    # Неправильный порядок происходит из-за того, что обе ветки обрабатываются по
+    # одному коммиту за раз из каждой. Но из-за того, что коммитов в них разное
+    # количество, то по более короткой ветке алгоритм быстро доходит
+    # до коммита cd9c06a и считает, что нашел версию 0.7.0 ещё до того, как
+    # добрался до коммита 8bb3a11, и нашел перход на 0.7.1.
+
+    # Поэтому для теста мы построим такую структуру:
+
+    # * 7 (2)
+    # |\
+    # | * 6 (1)
+    # * | 5 (2)
+    # * | 4 (2)
+    # * | 3 (2)
+    # |/
+    # * 2 (1)
+    # * 1 (None)
+
+    tree = _build_tree(
+        tree={
+            '7': {'version': '2',  'parents': ['5', '6']},
+            '6': {'version': '1',  'parents': ['2']},
+            '5': {'version': '2',  'parents': ['4']},
+            '4': {'version': '2',  'parents': ['3']},
+            '3': {'version': '2',  'parents': ['2']},
+            '2': {'version': '1',  'parents': ['1']},
+            '1': {'version': None, 'parents': []},
+        },
+        root='7',
+    )
+    _add_dates(tree)
+    bumps = mark_version_bumps(tree)
+    eq_(['2', '3'], bumps)
 
 
 def test_group_versions():

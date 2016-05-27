@@ -1,6 +1,11 @@
 1.5.1 (Unreleased)
 ==================
 
+## Major Imporvements
+
+Algorithm for collecting release notes from Git's commit messages was
+fixed and improved. Previously it produced wrong results in some circumstances.
+
 ## Fixes
 
 * Now links to tagged project contains anchor name to open right tagged version.
