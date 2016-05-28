@@ -278,6 +278,43 @@ def test_mark_version_bumps_outputs_bumps_in_right_order():
     eq_(['2', '3'], bumps)
 
 
+def test_mark_version_bumps_can_use_tagged_versions():
+    # Проверяем, что mark_version_bumps может принимать
+    # tagged_versions и они обладают преимуществом
+
+    # Для теста мы построим такую структуру:
+
+    # * 7 (2)
+    # |\
+    # | * 6 (1)
+    # * | 5 (2)
+    # * | 4 (2)
+    # * | 3 (2)
+    # |/
+    # * 2 (1)
+    # * 1 (None)
+
+    tree = _build_tree(
+        tree={
+            '7': {'version': '2',  'parents': ['5', '6']},
+            '6': {'version': '1',  'parents': ['2']},
+            '5': {'version': '2',  'parents': ['4']},
+            '4': {'version': '2',  'parents': ['3']},
+            '3': {'version': '2',  'parents': ['2']},
+            '2': {'version': '1',  'parents': ['1']},
+            '1': {'version': None, 'parents': []},
+        },
+        root='7',
+    )
+    _add_dates(tree)
+    tagged_versions = {
+        '5': '2',
+        '7': '3'
+    }
+    bumps = mark_version_bumps(tree, tagged_versions)
+    eq_(['2', '5', '7'], bumps)
+
+
 def test_group_versions():
     tree = _build_tree()
     bumps = ['2', '4', '8']

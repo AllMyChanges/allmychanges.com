@@ -9,13 +9,14 @@ import sys
 import itertools
 import string
 import operator
+import datetime
 
-
-from collections import defaultdict
+from collections import defaultdict, deque
 from orderedset import OrderedSet
 from allmychanges.utils import cd, trace
 from allmychanges.crawler import _extract_date, _extract_version, RE_BUMP_LINE
 from django.utils.encoding import force_str
+
 
 from twiggy_goodies.threading import log
 
@@ -132,7 +133,7 @@ def git_history_extractor(path, limit=None):
                 if key.startswith(hh):
                     return value
 
-        return result
+        return result, tagged_versions
 
 
 def choose_history_extractor(path):
@@ -150,7 +151,8 @@ def choose_history_extractor(path):
             # commit history instead of pointing to a separate
             # object
             commits['root'] = commits[commits['root']['hash']]
-            return commits
+            tagged_versions = {}
+            return commits, tagged_versions
         return test_history_extractor
 
     return git_history_extractor
@@ -461,7 +463,7 @@ def get_versions_from_vcs(env):
     path = env.dirname
 
     get_history = choose_history_extractor(path)
-    commits = get_history(path)
+    commits, tagged_versions = get_history(path)
 
     # we only go through the history
     # if version extractor is available for this repository
@@ -480,7 +482,7 @@ def get_versions_from_vcs(env):
                        if 'version' in commit)
 
     if has_versions:
-        bumps = mark_version_bumps(commits)
+        bumps = mark_version_bumps(commits, tagged_versions)
         grouped = group_versions(commits, bumps)
         for version in grouped:
             yield env.push(type='almost_version',
@@ -490,42 +492,6 @@ def get_versions_from_vcs(env):
                             date=None if version.get('unreleased') else version['date'],
                             unreleased=version.get('unreleased', False),
                             content=messages_to_html(version['messages']))
-
-
-
-def extract_changelog_from_vcs(path):
-    walk_through_history = choose_history_extractor(path)
-    extract_version = choose_version_extractor(path)
-    current_version = None
-    current_commits = []
-    results = []
-
-    for date, message in walk_through_history(path):
-        version = extract_version(path)
-
-        if message:
-            current_commits.append(message)
-
-        if version != current_version and version is not None:
-            current_version = version
-            results.append({'version': current_version,
-                            'date': date,
-                            'sections': [{'items': current_commits}]})
-            current_commits = []
-
-    if current_commits:
-        results.append({'version': 'x.x.x',
-                        'unreleased': True,
-                        'date': date,
-                        'sections': [{'items': current_commits}]})
-
-    if len(results) < 2:
-        return []
-
-    return results
-
-
-from collections import deque
 
 
 
@@ -578,10 +544,18 @@ def find_fork_point(tree, left, right):
             return hash
 
 
-def mark_version_bumps(tree):
+def mark_version_bumps(tree, tagged_versions=None):
+    """Returns hashes where version was incremented.
+
+    If tagged_versions given, it should be a dict
+    {hash -> version}. In this case, hashes for this
+    dict will be considered as increments to versions
+    from this dict.
+    """
     bumps = []
     queue = deque()
     processed = set()
+    tagged_versions = tagged_versions or {}
 
     def add_bump(hash, version, date):
 #        print 'add', hash[:7], version
@@ -593,9 +567,9 @@ def mark_version_bumps(tree):
         if found is not None:
             if bumps[found][2] > date:
                 del bumps[idx]
-                bumps.append((hash, version, commit['date']))
+                bumps.append((hash, version, date))
         else:
-            bumps.append((hash, version, commit['date']))
+            bumps.append((hash, version, date))
 
     queue.extend(
         map(
@@ -624,7 +598,14 @@ def mark_version_bumps(tree):
 
                 # if all parents have different version, then
                 # this version was incremented in this commit
-                if not any(map(lambda parent: parent['version'] == version,
+                if hash in tagged_versions:
+                    version = tagged_versions[hash]
+                    # we use 1970-01-01 to make tagged version have
+                    # advantage over versions guessed using other ways
+                    dt = datetime.date(1970, 01, 01)
+                    add_bump(hash, version, dt)
+
+                elif not any(map(lambda parent: parent['version'] == version,
                    parents)):
                     add_bump(hash, version, commit['date'])
 
