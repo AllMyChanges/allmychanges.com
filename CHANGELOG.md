@@ -1,4 +1,4 @@
-1.5.1 (Unreleased)
+1.5.1 (2016-05-29)
 ==================
 
 ## Major Imporvements
