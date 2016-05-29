@@ -51,6 +51,7 @@ from .views import (OldIndexView,
                     ProjectIssuesView,
                     ProjectView,
                     DeleteProjectView,
+                    PingView,
                     EditProjectView)
 from .sitemaps import PackagesSitemap
 from django.shortcuts import redirect
@@ -62,6 +63,7 @@ sitemaps = {'packages': PackagesSitemap}
 urlpatterns = patterns(
     '',
     url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^ping/$', PingView.as_view(), name='ping'),
     url(r'^sitemap\.xml$',
          'django.contrib.sitemaps.views.sitemap',
          {'sitemaps': sitemaps}),

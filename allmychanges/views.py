@@ -2081,3 +2081,8 @@ class TestWebhookView(View):
             request.GET['url'],
             version)
         return HttpResponse('OK')
+
+
+class PingView(View):
+    def get(self, request, **kwargs):
+        return HttpResponse('OK')
