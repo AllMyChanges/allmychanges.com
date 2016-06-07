@@ -16,6 +16,7 @@ information:
 
     {"namespace": "common-lisp",
      "name": "sbcl",
+     "user_tags": [{"name": "some-environment", "version": "1.2.3"}],
      "versions": [
        {"released_at": null,
         "content": "<ul><li>minor incompatible change and ...",
