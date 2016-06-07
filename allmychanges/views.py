@@ -249,6 +249,25 @@ def get_package_data_for_template(changelog,
     return result
 
 
+def add_user_tags_to_versions(versions, tags):
+    # now enrich data with previosly fetched tags
+    # each tag has name and a link to all projects
+    # tagged with the same tag
+    versions_map = {v['id']: v for v in versions}
+
+    for tag in tags:
+        tag_version = tag.version_id
+        if tag_version in versions_map:
+            version = versions_map[tag_version]
+            version.setdefault('user_tags', [])
+            version['user_tags'].append(
+                dict(
+                    name=tag.name,
+                    uri=reverse('tagged-projects', name=tag.name),
+                )
+            )
+
+
 def get_digest_for(changelogs,
                    before_date=None,
                    after_date=None,
@@ -529,19 +548,7 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         # now enrich data with previosly fetched tags
         # each tag has name and a link to all projects
         # tagged with the same tag
-        versions_map = {v['id']: v for v in package_data['versions']}
-
-        for tag in tags:
-            tag_version = tag.version_id
-            if tag_version in versions_map:
-                version = versions_map[tag_version]
-                version.setdefault('user_tags', [])
-                version['user_tags'].append(
-                    dict(
-                        name=tag.name,
-                        uri=reverse('tagged-projects', name=tag.name),
-                    )
-                )
+        add_user_tags_to_versions(package_data['versions'], tags)
 
         result['package'] = package_data
         result['login_to_track'] = login_to_track

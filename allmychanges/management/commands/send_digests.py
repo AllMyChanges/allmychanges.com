@@ -11,7 +11,9 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse
 
 from allmychanges.models import UserHistoryLog
-from allmychanges.views import get_digest_for
+from allmychanges.views import (
+    get_digest_for,
+    add_user_tags_to_versions)
 from allmychanges.utils import dt_in_window
 from allmychanges.notifications.email import send_email
 
@@ -27,19 +29,38 @@ def send_digest_to(user, period='day'):
                                    after_date=period_ago)
 
     if today_changes:
+        print 'Sending digest to {0} {1}'.format(user.username, user.email)
+
         # if True, then this digest includes only our own changelog
         # and we don't need to send a copy to me
         only_allmychanges = (len(today_changes) == 1
                              and today_changes[0]['name'] == 'allmychanges')
 
-        print 'Sending digest to {0} {1}'.format(user.username, user.email)
+        from operator import attrgetter
+        from itertools import groupby
+
+        changelog_ids = map(lambda ch: ch['changelog']['obj'].id, today_changes)
+        tags = list(user.tags.filter(changelog_id__in=changelog_ids))
+        get_changelog_id = attrgetter('changelog_id')
+        tags.sort(key=get_changelog_id)
+        tags = groupby(tags, key=get_changelog_id)
+        # make a map to show all tags
+        # for each changelog
+        tags = {key: list(values)
+                for key, values in tags}
+
         UserHistoryLog.write(user, '',
                              'digest-sent',
                              'We send user an email with digest')
 
-        for package in today_changes:
-            print '\t{namespace}/{name}'.format(**package)
-            for version in package['versions']:
+        for project in today_changes:
+            # inject user tags into the datastructure
+            changelog_id = project['changelog']['obj'].id
+            project['user_tags'] = tags.get(changelog_id, [])
+
+            # output their names to make cron send email what it sent to users
+            print '\t{namespace}/{name}'.format(**project)
+            for version in project['versions']:
                 print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
                     **version)
 

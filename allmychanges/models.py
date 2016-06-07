@@ -674,6 +674,10 @@ class Changelog(Downloadable, models.Model):
         If tag was updated, returns 'updated'
         otherwise, returns 'created'
         """
+        assert isinstance(version_number, basestring), \
+            'Parameter "version_number" should be a string, not "{0}"'.format(
+                type(version_number))
+
         params = dict(user=user, name=name)
 
         existing_tag = self.tags.filter(
@@ -1129,6 +1133,11 @@ class Tag(models.Model):
 
     class Meta:
         unique_together = ('changelog', 'user', 'name')
+
+    def get_absolute_url(self):
+        # the name shouldn't contain any unicode or nonascii letters nor spaces
+        # otherwise, we need to encode tu utf-8 and quote_plus it.
+        return self.changelog.get_absolute_url() + '#' + self.name
 
 
 class FeedItem(models.Model):

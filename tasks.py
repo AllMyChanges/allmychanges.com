@@ -286,7 +286,14 @@ def test(case='', failed=False, verbose=False):
         if locals().get(name):
             command.append('--' + name)
 
-    command.append(case)
+    if case:
+        if ':' not in case:
+            # replace last dot to make nosetests happy
+            # and allow just copy&paste test names from
+            # stdout
+            case = ':'.join(case.rsplit('.', 1))
+
+        command.append(case)
 
     run(_get_docker_command('tests.command.allmychanges.com') +
         ' '.join(command))

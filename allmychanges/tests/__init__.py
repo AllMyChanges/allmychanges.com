@@ -22,3 +22,4 @@ from .synonyms import *
 from .update_changelog import *
 from .digest import *
 from .slack import *
+from .email import *

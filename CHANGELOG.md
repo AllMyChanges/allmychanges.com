@@ -1,3 +1,10 @@
+1.6.0 (2016-06-07)
+==================
+
+## Improvements
+
+Now user tags are shown in the email digests.
+
 1.5.1 (2016-05-29)
 ==================
 
