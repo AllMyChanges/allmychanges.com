@@ -26,18 +26,28 @@ def test_email_with_changes_contains_tags():
     version = changelog.versions.all()[0]
     tag = 'blah-minor'
     changelog.set_tag(art, tag, version.number)
+    another_tag = 'foo'
     unknown_number = 'custom'
-    changelog.set_tag(art, tag, unknown_number)
+    changelog.set_tag(art, another_tag, unknown_number)
 
     with patch('allmychanges.notifications.email._send_email') as send_email:
         send_digest_to(art, period=7)
         # we send two emails one - to user and one to my email.
         eq_(2, send_email.call_count)
         body = send_email.call_args[0][0]
+
         tag_mention = (
-            ur'Tags: '
-            ur'<a href="https://allmychanges.com'
-            ur'/p/python/pip/#{0}"[^>]*>{0} (</a>'.format(
-            tag)
+            (
+                ur'Tags: '
+                ur'<a href="https://allmychanges.com'
+                ur'/p/python/pip/#{0}"[^>]*>{0} \({1}\)</a>, '
+                ur'<a href="https://allmychanges.com'
+                ur'/p/python/pip/#{2}"[^>]*>{2} \({3}\)</a>'
+            ).format(
+                tag,
+                version.number,
+                another_tag,
+                unknown_number,
+            )
         )
         assert re.search(tag_mention, body) is not None

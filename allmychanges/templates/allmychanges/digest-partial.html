@@ -12,7 +12,7 @@
     {% url 'project' namespace=package.namespace name=package.name as project_url %}
     <li class="package-changes">
       <h3 class="package-changes__package-title"><a href="{{ project_url }}">{{package.namespace}}/{{package.name}}</a></h3>
-      <h3 class="package-changes__tags">Tags: {% if package.user_tags %}{% for tag in package.user_tags %}<a href="{{ tag.get_absolute_url }}">{{ tag.name }}{% if not forloop.last %}}, {% endif %}{% endfor %}{% else %}<a href="{{ project_url }}?add-tags">add some now!</a>{% endif %}</h3>
+      <h3 class="package-changes__tags">Tags: {% if package.user_tags %}{% for tag in package.user_tags %}<a href="{{ tag.get_absolute_url }}">{{ tag.name }} ({{ tag.version_number }})</a>{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}<a href="{{ project_url }}?add-tags">add some now!</a>{% endif %}</h3>
       <ul class="package-changes__version">
         {% include "allmychanges/blocks/package-changes.html" %}
       </ul>
