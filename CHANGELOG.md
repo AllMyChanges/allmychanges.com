@@ -3,7 +3,7 @@
 
 ## Improvements
 
-Now user tags are shown in the email digests.
+Now user tags are shown in the email digests and Slack notifications.
 
 1.5.1 (2016-05-29)
 ==================

@@ -275,6 +275,7 @@ def notify_users_about_new_versions(changelog_id, version_ids):
                 if tracker.slack_url:
                     try:
                         slack.notify_about_version(
+                            user=tracker,
                             url=tracker.slack_url,
                             version=version,
                             changelog=changelog)

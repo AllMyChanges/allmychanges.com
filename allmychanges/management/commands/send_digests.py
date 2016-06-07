@@ -11,9 +11,7 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse
 
 from allmychanges.models import UserHistoryLog
-from allmychanges.views import (
-    get_digest_for,
-    add_user_tags_to_versions)
+from allmychanges.views import get_digest_for
 from allmychanges.utils import dt_in_window
 from allmychanges.notifications.email import send_email
 

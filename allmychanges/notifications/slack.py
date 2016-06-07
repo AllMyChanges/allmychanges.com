@@ -34,10 +34,19 @@ def convert_md_images(text):
         text)
 
 
-def notify_about_version(url,
-                         version,
-                         changelog=None,
-                         subject=u'New Version Released'):
+def format_tag_for_slack(tag):
+    return '<{0}|{1} ({2})>'.format(
+        tag.get_absolute_url(),
+        tag.name,
+        tag.version)
+
+
+def notify_about_version(
+        user,
+        url,
+        version,
+        changelog=None,
+        subject=u'New Version Released'):
     markdown_text = html2md(version.processed_text)
 
     text = re.sub(ur'^  \* ', ur'- ', markdown_text, flags=re.MULTILINE)
@@ -52,6 +61,12 @@ def notify_about_version(url,
 
     version_url = settings.BASE_URL + version.get_absolute_url()
     project_url = settings.BASE_URL + changelog.get_absolute_url()
+    user_tags = list(user.tags.filter(changelog=changelog))
+    if user_tags:
+        formatted_tags = u', '.join(map(format_tag_for_slack, user_tags)),
+    else:
+        formatted_tags = u'<{0}|add some tags!>'.format(
+            project_url + '?add-tags')
 
 # These comments are for debug
 # and can be removed when I decide what to do with images
@@ -88,6 +103,9 @@ def notify_about_version(url,
                  short=True),
             dict(title='Version',
                  value=u'<{0}|{1}>'.format(version_url, version.number),
+                 short=True),
+            dict(title='Tags',
+                 value=formatted_tags,
                  short=True),
         ]
     )

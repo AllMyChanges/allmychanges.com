@@ -2074,8 +2074,9 @@ class TestSlackView(View):
     def post(self, request, **kwargs):
         version = _get_test_version(request.user)
         slack.notify_about_version(
-            request.GET['url'],
-            version,
+            user=request.user,
+            url=request.GET['url'],
+            version=version,
             subject=u'This is the test of slack integration',
         )
         return HttpResponse('OK')
