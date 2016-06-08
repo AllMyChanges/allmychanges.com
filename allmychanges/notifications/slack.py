@@ -36,9 +36,9 @@ def convert_md_images(text):
 
 def format_tag_for_slack(tag):
     return '<{0}|{1} ({2})>'.format(
-        tag.get_absolute_url(),
+        settings.BASE_URL + tag.get_absolute_url(),
         tag.name,
-        tag.version)
+        tag.version_number)
 
 
 def notify_about_version(
@@ -63,7 +63,7 @@ def notify_about_version(
     project_url = settings.BASE_URL + changelog.get_absolute_url()
     user_tags = list(user.tags.filter(changelog=changelog))
     if user_tags:
-        formatted_tags = u', '.join(map(format_tag_for_slack, user_tags)),
+        formatted_tags = u', '.join(map(format_tag_for_slack, user_tags))
     else:
         formatted_tags = u'<{0}|add some tags!>'.format(
             project_url + '?add-tags')
