@@ -2,6 +2,9 @@
 import times
 import logging
 
+from operator import attrgetter
+from itertools import groupby
+
 from django.core.management.base import BaseCommand
 from twiggy_goodies.django import LogMixin
 
@@ -20,21 +23,36 @@ def send_digest_to(user, period='day'):
     today_changes = get_digest_for(user)
 
     if today_changes:
-        # if True, then this digest includes only our own changelog
-        # and we don't need to send a copy to me
-        only_allmychanges = (len(today_changes) == 1
-                             and today_changes[0]['name'] == 'allmychanges')
-
         print 'Sending digest to {0} {1}'.format(user.username, user.email)
         UserHistoryLog.write(user, '',
                              'digest-sent',
                              'We send user an email with digest')
 
-        for package in today_changes:
-            print '\t{namespace}/{name}'.format(**package)
-            for version in package['versions']:
+        changelog_ids = map(lambda ch: ch['changelog']['obj'].id, today_changes)
+        tags = list(user.tags.filter(changelog_id__in=changelog_ids))
+        get_changelog_id = attrgetter('changelog_id')
+        tags.sort(key=get_changelog_id)
+        tags = groupby(tags, key=get_changelog_id)
+        # make a map to show all tags
+        # for each changelog
+        tags = {key: list(values)
+                for key, values in tags}
+
+        for project in today_changes:
+            # inject user tags into the datastructure
+            changelog_id = project['changelog']['obj'].id
+            project['user_tags'] = tags.get(changelog_id, [])
+
+            # output their names to make cron send email what it sent to users
+            print '\t{namespace}/{name}'.format(**project)
+            for version in project['versions']:
                 print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
                     **version)
+
+        # if True, then this digest includes only our own changelog
+        # and we don't need to send a copy to me
+        only_allmychanges = (len(today_changes) == 1
+                             and today_changes[0]['name'] == 'allmychanges')
 
         def send_to(email):
             if user.username != 'svetlyak40wt' \

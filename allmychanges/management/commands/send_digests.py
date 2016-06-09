@@ -16,6 +16,11 @@ from allmychanges.utils import dt_in_window
 from allmychanges.notifications.email import send_email
 
 
+########################################################
+# WARNING!
+# This file is deprecated and shouldn't be used anymore!
+########################################################
+
 
 def send_digest_to(user, period='day'):
     now = timezone.now()
