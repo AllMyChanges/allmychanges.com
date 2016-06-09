@@ -28,6 +28,7 @@ from allmychanges.utils import (
     split_filenames,
     parse_search_list,
     get_one_or_none,
+    make_repr,
 )
 from allmychanges import chat
 from allmychanges.downloaders import (
@@ -1138,6 +1139,8 @@ class Tag(models.Model):
         # the name shouldn't contain any unicode or nonascii letters nor spaces
         # otherwise, we need to encode tu utf-8 and quote_plus it.
         return self.changelog.get_absolute_url() + '#' + self.name
+
+    __repr__ = make_repr('name', 'version_number')
 
 
 class FeedItem(models.Model):
