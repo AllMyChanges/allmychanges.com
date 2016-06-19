@@ -32,7 +32,7 @@ plumbum
 ndg-httpsclient
 pyOpenSSL
 orderedset
-closeio
+
 # чтобы показывать прогресс-бары в консольных утилитках
 clint
 # чтобы собирать статистику по производительности
