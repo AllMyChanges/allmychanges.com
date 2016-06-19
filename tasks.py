@@ -25,22 +25,26 @@ def get_current_version():
 def get_docker_client():
     import docker
     import os
-    cert_path = os.environ['DOCKER_CERT_PATH']
+    cert_path = os.environ.get('DOCKER_CERT_PATH')
+    if cert_path:
 
-    client_cert = os.path.join(cert_path, 'cert.pem')
-    # пробовал использовать для валидации сертификат,
-    # но почему-то не срабатывает. Жалуется на
-    # то что 192.168.*.* не соответствует localhost.
-    # Надо разбираться.
-    # ca_cert = os.path.join(cert_path, 'ca.pem')
-    client_key = os.path.join(cert_path, 'key.pem')
+        client_cert = os.path.join(cert_path, 'cert.pem')
+        # пробовал использовать для валидации сертификат,
+        # но почему-то не срабатывает. Жалуется на
+        # то что 192.168.*.* не соответствует localhost.
+        # Надо разбираться.
+        # ca_cert = os.path.join(cert_path, 'ca.pem')
+        client_key = os.path.join(cert_path, 'key.pem')
 
-    tls_config = docker.tls.TLSConfig(
-        client_cert=(client_cert, client_key),
-        verify=False,
-    )
-    url = os.environ['DOCKER_HOST'].replace('tcp://', 'https://')
-    return docker.Client(base_url=url, tls=tls_config)
+        tls_config = docker.tls.TLSConfig(
+            client_cert=(client_cert, client_key),
+            verify=False,
+        )
+        url = os.environ['DOCKER_HOST'].replace('tcp://', 'https://')
+        return docker.Client(base_url=url, tls=tls_config)
+
+    else:
+        return docker.Client()
 
 
 
@@ -100,39 +104,40 @@ def check_versions():
 
 @task
 def push_to_amch():
-    import requirements
-    import tablib
+    run('time pip2amch --tag allmychanges.com requirements/production.txt | amch push')
+    # import requirements
+    # import tablib
 
-    with open('requirements/production.txt') as f:
-        lines = f.readlines()
-        lines = (line.split('#', 1)[0] for line in lines)
-        lines = (line.strip() for line in lines)
-        reqs = '\n'.join(lines)
+    # with open('requirements/production.txt') as f:
+    #     lines = f.readlines()
+    #     lines = (line.split('#', 1)[0] for line in lines)
+    #     lines = (line.strip() for line in lines)
+    #     reqs = '\n'.join(lines)
 
-    parsed = requirements.parse(reqs)
-    data = tablib.Dataset()
-    data.headers = ['namespace', 'name', 'version', 'tag']
+    # parsed = requirements.parse(reqs)
+    # data = tablib.Dataset()
+    # data.headers = ['namespace', 'name', 'version', 'tag']
 
-    def extract_version(specs):
-        for spec, version in specs:
-            if spec == '==':
-                return version
-        return ''
+    # def extract_version(specs):
+    #     for spec, version in specs:
+    #         if spec == '==':
+    #             return version
+    #     return ''
 
-    for item in parsed:
-        data.append(
-            (
-                'python',
-                item.name,
-                extract_version(item.specs),
-                'allmychanges.com'
-            )
-        )
+    # for item in parsed:
+    #     data.append(
+    #         (
+    #             'python',
+    #             item.name,
+    #             extract_version(item.specs),
+    #             'allmychanges.com'
+    #         )
+    #     )
 
-    with open('amch-data.csv', 'w') as f:
-        f.write(data.csv)
+    # with open('amch-data.csv', 'w') as f:
+    #     f.write(data.csv)
 
-    run('amch push --filename amch-data.csv', pty=True)
+    # run('amch push --filename amch-data.csv', pty=True)
 #    run('rm -fr amch-data.csv')
 
 
@@ -149,11 +154,16 @@ def start_databases():
         run('docker start mysql.allmychanges.com')
     else:
         run('docker run --net amch --name mysql.allmychanges.com '
-            '-v `pwd`/dumps:/dumps -e MYSQL_ROOT_PASSWORD=password -d mysql')
+            '-v `pwd`/dumps:/dumps '
+            '-e MYSQL_ROOT_PASSWORD=password '
+            '-d mysql '
+            ' --character-set-server=utf8mb4 '
+            '--collation-server=utf8mb4_unicode_ci')
+
         print 'Waiting for mysql start'
         time.sleep(30)
         run('docker exec -it mysql.allmychanges.com mysqladmin -ppassword create allmychanges')
-        run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb')
+        #run('docker run --rm -it -v `pwd`:/app --net amch allmychanges.com /env/bin/python /app/manage.py syncdb')
 
     # Commented while I'm not experimenting with postgres
 
@@ -352,8 +362,13 @@ def get_latest_db():
 
 
 @task
-def restore_db():
-    run('docker exec mysql.allmychanges.com /dumps/restore.sh')
+def restore_db(name='latest'):
+    run('docker exec -ti mysql.allmychanges.com /dumps/restore.sh ' + name)
+
+
+@task
+def backup_dev_db():
+    run('docker exec mysql.allmychanges.com mysqldump  -ppassword allmychanges > dumps/dev.sql')
 
 
 @task
