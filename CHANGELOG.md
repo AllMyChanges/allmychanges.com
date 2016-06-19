@@ -1,3 +1,10 @@
+1.6.3 (2016-06-19)
+==================
+
+## Small fixes
+
+* Fixed issue with reporting problems about projects with non ASCII names.
+
 1.6.0 (2016-06-07)
 ==================
 
