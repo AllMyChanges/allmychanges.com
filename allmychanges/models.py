@@ -9,6 +9,7 @@ import envoy
 import jsonfield
 import logging
 
+from magic_repr import make_repr
 from hashlib import md5, sha1
 from django.db import models
 from django.db.models import Q
@@ -28,7 +29,6 @@ from allmychanges.utils import (
     split_filenames,
     parse_search_list,
     get_one_or_none,
-    make_repr,
 )
 from allmychanges import chat
 from allmychanges.downloaders import (
@@ -186,6 +186,8 @@ class User(AbstractBaseUser):
     class Meta:
         verbose_name = 'user'
         verbose_name_plural = 'users'
+
+    __repr__ = make_repr('username', 'email')
 
     @property
     def is_superuser(self):
@@ -400,6 +402,8 @@ class Changelog(Downloadable, models.Model):
 
     def __unicode__(self):
         return u'Changelog from {0}'.format(self.source)
+
+    __repr__ = make_repr('namespace', 'name', 'source')
 
     def latest_versions(self, limit):
         return self.versions.exclude(unreleased=True) \
@@ -746,13 +750,7 @@ class Issue(models.Model):
     page = models.CharField(max_length=100, blank=True, null=True)
     importance = models.IntegerField(db_index=True, blank=True, default=0)
 
-    def __repr__(self):
-        return """
-Issue(changelog={self.changelog},
-      type={self.type},
-      comment={self.comment},
-      created_at={self.created_at},
-      resolved_at={self.resolved_at})""".format(self=self).strip()
+    __repr__ = make_repr('changelog', 'type', 'comment', 'created_at', 'resolved_at')
 
     def save(self, *args, **kwargs):
         if not self.importance:
@@ -833,9 +831,7 @@ class DiscoveryHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-    def __repr__(self):
-        return '<DiscoveryHistory versions={0.discovered_versions}'.format(
-            self)
+    __repr__ = make_repr('discovered_versions')
 
 
 class LightModerator(models.Model):
@@ -1201,13 +1197,7 @@ class DeploymentHistory(models.Model):
     description = models.TextField()
     deployed_at = models.DateTimeField(auto_now_add=True)
 
-    def __repr__(self):
-        response =[u'<DeploymentHistory deployed_at={0.deployed_at} hash={0.hash}'.format(self)]
-        response.extend(
-                   u'                  ' + line
-            for line in self.description.split('\n'))
-        response.append(u'>')
-        return u'\n'.join(response).encode('utf-8')
+    __repr__ = make_repr('deployed_at', 'hash')
 
 
 class EmailVerificationCode(models.Model):
@@ -1268,8 +1258,7 @@ class AutocompleteData(models.Model):
                                            'should appear at the top '
                                            'of the suggest.'))
 
-    def __repr__(self):
-        return '<AutocompleteData: {0}>'.format(self.title.encode('utf-8'))
+    __repr__ = make_repr('title')
 
     def save(self, *args, **kwargs):
         super(AutocompleteData, self).save(*args, **kwargs)
@@ -1298,8 +1287,7 @@ class AutocompleteWord(models.Model):
     data = models.ForeignKey(AutocompleteData,
                              related_name='words')
 
-    def __repr__(self):
-        return '<AutocompleteWord: {0}>'.format(self.word.encode('utf-8'))
+    __repr__ = make_repr('word')
 
 
 class AutocompleteWord2(models.Model):
@@ -1308,14 +1296,14 @@ class AutocompleteWord2(models.Model):
         AutocompleteData,
         related_name='words2')
 
-    def __repr__(self):
-        return '<AutocompleteWord: {0}>'.format(self.word.encode('utf-8'))
+    __repr__ = make_repr('word')
 
 
 class AppStoreBatch(models.Model):
     """To identify separate processing batches.
     """
     created = models.DateTimeField(auto_now_add=True)
+    __repr__ = make_repr()
 
 
 class AppStoreUrl(models.Model):
@@ -1339,8 +1327,7 @@ class AppStoreUrl(models.Model):
     rating = models.FloatField(blank=True, null=True)
     rating_count = models.IntegerField(blank=True, null=True)
 
-    def __repr__(self):
-        return '<AppStoreUrl: {0}>'.format(self.source.encode('utf-8'))
+    __repr__ = make_repr('source')
 
 
 class MandrillMessage(models.Model):
@@ -1355,3 +1342,5 @@ class MandrillMessage(models.Model):
                              blank=True,
                              null=True)
     payload = models.TextField()
+
+    __repr__ = make_repr('mid', 'email')

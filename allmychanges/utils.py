@@ -551,23 +551,3 @@ def get_one_or_none(queryset, **kwargs):
     result = list(queryset.filter(**kwargs)[:1])
     if result:
         return result[0]
-
-
-from itertools import starmap
-
-def make_repr(*field_names):
-    def method(self):
-        fields = ((name, getattr(self, name))
-                  for name in field_names)
-        fields = starmap(u'{0}={1!r}'.format, fields)
-        fields = u', '.join(fields)
-
-        cls_name = self.__class__.__name__
-
-        result = u'<{cls_name}: {fields}>'.format(
-            cls_name=cls_name,
-            fields=fields
-        )
-        return result.encode('utf-8')
-
-    return method
