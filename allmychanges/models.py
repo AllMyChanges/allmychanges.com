@@ -792,8 +792,8 @@ Issue(changelog={self.changelog},
         self.resolved_at = timezone.now()
         self.resolved_by = user
         self.save(update_fields=('resolved_at', 'resolved_by'))
-        chat.send(('Issue <https://allmychanges.com{url}|#{issue_id}> '
-                   'for {namespace}/{name} was resolved by {username}.').format(
+        chat.send((u'Issue <https://allmychanges.com{url}|#{issue_id}> '
+                   u'for {namespace}/{name} was resolved by {username}.').format(
             url=reverse('issue-detail', pk=self.id),
             issue_id=self.id,
             namespace=self.changelog.namespace,
@@ -806,7 +806,7 @@ Issue(changelog={self.changelog},
                 log.info('Resuming changelog updates')
                 changelog.resume()
 
-                chat.send('Autopaused package {namespace}/{name} was resumed {username}.'.format(
+                chat.send(u'Autopaused package {namespace}/{name} was resumed {username}.'.format(
                     namespace=changelog.namespace,
                     name=changelog.name,
                     username=user.username))

@@ -808,21 +808,21 @@ class IssueViewSet(HandleExceptionMixin,
         if created:
             changelog = obj.changelog
             if changelog:
-                history_message = 'Created issue for <changelog:{0}>'.format(
+                history_message = u'Created issue for <changelog:{0}>'.format(
                     changelog.id)
                 chat_message = (
-                    'New issue was created for '
-                    '<https://allmychanges.com{issue_url}|'
-                    '{namespace}/{name}>.').format(
+                    u'New issue was created for '
+                    u'<https://allmychanges.com{issue_url}|'
+                    u'{namespace}/{name}>.').format(
                         issue_url=reverse('issue-detail', pk=obj.id),
                         namespace=changelog.namespace,
                         name=changelog.name)
             else:
-                history_message = 'Feedback was given at page "{0}"'.format(obj.page)
+                history_message = u'Feedback was given at page "{0}"'.format(obj.page)
                 chat_message = (
-                    'Feedback was given for page '
-                    '<https://allmychanges.com{page}|{page}> '
-                    '<https://allmychanges.com{issue_url}|#{pk}>.').format(
+                    u'Feedback was given for page '
+                    u'<https://allmychanges.com{page}|{page}> '
+                    u'<https://allmychanges.com{issue_url}|#{pk}>.').format(
                         issue_url=reverse('issue-detail',
                                           pk=obj.id),
                         page=obj.page)
