@@ -46,14 +46,16 @@ class Command(LogMixin, BaseCommand):
             envoy.run('git pull')
 
         get_history = choose_history_extractor(path)
-        commits = get_history(path, limit=options.get('limit_history', 0))
+        commits, tagged_versions = get_history(path, limit=options.get('limit_history', 0))
 
         extract_version = choose_version_extractor(path)
 
         num_extractions = [0]
         def custom_extractor(path):
             num_extractions[0] += 1
-            return extract_version(path)
+            result = extract_version(path)
+            print 'Extracted {0}'.format(result)
+            return result
 
         if options['slow']:
             write_vcs_versions_slowly(commits, custom_extractor)
@@ -62,7 +64,10 @@ class Command(LogMixin, BaseCommand):
 
 
         if options['bumps']:
-            bumps = mark_version_bumps(commits)
+            bumps = mark_version_bumps(
+                commits,
+                tagged_versions=tagged_versions,
+            )
             for bump in bumps:
                 print bump[:7], commits[bump]['version']
 
@@ -70,7 +75,12 @@ class Command(LogMixin, BaseCommand):
             print 'Num version extractions:', num_extractions[0]
         else:
             printed = set()
-            bumps = mark_version_bumps(commits)
+
+            bumps = mark_version_bumps(
+                commits,
+                tagged_versions=tagged_versions,
+            )
+            print 'Bumps searching DONE.'
 
             def print_(commit):
                 h = commit['hash']
