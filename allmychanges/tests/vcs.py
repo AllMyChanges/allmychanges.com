@@ -207,6 +207,9 @@ def test_find_fork_point():
     # commits below '4' hash
     eq_('4', find_fork_point(tree, '6', '8'))
 
+    # for triangle we have to return one of nodes
+    eq_('2', find_fork_point(tree, '2', '3'))
+
 
 def test_mark_version_bumps_outputs_bumps_in_right_order():
     # По мотивам разбирательства с обработкой python/imagesize.

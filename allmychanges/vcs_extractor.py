@@ -6,11 +6,11 @@ import os
 import os.path
 import setuptools as orig_setuptools
 import sys
-import itertools
 import string
 import operator
 import datetime
 
+from itertools import islice, dropwhile, izip_longest
 from collections import defaultdict, deque
 from orderedset import OrderedSet
 from allmychanges.utils import cd, trace
@@ -33,7 +33,7 @@ def process_vcs_message(text):
     lines = text.split(u'\n')
     lines = (line for line in lines
              if RE_BUMP_LINE.match(line) is None)
-    lines = itertools.dropwhile(operator.not_, lines)
+    lines = dropwhile(operator.not_, lines)
     return u'<br/>\n'.join(lines)
 
 
@@ -112,7 +112,7 @@ def git_history_extractor(path, limit=None):
         result = list(result)
 
         if limit:
-            result = itertools.islice(result, 0, limit)
+            result = islice(result, 0, limit)
         result = list(result)
 
         root = result[0]['hash']
@@ -348,6 +348,7 @@ def _normalize_version_numbers2(commits):
 
 
 def write_vcs_versions_slowly(commits, extract_version):
+
     for idx, commit in enumerate(commits.values()):
         _add_version_number(commit, extract_version)
 
@@ -494,7 +495,6 @@ def get_versions_from_vcs(env):
                             content=messages_to_html(version['messages']))
 
 
-
 def iterate_over_commits(tree, start_hash, upto=None):
     """Returns iterable over all hashes in the tree,
     starting from `start_hash` and up to `upto`.
@@ -538,10 +538,28 @@ def find_fork_point(tree, left, right):
     designated by `left` and `right` hashes.
     """
 
-    left_ancestors = set(iterate_over_commits(tree, left))
-    for hash in iterate_over_commits(tree, right):
-        if hash in left_ancestors:
-            return hash
+    left_ancestors = iterate_over_commits(tree, left)
+    right_ancestors = iterate_over_commits(tree, right)
+    zipped_branches = izip_longest(left_ancestors, right_ancestors)
+
+    left_set = set()
+    right_set = set()
+
+    for left_hash, right_hash in zipped_branches:
+        if left_hash is not None:
+            left_set.add(left_hash)
+
+        if right_hash is not None:
+            right_set.add(right_hash)
+
+        intersection = left_set.intersection(right_set)
+
+        # if there is an intersection between these two
+        # sets, then it should contain only one hash
+        # and this hash is the fork point
+        if intersection:
+            assert len(intersection) == 1
+            return intersection.pop()
 
 
 def mark_version_bumps(tree, tagged_versions=None):
@@ -576,7 +594,7 @@ def mark_version_bumps(tree, tagged_versions=None):
             tree.get,
             iterate_over_commits(
                 tree,
-                tree['root']['hash']
+                tree['root']['hash'],
             )
         )
     )
@@ -646,8 +664,6 @@ def mark_version_bumps_rec(tree):
 
     return rec(tree['root'])
 
-
-from itertools import chain
 
 def group_versions(tree, bumps):
     root_hash = tree['root']['hash']

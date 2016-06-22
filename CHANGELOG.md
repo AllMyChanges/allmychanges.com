@@ -1,8 +1,10 @@
-1.6.3 (2016-06-19)
+1.6.3 (2016-06-22)
 ==================
 
-## Small fixes
+## Fixes
 
+* Fixed an error which prevented changelog building from commit messages
+  for some repositories.
 * Fixed issue with reporting problems about projects with non ASCII names.
 
 1.6.0 (2016-06-07)
