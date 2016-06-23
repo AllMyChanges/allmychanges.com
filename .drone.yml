@@ -1,0 +1,12 @@
+build:
+  image: ubuntu:trusty
+  commands:
+    - echo 'OK'
+
+publish:
+  docker:
+    registry: registry.40ants.com:5000
+    repo: allmychanges.com
+    tag: new
+    when:
+      branch: master
