@@ -202,7 +202,7 @@ def build_image(dev=True):
 
 @task
 def push_image():
-    tag = 'localhost:5000/allmychanges.com:' + get_current_version()
+    tag = 'registry.40ants.com:5000/allmychanges.com:' + get_current_version()
     run('docker build -t {} .'.format(tag))
     run('docker push ' + tag)
     print 'Pushed', tag
