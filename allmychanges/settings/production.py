@@ -33,7 +33,7 @@ TWITTER_CREDS = ('WjfgjgXOwgj2vjUrDYvebI91x',
                  '3260477051-94dnqE4lm3rx3PLqPhEbjR8SipmRMgcf8s5Pshd',
                  'di7AAGhtFT2PuCgztxqC3hLP6QcDIIHq2e9flRpUemVSw')
 
-LOG_FILENAME = '/var/log/allmychanges/django-root.log'
+LOG_FILENAME = '/var/log/allmychanges/django.log'
 try:
     init_logging(LOG_FILENAME, logstash=True)
 except OSError:

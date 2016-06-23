@@ -25,7 +25,7 @@ ANALYTICS_ID = 'UA-49927178-2'
 #                  '6SeGn2urZzs2ztBuRLD4GdTVuejPx170uAoFEHMXgBfBl')
 
 
-LOG_FILENAME = '/var/log/allmychanges/django-' + CURRENT_USER + '.log'
+LOG_FILENAME = '/var/log/allmychanges/django.log'
 init_logging(LOG_FILENAME)
 
 

@@ -2,8 +2,9 @@ FROM ubuntu:14.04
 MAINTAINER Alexander Artemenko <svetlyak.40wt@gmail.com>
 
 # Prepare
-RUN DEBIAN_FRONTEND=noninteractive \
-    apt-get update && \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
     apt-get install -y \
             build-essential \
             python-dev \
@@ -26,7 +27,9 @@ COPY ./wheelhouse /wheelhouse
 COPY ./requirements/dev.txt /requirements.txt
 COPY ./requirements/from-git.txt /requirements-from-git.txt
 
-RUN /env/bin/pip install --use-wheel --no-index --find-links=/wheelhouse -r /requirements.txt
+# disable wheelhouse for Drone builds
+# RUN /env/bin/pip install --use-wheel --no-index --find-links=/wheelhouse -r /requirements.txt
+RUN /env/bin/pip install -r /requirements.txt
 RUN /env/bin/pip install -r /requirements-from-git.txt
 
 COPY . /app

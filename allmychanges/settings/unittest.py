@@ -18,7 +18,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-LOG_FILENAME = 'unittest-' + CURRENT_USER + '.log'
+LOG_FILENAME = '/var/log/allmychanges/unittest.log'
 
 init_logging(LOG_FILENAME)
 
