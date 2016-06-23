@@ -23,7 +23,7 @@ RUN apt-get update && \
 RUN virtualenv --python=python2 /env
 RUN /env/bin/pip install pip==8.0.2
 
-COPY ./wheelhouse /wheelhouse
+#COPY ./wheelhouse /wheelhouse
 COPY ./requirements/dev.txt /requirements.txt
 COPY ./requirements/from-git.txt /requirements-from-git.txt
 
