@@ -7,7 +7,9 @@ publish:
   docker:
     registry: registry.40ants.com:5000
     repo: allmychanges.com
-    tag: new
+    tag:
+      - latest
+      - 1.6.3
     insecure: true
     when:
       branch: master
