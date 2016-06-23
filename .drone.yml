@@ -8,5 +8,6 @@ publish:
     registry: registry.40ants.com:5000
     repo: allmychanges.com
     tag: new
+    insecure: true
     when:
       branch: master
