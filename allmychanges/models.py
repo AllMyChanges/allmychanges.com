@@ -786,17 +786,19 @@ class Issue(models.Model):
             .filter(deployed_at__lte=self.created_at) \
             .order_by('-id')[:3]
 
-    def resolve(self, user):
+    def resolve(self, user, notify=True):
         self.resolved_at = timezone.now()
         self.resolved_by = user
         self.save(update_fields=('resolved_at', 'resolved_by'))
-        chat.send((u'Issue <https://allmychanges.com{url}|#{issue_id}> '
-                   u'for {namespace}/{name} was resolved by {username}.').format(
-            url=reverse('issue-detail', pk=self.id),
-            issue_id=self.id,
-            namespace=self.changelog.namespace,
-            name=self.changelog.name,
-            username=user.username))
+
+        if notify:
+            chat.send((u'Issue <https://allmychanges.com{url}|#{issue_id}> '
+                       u'for {namespace}/{name} was resolved by {username}.').format(
+                url=reverse('issue-detail', pk=self.id),
+                issue_id=self.id,
+                namespace=self.changelog.namespace,
+                name=self.changelog.name,
+                username=user.username))
 
         if self.type == 'auto-paused':
             changelog = self.changelog
@@ -804,10 +806,11 @@ class Issue(models.Model):
                 log.info('Resuming changelog updates')
                 changelog.resume()
 
-                chat.send(u'Autopaused package {namespace}/{name} was resumed {username}.'.format(
-                    namespace=changelog.namespace,
-                    name=changelog.name,
-                    username=user.username))
+                if notify:
+                    chat.send(u'Autopaused package {namespace}/{name} was resumed {username}.'.format(
+                        namespace=changelog.namespace,
+                        name=changelog.name,
+                        username=user.username))
 
 
 
