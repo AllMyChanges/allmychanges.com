@@ -1,5 +1,6 @@
 from datetime import date
 from nose.tools import eq_
+from nose.plugins.attrib import attr
 
 from allmychanges.crawler import (
     _filter_changelog_files,
@@ -228,7 +229,8 @@ def test_url_normalization():
         normalize_url('git+https://some-server.com/repo'))
     eq_(('https://github.com/sass/sass', 'sass', 'sass'),
         normalize_url('git@github.com:sass/sass.git', for_checkout=False))
-
+    eq_(('https://github.com/sass/sass', 'sass', 'sass'),
+        normalize_url('https://github.com/sass/sass/releases', for_checkout=False))
 
 
 def test_get_markup_type():
