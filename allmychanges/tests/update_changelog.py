@@ -136,3 +136,29 @@ class UpdaterTests(TestCase):
         dt_eq(now,          dates['0.1.1'])
         dt_eq(special_date, dates['0.2.0'])
         dt_eq(now,          dates['0.2.1'])
+
+
+    def test_set_unreleased_if_date_is_in_future(self):
+        # check if version have date in future, it will not
+        # be added to user's feed and it will have
+        # unreleased=True
+
+        self.changelog.versions.all().delete()
+
+        date_in_future = datetime.datetime(2020, 1, 1)
+
+        data = [v(version='0.2.0',
+                  date=date_in_future)]
+
+        update_changelog_from_raw_data3(self.changelog, data)
+
+
+        # version should be added to the database
+        eq_(1, self.changelog.versions.count())
+
+        # and not added to the feed
+        eq_(0, self.user.feed_versions.count())
+
+        # and version should have unreleased=True
+        version = self.changelog.versions.all()[0]
+        eq_(True, version.unreleased)

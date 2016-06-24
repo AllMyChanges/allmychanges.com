@@ -31,6 +31,7 @@ def add_tzinfo(obj):
 def update_changelog_from_raw_data3(obj, raw_data):
     """ raw_data should be a list where versions come from
     more recent to the oldest."""
+
     from allmychanges.models import Changelog
     from allmychanges.tasks import notify_users_about_new_versions, post_tweet
 
@@ -117,9 +118,17 @@ def update_changelog_from_raw_data3(obj, raw_data):
                 # it was not released
                 old_version_was_not_released = True
 
-            version.unreleased = getattr(raw_version, 'unreleased', False)
-            version.filename = getattr(raw_version, 'filename', None)
             version.date = getattr(raw_version, 'date', None)
+
+            # for versions which will be released in future
+            # we set flag 'unreleased'
+            if version.date \
+               and arrow.get(version.date).date() > arrow.get().date():
+                version.unreleased = True
+            else:
+                version.unreleased = getattr(raw_version, 'unreleased', False)
+
+            version.filename = getattr(raw_version, 'filename', None)
             version.raw_text = raw_version.content
 
             version.processed_text = raw_version.processed_content

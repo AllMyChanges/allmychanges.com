@@ -1,3 +1,10 @@
+1.7.0 (unreleased)
+==================
+
+## Fixes
+
+* Now versions with release date "in future" are concidered as "unreleased".
+
 1.6.3 (2016-06-22)
 ==================
 
