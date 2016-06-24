@@ -289,7 +289,7 @@ def dbshell():
 
 
 @task(start_databases)
-def test(case='', failed=False, verbose=False):
+def test(case='', failed=False, verbose=False, attr=None):
     command = ['/env/bin/nosetests']
 
     for name in ('verbose', 'failed'):
@@ -304,6 +304,9 @@ def test(case='', failed=False, verbose=False):
             case = ':'.join(case.rsplit('.', 1))
 
         command.append(case)
+
+    if attr:
+        command.append('-a ' + attr)
 
     run(_get_docker_command('tests.command.allmychanges.com') +
         ' '.join(command))
