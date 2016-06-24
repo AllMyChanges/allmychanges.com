@@ -4,6 +4,8 @@
 ## Fixes
 
 * Now versions with release date "in future" are concidered as "unreleased".
+* If there are words "in progress" somewhere in version description, it is
+  marked as "unreleased" now.
 
 1.6.3 (2016-06-22)
 ==================

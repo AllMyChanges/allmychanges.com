@@ -251,6 +251,7 @@ UNRELEASED_KEYWORDS = set([
     'release date.*to be determined',
     'no release date',
     'in-progress',
+    'in progress',
     'work in progress',
     'upcoming',
 ])

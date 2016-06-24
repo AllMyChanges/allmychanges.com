@@ -249,6 +249,14 @@ def test_extract_metadata_is_able_to_detect_unreleased_version():
             v(title='1.45',
               content='Under Development')))
 
+    eq_([v(type='prerender_items',
+           title='1.45',
+           unreleased=True,
+           content='Development is in progress')],
+        extract_metadata(
+            v(title='1.45',
+              content='Development is in progress')))
+
 
 def test_extract_metadata_ignores_unreleased_keywords_if_date_was_found_ealier():
     env = Environment()
