@@ -556,6 +556,11 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         result['issues'] = changelog.issues.filter(resolved_at=None)
         result['num_trackers'] = changelog.trackers.count()
 
+        if 'add-tags' in self.request.GET:
+            # we'll show dialog immediately if special ?add-tags was given
+            # in the url
+            result['show_tags_help'] = True
+
         # twitter card
         if self.request.META.get('HTTP_USER_AGENT', '').lower().startswith('twitterbot'):
             # with open('static/shots/55a4a1916a5b747a15f5e43a5128f9e9f2abafd3.png', 'rb') as f:

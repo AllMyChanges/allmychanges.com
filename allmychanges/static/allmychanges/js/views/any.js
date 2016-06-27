@@ -5,6 +5,7 @@ var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
 var TagButton = require('../components/tag-button')
+var TagHelp = require('../components/tag-help')
 var TrackButton = require('../components/track-button.js')
 var SlackURL = require('../components/slack-url.js')
 var WebhookURL = require('../components/webhook-url.js')
@@ -70,9 +71,16 @@ module.exports = {
                 <DeleteButton version_id={element.dataset['versionId']}/>,
                 element);
         });
+
+        var tag_help_shown = false;
+        
+        $('.tag-help-container').each(function (idx, element) {
+            React.render(<TagHelp key="help" />, element);
+        });
         $('.tag-button-container').each(function (idx, element) {
             React.render(
-                <TagButton version_id={element.dataset['versionId']}
+                <TagButton key="button"
+                           version_id={element.dataset['versionId']}
                            version_number={element.dataset['versionNumber']}
                            project_id={element.dataset['projectId']}/>,
                 element);

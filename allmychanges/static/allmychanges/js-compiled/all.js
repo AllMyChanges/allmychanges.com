@@ -28219,10 +28219,10 @@ componentHandler.register({
 
 	__webpack_require__(1).render();
 	__webpack_require__(163).render();
-	__webpack_require__(283).render();
-	__webpack_require__(284).render();
 	__webpack_require__(286).render();
-	__webpack_require__(288);
+	__webpack_require__(287).render();
+	__webpack_require__(289).render();
+	__webpack_require__(291);
 
 /***/ },
 /* 1 */
@@ -48215,18 +48215,19 @@ componentHandler.register({
 	var ResolveButton = __webpack_require__(166);
 	var DeleteButton = __webpack_require__(167);
 	var TagButton = __webpack_require__(168);
+	var TagHelp = __webpack_require__(236);
 	var TrackButton = __webpack_require__(160);
-	var SlackURL = __webpack_require__(236);
-	var WebhookURL = __webpack_require__(238);
-	var MagicPrompt = __webpack_require__(239);
-	var Share = __webpack_require__(240);
-	var Notifications = __webpack_require__(241);
-	var FeedbackForm = __webpack_require__(242);
-	var PackageSettings = __webpack_require__(243);
-	var init_sticky_versions = __webpack_require__(280);
+	var SlackURL = __webpack_require__(239);
+	var WebhookURL = __webpack_require__(241);
+	var MagicPrompt = __webpack_require__(242);
+	var Share = __webpack_require__(243);
+	var Notifications = __webpack_require__(244);
+	var FeedbackForm = __webpack_require__(245);
+	var PackageSettings = __webpack_require__(246);
+	var init_sticky_versions = __webpack_require__(283);
 
 	/* make introjs globally available */
-	window.intro = __webpack_require__(281);
+	window.intro = __webpack_require__(284);
 
 	$(document).ready(function () {
 	    init_sticky_versions();
@@ -48271,8 +48272,15 @@ componentHandler.register({
 	        $('.delete-button-container').each(function (idx, element) {
 	            React.render(React.createElement(DeleteButton, { version_id: element.dataset['versionId'] }), element);
 	        });
+
+	        var tag_help_shown = false;
+
+	        $('.tag-help-container').each(function (idx, element) {
+	            React.render(React.createElement(TagHelp, { key: 'help' }), element);
+	        });
 	        $('.tag-button-container').each(function (idx, element) {
-	            React.render(React.createElement(TagButton, { version_id: element.dataset['versionId'],
+	            React.render(React.createElement(TagButton, { key: 'button',
+	                version_id: element.dataset['versionId'],
 	                version_number: element.dataset['versionNumber'],
 	                project_id: element.dataset['projectId'] }), element);
 	        });
@@ -48457,7 +48465,7 @@ componentHandler.register({
 	                comment: comment },
 	            success: (function (data) {
 	                this.setState({ show_popup: false });
-	                PubSub.publish('show-info', 'Thank you for reporing about the issue. We\'ll fix it as soon as possible.');
+	                PubSub.publish('show-info', 'Thank you for reporting about the issue. We\'ll fix it as soon as possible.');
 	            }).bind(this),
 	            error: (function (xhr, status, err) {
 	                console.error(this.props.url, status, err.toString());
@@ -62811,7 +62819,153 @@ componentHandler.register({
 
 	'use strict';
 
-	var create_url_checker = __webpack_require__(237);
+	var css = __webpack_require__(237);
+	var React = __webpack_require__(2);
+	var ReactMDL = __webpack_require__(174);
+	var Button = ReactMDL.Button;
+
+	module.exports = React.createClass({
+	    displayName: 'exports',
+
+	    getInitialState: function getInitialState() {
+	        return {
+	            show: true
+	        };
+	    },
+	    handle_close: function handle_close(e) {
+	        this.setState({ 'show': false });
+	    },
+	    check_if_esc_was_pressed: function check_if_esc_was_pressed(e) {
+	        if (e.key === 'ESC') {
+	            this.add_new_tag(e);
+	        }
+	    },
+	    render: function render() {
+	        if (this.state.show) {
+	            return React.createElement(
+	                'div',
+	                { className: 'modal-popup',
+	                    onKeyPress: this.check_if_esc_was_pressed,
+	                    onClick: this.handle_close },
+	                React.createElement(
+	                    'div',
+	                    { className: 'modal-popup__content tagging-help' },
+	                    React.createElement(
+	                        'h1',
+	                        null,
+	                        'What'
+	                    ),
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'Tags allow to mark dependencies or soft you are using.'
+	                    ),
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'Tag could have any meaning: a hostname, a name of a project or some environment, where library used.'
+	                    ),
+	                    React.createElement(
+	                        'h1',
+	                        null,
+	                        'Why'
+	                    ),
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'Tags mark a project\'s version and displayed on pages of the service and in notifications. They remind you which version are you use and if there any updates.'
+	                    ),
+	                    React.createElement(
+	                        'h1',
+	                        null,
+	                        'How'
+	                    ),
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'To tag some version, click "Tag" button beside version number on this page.'
+	                    ),
+	                    React.createElement(
+	                        'p',
+	                        null,
+	                        'You can also use ',
+	                        React.createElement(
+	                            'a',
+	                            { href: 'https://github.com/svetlyak40wt/allmychanges' },
+	                            'amch'
+	                        ),
+	                        ' with ',
+	                        React.createElement(
+	                            'a',
+	                            { href: 'https://github.com/allmychanges/pip2amch' },
+	                            'pip2amch'
+	                        ),
+	                        ' (or similar tool), to automate version tagging.'
+	                    ),
+	                    React.createElement(
+	                        'p',
+	                        { className: 'close-button-row' },
+	                        React.createElement(
+	                            Button,
+	                            { onClick: this.on_done },
+	                            'Close'
+	                        )
+	                    )
+	                )
+	            );
+	        } else {
+	            return React.createElement('div', null);
+	        }
+	    }
+	});
+
+/***/ },
+/* 237 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(238);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(172)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../../../../../node_modules/css-loader/index.js!./../../../../../../node_modules/stylus-loader/index.js!./index.styl", function() {
+				var newContent = require("!!./../../../../../../node_modules/css-loader/index.js!./../../../../../../node_modules/stylus-loader/index.js!./index.styl");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 238 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(171)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".tagging-help h1 {\n  font-weight: bold;\n  margin-top: 16px;\n}\n.tagging-help h1:first-child {\n  margin-top: 0;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 239 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var create_url_checker = __webpack_require__(240);
 
 	var check_callback = function check_callback(url, set_state) {
 	    $.ajax({
@@ -62833,7 +62987,7 @@ componentHandler.register({
 	module.exports = create_url_checker('slack_url', check_callback);
 
 /***/ },
-/* 237 */
+/* 240 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62902,12 +63056,12 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 238 */
+/* 241 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var create_url_checker = __webpack_require__(237);
+	var create_url_checker = __webpack_require__(240);
 
 	var check_callback = function check_callback(url, set_state) {
 	    $.ajax({
@@ -62929,7 +63083,7 @@ componentHandler.register({
 	module.exports = create_url_checker('webhook_url', check_callback);
 
 /***/ },
-/* 239 */
+/* 242 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63023,7 +63177,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 240 */
+/* 243 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63115,7 +63269,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 241 */
+/* 244 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63191,7 +63345,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 242 */
+/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63276,25 +63430,25 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 243 */
+/* 246 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var Accordion = __webpack_require__(244);
+	var Accordion = __webpack_require__(247);
 	var ReactMDL = __webpack_require__(174);
 	var Spinner2 = ReactMDL.Spinner;
 	var R = __webpack_require__(173);
-	var css = __webpack_require__(247);
+	var css = __webpack_require__(250);
 
 	var React = __webpack_require__(2);
-	var ReactTabs = __webpack_require__(249);
+	var ReactTabs = __webpack_require__(252);
 	var Tab = ReactTabs.Tab;
 	var Tabs = ReactTabs.Tabs;
 	var TabList = ReactTabs.TabList;
 	var TabPanel = ReactTabs.TabPanel;
-	var render_change_downloader_tab = __webpack_require__(277);
-	var TunePanel = __webpack_require__(279);
+	var render_change_downloader_tab = __webpack_require__(280);
+	var TunePanel = __webpack_require__(282);
 
 	var render_tabs = function render_tabs(tabs, tab_panels) {
 	    return React.createElement(
@@ -63970,13 +64124,13 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 244 */
+/* 247 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
-	var css = __webpack_require__(245);
+	var css = __webpack_require__(248);
 
 	var Section = React.createClass({
 	  displayName: 'Section',
@@ -64056,13 +64210,13 @@ componentHandler.register({
 	module.exports = Accordion;
 
 /***/ },
-/* 245 */
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(246);
+	var content = __webpack_require__(249);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(172)(content, {});
@@ -64082,7 +64236,7 @@ componentHandler.register({
 	}
 
 /***/ },
-/* 246 */
+/* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(171)();
@@ -64096,13 +64250,13 @@ componentHandler.register({
 
 
 /***/ },
-/* 247 */
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(248);
+	var content = __webpack_require__(251);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(172)(content, {});
@@ -64122,7 +64276,7 @@ componentHandler.register({
 	}
 
 /***/ },
-/* 248 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports = module.exports = __webpack_require__(171)();
@@ -64136,20 +64290,20 @@ componentHandler.register({
 
 
 /***/ },
-/* 249 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	module.exports = {
-	  Tabs: __webpack_require__(250),
-	  TabList: __webpack_require__(274),
-	  Tab: __webpack_require__(273),
-	  TabPanel: __webpack_require__(276)
+	  Tabs: __webpack_require__(253),
+	  TabList: __webpack_require__(277),
+	  Tab: __webpack_require__(276),
+	  TabPanel: __webpack_require__(279)
 	};
 
 /***/ },
-/* 250 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -64157,19 +64311,19 @@ componentHandler.register({
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _reactAddons = __webpack_require__(251);
+	var _reactAddons = __webpack_require__(254);
 
 	var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
-	var _jsStylesheet = __webpack_require__(270);
+	var _jsStylesheet = __webpack_require__(273);
 
 	var _jsStylesheet2 = _interopRequireDefault(_jsStylesheet);
 
-	var _helpersUuid = __webpack_require__(271);
+	var _helpersUuid = __webpack_require__(274);
 
 	var _helpersUuid2 = _interopRequireDefault(_helpersUuid);
 
-	var _helpersChildrenPropType = __webpack_require__(272);
+	var _helpersChildrenPropType = __webpack_require__(275);
 
 	var _helpersChildrenPropType2 = _interopRequireDefault(_helpersChildrenPropType);
 
@@ -64217,7 +64371,7 @@ componentHandler.register({
 	  },
 
 	  componentWillMount: function componentWillMount() {
-	    (0, _jsStylesheet2['default'])(__webpack_require__(275));
+	    (0, _jsStylesheet2['default'])(__webpack_require__(278));
 	  },
 
 	  componentWillReceiveProps: function componentWillReceiveProps(newProps) {
@@ -64480,7 +64634,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 251 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64492,10 +64646,10 @@ componentHandler.register({
 	// Otherwise the build tools will attempt to build a 'react-addons-{addon}' module.
 	'require' + "('react/addons') is deprecated. " + 'Access using require' + "('react-addons-{addon}') instead.");
 
-	module.exports = __webpack_require__(252);
+	module.exports = __webpack_require__(255);
 
 /***/ },
-/* 252 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -64518,17 +64672,17 @@ componentHandler.register({
 
 	'use strict';
 
-	var LinkedStateMixin = __webpack_require__(253);
+	var LinkedStateMixin = __webpack_require__(256);
 	var React = __webpack_require__(3);
-	var ReactComponentWithPureRenderMixin = __webpack_require__(256);
-	var ReactCSSTransitionGroup = __webpack_require__(258);
-	var ReactFragment = __webpack_require__(264);
-	var ReactTransitionGroup = __webpack_require__(259);
+	var ReactComponentWithPureRenderMixin = __webpack_require__(259);
+	var ReactCSSTransitionGroup = __webpack_require__(261);
+	var ReactFragment = __webpack_require__(267);
+	var ReactTransitionGroup = __webpack_require__(262);
 	var ReactUpdates = __webpack_require__(54);
 
-	var cloneWithProps = __webpack_require__(265);
-	var shallowCompare = __webpack_require__(257);
-	var update = __webpack_require__(268);
+	var cloneWithProps = __webpack_require__(268);
+	var shallowCompare = __webpack_require__(260);
+	var update = __webpack_require__(271);
 	var warning = __webpack_require__(26);
 
 	var warnedAboutBatchedUpdates = false;
@@ -64554,14 +64708,14 @@ componentHandler.register({
 
 	if (process.env.NODE_ENV !== 'production') {
 	  React.addons.Perf = __webpack_require__(142);
-	  React.addons.TestUtils = __webpack_require__(269);
+	  React.addons.TestUtils = __webpack_require__(272);
 	}
 
 	module.exports = React;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 253 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -64578,8 +64732,8 @@ componentHandler.register({
 
 	'use strict';
 
-	var ReactLink = __webpack_require__(254);
-	var ReactStateSetters = __webpack_require__(255);
+	var ReactLink = __webpack_require__(257);
+	var ReactStateSetters = __webpack_require__(258);
 
 	/**
 	 * A simple mixin around ReactLink.forState().
@@ -64602,7 +64756,7 @@ componentHandler.register({
 	module.exports = LinkedStateMixin;
 
 /***/ },
-/* 254 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -64676,7 +64830,7 @@ componentHandler.register({
 	module.exports = ReactLink;
 
 /***/ },
-/* 255 */
+/* 258 */
 /***/ function(module, exports) {
 
 	/**
@@ -64795,7 +64949,7 @@ componentHandler.register({
 	module.exports = ReactStateSetters;
 
 /***/ },
-/* 256 */
+/* 259 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -64811,7 +64965,7 @@ componentHandler.register({
 
 	'use strict';
 
-	var shallowCompare = __webpack_require__(257);
+	var shallowCompare = __webpack_require__(260);
 
 	/**
 	 * If your React component's render function is "pure", e.g. it will render the
@@ -64846,7 +65000,7 @@ componentHandler.register({
 	module.exports = ReactComponentWithPureRenderMixin;
 
 /***/ },
-/* 257 */
+/* 260 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -64875,7 +65029,7 @@ componentHandler.register({
 	module.exports = shallowCompare;
 
 /***/ },
-/* 258 */
+/* 261 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -64896,8 +65050,8 @@ componentHandler.register({
 
 	var assign = __webpack_require__(40);
 
-	var ReactTransitionGroup = __webpack_require__(259);
-	var ReactCSSTransitionGroupChild = __webpack_require__(261);
+	var ReactTransitionGroup = __webpack_require__(262);
+	var ReactCSSTransitionGroupChild = __webpack_require__(264);
 
 	function createTransitionTimeoutPropValidator(transitionType) {
 	  var timeoutPropName = 'transition' + transitionType + 'Timeout';
@@ -64963,7 +65117,7 @@ componentHandler.register({
 	module.exports = ReactCSSTransitionGroup;
 
 /***/ },
-/* 259 */
+/* 262 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -64980,7 +65134,7 @@ componentHandler.register({
 	'use strict';
 
 	var React = __webpack_require__(3);
-	var ReactTransitionChildMapping = __webpack_require__(260);
+	var ReactTransitionChildMapping = __webpack_require__(263);
 
 	var assign = __webpack_require__(40);
 	var emptyFunction = __webpack_require__(16);
@@ -65173,7 +65327,7 @@ componentHandler.register({
 	module.exports = ReactTransitionGroup;
 
 /***/ },
-/* 260 */
+/* 263 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -65276,7 +65430,7 @@ componentHandler.register({
 	module.exports = ReactTransitionChildMapping;
 
 /***/ },
-/* 261 */
+/* 264 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -65296,8 +65450,8 @@ componentHandler.register({
 	var React = __webpack_require__(3);
 	var ReactDOM = __webpack_require__(4);
 
-	var CSSCore = __webpack_require__(262);
-	var ReactTransitionEvents = __webpack_require__(263);
+	var CSSCore = __webpack_require__(265);
+	var ReactTransitionEvents = __webpack_require__(266);
 
 	var onlyChild = __webpack_require__(156);
 
@@ -65441,7 +65595,7 @@ componentHandler.register({
 	module.exports = ReactCSSTransitionGroupChild;
 
 /***/ },
-/* 262 */
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -65544,7 +65698,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 263 */
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -65658,7 +65812,7 @@ componentHandler.register({
 	module.exports = ReactTransitionEvents;
 
 /***/ },
-/* 264 */
+/* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -65728,7 +65882,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 265 */
+/* 268 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -65746,7 +65900,7 @@ componentHandler.register({
 	'use strict';
 
 	var ReactElement = __webpack_require__(43);
-	var ReactPropTransferer = __webpack_require__(266);
+	var ReactPropTransferer = __webpack_require__(269);
 
 	var keyOf = __webpack_require__(79);
 	var warning = __webpack_require__(26);
@@ -65788,7 +65942,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 266 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -65806,7 +65960,7 @@ componentHandler.register({
 
 	var assign = __webpack_require__(40);
 	var emptyFunction = __webpack_require__(16);
-	var joinClasses = __webpack_require__(267);
+	var joinClasses = __webpack_require__(270);
 
 	/**
 	 * Creates a transfer strategy that will merge prop values using the supplied
@@ -65901,7 +66055,7 @@ componentHandler.register({
 	module.exports = ReactPropTransferer;
 
 /***/ },
-/* 267 */
+/* 270 */
 /***/ function(module, exports) {
 
 	/**
@@ -65945,7 +66099,7 @@ componentHandler.register({
 	module.exports = joinClasses;
 
 /***/ },
-/* 268 */
+/* 271 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -66058,7 +66212,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 269 */
+/* 272 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {/**
@@ -66531,7 +66685,7 @@ componentHandler.register({
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ },
-/* 270 */
+/* 273 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66569,7 +66723,7 @@ componentHandler.register({
 	})();
 
 /***/ },
-/* 271 */
+/* 274 */
 /***/ function(module, exports) {
 
 	// Get a universally unique identifier
@@ -66581,7 +66735,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 272 */
+/* 275 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66592,11 +66746,11 @@ componentHandler.register({
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _componentsTab = __webpack_require__(273);
+	var _componentsTab = __webpack_require__(276);
 
 	var _componentsTab2 = _interopRequireDefault(_componentsTab);
 
-	var _componentsTabList = __webpack_require__(274);
+	var _componentsTabList = __webpack_require__(277);
 
 	var _componentsTabList2 = _interopRequireDefault(_componentsTabList);
 
@@ -66630,7 +66784,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 273 */
+/* 276 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -66700,7 +66854,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 274 */
+/* 277 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -66729,7 +66883,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 275 */
+/* 278 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -66783,7 +66937,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 276 */
+/* 279 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* eslint indent:0 */
@@ -66834,7 +66988,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 277 */
+/* 280 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -66845,7 +66999,7 @@ componentHandler.register({
 
 	var R = __webpack_require__(173);
 	var React = __webpack_require__(2);
-	var DOWNLOADERS_SETTINGS_RENDERERS = __webpack_require__(278);
+	var DOWNLOADERS_SETTINGS_RENDERERS = __webpack_require__(281);
 	var default_option_value = '---';
 
 	var panel = function panel(opts) {
@@ -66957,7 +67111,7 @@ componentHandler.register({
 	module.exports = panel;
 
 /***/ },
-/* 278 */
+/* 281 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -67061,7 +67215,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 279 */
+/* 282 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -67175,7 +67329,7 @@ componentHandler.register({
 	module.exports = Panel;
 
 /***/ },
-/* 280 */
+/* 283 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -67250,12 +67404,12 @@ componentHandler.register({
 	module.exports = init;
 
 /***/ },
-/* 281 */
+/* 284 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var PriorityQueue = __webpack_require__(282);
+	var PriorityQueue = __webpack_require__(285);
 	var _introjs_items = new PriorityQueue(function (a, b) {
 	    return a.priority - b.priority;
 	});
@@ -67293,7 +67447,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 282 */
+/* 285 */
 /***/ function(module, exports) {
 
 	/**
@@ -67472,13 +67626,13 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 283 */
+/* 286 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
-	var Share = __webpack_require__(240);
+	var Share = __webpack_require__(243);
 
 	module.exports = {
 	    render: function render() {
@@ -67490,13 +67644,13 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 284 */
+/* 287 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
-	var Promo = __webpack_require__(285);
+	var Promo = __webpack_require__(288);
 
 	module.exports = {
 	    render: function render() {
@@ -67507,7 +67661,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 285 */
+/* 288 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67741,13 +67895,13 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 286 */
+/* 289 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(2);
-	var Landing = __webpack_require__(287);
+	var Landing = __webpack_require__(290);
 
 	module.exports = {
 	    render: function render() {
@@ -67758,7 +67912,7 @@ componentHandler.register({
 	};
 
 /***/ },
-/* 287 */
+/* 290 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -67784,7 +67938,7 @@ componentHandler.register({
 	});
 
 /***/ },
-/* 288 */
+/* 291 */
 /***/ function(module, exports) {
 
 	'use strict';
