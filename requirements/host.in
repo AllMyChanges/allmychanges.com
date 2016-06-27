@@ -9,4 +9,7 @@ invoke==0.10.1
 docker-py
 pip-tools
 
+# A backend for elpy, to make navigation in Python code
+jedi
+
 -e git+https://github.com/svetlyak40wt/40wt-common-tasks#egg=40wt-common-tasks
