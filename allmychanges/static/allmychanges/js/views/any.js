@@ -1,4 +1,5 @@
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var LoginMenu = require('../components/login-menu.js')
 var ReportButton = require('../components/report-button.js')
@@ -47,13 +48,13 @@ $(document).ready(function() {
 module.exports = {
     render: function () {
         $('.report-button').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <ReportButton changelog_id={element.dataset['changelogId']}/>,
                 element);
         });
 
         $('.track-button-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <TrackButton changelog_id={element.dataset['changelogId']}
                              tracked={element.dataset['tracked']}
                              username={username}
@@ -62,12 +63,12 @@ module.exports = {
         });
 
         $('.resolve-button-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <ResolveButton issue_id={element.dataset['issueId']}/>,
                 element);
         });
         $('.delete-button-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <DeleteButton version_id={element.dataset['versionId']}/>,
                 element);
         });
@@ -75,10 +76,10 @@ module.exports = {
         var tag_help_shown = false;
         
         $('.tag-help-container').each(function (idx, element) {
-            React.render(<TagHelp key="help" />, element);
+            ReactDOM.render(<TagHelp key="help" />, element);
         });
         $('.tag-button-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <TagButton key="button"
                            version_id={element.dataset['versionId']}
                            version_number={element.dataset['versionNumber']}
@@ -86,35 +87,35 @@ module.exports = {
                 element);
         });
         $('.slack-url-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                     <SlackURL url={element.dataset['url']}
                               error={element.dataset['error']}/>,
                 element);
         });
         $('.webhook-url-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                     <WebhookURL url={element.dataset['url']}
                                 error={element.dataset['error']}/>,
                 element);
         });
         $('.magic-prompt-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <MagicPrompt />,
                 element);
         });
         $('.login-menu-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <LoginMenu opened={element.dataset['opened']}
                            username={element.dataset['username']}/>,
                 element);
         });
         $('.notifications-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <Notifications/>,
                 element);
         });
         $('.feedback-form-container').each(function (idx, element) {
-            React.render(
+            ReactDOM.render(
                 <FeedbackForm page={element.dataset['page']}/>,
                 element);
         });
@@ -125,7 +126,7 @@ module.exports = {
             var guessed_sources = element.dataset['guessedSources'];
             guessed_sources = JSON.parse(guessed_sources);
             
-            React.render(
+            ReactDOM.render(
                 <PackageSettings
                      preview_id={element.dataset['previewId']}
                      changelog_id={element.dataset['changelogId']}

@@ -20038,12 +20038,13 @@
 	'use strict';
 
 	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(164);
 
-	var LoginMenu = __webpack_require__(164);
-	var ReportButton = __webpack_require__(165);
-	var ResolveButton = __webpack_require__(166);
-	var DeleteButton = __webpack_require__(167);
-	var TagButton = __webpack_require__(168);
+	var LoginMenu = __webpack_require__(165);
+	var ReportButton = __webpack_require__(166);
+	var ResolveButton = __webpack_require__(167);
+	var DeleteButton = __webpack_require__(168);
+	var TagButton = __webpack_require__(169);
 	var TagHelp = __webpack_require__(236);
 	var TrackButton = __webpack_require__(160);
 	var SlackURL = __webpack_require__(239);
@@ -20085,54 +20086,54 @@
 	module.exports = {
 	    render: function render() {
 	        $('.report-button').each(function (idx, element) {
-	            React.render(React.createElement(ReportButton, { changelog_id: element.dataset['changelogId'] }), element);
+	            ReactDOM.render(React.createElement(ReportButton, { changelog_id: element.dataset['changelogId'] }), element);
 	        });
 
 	        $('.track-button-container').each(function (idx, element) {
-	            React.render(React.createElement(TrackButton, { changelog_id: element.dataset['changelogId'],
+	            ReactDOM.render(React.createElement(TrackButton, { changelog_id: element.dataset['changelogId'],
 	                tracked: element.dataset['tracked'],
 	                username: username,
 	                num_trackers: element.dataset['numTrackers'] }), element);
 	        });
 
 	        $('.resolve-button-container').each(function (idx, element) {
-	            React.render(React.createElement(ResolveButton, { issue_id: element.dataset['issueId'] }), element);
+	            ReactDOM.render(React.createElement(ResolveButton, { issue_id: element.dataset['issueId'] }), element);
 	        });
 	        $('.delete-button-container').each(function (idx, element) {
-	            React.render(React.createElement(DeleteButton, { version_id: element.dataset['versionId'] }), element);
+	            ReactDOM.render(React.createElement(DeleteButton, { version_id: element.dataset['versionId'] }), element);
 	        });
 
 	        var tag_help_shown = false;
 
 	        $('.tag-help-container').each(function (idx, element) {
-	            React.render(React.createElement(TagHelp, { key: 'help' }), element);
+	            ReactDOM.render(React.createElement(TagHelp, { key: 'help' }), element);
 	        });
 	        $('.tag-button-container').each(function (idx, element) {
-	            React.render(React.createElement(TagButton, { key: 'button',
+	            ReactDOM.render(React.createElement(TagButton, { key: 'button',
 	                version_id: element.dataset['versionId'],
 	                version_number: element.dataset['versionNumber'],
 	                project_id: element.dataset['projectId'] }), element);
 	        });
 	        $('.slack-url-container').each(function (idx, element) {
-	            React.render(React.createElement(SlackURL, { url: element.dataset['url'],
+	            ReactDOM.render(React.createElement(SlackURL, { url: element.dataset['url'],
 	                error: element.dataset['error'] }), element);
 	        });
 	        $('.webhook-url-container').each(function (idx, element) {
-	            React.render(React.createElement(WebhookURL, { url: element.dataset['url'],
+	            ReactDOM.render(React.createElement(WebhookURL, { url: element.dataset['url'],
 	                error: element.dataset['error'] }), element);
 	        });
 	        $('.magic-prompt-container').each(function (idx, element) {
-	            React.render(React.createElement(MagicPrompt, null), element);
+	            ReactDOM.render(React.createElement(MagicPrompt, null), element);
 	        });
 	        $('.login-menu-container').each(function (idx, element) {
-	            React.render(React.createElement(LoginMenu, { opened: element.dataset['opened'],
+	            ReactDOM.render(React.createElement(LoginMenu, { opened: element.dataset['opened'],
 	                username: element.dataset['username'] }), element);
 	        });
 	        $('.notifications-container').each(function (idx, element) {
-	            React.render(React.createElement(Notifications, null), element);
+	            ReactDOM.render(React.createElement(Notifications, null), element);
 	        });
 	        $('.feedback-form-container').each(function (idx, element) {
-	            React.render(React.createElement(FeedbackForm, { page: element.dataset['page'] }), element);
+	            ReactDOM.render(React.createElement(FeedbackForm, { page: element.dataset['page'] }), element);
 	        });
 	        $('.add-new-container').each(function (idx, element) {
 	            var downloader_settings = element.dataset['downloaderSettings'];
@@ -20141,7 +20142,7 @@
 	            var guessed_sources = element.dataset['guessedSources'];
 	            guessed_sources = JSON.parse(guessed_sources);
 
-	            React.render(React.createElement(PackageSettings, {
+	            ReactDOM.render(React.createElement(PackageSettings, {
 	                preview_id: element.dataset['previewId'],
 	                changelog_id: element.dataset['changelogId'],
 	                source: element.dataset['source'],
@@ -20161,6 +20162,14 @@
 
 /***/ },
 /* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = __webpack_require__(4);
+
+/***/ },
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20232,7 +20241,7 @@
 	});
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20391,7 +20400,7 @@
 	});
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20437,7 +20446,7 @@
 	});
 
 /***/ },
-/* 167 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -20483,15 +20492,15 @@
 	});
 
 /***/ },
-/* 168 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var css = __webpack_require__(169);
+	var css = __webpack_require__(170);
 	var React = __webpack_require__(2);
-	var R = __webpack_require__(173);
-	var ReactMDL = __webpack_require__(174);
+	var R = __webpack_require__(174);
+	var ReactMDL = __webpack_require__(175);
 	var FABButton = ReactMDL.FABButton;
 	var Button = ReactMDL.Button;
 	var Icon = ReactMDL.Icon;
@@ -20691,16 +20700,16 @@
 	});
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(170);
+	var content = __webpack_require__(171);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(172)(content, {});
+	var update = __webpack_require__(173)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -20717,10 +20726,10 @@
 	}
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(171)();
+	exports = module.exports = __webpack_require__(172)();
 	// imports
 
 
@@ -20731,7 +20740,7 @@
 
 
 /***/ },
-/* 171 */
+/* 172 */
 /***/ function(module, exports) {
 
 	/*
@@ -20786,7 +20795,7 @@
 	};
 
 /***/ },
-/* 172 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -21011,7 +21020,7 @@
 
 
 /***/ },
-/* 173 */
+/* 174 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//  Ramda v0.18.0
@@ -28959,7 +28968,7 @@
 
 
 /***/ },
-/* 174 */
+/* 175 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28968,7 +28977,7 @@
 	    value: true
 	});
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	Object.defineProperty(exports, 'mdlUpgrade', {
 	    enumerable: true,
@@ -28977,7 +28986,7 @@
 	    }
 	});
 
-	var _MDLComponent = __webpack_require__(176);
+	var _MDLComponent = __webpack_require__(177);
 
 	Object.defineProperty(exports, 'MDLComponent', {
 	    enumerable: true,
@@ -29378,7 +29387,7 @@
 	}
 
 /***/ },
-/* 175 */
+/* 176 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29391,7 +29400,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _MDLComponent = __webpack_require__(176);
+	var _MDLComponent = __webpack_require__(177);
 
 	var _MDLComponent2 = _interopRequireDefault(_MDLComponent);
 
@@ -29412,7 +29421,7 @@
 	};
 
 /***/ },
-/* 176 */
+/* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29433,7 +29442,7 @@
 
 	var _react = __webpack_require__(2);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	function _classCallCheck(instance, Constructor) {
 	    if (!(instance instanceof Constructor)) {
@@ -29483,14 +29492,6 @@
 	})(_react.Component);
 
 	exports["default"] = MDLComponent;
-
-/***/ },
-/* 177 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	module.exports = __webpack_require__(4);
 
 /***/ },
 /* 178 */
@@ -29688,7 +29689,7 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -30147,13 +30148,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -30388,7 +30389,7 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _MDLComponent = __webpack_require__(176);
+	var _MDLComponent = __webpack_require__(177);
 
 	var _MDLComponent2 = _interopRequireDefault(_MDLComponent);
 
@@ -31151,7 +31152,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
@@ -32094,7 +32095,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
@@ -32104,7 +32105,7 @@
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -32318,7 +32319,7 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -33260,7 +33261,7 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -33392,13 +33393,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -33530,13 +33531,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -33751,13 +33752,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -34049,7 +34050,7 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -34155,13 +34156,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -34494,13 +34495,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(177);
+	var _reactDom = __webpack_require__(164);
 
 	var _classnames = __webpack_require__(179);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _mdlUpgrade = __webpack_require__(175);
+	var _mdlUpgrade = __webpack_require__(176);
 
 	var _mdlUpgrade2 = _interopRequireDefault(_mdlUpgrade);
 
@@ -34650,7 +34651,7 @@
 
 	var css = __webpack_require__(237);
 	var React = __webpack_require__(2);
-	var ReactMDL = __webpack_require__(174);
+	var ReactMDL = __webpack_require__(175);
 	var Button = ReactMDL.Button;
 
 	module.exports = React.createClass({
@@ -34758,7 +34759,7 @@
 	var content = __webpack_require__(238);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(172)(content, {});
+	var update = __webpack_require__(173)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -34778,7 +34779,7 @@
 /* 238 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(171)();
+	exports = module.exports = __webpack_require__(172)();
 	// imports
 
 
@@ -35265,9 +35266,9 @@
 	'use strict';
 
 	var Accordion = __webpack_require__(247);
-	var ReactMDL = __webpack_require__(174);
+	var ReactMDL = __webpack_require__(175);
 	var Spinner2 = ReactMDL.Spinner;
-	var R = __webpack_require__(173);
+	var R = __webpack_require__(174);
 	var css = __webpack_require__(250);
 
 	var React = __webpack_require__(2);
@@ -36048,7 +36049,7 @@
 	var content = __webpack_require__(249);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(172)(content, {});
+	var update = __webpack_require__(173)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -36068,7 +36069,7 @@
 /* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(171)();
+	exports = module.exports = __webpack_require__(172)();
 	// imports
 
 
@@ -36088,7 +36089,7 @@
 	var content = __webpack_require__(251);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(172)(content, {});
+	var update = __webpack_require__(173)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -36108,7 +36109,7 @@
 /* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(171)();
+	exports = module.exports = __webpack_require__(172)();
 	// imports
 
 
@@ -38826,7 +38827,7 @@
 
 	'use strict';
 
-	var R = __webpack_require__(173);
+	var R = __webpack_require__(174);
 	var React = __webpack_require__(2);
 	var DOWNLOADERS_SETTINGS_RENDERERS = __webpack_require__(281);
 	var default_option_value = '---';
@@ -38951,7 +38952,7 @@
 	'use strict';
 
 	var React = __webpack_require__(2);
-	var R = __webpack_require__(173);
+	var R = __webpack_require__(174);
 
 	// each downloader should get two parameters:
 	// settings is a dictionary with downloader's settings

@@ -13,11 +13,12 @@ mock
 werkzeug
 tailer
 docopt
-fabric
+
 rq-dashboard
 #memory-profiler
 Pympler
 
+# better assertions for unittests
 PyHamcrest
 
 ##-e git+git://github.com/svetlyak40wt/pip-1.git@ask-before-hard-reset#egg=pip
