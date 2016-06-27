@@ -2,7 +2,6 @@ var React = require('react');
 
 var Modal = React.createClass({
     componentDidMount: function() {
-        debugger
         // Initialize the modal, once we have the DOM node @modal.dialog
         // TODO: Pass these in via props
         $(this.getDOMNode()).modal({background: true, keyboard: true, show: false});
