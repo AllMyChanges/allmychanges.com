@@ -7,6 +7,7 @@ from django.views.generic.base import RedirectView
 
 
 from .views import (OldIndexView,
+                    UserProfileView,
                     MergeProjectView,
                     TestSlackView,
                     TestWebhookView,
@@ -135,6 +136,10 @@ urlpatterns = patterns(
     url(r'^p/(?P<namespace>.*?)/(?P<name>.*?)/$',
         ProjectView.as_view(),
         name='project'),
+
+    url(r'^u/(?P<username>.*?)/',
+        UserProfileView.as_view(),
+        name='user-profile'),
 
     url(r'^humans.txt/$', HumansView.as_view(), name='humans'),
     url(r'^v1/', include('allmychanges.api.urls')),

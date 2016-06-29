@@ -20191,6 +20191,7 @@
 	    },
 	    render: function render() {
 	        if (this.state.opened) {
+	            var profile_url = '/u/' + this.props.username + '/';
 	            return React.createElement(
 	                'div',
 	                { className: 'login-menu' },
@@ -20204,6 +20205,15 @@
 	                React.createElement(
 	                    'ul',
 	                    { className: 'login-menu__items' },
+	                    React.createElement(
+	                        'li',
+	                        null,
+	                        React.createElement(
+	                            'a',
+	                            { href: profile_url },
+	                            'My Profile'
+	                        )
+	                    ),
 	                    React.createElement(
 	                        'li',
 	                        null,

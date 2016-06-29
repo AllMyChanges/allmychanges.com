@@ -1,0 +1,43 @@
+{% extends "allmychanges/base.html" %}
+
+{% block content %}
+  <!-- для отображения загруженности ангажированности пользователя -->
+  <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.5.2/cal-heatmap.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/cal-heatmap/3.5.2/cal-heatmap.css" />
+
+  {% if avatar %}
+  <img class="avatar" width="200" height="200" src={{ avatar }} />
+    {% if customer == user %}
+      <p>To change this avatar, upload image at <a href="https://gravatar.com">Gravatar.com</a><br/>for email <code>{{ user.email }}</code>.<p>
+    {% endif %}
+  {% endif %}
+
+
+  <h1 class="page-header">{{ customer.username }}</h1>
+
+  <dl class="user-contacts">
+    <dt>Joined at</dt>
+    <dd>{{ customer.date_joined }}</dd>
+    {% for name, url in customer.auth_through.items %}
+      <dt>{{ name }}</dt>
+      <dd><a href="{{ url }}" target="_blank">{{ url }}</a></dd>
+    {% endfor %}
+    <dt>Tracks</dt>
+    <dd>{{ customer.tracked_changelogs|safe }}</dd>
+    {% if customer.opened_issues or customer.resolved_issues %}
+      <dt>Issues</dt>
+      <dd><a href="{% url 'issues' %}?username={{ customer.username }}">opened – {{ customer.opened_issues_count }}</a>, <a href="{% url 'issues' %}?username={{ customer.username }}&resolved=1">resolved – {{ customer.resolved_issues_count }}</a></dd>
+    {% endif %}
+    {% if customer.moderated_changelogs_str %}
+      <dt>Moderates</dt>
+      <dd>{{ customer.moderated_changelogs_str|safe }}</dd>
+    {% endif %}
+  </dl>
+  
+  <h1 class="page-header">User activity</h1>
+  <div id="cal-heatmap"></div>
+  <script type="text/javascript">
+    var activity_heat_map = {{activity_heat_map|safe}};
+  </script>
+{% endblock content %}

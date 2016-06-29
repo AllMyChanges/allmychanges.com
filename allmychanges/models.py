@@ -8,6 +8,7 @@ import random
 import envoy
 import jsonfield
 import logging
+import urllib
 
 from magic_repr import make_repr
 from hashlib import md5, sha1
@@ -188,6 +189,29 @@ class User(AbstractBaseUser):
         verbose_name_plural = 'users'
 
     __repr__ = make_repr('username', 'email')
+
+    def get_avatar(self, size):
+#        adorable_template = 'https://api.adorable.io/avatars/{size}/{hash}.png'
+        robohash_template = 'https://robohash.org/{hash}.png?size={size}x{size}'
+
+        if self.email:
+            hash = md5(self.email.lower()).hexdigest()
+            default = robohash_template.format(size=size, hash=hash)
+            avatar_url = 'https://www.gravatar.com/avatar/{hash}?{opts}'.format(
+                hash=hash,
+                opts=urllib.urlencode(
+                    dict(
+                        s=str(size),
+                        d=default
+                    )
+                )
+            )
+        else:
+            hash = md5(self.username).hexdigest()
+            avatar_url = robohash_template.format(size=size, hash=hash)
+
+        return avatar_url
+
 
     @property
     def is_superuser(self):

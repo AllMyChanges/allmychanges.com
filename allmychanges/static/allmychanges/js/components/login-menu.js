@@ -13,11 +13,13 @@ module.exports = React.createClass({
     },
     render: function() {
         if (this.state.opened) {
+            var profile_url = '/u/' + this.props.username + '/';
             return (<div className="login-menu">
                       <a className="login-menu__button"
                               onClick={this.close}
                               title="Click to close a menu.">{this.props.username}</a>
                       <ul className="login-menu__items">
+                        <li><a href={profile_url}>My Profile</a></li>
                         <li><a href="/account/settings/">Settings</a></li>
                         <li><a href="/logout/?next=/">Logout</a></li>
                       </ul>

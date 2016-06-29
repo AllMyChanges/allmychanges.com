@@ -1006,6 +1006,67 @@ class AdminUserProfileEditView(SuperuserRequiredMixin,
         return HttpResponseRedirect(reverse('admin-user-profile', **kwargs))
 
 
+class UserProfileView(CommonContextMixin,
+                      TemplateView):
+    template_name = 'allmychanges/user-profile.html'
+
+    def get_context_data(self, **kwargs):
+        result = super(UserProfileView, self).get_context_data(**kwargs)
+        user = User.objects.get(username=kwargs['username'])
+        result['customer'] = user
+        result['avatar'] = user.get_avatar(200)
+
+        def transform_changelog_mention(match):
+            try:
+                pk = match.group('pk')
+                ch = Changelog.objects.get(pk=pk)
+                return project_html_name(ch)
+            except Changelog.DoesNotExist:
+                return 'Not Found'
+
+        def format_names(changelogs):
+            values = list(changelogs)
+            values.sort(key=lambda ch: (ch.namespace, ch.name))
+            return map(project_html_name, values)
+
+        # show changelogs
+        tracked_changelogs = format_names(user.changelogs.all())
+        user.tracked_changelogs = ', '.join(tracked_changelogs)
+
+        # moderated changelogs
+        user.moderated_changelogs_str = ', '.join(format_names(user.moderated_changelogs.all()))
+
+        # calculate issues count
+        user.opened_issues_count = user.issues.filter(resolved_at=None).count()
+        user.resolved_issues_count = user.issues.exclude(resolved_at=None).count()
+
+        # show social profiles, used for authentication
+        user.auth_through = {}
+
+        auth_templates = {'twitter': ('Twitter', 'https://twitter.com/{username}'),
+                          'github': ('GitHub', 'https://github.com/{username}/')}
+        auth = user.social_auth.all().values_list('provider', flat=True)
+        for item in auth:
+            title, tmpl = auth_templates.get(item)
+            user.auth_through[title] = tmpl.format(username=user.username)
+
+
+        heatmap = get_user_actions_heatmap(
+            user,
+            only_active=self.request.GET.get('all') is None)
+
+        timestamp = lambda dt: arrow.get(dt).timestamp
+        grouped = dict((str(timestamp(date)), count) for date, count in heatmap.iteritems())
+
+        result['activity_heat_map'] = grouped
+
+        def process_description(text):
+            return re.sub(ur'changelog:(?P<pk>\d+)',
+                          transform_changelog_mention,
+                          text)
+        return result
+
+
 class ImmediateResponse(BaseException):
     def __init__(self, response):
         self.response = response
