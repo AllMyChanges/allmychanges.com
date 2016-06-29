@@ -133,7 +133,7 @@ class User(AbstractBaseUser):
     Email and password are required. Other fields are optional.
     """
     username = models.CharField('user name', max_length=254, unique=True)
-    email = models.EmailField('email address', max_length=254, blank=True)
+    email = models.EmailField('email address', max_length=254)
     email_is_valid = models.BooleanField(default=False)
     date_joined = models.DateTimeField('date joined', default=timezone.now)
     timezone = models.CharField(max_length=100,

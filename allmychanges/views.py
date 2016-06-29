@@ -785,11 +785,29 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
 
     def get_form_class(self):
         from django.forms.models import modelform_factory
-        return modelform_factory(User, fields=('email', 'timezone', 'send_digest', 'slack_url', 'webhook_url'))
+        return modelform_factory(
+            User,
+            fields=(
+                'email',
+                'timezone',
+                'send_digest',
+                'slack_url',
+                'webhook_url',
+            ),
+            error_messages={
+                'email': {
+                    'required': 'We need your email to deliver fresh release notes.'
+                },
+            }
+        )
 
     def get_context_data(self, **kwargs):
         result = super(ProfileView, self).get_context_data(**kwargs)
-        result['from_registration'] = self.request.GET.get('registration')
+        # this option can be in GET or in POST data
+        result['from_registration'] = self.request.POST.get(
+            'registration',
+            self.request.GET.get('registration')
+        )
         return result
 
     def get_success_url(self):

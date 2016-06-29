@@ -48,3 +48,24 @@ def test_verification_code():
 
     user = refresh(user)
     eq_(True, user.email_is_valid)
+
+
+def test_email_is_required_in_account_settings():
+    # email field is required now.
+    # here we check if error message is shown on the page
+    # when email is not given
+
+    cl = Client()
+    user = create_user('art')
+    cl.login(username='art', password='art')
+
+    url = reverse('account-settings')
+    response = cl.post(
+        url,
+        dict={}
+    )
+    check_status_code(200, response)
+    assert 'There is some error in the form data' in response.content
+    with open('/tmp/allmychanges/response.html', 'w') as f:
+        f.write(response.content)
+    assert 'We need your email to deliver fresh release notes.' in response.content

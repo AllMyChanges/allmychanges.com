@@ -6,12 +6,18 @@
   <h2 class="page-subheader"><a name="notifications">Notifications</a></h2>
 
   <form action="." method="post" class="form form_profile">
+    <input type="hidden" name="registration" value="{{ from_registration }}" />
+    
     <table class="form__layout">
       <tr class="form__layout__row">
         <td class="form__layout__left-column"><label class="label">Email:</label></td>
         <td class="form__layout__right-column">
           {{ form.email|add_class:"mdl-textfield__input profile-form__email-field" }}
-          <p class="form__layout__right-column form__help">We will mail you when new versions will be discovered.</p>
+          {% if form.email.errors %}
+            <p class="form__layout__right-column form__error">We need your email to deliver fresh release notes.</p>
+          {% else %}
+            <p class="form__layout__right-column form__help">We will mail you when new versions will be discovered.</p>
+          {% endif %}
         </td>
       </tr>
       <tr class="form__layout__row">

@@ -232,9 +232,15 @@ class ProfileTests(TransactionTestCase):
 
     def test_timezone_update(self):
         url = '/account/settings/'
-        response = self.cl.post(url, dict(timezone='Europe/Moscow',
-                                          send_digest='daily',
-                                          slack_url=''))
+        response = self.cl.post(
+            url,
+            dict(
+                email='some@example.com',
+                timezone='Europe/Moscow',
+                send_digest='daily',
+                slack_url=''
+            )
+        )
         check_status_code(302, response)
         assert url in response['Location']
         user = refresh(self.user)
