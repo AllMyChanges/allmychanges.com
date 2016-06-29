@@ -811,10 +811,10 @@ class ProfileView(LoginRequiredMixin, CommonContextMixin, UpdateView):
         return result
 
     def get_success_url(self):
-        if self.request.POST.get('from_registration'):
-            return '/digest/'
+        if self.request.POST.get('registration'):
+            return reverse('categories')
         else:
-            return '/account/settings/'
+            return reverse('account-settings')
 
 
     def get_object(self, queryset=None):
