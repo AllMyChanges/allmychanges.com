@@ -1,6 +1,12 @@
 1.7.0 (unreleased)
 ==================
 
+## Features
+
+* User profiles were added. Now you can view user's avatar,
+which projects he is moderating or tracking.
+* And on each project's page you can see who tracks and moderates it.
+
 ## Fixes
 
 * Now versions with release date "in future" are concidered as "unreleased".

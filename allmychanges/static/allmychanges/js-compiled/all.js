@@ -48044,7 +48044,6 @@ componentHandler.register({
 	        e.nativeEvent.stopImmediatePropagation();
 	    },
 	    render: function render() {
-	        var num_trackers = this.props.num_trackers;
 	        var popup;
 
 	        if (this.state.show_popup) {
@@ -48085,24 +48084,6 @@ componentHandler.register({
 	            );
 	        }
 
-	        var trackers_msg;
-	        if (num_trackers) {
-	            var msg;
-	            if (num_trackers && num_trackers != '0') {
-	                msg = num_trackers + ' followers';
-	                if (num_trackers == '1') {
-	                    msg = 'one follower';
-	                }
-	            } else {
-	                msg = 'nobody follows it, be the first!';
-	            }
-	            trackers_msg = React.createElement(
-	                'div',
-	                { className: 'track-button__message' },
-	                msg
-	            );
-	        }
-
 	        if (this.state.tracked) {
 	            return React.createElement(
 	                'div',
@@ -48126,8 +48107,7 @@ componentHandler.register({
 	                        onClick: this.track,
 	                        title: 'Click to receive notifications about new versions.' },
 	                    'Follow'
-	                ),
-	                trackers_msg
+	                )
 	            );
 	        }
 	    }
@@ -48263,8 +48243,7 @@ componentHandler.register({
 	        $('.track-button-container').each(function (idx, element) {
 	            ReactDOM.render(React.createElement(TrackButton, { changelog_id: element.dataset['changelogId'],
 	                tracked: element.dataset['tracked'],
-	                username: username,
-	                num_trackers: element.dataset['numTrackers'] }), element);
+	                username: username }), element);
 	        });
 
 	        $('.resolve-button-container').each(function (idx, element) {

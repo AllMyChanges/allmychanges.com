@@ -555,6 +555,8 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         result['already_tracked'] = already_tracked
         result['issues'] = changelog.issues.filter(resolved_at=None)
         result['num_trackers'] = changelog.trackers.count()
+        result['trackers'] = list(changelog.trackers.all())
+        result['moderators'] = list(changelog.moderators.all())
 
         if 'add-tags' in self.request.GET:
             # we'll show dialog immediately if special ?add-tags was given

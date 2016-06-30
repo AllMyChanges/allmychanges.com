@@ -46,7 +46,6 @@ module.exports = React.createClass({
         e.nativeEvent.stopImmediatePropagation();
     },
     render: function() {
-        var num_trackers = this.props.num_trackers;
         var popup;
 
         if (this.state.show_popup) {
@@ -61,20 +60,6 @@ module.exports = React.createClass({
         }
 
 
-        var trackers_msg;
-        if (num_trackers) {
-            var msg;
-            if (num_trackers && num_trackers != '0') {
-                msg = num_trackers + ' followers';
-                if (num_trackers == '1') {
-                    msg = 'one follower';
-                }
-            } else {
-                msg = 'nobody follows it, be the first!';
-            }
-            trackers_msg = <div className="track-button__message">{msg}</div>;
-        }
-
         if (this.state.tracked) {
             return (<div className="track-button">
                       <button className="button _bad"
@@ -87,7 +72,6 @@ module.exports = React.createClass({
                       <button className="button _good"
                               onClick={this.track}
                               title="Click to receive notifications about new versions.">Follow</button>
-                      {trackers_msg}
                     </div>);
         }
     }

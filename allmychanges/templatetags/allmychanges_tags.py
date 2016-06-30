@@ -3,6 +3,7 @@ import anyjson
 
 from django import template
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 from allmychanges.utils import reverse
 
@@ -78,3 +79,23 @@ def admin_user_links(users):
             username)
     fragment = u', '.join(map(get_link, users))
     return mark_safe(fragment)
+
+
+@register.simple_tag
+def avatars_list(users):
+    size = 24
+
+    def format_user(u):
+        username = u.username
+        return format_html(
+            u'<a href="{profile_url}" title="{username}"><img width="{size}" src="{avatar_url}" /></a>',
+            profile_url=reverse(
+                'user-profile',
+                username=username
+            ),
+            username=username,
+            size=size,
+            avatar_url=u.get_avatar(size),
+        )
+    users = map(format_user, users)
+    return u', '.join(users)
