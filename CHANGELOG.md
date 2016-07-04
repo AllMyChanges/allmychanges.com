@@ -1,11 +1,16 @@
-1.7.0 (unreleased)
+1.7.0 (2016-07-05)
 ==================
 
-## Features
+## Features and Changes
 
 * User profiles were added. Now you can view user's avatar,
-which projects he is moderating or tracking.
+which projects he is moderating or tracking. To change your avatar,
+you need to setup an email at [account settings](https://allmychanges.com/account/settings/)
+and to upload the avatar to [gravatar.com](https://gravatar.com).
+* Email field is required now.
 * And on each project's page you can see who tracks and moderates it.
+* [Project documentation](https://allmychanges.com/help/) is reformatted
+into reStructured text because of it's flexibility.
 
 ## Fixes
 
