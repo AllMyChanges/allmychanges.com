@@ -905,19 +905,339 @@ a:hover {
 .help ol {
   margin-top: 20px;
 }
-.help .anchor {
+.help h1:hover .headerlink,
+.help h2:hover .headerlink,
+.help h3:hover .headerlink,
+.help h4:hover .headerlink,
+.help h5:hover .headerlink,
+.help h6:hover .headerlink {
+  display: inline-block;
+}
+.help .headerlink {
+  display: none;
   color: #333;
   text-decoration: none;
-  cursor: text;
 }
-.help .anchor:hover:after {
-  content: "permalink";
-  display: inline;
-  cursor: pointer;
-  font-size: 10px;
-  line-height: 10px;
+.help-breadcrumbs li {
+  display: inline-block;
+  list-style: none;
+}
+.rst-content img {
+  max-width: 100%;
+  height: auto !important;
+}
+.rst-content div.figure {
+  margin-bottom: 16px;
+}
+.rst-content div.figure p.caption {
+  font-style: italic;
+}
+.rst-content div.figure.align-center {
+  text-align: center;
+}
+.rst-content .section > img,
+.rst-content .section > a > img {
+  margin-bottom: 16px;
+/* // Questionable whether this is nice or not. It styles eternal links, but comes with some baggage. */
+/* // a.reference.external:after */
+/* //   font-family: FontAwesome */
+/* //   content: " \f08e " */
+/* //   color: $text-light */
+/* //   vertical-align: super */
+/* //   font-size: 60% */
+}
+.rst-content blockquote {
+  margin-left: 16px;
+  line-height: 16px;
+  margin-bottom: 16px;
+}
+.rst-content .literal-block .last,
+.rst-content pre.literal-block .last,
+.rst-content .note .last,
+.rst-content .attention .last,
+.rst-content .caution .last,
+.rst-content .danger .last,
+.rst-content .error .last,
+.rst-content .hint .last,
+.rst-content .important .last,
+.rst-content .tip .last,
+.rst-content .warning .last,
+.rst-content .seealso .last,
+.rst-content .admonition-todo .last {
+  margin-bottom: 0;
+}
+.rst-content .admonition-title:before {
+  margin-right: 4px;
+}
+.rst-content .admonition table {
+  border-color: rgba(0,0,0,0.1);
+}
+.rst-content .admonition table td,
+.rst-content .admonition table th {
+  background: transparent !important;
+  border-color: rgba(0,0,0,0.1) !important;
+}
+.rst-content .section ol.loweralpha,
+.rst-content .section ol.loweralpha li {
+  list-style: lower-alpha;
+}
+.rst-content .section ol.upperalpha,
+.rst-content .section ol.upperalpha li {
+  list-style: upper-alpha;
+}
+.rst-content .section ol p,
+.rst-content .section ul p {
+  margin-bottom: 16px/2;
+}
+.rst-content .line-block {
+  margin-left: 16px;
+}
+.rst-content .topic-title {
+  font-weight: bold;
+  margin-bottom: 16px/2;
+}
+.rst-content .toc-backref {
+  color: #333;
+}
+.rst-content .align-right {
+  float: right;
+  margin: 0px 0px 16px 16px;
+}
+.rst-content .align-left {
+  float: left;
+  margin: 0px 16px 16px 0px;
+}
+.rst-content .align-center {
+  margin: auto;
+  display: block;
+}
+.rst-content h1 .headerlink,
+.rst-content h2 .headerlink,
+.rst-content h3 .headerlink,
+.rst-content h4 .headerlink,
+.rst-content h5 .headerlink,
+.rst-content h6 .headerlink,
+.rst-content dl dt .headerlink,
+.rst-content p.caption .headerlink {
+  display: none;
+  visibility: hidden;
+  font-size: 14px;
+/* //    @extend .fa */
+}
+.rst-content h1 .headerlink:after,
+.rst-content h2 .headerlink:after,
+.rst-content h3 .headerlink:after,
+.rst-content h4 .headerlink:after,
+.rst-content h5 .headerlink:after,
+.rst-content h6 .headerlink:after,
+.rst-content dl dt .headerlink:after,
+.rst-content p.caption .headerlink:after {
+  visibility: visible;
+  content: "\f0c1";
+  font-family: FontAwesome;
+  display: inline-block;
+}
+.rst-content h1:hover .headerlink,
+.rst-content h2:hover .headerlink,
+.rst-content h3:hover .headerlink,
+.rst-content h4:hover .headerlink,
+.rst-content h5:hover .headerlink,
+.rst-content h6:hover .headerlink,
+.rst-content dl dt:hover .headerlink,
+.rst-content p.caption:hover .headerlink {
+  display: inline-block;
+}
+.rst-content .highlighted {
+  background: #ff0;
+  display: inline-block;
+  font-weight: bold;
+  padding: 0 16px/4;
+}
+.rst-content .footnote-reference,
+.rst-content .citation-reference {
+  vertical-align: super;
+  font-size: 90%;
+}
+.rst-content table.docutils.citation,
+.rst-content table.docutils.footnote {
+  background: none;
+  border: none;
+  color: #777;
+}
+.rst-content table.docutils.citation td,
+.rst-content table.docutils.footnote td,
+.rst-content table.docutils.citation tr,
+.rst-content table.docutils.footnote tr {
+  border: none;
+  background-color: transparent !important;
+  white-space: normal;
+}
+.rst-content table.docutils.citation td.label,
+.rst-content table.docutils.footnote td.label {
+  padding-left: 0;
+  padding-right: 0;
+  vertical-align: top;
+}
+.rst-content table.docutils.citation code,
+.rst-content table.docutils.footnote code {
+  color: #777;
+}
+.rst-content table.field-list {
+  border: none;
+}
+.rst-content table.field-list td {
+  border: none;
+  padding-top: 5px;
+}
+.rst-content table.field-list td > strong {
+  display: inline-block;
+  margin-top: 3px;
+}
+.rst-content table.field-list .field-name {
+  padding-right: 10px;
+  text-align: left;
+  white-space: nowrap;
+}
+.rst-content table.field-list .field-body {
+  text-align: left;
+  padding-left: 0;
+}
+.rst-content tt,
+.rst-content code {
+  color: #333;
+  padding: 2px 5px;
+}
+.rst-content tt big,
+.rst-content code big,
+.rst-content tt em,
+.rst-content code em {
+  font-size: 100% !important;
+  line-height: normal;
+}
+.rst-content tt.literal,
+.rst-content code.literal {
+  color: #333;
+}
+.rst-content tt.xref,
+.rst-content code.xref,
+a .rst-content tt,
+a .rst-content code {
+  font-weight: bold;
+  color: #46f;
+}
+.rst-content a tt,
+.rst-content a code {
+  color: #46f;
+}
+.rst-content dl {
+  margin-bottom: 16px;
+/* // Most of the content within these dls are one liners, so I halve the normal margins. */
+/* // rST seems to want dds to be treated as the browser would, indented. */
+}
+.rst-content dl dt {
+  font-weight: bold;
+}
+.rst-content dl p,
+.rst-content dl table,
+.rst-content dl ul,
+.rst-content dl ol {
+  margin-bottom: 16px/2 !important;
+}
+.rst-content dl dd {
+  margin: 0 0 16px/2 16px;
+}
+.rst-content dl:not(.docutils) {
+  margin-bottom: 16px;
+/* // This would be the equivilant of a .. class:: */
+/* // And this would be the .. method:: */
+/* // Since dts get the callout style, we treat this less as callouts. */
+/* // This is for more advanced parameter control */
+}
+.rst-content dl:not(.docutils) dt {
+  display: inline-block;
+  margin: 16px/4 0;
+  font-size: 90%;
+  line-height: normal;
+  background: #999;
+  color: #333;
+  border-top: solid 3px #5c5c5c;
+  padding: 16px/4;
   position: relative;
-  top: -15px;
+}
+.rst-content dl:not(.docutils) dt:before {
+  color: #5c5c5c;
+}
+.rst-content dl:not(.docutils) dt .headerlink {
+  color: #333;
+  font-size: 100% !important;
+}
+.rst-content dl:not(.docutils) dl dt {
+  margin-bottom: 16px/4;
+  border: none;
+  border-left: solid 3px #ccc;
+  background: #f0f0f0;
+  color: #46f;
+}
+.rst-content dl:not(.docutils) dl dt .headerlink {
+  color: #46f;
+  font-size: 100% !important;
+}
+.rst-content dl:not(.docutils) dt:first-child {
+  margin-top: 0;
+}
+.rst-content dl:not(.docutils) tt,
+.rst-content dl:not(.docutils) code {
+  font-weight: bold;
+}
+.rst-content dl:not(.docutils) tt.descname,
+.rst-content dl:not(.docutils) code.descname,
+.rst-content dl:not(.docutils) tt.descclassname,
+.rst-content dl:not(.docutils) code.descclassname {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  font-size: 100% !important;
+}
+.rst-content dl:not(.docutils) tt.descname,
+.rst-content dl:not(.docutils) code.descname {
+  font-weight: bold;
+}
+.rst-content dl:not(.docutils) .optional {
+  display: inline-block;
+  padding: 0 4px;
+  color: #333;
+  font-weight: bold;
+}
+.rst-content dl:not(.docutils) .property {
+  display: inline-block;
+  padding-right: 8px;
+}
+.rst-content .viewcode-link,
+.rst-content .viewcode-back {
+  display: inline-block;
+  color: #46f;
+  font-size: 80%;
+  padding-left: 16px;
+}
+.rst-content .viewcode-back {
+  display: block;
+  float: right;
+}
+.rst-content p.rubric {
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+.rst-content code.download {
+  background: inherit;
+  padding: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: inherit;
+  white-space: inherit;
+}
+.rst-content code.download span:first-child:before {
+  margin-right: 4px;
 }
 .landing-for-ios {
   margin-top: 65px;
@@ -972,7 +1292,7 @@ a:hover {
 }
 .ios-promo__suggest-item-description {
   padding-left: 10px;
-  color: #808080;
+  color: #777;
 }
 .ios-promo__digest {
   position: relative;
@@ -983,12 +1303,12 @@ a:hover {
 .ios-promo .tt-dropdown-menu {
   width: 100%;
   background: #fff;
-  border: 1px solid #808080;
+  border: 1px solid #777;
   box-shadow: 0 0 3px #111;
   margin-top: 10px;
 }
 .ios-promo .tt-suggestion {
-  border-bottom: 1px solid #808080;
+  border-bottom: 1px solid #777;
   font-size: 15px;
   line-height: 20px;
   padding: 10px;
@@ -1063,7 +1383,7 @@ a:hover {
   min-width: 40px;
 }
 .version-links-container .version-links__selected-item a {
-  color: #000;
+  color: #333;
   text-decoration: none;
   font-weight: bold;
   cursor: default;
@@ -1291,7 +1611,7 @@ a:hover {
   display: box;
 }
 .package-selector__date {
-  color: #808080;
+  color: #777;
 }
 .package-selector__versions {
   width: 100%;
@@ -1358,13 +1678,13 @@ a:hover {
   .changelog-settings__tune {
     position: fixed;
     bottom: 0;
-    box-shadow: 0px 0px 20px #808080;
+    box-shadow: 0px 0px 20px #777;
     transition: all 0.2s ease-in;
   }
 }
 @media (max-height: 500px) {
   .changelog-settings__tune {
-    box-shadow: 0px -3px 10px #808080;
+    box-shadow: 0px -3px 10px #777;
     margin-top: 20px;
   }
 }
@@ -1386,7 +1706,7 @@ a:hover {
   .preview-container__content {
     max-height: 300px;
     overflow: hidden;
-    border-bottom: 1px solid #808080;
+    border-bottom: 1px solid #777;
   }
 }
 .preview-container__show-more {
@@ -1496,7 +1816,7 @@ a:hover {
   top: -16px;
   left: 70px;
   font-size: 16px;
-  color: #808080;
+  color: #777;
   font: proxima-nova, sans-serif;
 }
 .tweet-button {
@@ -1558,7 +1878,7 @@ body.email {
   margin-bottom: 1em;
   border-top: 2px dotted #588c8c;
   padding-top: 1em;
-  color: #808080;
+  color: #777;
 }
 @media (max-width: 600px) {
   .footer {
@@ -1590,7 +1910,7 @@ body.email {
   font-family: proxima-nova, sans-serif;
 }
 .package-changes__package-title > a {
-  color: #000;
+  color: #333;
   text-decoration: none;
 }
 .package-changes__package-title > a:hover {
@@ -1605,7 +1925,7 @@ body.email {
   font-family: proxima-nova, sans-serif;
 }
 .package-version__number > a {
-  color: #000;
+  color: #333;
   text-decoration: none;
 }
 .package-version__number > a:hover {
@@ -1613,7 +1933,7 @@ body.email {
 }
 .package-version__date {
   display: inline;
-  color: #808080;
+  color: #777;
   font-family: proxima-nova, sans-serif;
 }
 .package-version__description {
@@ -1666,7 +1986,7 @@ body.email {
   line-height: 22px;
   margin-top: 16px;
   margin-bottom: 6px;
-  color: #808080;
+  color: #777;
 }
 .package-version__description h1 tt,
 .package-version__description h2 tt,
@@ -1698,12 +2018,12 @@ body.email {
 .package-metadata > dt {
   float: left;
   clear: left;
-  color: #b3b3b3;
+  color: #aaa;
 }
 .package-metadata > dd {
   float: left;
   margin-left: 0.6em;
-  color: #808080;
+  color: #777;
 }
 .changelog-item-type {
   background-color: #800080;
@@ -1761,7 +2081,7 @@ body.email {
   width: 100%;
 }
 .table > thead {
-  color: #808080;
+  color: #777;
 }
 .table > tbody > tr:nth-child(even) {
   background: #f8f8f8;

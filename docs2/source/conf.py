@@ -91,12 +91,25 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+# import sphinx_py3doc_enhanced_theme
+# html_theme = 'sphinx_py3doc_enhanced_theme'
+# html_theme_path = [sphinx_py3doc_enhanced_theme.get_html_theme_path()]
+
+# import allmychanges.sphinx_theme
+# html_theme = "sphinx_theme"
+# html_theme_path = [allmychanges.sphinx_theme.get_html_theme_path()]
+
+import allabaster
+html_theme_path = [allabaster.get_path()]
+extensions = ['allabaster']
+html_theme = 'allabaster'
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
-# documentation.
-#html_theme_options = {}
+# documentation
+html_theme_options = {
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -161,10 +174,10 @@ html_static_path = ['_static']
 #html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
-#html_file_suffix = None
+html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'AllMyChangesdoc'
+htmlhelp_basename = 'AllMyChanges'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -240,3 +253,6 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+
+# my params

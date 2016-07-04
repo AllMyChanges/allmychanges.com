@@ -1,0 +1,39 @@
+<div class="body" role="main">
+  <div role="navigation" aria-label="breadcrumbs navigation">
+    <ul class="breadcrumbs">
+      
+      <li><a href="index">Docs</a> &raquo;</li>
+        
+      <li>Slack</li>
+      
+    </ul>
+  </div>
+
+  
+  <div class="section" id="slack">
+<h1>Slack<a class="headerlink" href="#slack" title="Permalink to this headline">¶</a></h1>
+<p>To receive updates as soon as possible, you could setup a Slack notifications.
+Enable them, following these steps:</p>
+<ol class="arabic">
+<li><p class="first">Go to you Slack account.</p>
+</li>
+<li><p class="first">In channel&#8217;s dropdown menu, choose &#8220;Add a service integration...&#8221;</p>
+<img alt="https://img-fotki.yandex.ru/get/6810/13558447.f/0_b36af_fdb87a97_L.png" src="https://img-fotki.yandex.ru/get/6810/13558447.f/0_b36af_fdb87a97_L.png" />
+</li>
+<li><p class="first">Next, filter all available integrations by &#8220;webhook&#8221; keyword.</p>
+<img alt="https://img-fotki.yandex.ru/get/5500/13558447.f/0_b36ae_4eb39439_L.png" src="https://img-fotki.yandex.ru/get/5500/13558447.f/0_b36ae_4eb39439_L.png" />
+</li>
+<li><p class="first">And select &#8220;Incoming WebHooks&#8221;.</p>
+</li>
+<li><p class="first">Choose a channel to which notification should be sent by AllMyChanges.</p>
+</li>
+<li><p class="first">And push this huge &#8220;Add Incoming Webhook Integration&#8221; button :)</p>
+</li>
+<li><p class="first">Finally, copy value from &#8220;Webhook URL&#8221; field into &#8220;Slack Url field at
+allmychanges&#8217;s <a class="reference external" href="https://allmychanges.com/account/settings/">account settings</a> page.</p>
+</li>
+</ol>
+</div>
+
+
+</div>

@@ -1,0 +1,39 @@
+<div class="body" role="main">
+  <div role="navigation" aria-label="breadcrumbs navigation">
+    <ul class="breadcrumbs">
+      
+      <li><a href="index">Docs</a> &raquo;</li>
+        
+      <li>ChangeLog Generators</li>
+      
+    </ul>
+  </div>
+
+  
+  <div class="section" id="changelog-generators">
+<h1>ChangeLog Generators<a class="headerlink" href="#changelog-generators" title="Permalink to this headline">¶</a></h1>
+<p>There are many utilities already exists to help developers write release
+notes. Most of these utilities just group commit messages or issues from
+a tracker and add result ontop of a changelog.</p>
+<p>Here is the unordered list of available changelog generators.  If we
+missed some good one, tell us about it through the feedback form.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://alaibe.github.io/amanuensis/">alaibe/Amanuensis</a> – very feature rich release notes
+generator which is able to work with GitHub&#8217;s issues, Trello&#8217;s cards and Pivotal tracker
+or generate changelog based on closed GitHub&#8217;s pull requests.</li>
+<li><a class="reference external" href="https://github.com/Particular/GitHubReleaseNotes">Particular/GitHubReleaseNotes</a> – generates
+release notes based on github issues assigned to milestones.</li>
+<li><a class="reference external" href="https://github.com/skywinder/github-changelog-generator">skywinder/github-changelog-generator</a> –
+automatically generates changelog from your tags, issues, labels and pull requests on GitHub.</li>
+<li><a class="reference external" href="https://github.com/lalitkapoor/github-changes">lalitkapoor/github-changes</a> – transforms
+closed GitHub issues into a changelog.</li>
+<li><a class="reference external" href="https://github.com/samholmes1337/changelog">changelogapp</a> – command line utility to update
+changelog data in json file and to generate a nice formatted markdown file.</li>
+</ul>
+<div class="section" id="want-to-add-a-generator-to-the-list">
+<span id="feedback"></span><h2>Want to add a generator to the list?<a class="headerlink" href="#want-to-add-a-generator-to-the-list" title="Permalink to this headline">¶</a></h2>
+<div class="feedback-form-container" data-page="changelog-generators">Feedback form</div></div>
+</div>
+
+
+</div>

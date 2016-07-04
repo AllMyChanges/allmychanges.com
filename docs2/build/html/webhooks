@@ -1,0 +1,48 @@
+<div class="body" role="main">
+  <div role="navigation" aria-label="breadcrumbs navigation">
+    <ul class="breadcrumbs">
+      
+      <li><a href="index">Docs</a> &raquo;</li>
+        
+      <li>WebHooks</li>
+      
+    </ul>
+  </div>
+
+  
+  <div class="section" id="webhooks">
+<h1>WebHooks<a class="headerlink" href="#webhooks" title="Permalink to this headline">¶</a></h1>
+<p>AllMyChanges is able to post notifications to any
+WebHook. To setup this integration, go to the account
+settings page and paste URL into the &#8220;WebHook&#8217;s URL&#8221; field.</p>
+<p>For processing web hooks we recommend you to use <a class="reference external" href="https://python-processor.readthedocs.org">python-processor</a>.</p>
+<div class="section" id="data-format">
+<h2>Data Format<a class="headerlink" href="#data-format" title="Permalink to this headline">¶</a></h2>
+<p>AllMychanges will make a HTTP POST to the URL any time when
+new versions for package are discovered. It provides you following
+information:</p>
+<div class="code json highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;common-lisp&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sbcl&quot;</span><span class="p">,</span>
+ <span class="s2">&quot;user_tags&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;some-environment&quot;</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.2.3&quot;</span><span class="p">}],</span>
+ <span class="s2">&quot;versions&quot;</span><span class="p">:</span> <span class="p">[</span>
+   <span class="p">{</span><span class="s2">&quot;released_at&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;ul&gt;&lt;li&gt;minor incompatible change and ...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="s2">&quot;1.2.9&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;discovered_at&quot;</span><span class="p">:</span> <span class="s2">&quot;2015-03-22T18:12:00+00:00&quot;</span><span class="p">},</span>
+   <span class="p">{</span><span class="s2">&quot;released_at&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;ul&gt;&lt;li&gt;enhancement: better error and warning messages...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="s2">&quot;1.2.8&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;discovered_at&quot;</span><span class="p">:</span> <span class="s2">&quot;2015-02-20T18:12:00+00:00&quot;</span><span class="p">}]}</span>
+</pre></div>
+</div>
+<p>Please note, there could be more than one version. And each version has two dates:
+<code class="docutils literal"><span class="pre">released_at</span></code> and <code class="docutils literal"><span class="pre">discovered_at</span></code>. Release date could be empty if changelog&#8217;s maintaners don&#8217;t keep release dates in a changelog. If you are a maintainer of such changelog, please stop it!</p>
+<p>Field <code class="docutils literal"><span class="pre">discovered_at</span></code> keeps a date when AllMyChanges bot discovered that version.</p>
+<p><code class="docutils literal"><span class="pre">Content</span></code> field contains version&#8217;s
+description in a HTML format, that is the same content you see on the and
+in email notifications.</p>
+</div>
+</div>
+
+
+</div>

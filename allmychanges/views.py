@@ -1851,6 +1851,28 @@ class HelpView(CommonContextMixin, TemplateView):
         return result
 
 
+class DocsView(CommonContextMixin, TemplateView):
+    template_name = 'allmychanges/help.html'
+
+    def get_context_data(self, *args, **kwargs):
+        result = super(DocsView, self).get_context_data(**kwargs)
+        topic = self.kwargs['topic'].strip('/') or 'index'
+        filename = os.path.join(settings.PROJECT_ROOT, 'docs2/build/html/', topic)
+
+        if not os.path.exists(filename):
+            raise Http404
+
+        with open(filename) as f:
+            html = f.read()
+            result['content'] = html
+
+        if topic == 'faq':
+            result['menu_faq'] = True
+        else:
+            result['menu_help'] = True
+        return result
+
+
 _browser = None
 _browser_lock = threading.Lock()
 

@@ -1,0 +1,50 @@
+<div class="body" role="main">
+  <div role="navigation" aria-label="breadcrumbs navigation">
+    <ul class="breadcrumbs">
+      
+      <li><a href="index">Docs</a> &raquo;</li>
+        
+      <li>Tools</li>
+      
+    </ul>
+  </div>
+
+  
+  <div class="section" id="tools">
+<h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="bookmarklet">
+<h2>Bookmarklet<a class="headerlink" href="#bookmarklet" title="Permalink to this headline">¶</a></h2>
+<p>Save this link to to your favorites or drag onto bookmarks toolbar:</p>
+<a href="javascript:location.href='https://allmychanges.com/search/?q=' + encodeURIComponent(location.href)"
+   style="text-decoration: none; border-bottom: 1px dotted;"
+   onclick="return false">View Changelog</a><p>Next, beeing on project&#8217;s page click bookmarklet to view a release notes.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This bookmarklet doesn&#8217;t work on GitHub&#8217;s pages because it&#8217;s developers</p>
+</div>
+<p>are security geeks. However it works nicely on <a class="reference external" href="https://itunes.apple.com/us/genre/ios/id36?mt=8">iTunes AppStore&#8217;s</a> pages
+and at any other page containing html version of the changelog.</p>
+</div>
+<div class="section" id="command-line-utility">
+<h2>Command line utility<a class="headerlink" href="#command-line-utility" title="Permalink to this headline">¶</a></h2>
+<p>There is also a <a class="reference external" href="https://github.com/svetlyak40wt/allmychanges">command line utility</a> called <code class="docutils literal"><span class="pre">amch</span></code>, which is able
+to import and export tracked packages. It uses generic data formats
+like JSON, YAML or CSV and could be used with any other tools.</p>
+<p>Here, for example, how you could upload to allmychanges all
+dependencies from yours <cite>requirements.txt</cite> file:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> \
+  <span class="o">|</span> <span class="n">grep</span> <span class="o">-</span><span class="n">v</span> <span class="s1">&#39;^-e&#39;</span> \
+  <span class="o">|</span> <span class="n">sed</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;s/\([^=]\+\).*/python,</span><span class="se">\1</span><span class="s1">/&#39;</span> \
+        <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;1 i</span><span class="se">\n</span><span class="s1">amespace,name&#39;</span> \
+  <span class="o">&gt;</span> <span class="n">data</span>
+<span class="n">amch</span> <span class="kn">import</span> <span class="o">--</span><span class="nb">input</span> <span class="n">data</span>
+</pre></div>
+</div>
+<p>First, with <cite>cat</cite>, <cite>grep</cite> and <cite>sed</cite> you prepare and input file <cite>data</cite> in CSV format.
+And second – upload it to the service with <cite>amch</cite> command.</p>
+<p>Read more about this tool in <a class="reference external" href="https://github.com/svetlyak40wt/allmychanges#installation">it&#8217;s documentation</a>.</p>
+</div>
+</div>
+
+
+</div>

@@ -1,0 +1,115 @@
+<div class="body" role="main">
+  <div role="navigation" aria-label="breadcrumbs navigation">
+    <ul class="breadcrumbs">
+      
+      <li><a href="index">Docs</a> &raquo;</li>
+        
+      <li>FAQ</li>
+      
+    </ul>
+  </div>
+
+  
+  <div class="section" id="faq">
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-allmychanges-com">
+<span id="what-is-allmychanges"></span><h2>What is allmychanges.com?<a class="headerlink" href="#what-is-allmychanges-com" title="Permalink to this headline">¶</a></h2>
+<p>AllMyChanges is totally about release notes you care about. It tracks
+them automatically and sends you updates via email or Slack.</p>
+</div>
+<div class="section" id="why-do-you-think-i-need-it">
+<span id="why-do-i-need-it"></span><h2>Why do you think I need it?<a class="headerlink" href="#why-do-you-think-i-need-it" title="Permalink to this headline">¶</a></h2>
+<p>Well, if you don&#8217;t care about security holes in your software. If you
+never break your apps because something was changed in a third party
+library. Then you don&#8217;t need it. Go away!</p>
+<p>Are you still here? Why? Do you care about being on edge, being safe and
+using the most recent features of numerous libraries, frameworks and
+SDKs? AllMyChanges will help you to automate release notes tracking. It
+is like a Google Reader or Feedly, but for release notes and
+changelogs.</p>
+</div>
+<div class="section" id="how-does-it-work">
+<h2>How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h2>
+<p>You paste into a search field a link to a source where to search release
+notes. We do the rest. Actually, we don&#8217;t, but our robot does.</p>
+<p>If release notes can be found and extracted, we&#8217;ll show them and you will be able to subscribe.</p>
+<p>Actually many libraries, frameworks and apps already tracked by
+someone. Use search or catalogue to find them.</p>
+</div>
+<div class="section" id="did-you-say-apps-which-apps">
+<h2>Did you say apps? Which apps?<a class="headerlink" href="#did-you-say-apps-which-apps" title="Permalink to this headline">¶</a></h2>
+<p>You can subscribe on any iOS app&#8217;s release notes at allmychanges. Like
+how Slack&#8217;s release notes are written? Like creativity of Trello&#8217;s pr
+team? Track them at allmychanges and you never miss an update.</p>
+</div>
+<div class="section" id="how-to-track-some-app-s-release-notes">
+<h2>How to track some app&#8217;s release notes?<a class="headerlink" href="#how-to-track-some-app-s-release-notes" title="Permalink to this headline">¶</a></h2>
+<p>First, try to search it by name in our search bar. If it is there, you are lucky, choose&amp;track it!</p>
+<p>If autocomplete is unable to find the app, then find it in the AppStore. Copy it&#8217;s URL and paste into a search bar at allmychanges. Hit Enter. You have Enter on you keyboard, right? Hit it! And track. Don&#8217;t forget to track!</p>
+</div>
+<div class="section" id="why-do-i-have-to-login">
+<h2>Why do I have to login?<a class="headerlink" href="#why-do-i-have-to-login" title="Permalink to this headline">¶</a></h2>
+<p>We need your email. I&#8217;m serious, we need it. Not to sell it to spammers, but to be able to notify you about updates in release notes you&#8217;ve tracked.</p>
+</div>
+<div class="section" id="how-often-i-ll-receive-notifications-about-updates">
+<h2>How often I&#8217;ll receive notifications about updates?<a class="headerlink" href="#how-often-i-ll-receive-notifications-about-updates" title="Permalink to this headline">¶</a></h2>
+<p>By default, we are sending a daily digest at 9am, if there were updates. But you could choose a period of week or turn email digests off at the settings page.</p>
+</div>
+<div class="section" id="i-want-to-receive-updates-asap-is-it-possible">
+<h2>I want to receive updates ASAP. Is it possible?<a class="headerlink" href="#i-want-to-receive-updates-asap-is-it-possible" title="Permalink to this headline">¶</a></h2>
+<p>Sure. We have Slack integration. Go and set it up!</p>
+</div>
+<div class="section" id="are-you-planning-to-add-other-integrations">
+<h2>Are you planning to add other integrations?<a class="headerlink" href="#are-you-planning-to-add-other-integrations" title="Permalink to this headline">¶</a></h2>
+<p>Sure, this is easy. Tell us about your needs. Our &lt;a href=&#8221;#feedback&#8221;&gt;feedback form&lt;/a&gt; is at the bottom of the page.</p>
+<p>I don&#8217;t want manually as everything from my requirements.txt, package.json, whatever.else. Is there a way to do this automatically?</p>
+<p>Yes and no. Some popular libraries are already in allmychanges&#8217; database. Others are not. But to find release notes, our robot needs a link to a source code, without it he (or maybe she, we aren&#8217;t sure yet :)) can&#8217;t do the job.</p>
+<p>But there is a tool to automate submitting packages. Using it, you could submit dependencies from any source like requirements.txt or package.json or anything else. This is a command line utility amch. It uses our secret undocumented API.</p>
+</div>
+<div class="section" id="do-you-have-an-api">
+<h2>Do you have an API?<a class="headerlink" href="#do-you-have-an-api" title="Permalink to this headline">¶</a></h2>
+<p>Sure. But tsssss. It is a secret!</p>
+</div>
+<div class="section" id="what-kind-of-sources-could-you-process">
+<h2>What kind of sources could you process?<a class="headerlink" href="#what-kind-of-sources-could-you-process" title="Permalink to this headline">¶</a></h2>
+<p>Any link to any git or mercurial repository is ok. Not only GitHub, not only Bitbucket. Any public repository.</p>
+<p>Or a link to an app in apple&#8217;s AppStore.</p>
+<p>Or URL of any html page containing version numbers in headers. I did say we could parse any release notes. Well, almost any structured release notes.</p>
+<p>Also it is possible to process multiple html pages; we have a special recursive downloader for that. But tuning it requires to be a 89 level Regex&#8217;n&#8217;XSL Mage. Just send us a link to a complex html release notes via &lt;a href=&#8221;#feedback&#8221;&gt;feedback form&lt;/a&gt;, and we&#8217;ll do the rest.</p>
+</div>
+<div class="section" id="agrhh-explain-how-it-works">
+<h2>Agrhh! Explain, how it works?<a class="headerlink" href="#agrhh-explain-how-it-works" title="Permalink to this headline">¶</a></h2>
+<p>As I said, there is a robot. He (or she, we&#8217;re really not sure), does the job. It&#8217;s like magic. We feed it with coal, seems it&#8217;s powered by steam. But it works! Really. I&#8217;m not joking. Go on, try to drop a URL into a search field.</p>
+</div>
+<div class="section" id="ok-i-tried-it-is-amazing-now-please-explain-what-s-really-happening-behind-the-scene">
+<h2>Ok, I tried. It is amazing! Now please, explain, what&#8217;s really happening behind the scene?<a class="headerlink" href="#ok-i-tried-it-is-amazing-now-please-explain-what-s-really-happening-behind-the-scene" title="Permalink to this headline">¶</a></h2>
+<p>Well, we have a bunch of downloaders responsible for fetching sources from the link you gave us.</p>
+<p>When sources are downloaded, we are trying to find handwritten release notes using file processors. These processors are able to process txt, markdown, restructured and html files. If something which looks like a version description was found, then these pieces are grouped and filtered to remove duplicates.</p>
+<p>If processors were not able to find handwritten release notes, then we start another processor which tries to group release notes around versions. Right now it works only for git repositories and cases when there are tags with version numbers or for python and npm packages where we know how to extract version numbers.</p>
+</div>
+<div class="section" id="how-far-back-in-time-does-it-go-looks-like-a-few-months-or-few-versions">
+<h2>How far back in time does it go? Looks like a few months or few versions.<a class="headerlink" href="#how-far-back-in-time-does-it-go-looks-like-a-few-months-or-few-versions" title="Permalink to this headline">¶</a></h2>
+<p>For iOS apps, it downloads all versions which are available from AppStore. And keeps them forever.</p>
+<p>But for Google Play, it is only able to download a latest release description, so history starts
+from the point you add an app&#8217;s URL into AllMyChanges.</p>
+<p>For other software, AllMyChanges parses release notes from the URL you gave, and all depends how
+many versions already there. But anyway, it keeps historical records even in case they will be deleted
+from original source.</p>
+</div>
+<div class="section" id="why-don-t-you-extract-information-from-github-releases-api">
+<h2>Why don&#8217;t you extract information from GitHub Releases API?<a class="headerlink" href="#why-don-t-you-extract-information-from-github-releases-api" title="Permalink to this headline">¶</a></h2>
+<p>Because it&#8217;s very few who really uses it. Tell us about some popular projects, writing their release notes at github, and we&#8217;ll add this feature to our roadmap.</p>
+</div>
+<div class="section" id="are-there-any-recommendations-how-to-write-good-release-notes">
+<h2>Are there any recommendations how to write good release notes?<a class="headerlink" href="#are-there-any-recommendations-how-to-write-good-release-notes" title="Permalink to this headline">¶</a></h2>
+<p>There is a good description at <a class="reference external" href="http://keepachangelog.com">KeepAChangelog</a> site.
+Also, there is a <a class="reference external" href="http://www.semanticreleasenotes.org">SemanticReleaseNotes</a> proposal which
+is aimed to provide us with a new textual format for release notes.</p>
+</div>
+<div class="section" id="didn-t-find-answer-to-your-question-ask-it-and-we-ll-answer">
+<span id="feedback"></span><h2>Didn&#8217;t find answer to your question? Ask it and we&#8217;ll answer.<a class="headerlink" href="#didn-t-find-answer-to-your-question-ask-it-and-we-ll-answer" title="Permalink to this headline">¶</a></h2>
+<div class="feedback-form-container" data-page="faq">Feedback form</div></div>
+</div>
+
+
+</div>

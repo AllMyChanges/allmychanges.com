@@ -1,6 +1,12 @@
 {% extends "allmychanges/base.html" %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<link href="{% static 'allmychanges/css/help-theme.css' %}" rel="stylesheet">
+{% endblock extra_head %}
 
 {% block content %}
+
 <div class="help">
   {{ content|safe }}
 </div>
