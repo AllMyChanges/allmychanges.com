@@ -13,7 +13,7 @@ arrow==0.8.0              # via rq-dashboard, times
 babel==2.3.4              # via sphinx
 backports.shutil-get-terminal-size==1.0.0  # via columnize
 bleach==1.4.3
-cffi==1.6.0               # via cryptography
+cffi==1.7.0               # via cryptography
 chaussette==1.3.0
 click==6.6                # via flask, rq, tmuxp
 clint==0.5.1
@@ -40,10 +40,8 @@ djangorestframework==2.4.8
 docopt==0.6.2
 docutils==0.12
 drf-extensions==0.2.8
-ecdsa==0.13               # via paramiko
 enum34==1.1.6             # via cryptography
 envoy==0.0.3
-fabric==1.11.1
 feedgen==0.3.2
 feedparser==5.2.1
 Flask==0.11.1             # via rq-dashboard
@@ -73,16 +71,14 @@ nose==1.3.7
 nosedjango==1.0.13
 oauthlib==1.0.3           # via django-oauth-toolkit, python-social-auth, requests-oauthlib
 orderedset==2.0
-paramiko==1.17.0          # via fabric
 pbr==1.10.0               # via mock
-plumbum==1.6.1.post0
+plumbum==1.6.2
 premailer==3.0.0
 pyasn1==0.1.9             # via cryptography
 pycparser==2.14           # via cffi
-pycrypto==2.6.1           # via paramiko
 pyficache==0.3.0          # via trepan
 pyflakes==1.2.3
-pygments==2.1.3           # via pyficache, sphinx, trepan
+Pygments==2.1.3           # via pyficache, sphinx, trepan
 PyHamcrest==1.9.0
 PyJWT==1.4.0              # via python-social-auth
 Pympler==0.4.3
@@ -95,7 +91,7 @@ pytz==2016.4              # via babel, dateutils, twiggy-goodies
 PyYAML==3.11              # via kaptan
 rcssmin==1.0.6            # via django-compressor
 redis==2.10.5             # via rq, rq-dashboard
-repr==0.2.1
+repr==0.3.1
 requests-oauthlib==0.6.1  # via python-social-auth
 requests==2.10.0
 rjsmin==1.0.12            # via django-compressor
@@ -105,20 +101,22 @@ six==1.10.0               # via bleach, chaussette, cryptography, django-extensi
 snowballstemmer==1.2.1    # via sphinx
 sortedcontainers==1.5.3
 South==1.0.2
-spark-parser==1.3.0       # via uncompyle6
-Sphinx==1.4.4
+spark-parser==1.4.0       # via uncompyle6
+sphinx-rtd-theme==0.1.9
+sphinx==1.4.4
 sqlparse==0.1.19          # via django-debug-toolbar
 tailer==0.4.1
 times==0.7
 tmuxp==1.2.0
-tqdm==4.7.4
+tqdm==4.7.6
 tracer==0.3.2             # via trepan
 trepan==0.6.4
 twiggy-goodies==0.7.0
 twiggy==0.4.7             # via twiggy-goodies
-uncompyle6==2.4.0         # via trepan
+uncompyle6==2.5.0         # via trepan
 unittest-asserts==0.1.0
 werkzeug==0.11.10
+xdis==1.1.3               # via uncompyle6
 
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:

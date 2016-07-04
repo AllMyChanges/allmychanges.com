@@ -6,12 +6,14 @@
 #
 
 -e git+https://github.com/svetlyak40wt/40wt-common-tasks#egg=40wt-common-tasks
+allabaster==0.1.0
 backports.ssl-match-hostname==3.5.0.1  # via docker-py
 click==6.6                # via pip-tools
 docker-py==1.8.1
 first==2.0.1              # via pip-tools
 invoke==0.10.1
 ipaddress==1.0.16         # via docker-py
+jedi==0.9.0
 pip-tools==1.6.5
 requests==2.10.0          # via docker-py
 six==1.10.0               # via docker-py, pip-tools, websocket-client

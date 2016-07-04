@@ -12,4 +12,7 @@ pip-tools
 # A backend for elpy, to make navigation in Python code
 jedi
 
+# a theme for embedded documentation
+allabaster
+
 -e git+https://github.com/svetlyak40wt/40wt-common-tasks#egg=40wt-common-tasks

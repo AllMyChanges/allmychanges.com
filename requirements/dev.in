@@ -21,6 +21,10 @@ Pympler
 # better assertions for unittests
 PyHamcrest
 
+sphinx
+sphinx-rtd-theme
+#sphinx-py3doc-enhanced-theme
+
 ##-e git+git://github.com/svetlyak40wt/pip-1.git@ask-before-hard-reset#egg=pip
 #git+git://github.com/svetlyak40wt/pip-tools.git@my-future
 
