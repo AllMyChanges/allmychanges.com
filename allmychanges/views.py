@@ -1830,34 +1830,15 @@ class SecondStepView(CommonContextMixin, TemplateView):
 
 
 class HelpView(CommonContextMixin, TemplateView):
+    """Renders pages, compiled with sphinx adding an
+    allmychanges framing.
+    """
     template_name = 'allmychanges/help.html'
 
     def get_context_data(self, *args, **kwargs):
         result = super(HelpView, self).get_context_data(**kwargs)
         topic = self.kwargs['topic'].strip('/') or 'index'
-        filename = os.path.join(settings.PROJECT_ROOT, 'help/', topic + '.md')
-
-        if not os.path.exists(filename):
-            raise Http404
-
-        with open(filename) as f:
-            html = markdown2.markdown(f.read())
-            result['content'] = html
-
-        if topic == 'faq':
-            result['menu_faq'] = True
-        else:
-            result['menu_help'] = True
-        return result
-
-
-class DocsView(CommonContextMixin, TemplateView):
-    template_name = 'allmychanges/help.html'
-
-    def get_context_data(self, *args, **kwargs):
-        result = super(DocsView, self).get_context_data(**kwargs)
-        topic = self.kwargs['topic'].strip('/') or 'index'
-        filename = os.path.join(settings.PROJECT_ROOT, 'docs2/build/html/', topic)
+        filename = os.path.join(settings.PROJECT_ROOT, 'help/build/html/', topic)
 
         if not os.path.exists(filename):
             raise Http404

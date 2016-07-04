@@ -13,7 +13,6 @@ from .views import (OldIndexView,
                     TestWebhookView,
                     IssuesView,
                     HelpView,
-                    DocsView,
                     TrackListView,
                     TagListView,
                     TaggedProjectsView,
@@ -102,7 +101,6 @@ urlpatterns = patterns(
     url(r'^issues/(?P<pk>.*)/$', IssueDetailView.as_view(), name='issue-detail'),
 
     url(r'^help/(?P<topic>.*)$', HelpView.as_view(), name='help'),
-    url(r'^docs/(?P<topic>.*)$', DocsView.as_view(), name='docs'),
 
     url(r'^p/new/$', AddNewView.as_view(), name='add-new'),
 
