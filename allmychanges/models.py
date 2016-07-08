@@ -508,6 +508,20 @@ class Changelog(Downloadable, models.Model):
                     self.light_moderators.create(light_user=light_user)
                     return 'light'
 
+    def remove_from_moderators(self, user, light_user=None):
+        """Removes user from moderators and returns 'normal' or 'light'
+        if he really was removed.
+        In case if user wasn't a moderator, returns None."""
+
+        if self.is_moderator(user, light_user):
+            if user.is_authenticated():
+                Moderator.objects.filter(changelog=self, user=user).delete()
+                return 'normal'
+            else:
+                if light_user is not None:
+                    self.light_moderators.filter(light_user=light_user).delete()
+                    return 'light'
+
     def create_issue(self, type, comment='', related_versions=[]):
         joined_versions = u', '.join(related_versions)
 

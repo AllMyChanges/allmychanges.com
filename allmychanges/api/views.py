@@ -633,6 +633,51 @@ class ChangelogViewSet(HandleExceptionMixin,
         changelog.remove_tag(request.user, name)
         return Response(status=204)
 
+    @detail_route(
+        methods=['post'],
+        permission_classes=[],
+        # этот параметр поддерживается начиная с 3.0.3 версии
+        # https://allmychanges.com/p/python/django-rest-framework/#3.0.3
+        # url_path='add-to-moderators'
+    )
+    def add_to_moderators(self, request, pk=None):
+        user = self.request.user
+
+        if not user.is_authenticated():
+            return Response(
+                {'errors': 'Only authenticated user can become a moderator'},
+                status=403
+            )
+        changelog = self.get_object()
+        changelog.add_to_moderators(
+            self.request.user,
+            self.request.light_user
+        )
+        return Response({'result': 'ok'})
+
+    @detail_route(
+        methods=['post'],
+        permission_classes=[],
+        # этот параметр поддерживается начиная с 3.0.3 версии
+        # https://allmychanges.com/p/python/django-rest-framework/#3.0.3
+        # url_path='remove-from-moderators'
+    )
+    def remove_from_moderators(self, request, pk=None):
+        user = self.request.user
+
+        if not user.is_authenticated():
+            return Response(
+                {'errors': 'Only authenticated user can become a moderator'},
+                status=403
+            )
+        changelog = self.get_object()
+        changelog.remove_from_moderators(
+            self.request.user,
+            self.request.light_user
+        )
+        return Response({'result': 'ok'})
+
+
 
 class PreviewViewSet(HandleExceptionMixin,
                      DetailSerializerMixin,

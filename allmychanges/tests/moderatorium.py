@@ -114,3 +114,63 @@ def test_light_moderators_removed_after_24_hours():
 
     LightModerator.remove_stale_moderators()
     eq_(0, changelog.light_moderators.count())
+
+
+def test_moderator_receives_email_on_new_issues():
+    pass
+
+
+def test_everybody_can_become_a_moderator():
+    # right now I don't want to limit users abilitites to edit
+    # projects and to fix parsing problems
+    changelog = Changelog.objects.create(
+        namespace='python',
+        name='thebot',
+        source=THEBOT_GITHUB_URL,
+    )
+
+    create_user('art')
+    cl = Client()
+    cl.login(username='art', password='art')
+
+    # before call there is no moderators
+    eq_(0, changelog.moderators.count())
+
+    check_status_code(
+        200,
+        cl.post(reverse('changelog-detail',
+                        kwargs=dict(pk=changelog.id)) \
+                + 'add_to_moderators/'))
+
+    # after the call, user was added to moderators list
+    eq_(1, changelog.moderators.count())
+    assert 'art' in [u.username for u in changelog.moderators.all()]
+
+
+def test_moderator_can_give_away_the_project():
+    # Project moderator can give away his
+    # administration rights on some project
+
+    changelog = Changelog.objects.create(
+        namespace='python',
+        name='thebot',
+        source=THEBOT_GITHUB_URL,
+    )
+
+    art = create_user('art')
+    changelog.add_to_moderators(art)
+
+    cl = Client()
+    cl.login(username='art', password='art')
+
+    # before call he is a moderator
+    eq_(True, changelog.is_moderator(art))
+
+    check_status_code(
+        200,
+        cl.post(reverse('changelog-detail',
+                        kwargs=dict(pk=changelog.id)) \
+                + 'remove_from_moderators/'))
+
+    # after the call, user was removed to moderators list
+    eq_(False, changelog.is_moderator(art))

@@ -9,8 +9,14 @@ from allmychanges.downloaders import guess_downloaders
 class Command(LogMixin, BaseCommand):
     help = u"""Command to test how downloader guesser workds for given url."""
 
-    def handle(self, *args, **options):
-        url = args[0]
+    def add_arguments(self, parser):
+        # Positional arguments
+        # Moredocumentation is available here:
+        # https://docs.djangoproject.com/en/1.9/howto/custom-management-commands/#accepting-optional-arguments
+        parser.add_argument('url')
+
+
+    def handle(self, url, **options):
         for guessed in guess_downloaders(url):
             print 'Downloader:', guessed['name']
             print 'Changelog params:'
