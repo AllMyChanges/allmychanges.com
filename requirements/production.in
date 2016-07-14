@@ -11,7 +11,6 @@ rq
 #<0.5.0
 django-rq
 docutils
-markdown
 lxml
 gunicorn
 python-social-auth
@@ -39,9 +38,7 @@ clint
 newrelic
 
 MySQL-python
-# начиная с версии 0.10 oauth-toolkit не поддерживает Django 1.6
 django-oauth-toolkit
-django-markdown2
 django-sendmail-backend
 
 CommonMark
@@ -66,5 +63,3 @@ repr
 #git+git://github.com/svetlyak40wt/django-oauth-toolkit
 #git+git://github.com/svetlyak40wt/logster.git@allmychanges
 #git+git://github.com/svetlyak40wt/django-sendmail-backend
-#git+git://github.com/svetlyak40wt/django-markdown2
-#git+git://github.com/trentm/python-markdown2

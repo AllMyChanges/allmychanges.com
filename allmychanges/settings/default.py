@@ -166,7 +166,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 
     'social.apps.django_app.default',
-    'django_markdown2',
     'widget_tweaks',
     'oauth2_provider',
     'compressor',

@@ -221,8 +221,6 @@ def parse_markdown_file(obj):
         content = transform(content)
 
     html = render_markdown(content)
-    # import markdown2
-    # html = markdown2.markdown(obj.content)
 
     return parse_html_file(obj.push(content=html))
 

@@ -9,7 +9,6 @@ import requests
 import os
 import urllib
 import re
-import markdown2
 
 from itertools import groupby, takewhile
 from hashlib import sha1
