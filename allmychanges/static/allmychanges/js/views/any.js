@@ -6,8 +6,9 @@ var ReportButton = require('../components/report-button.js')
 var ResolveButton = require('../components/resolve-button.js')
 var DeleteButton = require('../components/delete-button.js')
 var TagButton = require('../components/tag-button')
+var ModerateButton = require('../components/moderate-button')
 var TagHelp = require('../components/tag-help')
-var TrackButton = require('../components/track-button.js')
+var TrackButton = require('../components/track-button')
 var SlackURL = require('../components/slack-url.js')
 var WebhookURL = require('../components/webhook-url.js')
 var MagicPrompt = require('../components/magic-prompt.js')
@@ -79,10 +80,15 @@ module.exports = {
         });
         $('.tag-button-container').each(function (idx, element) {
             ReactDOM.render(
-                <TagButton key="button"
-                           version_id={element.dataset['versionId']}
+                <TagButton version_id={element.dataset['versionId']}
                            version_number={element.dataset['versionNumber']}
                            project_id={element.dataset['projectId']}/>,
+                element);
+        });
+        $('.moderate-button-container').each(function (idx, element) {
+            ReactDOM.render(
+                <ModerateButton project_id={element.dataset['projectId']}
+                                moderated={element.dataset['moderated']}/>,
                 element);
         });
         $('.slack-url-container').each(function (idx, element) {

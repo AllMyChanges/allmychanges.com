@@ -1,5 +1,6 @@
 var React = require('react');
-var metrika = require('./metrika.js');
+var metrika = require('../metrika.js');
+var css = require('./index.styl');
 
 module.exports = React.createClass({
     getInitialState: function () {
@@ -62,7 +63,7 @@ module.exports = React.createClass({
 
         if (this.state.tracked) {
             return (<div className="track-button">
-                      <button className="button _bad"
+                      <button className="button"
                               onClick={this.untrack}
                               title="Click to unsubscribe from this package.">Unfollow</button>
                       {popup}

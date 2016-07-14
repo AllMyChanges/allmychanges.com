@@ -951,8 +951,20 @@ a:hover {
   line-height: 16px;
   margin-bottom: 16px;
 }
-.rst-content .literal-block .last,
-.rst-content pre.literal-block .last,
+.rst-content .literal-block,
+.rst-content pre.literal-block,
+.rst-content .admonition {
+  margin: 20px 0px;
+  padding: 10px 30px;
+  background-color: #fcc;
+  border: 1px solid #faa;
+}
+.rst-content .literal-block .note,
+.rst-content pre.literal-block .note,
+.rst-content .admonition .note {
+  background-color: #eee;
+  border: 1px solid #ccc;
+}
 .rst-content .note .last,
 .rst-content .attention .last,
 .rst-content .caution .last,
@@ -1535,11 +1547,15 @@ a .rst-content code {
   z-index: 50000;
 }
 .notifications__item {
-  padding: 5px 10px 5px 100px;
+  padding: 5px 10px 5px 10px;
+  margin-right: 150px;
+  margin-left: 90px;
 }
 @media (max-width: 600px) {
   .notifications__item {
     padding: 5px 10px 5px 10px;
+    margin-right: 50px;
+    margin-left: 0px;
   }
 }
 .notifications a {
@@ -1801,23 +1817,6 @@ a .rst-content code {
 }
 .synonyms-list {
   list-style-position: inside;
-}
-.track-button {
-  position: relative;
-  display: inline-block;
-  margin-right: 15px;
-}
-.track-button-container {
-  display: inline-block;
-}
-.track-button__message {
-  width: 400px;
-  position: absolute;
-  top: -16px;
-  left: 70px;
-  font-size: 16px;
-  color: #777;
-  font: proxima-nova, sans-serif;
 }
 .tweet-button {
   display: inline-block;

@@ -1031,8 +1031,20 @@ a:hover {
   line-height: 16px;
   margin-bottom: 16px;
 }
-.rst-content .literal-block .last,
-.rst-content pre.literal-block .last,
+.rst-content .literal-block,
+.rst-content pre.literal-block,
+.rst-content .admonition {
+  margin: 20px 0px;
+  padding: 10px 30px;
+  background-color: #fcc;
+  border: 1px solid #faa;
+}
+.rst-content .literal-block .note,
+.rst-content pre.literal-block .note,
+.rst-content .admonition .note {
+  background-color: #eee;
+  border: 1px solid #ccc;
+}
 .rst-content .note .last,
 .rst-content .attention .last,
 .rst-content .caution .last,

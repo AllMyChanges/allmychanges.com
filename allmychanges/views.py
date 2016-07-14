@@ -516,9 +516,12 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
             **params)
 
         already_tracked = False
+        already_moderated = False
+
         if user.is_authenticated():
             login_to_track = False
             already_tracked = user.does_track(changelog)
+            already_moderated = changelog.is_moderator(user)
 
             show_not_tuned_warning(self.request)
 
@@ -527,7 +530,6 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
             tags = list(user.tags.filter(changelog=changelog).exclude(version=None))
         else:
             login_to_track = True
-            already_tracked = False
             tags = []
 
         key = 'project-view:{0}'.format(changelog.id)
@@ -553,6 +555,7 @@ class ProjectView(CommonContextMixin, LastModifiedMixin, TemplateView):
         result['package'] = package_data
         result['login_to_track'] = login_to_track
         result['already_tracked'] = already_tracked
+        result['already_moderated'] = already_moderated
         result['issues'] = changelog.issues.filter(resolved_at=None)
         result['num_trackers'] = changelog.trackers.count()
         result['trackers'] = list(changelog.trackers.all())
