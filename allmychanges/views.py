@@ -1521,6 +1521,9 @@ class IssuesFilterForm(forms.Form):
     username = forms.CharField(required=False)
     from_user = forms.BooleanField(required=False)
     order = forms.CharField(required=False)
+    # show not only issues on moderated projects,
+    # but all
+    all = forms.BooleanField(required=False)
 
 
 class IssuesView(CommonContextMixin, TemplateView):
@@ -1535,6 +1538,12 @@ class IssuesView(CommonContextMixin, TemplateView):
 
         order_by = form.cleaned_data['order'] or '-importance'
         queryset = Issue.objects.order_by(order_by)
+
+        if not form.cleaned_data['all']:
+            # show only projects where current user is moderator
+            queryset = queryset.filter(
+                changelog__moderators=self.request.user
+            )
 
         page = form.cleaned_data['page'] or 1
         page_size = form.cleaned_data['page_size'] or 20
