@@ -26,6 +26,7 @@ from twiggy_goodies.threading import log
 from allmychanges.validators import URLValidator
 from allmychanges.downloaders.utils import normalize_url
 from allmychanges.issues import calculate_issue_importance
+from allmychanges.notifications.email import send_email
 from allmychanges.utils import (
     split_filenames,
     parse_search_list,
@@ -798,7 +799,30 @@ class Issue(models.Model):
                              else 0,
                 user=self.user,
                 light_user=self.light_user)
-        return super(Issue, self).save(*args, **kwargs)
+
+        # if id is None, then this is a new issue
+        creation = self.id is None
+        result = super(Issue, self).save(*args, **kwargs)
+
+        if creation:
+            # TODO: make this async
+
+            def send(email):
+                send_email(
+                        email,
+                        u'New issue was filed for {0}'.format(
+                            self.changelog.get_display_name()
+                        ),
+                        'new-issue.html',
+                        context=dict(issue=self),
+                        tags=['allmychanges', 'new-issue']
+                )
+
+            for moderator in self.changelog.moderators.all():
+                if moderator.email:
+                    send(moderator.email)
+
+        return result
 
     @staticmethod
     def merge(user, light_user):

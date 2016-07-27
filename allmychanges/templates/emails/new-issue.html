@@ -1,0 +1,24 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+    {% if issue.user %}
+        <p>User <a href="{% url 'user-profile' issue.user.username %}">{{ issue.user.username }}</a> reported an issue of type "{{ issue.type }}" with project <a href="{% url 'project-by-id' issue.changelog.id %}">{{ issue.changelog.get_full_name }}</a>: "{{ issue.comment }}"</p>
+    {% else %}
+        {% if issue.light_user %}
+<p>Anonymous user reported an issue of type "{{ issue.type }}" with project <a href="{% url 'project-by-id' issue.changelog.id %}">{{ issue.changelog.get_full_name }}</a>: "{{ issue.comment }}"</p>
+        {% else %}
+            <p>Automatic issue of type "{{ issue.type }}" was created for project <a href="{% url 'project-by-id' issue.changelog.id %}">{{ issue.changelog.get_full_name }}</a>: "{{ issue.comment }}"</p>
+        {% endif %}
+            {% endif %}
+
+    <p>{% blocktrans count tracker=issue.changelog.trackers|length %}This project has {num_trackers} tracker.{% plural %}This project has {num_trackers} trackers.{% blocktrans %} Probably, it is good idea <a href="{% url 'project-by-id' issue.changelog.id %}">to fix it</a>.</p>
+
+    <div class="email-note">
+      <hr/>
+      <p>Sincerely yours, change-tracking robot.</p>
+    </div>
+
+    <div class="email-unsubscribe">
+      <p>You received this email because you are a moderator of the project at allmychanges.com.</p>
+    </div>
+{% endblock %}

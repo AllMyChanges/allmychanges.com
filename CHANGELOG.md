@@ -1,3 +1,11 @@
+1.8.0 (unreleased)
+==================
+
+## Moderatorium
+
+* Users are able to become moderators of projects they are interested in.
+* Project moderator will receive email about any issues.
+
 1.7.0 (2016-07-05)
 ==================
 

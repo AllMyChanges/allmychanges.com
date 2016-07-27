@@ -1,6 +1,7 @@
 import anyjson
 import datetime
 
+from mock import patch
 from allmychanges.models import Changelog, LightModerator
 from django.test import Client
 from django.utils import timezone
@@ -116,10 +117,6 @@ def test_light_moderators_removed_after_24_hours():
     eq_(0, changelog.light_moderators.count())
 
 
-def test_moderator_receives_email_on_new_issues():
-    pass
-
-
 def test_everybody_can_become_a_moderator():
     # right now I don't want to limit users abilitites to edit
     # projects and to fix parsing problems
@@ -174,3 +171,29 @@ def test_moderator_can_give_away_the_project():
 
     # after the call, user was removed to moderators list
     eq_(False, changelog.is_moderator(art))
+
+
+def test_moderator_receives_email_on_new_issues():
+    with patch('allmychanges.models.send_email') as send_email:
+        changelog = Changelog.objects.create(
+            namespace='python',
+            name='thebot',
+            source=THEBOT_GITHUB_URL,
+        )
+
+        create_user('bob')
+        art = create_user('art')
+        # only art is a moderator
+        changelog.add_to_moderators(art)
+
+        issue = changelog.issues.create(
+            type='auto_paused',
+            comment='Some shit happened',
+        )
+        send_email.assert_called_once_with(
+            'art@example.yandex.ru',
+            'New issue was filed for python/thebot',
+            'new-issue.html',
+            context={'issue': issue},
+            tags=['allmychanges', 'new-issue'],
+        )
