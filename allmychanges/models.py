@@ -179,6 +179,9 @@ class User(AbstractBaseUser):
         default={},
         help_text='Custom fields such like "Location" or "SecondEmail".',
         blank=True)
+    karma = models.IntegerField(
+        default=0,
+        help_text='User\'s karma. Distinguishes users who made good things for the project.')
 
     objects = UserManager()
 
@@ -275,6 +278,19 @@ class User(AbstractBaseUser):
         if self.rss_hash is None:
             self.rss_hash = sha1(self.username + settings.SECRET_KEY).hexdigest()[:RSS_HASH_LENGH]
         return super(User, self).save(*args, **kwargs)
+
+
+class KarmaLog(models.Model):
+    user = models.ForeignKey(User)
+    created_at = models.DateTimeField(default=timezone.now)
+    points = models.IntegerField(
+        default=0,
+        help_text='Amount of karma points given for an action.'
+    )
+    amount = models.CharField(
+        max_length=100,
+        help_text='Why user was given these points.'
+    )
 
 
 class Subscription(models.Model):
