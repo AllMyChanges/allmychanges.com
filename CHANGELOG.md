@@ -1,3 +1,8 @@
+1.7.1 (2016-08-01)
+==================
+
+* Now namespace is normalized when new project was added to the service.
+
 1.7.0 (2016-07-05)
 ==================
 
