@@ -23,6 +23,30 @@ from allmychanges.exceptions import DownloaderWarning
 from twiggy_goodies.threading import log
 
 
+DEFAULT_UPPER_LIMIT = 100
+UPPER_LIMITS = {
+    'http://www.postgresql.org/docs/devel/static/release.html': 1000,
+    'http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
+    'https://enterprise.github.com/releases': 1000,
+    'https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
+    'https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
+    'http://www.zabbix.com': 10000,
+    'https://support.apple.com/.*': 10000,
+}
+UPPER_LIMITS = dict(
+    (re.compile('^{0}$'.format(regex)), limit)
+    for regex, limit
+    in UPPER_LIMITS.items()
+)
+
+
+def get_upper_limit_for(url):
+    for regex, limit in UPPER_LIMITS:
+        if regex.match(url):
+            return limit
+    return DEFAULT_UPPER_LIMIT
+
+
 def guess(source, discovered={}):
     with log.name_and_fields('http', source=source):
         log.info('Guessing')
@@ -84,16 +108,7 @@ def download(source,
             ignore_list = split_filenames(ignore_list)
 
         # raise RuntimeError()
-        DEFAULT_UPPER_LIMIT = 100
-        UPPER_LIMITS = {
-            'http://www.postgresql.org/docs/devel/static/release.html': 1000,
-            'http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
-            'https://enterprise.github.com/releases': 1000,
-            'https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
-            'https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
-            'http://www.zabbix.com': 10000,
-        }
-        upper_limit = UPPER_LIMITS.get(source, DEFAULT_UPPER_LIMIT)
+        upper_limit = get_upper_limit_for(source)
 
         base_path = tempfile.mkdtemp(dir=settings.TEMP_DIR)
 
