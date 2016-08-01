@@ -9,7 +9,7 @@ publish:
     repo: allmychanges.com
     tag:
       - latest
-      - 1.7.0
+      - 1.7.1
     insecure: true
     when:
       branch: master
