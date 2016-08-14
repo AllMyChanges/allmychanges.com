@@ -470,7 +470,9 @@ class Changelog(Downloadable, models.Model):
     @staticmethod
     def normalize_namespaces():
         namespaces_usage = defaultdict(int)
-        for namespace in Changelog.objects.values_list('namespace', flat=True):
+        changelogs_with_namespaces = Changelog.objects.exclude(namespace=None)
+
+        for namespace in changelogs_with_namespaces.values_list('namespace', flat=True):
             namespaces_usage[namespace] += 1
 
         def normalize(namespace):
