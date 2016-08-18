@@ -24,19 +24,19 @@ from twiggy_goodies.threading import log
 
 
 DEFAULT_UPPER_LIMIT = 100
-UPPER_LIMITS = {
-    'http://www.postgresql.org/docs/devel/static/release.html': 1000,
-    'http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/': 1000,
-    'https://enterprise.github.com/releases': 1000,
-    'https://mariadb.com/kb/en/mariadb/release-notes/': 10000,
-    'https://confluence.jetbrains.com/display/TW/ChangeLog': 1000,
-    'http://www.zabbix.com': 10000,
-    'https://support.apple.com/.*': 10000,
-}
-UPPER_LIMITS = dict(
+UPPER_LIMITS = (
+    ('http://www.postgresql.org/docs/devel/static/release.html', 1000),
+    ('http://changelogs.ubuntu.com/changelogs/pool/main/o/openssl/', 1000),
+    ('https://enterprise.github.com/releases', 1000),
+    ('https://mariadb.com/kb/en/mariadb/release-notes/', 10000),
+    ('https://confluence.jetbrains.com/display/TW/ChangeLog', 1000),
+    ('http://www.zabbix.com', 10000),
+    ('https://support.apple.com/.*', 10000),
+)
+UPPER_LIMITS = tuple(
     (re.compile('^{0}$'.format(regex)), limit)
     for regex, limit
-    in UPPER_LIMITS.items()
+    in UPPER_LIMITS
 )
 
 
