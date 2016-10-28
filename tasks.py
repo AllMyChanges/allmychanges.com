@@ -289,10 +289,10 @@ def dbshell():
 
 
 @task(start_databases)
-def test(case='', failed=False, verbose=False, attr=None):
+def test(case='', failed=False, verbose=False, pdb=False, attr=None):
     command = ['/env/bin/nosetests']
 
-    for name in ('verbose', 'failed'):
+    for name in ('verbose', 'failed', 'pdb'):
         if locals().get(name):
             command.append('--' + name)
 

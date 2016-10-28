@@ -820,7 +820,7 @@ class Issue(models.Model):
         creation = self.id is None
         result = super(Issue, self).save(*args, **kwargs)
 
-        if creation:
+        if creation and self.changelog:
             # TODO: make this async
 
             def send(email):
