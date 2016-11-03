@@ -52,3 +52,4 @@ nosetests.xml
 /env-to-remove/
 .tern-port
 /.env-debug-amch-client
+/emails/*.html

@@ -1,0 +1,36 @@
+{% extends "emails/base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h1>{% blocktrans count counter=issues_count %}There is {{ issues_count }} issue in project you moderate at AllMyChanges.{% plural %}There are {{ issues_count }} issues in projects you moderate at AllMyChanges.{% endblocktrans %}</h1>
+
+    <ul class="issues-digest-details">
+      {% for item in data %}
+      <li class="issues-digest-details__changelog">
+        <h2>{{ item.changelog.get_display_name }}</h2>
+        <ul class="changelog-issues">
+          {% for issue in item.issues %}
+          <li class="changelog-issues__issue">
+            <h3><a href="{% url 'issue-detail' pk=issue.pk %}">{{ issue.type }}</a> – {{ issue.comment }}</h3>
+            {% if issue.user %}
+              <p>Reported by: {{ issue.user }}</p>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="email-note">
+      <hr/>
+      <p>Sincerely yours, change-tracking robot.</p>
+    </div>
+
+    <div class="email-unsubscribe">
+      <p>You received this email because you (or somebody else) subscribed to
+        allmychanges.com digests. If you would like to unsubscribe or
+        manage your subscription's settings, please <a href="{% url "account-settings" %}">follow this link</a>.
+      </p>
+    </div>
+{% endblock %}
