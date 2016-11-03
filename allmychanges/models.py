@@ -10,6 +10,7 @@ import jsonfield
 import logging
 import urllib
 
+from collections import defaultdict
 from magic_repr import make_repr
 from hashlib import md5, sha1
 from django.db import models
@@ -474,6 +475,66 @@ class Changelog(Downloadable, models.Model):
                 name = '{0}{1}'.format(base_name, counter)
         return name
 
+    @staticmethod
+    def get_all_namespaces(like=None):
+        queryset = Changelog.objects.all()
+        if like is not None:
+            queryset = queryset.filter(
+                namespace__iexact=like
+            )
+        return list(queryset.values_list('namespace', flat=True).distinct())
+
+    @staticmethod
+    def normalize_namespaces():
+        namespaces_usage = defaultdict(int)
+        changelogs_with_namespaces = Changelog.objects.exclude(namespace=None)
+
+        for namespace in changelogs_with_namespaces.values_list('namespace', flat=True):
+            namespaces_usage[namespace] += 1
+
+        def normalize(namespace):
+            lowercased = namespace.lower()
+            # here we process only capitalized namespaces
+            if namespace == lowercased:
+                return
+
+            # if there lowercased is not used at all
+            if lowercased not in namespaces_usage:
+                return
+
+            lowercased_count = namespaces_usage[lowercased]
+            this_count = namespaces_usage[namespace]
+
+            if lowercased_count >= this_count:
+                # if num of occurences is equal,
+                # prefer lowercased name
+                Changelog.objects.filter(
+                    namespace=namespace).update(
+                        namespace=lowercased)
+            else:
+                Changelog.objects.filter(
+                    namespace=lowercased).update(
+                        namespace=namespace)
+
+            del namespaces_usage[namespace]
+            del namespaces_usage[lowercased]
+
+        all_namespaces = namespaces_usage.keys()
+        all_namespaces.sort()
+
+        for namespace in all_namespaces:
+            normalize(namespace)
+
+
+    def save(self, *args, **kwargs):
+        if self.id is None:
+            # than objects just created and this is good
+            # time to fix it's namespace
+            existing_namespaces = Changelog.get_all_namespaces(like=self.namespace)
+            if existing_namespaces:
+                self.namespace = existing_namespaces[0]
+
+        return super(Changelog, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('project',
