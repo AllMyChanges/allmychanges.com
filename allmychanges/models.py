@@ -884,12 +884,18 @@ class Issue(models.Model):
         if creation and self.changelog:
             # TODO: make this async
 
-            def send(email):
+            def send(username, email):
+                subject = u'New issue was filed for {0}'.format(
+                    self.changelog.get_display_name()
+                )
+                in_beta = True
+                if in_beta:
+                    email = 'svetlyak.40wt+amch-issue@gmail.com'
+                    subject = subject + ' (for ' + username + ')'
+
                 send_email(
                         email,
-                        u'New issue was filed for {0}'.format(
-                            self.changelog.get_display_name()
-                        ),
+                        subject,
                         'new-issue.html',
                         context=dict(issue=self),
                         tags=['allmychanges', 'new-issue']
@@ -897,7 +903,7 @@ class Issue(models.Model):
 
             for moderator in self.changelog.moderators.all():
                 if moderator.email:
-                    send(moderator.email)
+                    send(moderator.username, moderator.email)
 
         return result
 
