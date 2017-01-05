@@ -3,6 +3,7 @@
 import os
 import re
 import time
+import socket
 
 from invoke import task, run
 #invoke.tasks.Task
@@ -200,13 +201,32 @@ def build_image(dev=True):
     print 'Built', tag
 
 
+def probe_port(host, port):
+    """Проверяет, доступен ли порт на хосту.
+    """
+    s = socket.socket()
+    try:
+        s.connect((host, port))
+    except:
+        return False
+    else:
+        return True
+
+
 @task
 def push_image():
-    tag = 'registry.40ants.com:5000/allmychanges.com:' + get_current_version()
-#    tag = '127.0.0.1:5000/allmychanges.com:' + get_current_version()
-    run('docker build -t {} .'.format(tag))
-    run('docker push ' + tag)
-    print 'Pushed', tag
+    # так как до registry мы поднимаем тоннель, то фактически он
+    # должен быть поднят на локальном порту
+    # проверим что это так
+    if probe_port('localhost', 5000):
+        tag = 'registry.40ants.com:5000/allmychanges.com:' + get_current_version()
+        #tag = '127.0.0.1:5000/allmychanges.com:' + get_current_version()
+        print tag
+        # run('docker build -t {} .'.format(tag))
+        run('docker push ' + tag)
+        print 'Pushed', tag
+    else:
+        print 'Please, run "ssh registry" to open ssh tunnel'
 
 
 

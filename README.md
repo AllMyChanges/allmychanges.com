@@ -1,6 +1,14 @@
 allmychanges.com
 ================
 
+Деплой в прод
+-------------
+
+```
+cd ~/projects/ansible
+ansible-playbook -e allmychanges_version=1.8.0-rc1 allmychanges-deploy-new-version.yml
+```
+
 Развертывание dev-окружения
 ---------------------------
 
