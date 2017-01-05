@@ -34,22 +34,23 @@ def send_digest_to(user, debug=False):
     total, data = prepare_digest_for(user)
     subject = 'There are some issues at AllMyChanges'
 
-    in_beta = True
-    if in_beta:
-        email = 'svetlyak.40wt+issue-digests@gmail.com'
-        subject = subject + ' (for ' + user.username + ')'
-    else:
-        email = user.email
+    if data:
+        in_beta = True
+        if in_beta:
+            email = 'svetlyak.40wt+issue-digests@gmail.com'
+            subject = subject + ' (for ' + user.username + ')'
+        else:
+            email = user.email
 
-    send_email(email,
-               subject,
-               'issues-digest.html',
-               context=dict(
-                   issues_count=total,
-                   data=data,
-               ),
-               tags=['allmychanges', 'issues-digest'],
-               debug=debug)
+        send_email(email,
+                   subject,
+                   'issues-digest.html',
+                   context=dict(
+                       issues_count=total,
+                       data=data,
+                   ),
+                   tags=['allmychanges', 'issues-digest'],
+                   debug=debug)
 
 
 class Command(LogMixin, BaseCommand):
