@@ -215,18 +215,13 @@ def probe_port(host, port):
 
 @task
 def push_image():
-    # так как до registry мы поднимаем тоннель, то фактически он
-    # должен быть поднят на локальном порту
-    # проверим что это так
-    if probe_port('localhost', 5000):
-        tag = 'registry.40ants.com:5000/allmychanges.com:' + get_current_version()
-        #tag = '127.0.0.1:5000/allmychanges.com:' + get_current_version()
-        print tag
-        # run('docker build -t {} .'.format(tag))
-        run('docker push ' + tag)
-        print 'Pushed', tag
-    else:
-        print 'Please, run "ssh registry" to open ssh tunnel'
+    # в registry сначала надо постучать, чтобы он открыл порт
+    run('knock -d 300 registry.40ants.com 16890 14324 51894 2356 45522')
+    tag = 'registry.40ants.com:5000/allmychanges.com:' + get_current_version()
+    print tag
+    run('docker build -t {} .'.format(tag))
+    run('docker push ' + tag)
+    print 'Pushed', tag
 
 
 

@@ -687,10 +687,6 @@ class Changelog(Downloadable, models.Model):
         # limit upper bound
         return timezone.now() + datetime.timedelta(0, time_to_next_update)
 
-    def calc_next_update_if_error(self):
-        # TODO: check and remove
-        return timezone.now() + datetime.timedelta(0, 1 * 60 * 60)
-
     def schedule_update(self, async=True, full=False):
         with log.fields(changelog_name=self.name,
                         changelog_namespace=self.namespace,
