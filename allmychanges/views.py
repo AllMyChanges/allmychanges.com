@@ -1526,7 +1526,7 @@ class IssuesFilterForm(forms.Form):
     all = forms.BooleanField(required=False)
 
 
-class IssuesView(CommonContextMixin, TemplateView):
+class IssuesView(LoginRequiredMixin, CommonContextMixin, TemplateView):
     template_name = 'allmychanges/issues.html'
 
     def get_context_data(self, **kwargs):
