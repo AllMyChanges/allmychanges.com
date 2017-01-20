@@ -1,4 +1,5 @@
 # coding: utf-8
+import os
 import times
 import logging
 
@@ -74,7 +75,8 @@ def send_digest_to(user, period='day'):
                        'digest.html',
                        context=dict(current_user=user,
                                     today_changes=today_changes),
-                       tags=['allmychanges', 'digest'])
+                       tags=['allmychanges', 'digest'],
+                       debug=os.environ.get('DEBUG'))
 
         send_to(user.email)
         mark_digest_sent_for(user)
