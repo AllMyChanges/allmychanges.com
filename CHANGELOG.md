@@ -1,10 +1,14 @@
-1.8.0-rc1 (unreleased)
+1.8.0-rc5 (unreleased)
 ======================
 
 ## Moderatorium
 
 * Users are able to become moderators of projects they are interested in.
 * Project moderator will receive email about any issues.
+
+## Other fixes
+
+* Fixed error prevented digest sending when there is a package with unicode name in the list.
 
 1.7.1 (2016-08-01)
 ==================

@@ -45,7 +45,7 @@ def send_digest_to(user, period='day'):
             project['user_tags'] = tags.get(changelog_id, [])
 
             # output their names to make cron send email what it sent to users
-            print '\t{namespace}/{name}'.format(**project)
+            print u'\t{namespace}/{name}'.format(**project).encode('utf-8')
             for version in project['versions']:
                 print '\t\tversion={number}, date={date}, discovered_at={discovered_at}'.format(
                     **version)
