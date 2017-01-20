@@ -85,7 +85,13 @@ class Command(LogMixin, BaseCommand):
     help = u"""Prepares and sends digests to all users."""
     period = 'day'
 
-    def handle(self, *args, **options):
+    def add_arguments(self, parser):
+        # Positional arguments
+        # More documentation is available here:
+        # https://docs.djangoproject.com/en/1.9/howto/custom-management-commands/#accepting-optional-arguments
+        parser.add_argument('nickname', nargs='*')
+
+    def handle(self, nickname=[], *args, **options):
         # this will disable cssutil's logger
         cssutils_logger = logging.getLogger('CSSUTILS')
         cssutils_logger.level = logging.ERROR
@@ -99,9 +105,9 @@ class Command(LogMixin, BaseCommand):
 
         users = get_user_model().objects.exclude(email='')
 
-        if args:
-            if args[0] != 'all':
-                users = users.filter(username__in=args)
+        if nickname:
+            if nickname[0] != 'all':
+                users = users.filter(username__in=nickname)
         else:
             users = users.filter(timezone__in=send_for_timezones)
 
