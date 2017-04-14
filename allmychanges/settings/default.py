@@ -319,8 +319,7 @@ def init_logging(filename, logstash=False):
         add_emitters(('all-to-logstash',
                       levels.DEBUG,
                       lambda msg: not is_stats(msg),
-                      # candidus
-                      LogstashOutput('95.213.191.176', 6543)))
+                      LogstashOutput('opilio.machines.40ants.com', 6543)))
 
     add_emitters(('stats',
                  levels.DEBUG,
