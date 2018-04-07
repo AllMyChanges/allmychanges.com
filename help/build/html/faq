@@ -102,9 +102,7 @@ from original source.</p>
 </div>
 <div class="section" id="are-there-any-recommendations-how-to-write-good-release-notes">
 <h2>Are there any recommendations how to write good release notes?<a class="headerlink" href="#are-there-any-recommendations-how-to-write-good-release-notes" title="Permalink to this headline">¶</a></h2>
-<p>There is a good description at <a class="reference external" href="http://keepachangelog.com">KeepAChangelog</a> site.
-Also, there is a <a class="reference external" href="http://www.semanticreleasenotes.org">SemanticReleaseNotes</a> proposal which
-is aimed to provide us with a new textual format for release notes.</p>
+<p>There is a good description at <a class="reference external" href="http://keepachangelog.com">KeepAChangelog</a> site.</p>
 </div>
 <div class="section" id="didn-t-find-answer-to-your-question-ask-it-and-we-ll-answer">
 <span id="feedback"></span><h2>Didn&#8217;t find answer to your question? Ask it and we&#8217;ll answer.<a class="headerlink" href="#didn-t-find-answer-to-your-question-ask-it-and-we-ll-answer" title="Permalink to this headline">¶</a></h2>
