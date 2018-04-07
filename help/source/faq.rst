@@ -127,8 +127,6 @@ Are there any recommendations how to write good release notes?
 ==============================================================
 
 There is a good description at `KeepAChangelog <http://keepachangelog.com>`_ site.
-Also, there is a `SemanticReleaseNotes <http://www.semanticreleasenotes.org>`_ proposal which
-is aimed to provide us with a new textual format for release notes.
 
 
 .. _feedback:

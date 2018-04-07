@@ -266,3 +266,16 @@ inv test
 ```
 inv test --failed
 ```
+
+
+Как получить новый сертификат
+-----------------------------
+
+```
+ssh tuna
+cd www
+sudo docker stop allmychanges_proxy
+sudo certbot certonly --config-dir=config-dir --work-dir=work-dir --logs-dir=logs-dir --standalone -d allmychanges.com
+sudo bash -c 'cat config-dir/live/allmychanges.com/fullchain.pem config-dir/live/allmychanges.com/privkey.pem > /opt/haproxy/allmychanges.com.pem'
+sudo docker start allmychanges_proxy
+```
