@@ -25,7 +25,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('MYSQL_DATABASE', 'allmychanges_' + CURRENT_USER.replace('-', '_')),
         'USER': os.environ.get('MYSQL_USER', 'allmychanges'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'allmychanges'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
         'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
         'PORT': int(os.environ.get('MYSQL_PORT', 3306)),
         'OPTIONS': {'connect_timeout': 3},
@@ -228,14 +228,14 @@ EMAIL_BACKEND = 'django_sendmail_backend.backends.EmailBackend'
 # how to get a token:
 # http --auth svetlyak40wt https://api.github.com/authorizations scopes:='["public_repo"]' note="Background allmychanges process." client_id="f1106b299e606f5ae13c" client_secret="xxx"
 # copy client_secret from https://github.com/settings/applications/91994
-GITHUB_TOKEN = '6d7d8605f0d53f29b6e049267e8bcbc80577b27f'
+GITHUB_TOKEN = ''
 SLACK_URLS = {
-    'default': 'https://hooks.slack.com/services/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'
+    'default': ''
 }
-CLOSEIO_KEY = '34c5992096c7f67bd5d22f24e4e87a5837f58af5f326f2cdfda932d4'
-MANDRILL_KEY = 'g3pUEIJTBEd6KGeWkKihgQ'
+CLOSEIO_KEY = ''
+MANDRILL_KEY = ''
 # AllMyChangesBot
-TELEGRAM_BOT_BASE_URL = 'https://api.telegram.org/bot99002009:AAF2epqrBGImWKPANN1GWTnUsI0fxIUpTI0/'
+TELEGRAM_BOT_BASE_URL = ''
 
 
 # these are used to post tweets about new versions
