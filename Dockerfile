@@ -1,22 +1,22 @@
-FROM python:2-alpine3.11
+FROM python:2-slim
 LABEL MAINTAINER="Alexander Artemenko <svetlyak.40wt@gmail.com>"
 
-# libmysqlclient-dev replaced by mariadb-dev
-# removed python-virtualenv
-#TODO: python-qt4 for makescreenshot (546ce6c4b25e84fed70732669d00aa9ac1c372d8)
-# gcc for cffi
-# musl-dev for https://stackoverflow.com/a/30873179/5155484
-RUN apk add --no-cache \
-            openssl-dev \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y \
+            build-essential \
+            python-dev \
+            python-virtualenv \
+            libssl-dev \
             libxml2-dev \
-            libxslt-dev \
-            mysql-client \
-            mariadb-dev \
+            libxslt1-dev \
+            mariadb-client \
+            default-libmysqlclient-dev \
             libffi-dev \
-            musl-dev \
             git \
             mercurial \
-            gcc \
+            python-qt4 \
             xvfb
 
 #COPY ./wheelhouse /wheelhouse
