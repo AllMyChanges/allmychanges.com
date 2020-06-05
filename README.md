@@ -21,12 +21,7 @@ First you need to install the docker client and docker-machine via [homebrew][]:
 $ brew install docker docker-machine
 ```
 
-If you have not yet installed VirtualBox, then you need to install it either manually,
-either via [brew cask][cask]:
-
-```bash
-$ brew cask install virtualbox
-```
+If you have not yet installed VirtualBox, then you need to install it.
 
 Next, create a virtual machine in which docker will run:
 
@@ -58,21 +53,33 @@ In any case, you need to check if the docker client works:
 
 ```bash
 $ docker version
-Client:
-Version:      1.9.1
-API version:  1.21
-Go version:   go1.5.1
-Git commit:   a34a1d5
-Built:        Sat Nov 21 00:49:19 UTC 2015
-OS/Arch:      darwin/amd64
+Client: Docker Engine - Community
+ Version:           19.03.6
+ API version:       1.40
+ Go version:        go1.12.16
+ Git commit:        369ce74a3c
+ Built:             Thu Feb 13 01:27:49 2020
+ OS/Arch:           linux/amd64
+ Experimental:      false
 
-Server:
-Version:      1.9.1
-API version:  1.21
-Go version:   go1.4.3
-Git commit:   a34a1d5
-Built:        Fri Nov 20 17:56:04 UTC 2015
-OS/Arch:      linux/amd64
+Server: Docker Engine - Community
+ Engine:
+  Version:          19.03.6
+  API version:      1.40 (minimum version 1.12)
+  Go version:       go1.12.16
+  Git commit:       369ce74a3c
+  Built:            Thu Feb 13 01:26:23 2020
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.2.13
+  GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
+ runc:
+  Version:          1.0.0-rc10
+  GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+ docker-init:
+  Version:          0.18.0
+  GitCommit:        fec3683
 ```
 
 If the client does not find the server, then instead of information about the server, it will display something
@@ -147,7 +154,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 06aa8ed1bea8        mysql               "/entrypoint.sh mysql"   10 minutes ago      Up 15 seconds       3306/tcp            mysql.allmychanges.com
 ```
 
-Now we need to roll migration
+Now we need to run migrations
 -----------------------------
 
 To do this, somehow run `./manage.py` migrate inside the container with the code
@@ -225,9 +232,8 @@ inv restore-db
 **Warning** previous data will be erased.
 
 
-[homebrew]: http://brew.sh
-[cask]: http://caskroom.io
-[autoenv]: https://github.com/kennethreitz/autoenv
+[homebrew]: https://brew.sh
+[autoenv]: https://github.com/inishchith/autoenv
 
 
 How to create and run migrations
