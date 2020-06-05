@@ -214,7 +214,7 @@ def probe_port(host, port):
 
 
 @task
-def push_image():
+def docker_push():
     # в registry сначала надо постучать, чтобы он открыл порт
     # run('knock -d 300 registry.40ants.com 16890 14324 51894 2356 45522')
     #tag = 'registry.40ants.com:5000/allmychanges.com:' + get_current_version()
