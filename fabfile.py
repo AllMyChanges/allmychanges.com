@@ -7,11 +7,6 @@ import re
 from fabric.api import local
 
 
-def update_requirements():
-    local('pip-compile --annotate requirements.in')
-    local('pip-compile --annotate requirements-dev.in')
-
-
 def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
     command = ['docker run',]
 
@@ -46,10 +41,6 @@ def _get_docker_command(name, ports=[], image=None, rm=True, debug=True):
 
     command = ' '.join(command)
     return command + ' '
-
-
-def compile_wheels():
-    local('docker run --rm -v `pwd`:/wheels wheel-builder -r requirements-dev.txt')
 
 
 def build_docker_image(version):
@@ -121,10 +112,6 @@ def bash(args=''):
 
 def tail_errors():
     local("tail -f logs/django-root.log | jq 'if (.[\"@fields\"].level == \"WARNING\" or .[\"@fields\"].level == \"ERROR\") then . else 0 end | objects'")
-
-def watch_on_static():
-    local('node_modules/.bin/gulp')
-
 
 def manage(args=''):
     if len(args) < 40:
@@ -222,26 +209,3 @@ def _get_docker_containers():
     containers = cl.containers(all=True)
     containers = [c['Names'][0].strip('/') for c in containers]
     return containers
-
-
-def versioneye():
-    import requests
-
-    API_KEY = '6456641e554ff23dcdc8'
-    VERSIONEYE_SERVER = 'https://www.versioneye.com'
-    PRJ_REQUIREMENTS_TXT = (
-        ('56506b4253ef5f000c000c71', 'requirements.txt'),
-        ('56506bdcd91d82000a000e0c', 'package.json'),)
-
-    for project, filename in PRJ_REQUIREMENTS_TXT:
-        url = '{server}/api/v2/projects/{project}?api_key={key}'.format(
-            server=VERSIONEYE_SERVER,
-            project=project,
-            key=API_KEY)
-
-        response = requests.post(
-            url,
-#            data=dict(name='project_file'),
-            files=dict(project_file=open(filename, 'rb')))
-
-        assert response.status_code == 201

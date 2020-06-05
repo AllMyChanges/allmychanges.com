@@ -57,3 +57,7 @@ push_image:
 	docker build ./ -t ${TAG}
 	docker push ${TAG}
 	@echo "Pushed ${TAG}"
+
+update_requirements:
+	pip-compile --annotate requirements.in
+	pip-compile --annotate requirements-dev.in
