@@ -1,23 +1,22 @@
-FROM ubuntu:14.04
+FROM python:2-alpine3.11
 LABEL MAINTAINER="Alexander Artemenko <svetlyak.40wt@gmail.com>"
 
-# Prepare
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && \
-    apt-get install -y \
-            build-essential \
-            python-dev \
-            python-virtualenv \
-            libssl-dev \
+# libmysqlclient-dev replaced by mariadb-dev
+# removed python-virtualenv
+#TODO: python-qt4 for makescreenshot (546ce6c4b25e84fed70732669d00aa9ac1c372d8)
+# gcc for cffi
+# musl-dev for https://stackoverflow.com/a/30873179/5155484
+RUN apk add --no-cache \
+            openssl-dev \
             libxml2-dev \
-            libxslt1-dev \
-            mysql-client-core-5.5 \
-            libmysqlclient-dev \
+            libxslt-dev \
+            mysql-client \
+            mariadb-dev \
             libffi-dev \
+            musl-dev \
             git \
             mercurial \
-            python-qt4 \
+            gcc \
             xvfb
 
 #COPY ./wheelhouse /wheelhouse
