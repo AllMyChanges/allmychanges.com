@@ -29,8 +29,7 @@ bleach
 django-compressor
 sortedcontainers
 plumbum
-ndg-httpsclient
-pyOpenSSL
+# ndg-httpsclient
 orderedset
 
 # чтобы показывать прогресс-бары в консольных утилитках
@@ -38,7 +37,7 @@ clint
 # чтобы собирать статистику по производительности
 newrelic
 
-MySQL-python
+mysqlclient
 # начиная с версии 0.10 oauth-toolkit не поддерживает Django 1.6
 django-oauth-toolkit
 django-markdown2
