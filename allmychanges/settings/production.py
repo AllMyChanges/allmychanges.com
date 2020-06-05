@@ -24,14 +24,9 @@ METRIKA_ID = '22434466'
 ANALYTICS_ID = 'UA-49927178-1'
 
 SLACK_URLS = {
-    'default': 'https://hooks.slack.com/services/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',
-    'tasks': 'https://hooks.slack.com/services/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',
 }
 
-TWITTER_CREDS = ('WjfgjgXOwgj2vjUrDYvebI91x',
-                 'iyIGDiLzfFGDr0Kg0yF5x4gAt4zzgi3IjHEpTvoxs6pSeRSgSn',
-                 '3260477051-94dnqE4lm3rx3PLqPhEbjR8SipmRMgcf8s5Pshd',
-                 'di7AAGhtFT2PuCgztxqC3hLP6QcDIIHq2e9flRpUemVSw')
+TWITTER_CREDS = ()
 
 LOG_FILENAME = '/var/log/allmychanges/django.log'
 try:
