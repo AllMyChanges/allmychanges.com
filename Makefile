@@ -61,3 +61,10 @@ push_image:
 update_requirements:
 	pip-compile --annotate requirements.in
 	pip-compile --annotate requirements-dev.in
+
+SERVER_PORT=80
+run_server:
+	python ./manage.py runserver 0.0.0.0:${SERVER_PORT}
+
+migrate:
+	python ./manage.py migrate
