@@ -1,3 +1,5 @@
+.PHONY: all build_static get_latest_db restore_db backup_dev_db create_postgres drop_postgres connect_to_postgres create_database drop_database dbshell push_to_amch build_wheels build_image push_image migrate
+
 CURRENT_VERSION = `cat CURRENT_VERSION`
 
 all:
