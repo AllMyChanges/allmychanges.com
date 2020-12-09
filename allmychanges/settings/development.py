@@ -27,7 +27,9 @@ if not os.path.exists(TEMP_DIR):
 ALLOWED_HOSTS = ['localhost',
                  'art.dev.allmychanges.com',
                  'skate.svetlyak.ru',
-                 'dev.allmychanges.com']
+                 'dev.allmychanges.com',
+                 'allmychanges.localhost',
+                ]
 
 BASE_URL = 'http://dev.allmychanges.com'
 

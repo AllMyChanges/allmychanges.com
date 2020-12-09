@@ -1,0 +1,70 @@
+version: "3"
+services:
+  redis:
+    image: redis:latest
+    dns_search: amch.local
+    hostname: redis.amch.local
+    domainname: amch.local
+    restart: on-failure:2
+    networks:
+      amch-local:
+        aliases:
+          - redis.amch.local
+
+  mariadb:
+    image: mariadb:10.4
+    dns_search: amch.local
+    hostname: mariadb.amch.local
+    domainname: amch.local
+    restart: on-failure:2
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-upublic", "-ppublic"]
+      interval: 120s
+      timeout: 1s
+      retries: 3
+    networks:
+      amch-local:
+        aliases:
+          - mariadb.amch.local
+    volumes:
+      - "${AMCH_MYSQL_VOLUME:-amch_mariadb_data}:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=allmychanges
+      - MYSQL_USER=allmychanges-user
+      - MYSQL_PASSWORD=allmychanges-password
+
+  amch-web:
+    depends_on:
+      - mariadb
+      - redis
+    build: ./
+    container_name: amch-web
+    dns_search: amch.local
+    hostname: amch-web.amch.local
+    domainname: amch.local
+    restart: on-failure:2
+    command: tail -f /dev/null
+    working_dir: /app
+    networks:
+      amch-local:
+        aliases:
+          - amch-web.amch.local
+    volumes:
+      - ./:/app
+    environment:
+      - REDIS_HOST=redis.amch.local
+      - MYSQL_HOST=mariadb.amch.local
+      - MYSQL_DATABASE=allmychanges
+      - MYSQL_USER=allmychanges-user
+      - MYSQL_PASSWORD=allmychanges-password
+    ports:
+      - "1080:80"
+
+networks:
+  amch-local:
+    driver: bridge
+
+volumes:
+  amch_mariadb_data:
+    driver: local

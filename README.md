@@ -1,47 +1,41 @@
-allmychanges.com
-================
+# allmychanges.com
 
-Развертывание dev-окружения
----------------------------
 
-В девеловерской среде всё разворачивается в отдельных docker-контейнерах.
-В них надо поднять mysql, redis и в отдельных контейнерах будут стартовать
-все management команды типа runserver. Отличие от продакшн-окружения только
-в том, что в деве внтурь докер-контейнера пробрасывается всё дерево с
-исходниками, и когда они меняются, происходит reload кода, контейнер пересобирать
-и перезапускать не надо.
+## Dev environment
 
-Если рабочая машинка с Linux, то лучше поставить docker на неё, если нет, то
-докер надо запускать в VirtualBox, дальше будет часть про то, как это сделать на OSX.
+In a development environment, everything is deployed in separate docker containers.
+In them you need to raise mysql, redis and will start in separate containers
+all management commands like runerver. The difference from the production environment is only
+in the fact that in the maiden inside the docker container the whole tree is thrown with
+source codes, and when they change, reload the code, the container is reassembled
+and do not need to restart.
 
-### Поднимаем docker на OSX
+If a working machine with Linux, then it is better to put docker on it, if not, then
+the docker must be launched in VirtualBox, the next part will be about how to do this on OSX.
 
-Сначала надо установить docker клиент и docker-machine через [homebrew][]:
+### Raise docker on OSX
 
-```
+First you need to install the docker client and docker-machine via [homebrew][]:
+
+```bash
 $ brew install docker docker-machine
 ```
 
-Если у вас ещё не установлен VirtualBox, то его нужно поставить либо вручную,
-либо через [brew cask][cask]:
+If you have not yet installed VirtualBox, then you need to install it.
 
-```
-$ brew cask install virtualbox
-```
+Next, create a virtual machine in which docker will run:
 
-Далее, создаем виртуалку, в которой будет бежать docker:
-
-```
+```bash
 $ docker-machine create --driver virtualbox amch
 ```
 
-Когда команда отработает, у вас в VirtualBox появится новая виртуалка
-с именем amch и на ней будет установлен docker.
+When the team completes, a new virtual box will appear in your VirtualBox
+with the name amch and docker will be installed on it.
 
-Чтобы работать с этим докер-демоном из консоли OSX, нужно установить
-некоторые переменные окружения. Какие? Это подскажет команда:
+To work with this docker daemon from the OSX console, you need to install
+some environment variables. What kind? This will tell the command:
 
-```
+```bash
 $ docker-machine env amch
 export DOCKER_TLS_VERIFY="1"
 export DOCKER_HOST="tcp://192.168.99.100:2376"
@@ -51,78 +45,90 @@ export DOCKER_MACHINE_NAME="amch"
 # eval "$(docker-machine env amch)"
 ```
 
-Чтобы не устанавливать их вручную, можно либо прописать `eval "$(docker-machine env amch)"`
-в `~/.bashrc`, либо использовать [autoenv][] и прописать её в файлик .env внутри репозитория
+In order not to install them manually, you can either register `eval" $(docker-machine env amch)"`
+in `~/.bashrc`, or use [autoenv][] and write it to the .env file inside the repository
 AllMyChanges.
 
-В любом случае, надо проверить, работает ли клиент докера:
+In any case, you need to check if the docker client works:
 
-```
+```bash
 $ docker version
-Client:
-Version:      1.9.1
-API version:  1.21
-Go version:   go1.5.1
-Git commit:   a34a1d5
-Built:        Sat Nov 21 00:49:19 UTC 2015
-OS/Arch:      darwin/amd64
+Client: Docker Engine - Community
+ Version:           19.03.6
+ API version:       1.40
+ Go version:        go1.12.16
+ Git commit:        369ce74a3c
+ Built:             Thu Feb 13 01:27:49 2020
+ OS/Arch:           linux/amd64
+ Experimental:      false
 
-Server:
-Version:      1.9.1
-API version:  1.21
-Go version:   go1.4.3
-Git commit:   a34a1d5
-Built:        Fri Nov 20 17:56:04 UTC 2015
-OS/Arch:      linux/amd64
+Server: Docker Engine - Community
+ Engine:
+  Version:          19.03.6
+  API version:      1.40 (minimum version 1.12)
+  Go version:       go1.12.16
+  Git commit:       369ce74a3c
+  Built:            Thu Feb 13 01:26:23 2020
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.2.13
+  GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
+ runc:
+  Version:          1.0.0-rc10
+  GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+ docker-init:
+  Version:          0.18.0
+  GitCommit:        fec3683
 ```
 
-Если клиент не находит сервера, то вместо информации о сервере он выведет что-то
-вроде:
+If the client does not find the server, then instead of information about the server, it will display something
+like:
 
 ```
 Cannot connect to the Docker daemon. Is the docker daemon running on this host?
 ```
 
-Проблема тут в том, что не установлены те самые переменные окружения.
+The problem here is that the same environment variables are not set.
 
-Если виртуалка не запущена, то клиент подольше потупит, и сообщение будет другое:
+If the virtual machine is not running, then the client will wait longer and the message will be different:
 
 ```
 Cannot connect to the Docker daemon. Is the docker daemon running on this host?
 ```
 
-Тогда надо стартовать виртуалку командой:
+Then you need to start the virtual machine with the command:
 
 ```
 docker-machine start amch
 ```
 
-В принципе, и эту строку можно прописать в локальный `.env` файлик для [autoenv][].
+In principle, this line can also be written into the local `.env` file for [autoenv][].
 
 
-### Стартуем mysql и redis
+### Starting mysql and redis
 
-Для старта разных команд в проекте использовался fabric, но сейчас всё
-переписывается на invoke.
+The project used fabric to start different teams, but now everything
+Corresponds to invoke.
 
-Обычно я ставлю всякие python либы и утилиты прямо внутри дерева проекта,
-с созданную через virtualenv папку `env`.
+I usually put all sorts of python libs and utilities right inside the project tree,
+with the `env` folder created through virtualenv.
 
-Создаем окружение:
+Create an environment:
 
-```
+```bash
 $ virtualenv env
 $ pip install -U pip
 $ pip install -r requirements/host.txt
 ```
 
-Окружение надо активировать:
+The environment must be activated:
 
-```
+```bash
 $ source env/bin/activate
 ```
 
-Эту команду тоже удобно добавить в `.env` файл. Только лучше добавлять как:
+This command is also convenient to add to the `.env` file. It’s only better to add as:
 
 ```
 if [ -e env ]; then
@@ -130,17 +136,17 @@ if [ -e env ]; then
 fi
 ```
 
-После активации окружения, вам должна стать доступна команда `inv`,
-которая запускает таски, описанные в `tasks.py`.
+After activating the environment, the `inv` command should be available to you,
+which runs the tasks described in `tasks.py`.
 
-Чтобы создать контейнеры с базами, запускаем:
+To create containers with databases, run:
 
-```
+```bash
 $ inv start_databases
 ```
 
-Если всё прошло как надо, то команда `docker ps` должна показать нам два запущенных
-контейнера:
+If everything went as it should, then the `docker ps` command should show us two running
+container:
 
 ```
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
@@ -148,112 +154,111 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 06aa8ed1bea8        mysql               "/entrypoint.sh mysql"   10 minutes ago      Up 15 seconds       3306/tcp            mysql.allmychanges.com
 ```
 
-Теперь надо накатить миграции
+Now we need to run migrations
 -----------------------------
 
-Для этого надо как-то запустить `./manage.py` migrate внутри контейнера с кодом
-AllMyChanges. Но контейнера у нас нет, поэтому сначала его надо построить.
+To do this, somehow run `./manage.py` migrate inside the container with the code
+AllMyChanges. But we do not have a container, so we must first build it.
 
-При сборке образа, чтобы pip быстрее отрабатывал, у нас используется
-предварительная компиляция wheels. Для этого, запустите команду:
+When assembling the image so that pip runs faster, we use
+wheels precompilation. To do this, run the command:
 
-```
+```bash
 $ inv build-wheels
 ```
 
-Затем нужно собрать docker образ:
+Then you need to build a docker image:
 
-```
+```bash
 $ inv build-image
 ```
 
-И создать базу:
+And create a base:
 
-```
+```bash
 $ inv create-database
 $ inv manage migrate
 ```
 
-Миграцию приходится запускать дважды, потому что первый раз там
-вылазит какая-то Integrity error.
+Migration has to be run twice because the first time there
+climbs out some Integrity error.
 
-Осталось запустить вебсервер
+It remains to start the web server
 ----------------------------
 
-```
+```bash
 $ inv runserver
 ```
 
-И асинхронный воркер
+And asynchronous worker
 --------------------
 
-```
+```bash
 $ inv rqworker
 ```
 
-Да открыть в браузере результат
+Yes, open the result in a browser
 -------------------------------
 
-Для того, чтобы посмотреть, что там поднялось в докере, надо получить адрес
-виртуалки:
+In order to see what went up in the docker, you need to get the address
+virtual computers:
 
 ```
 $ docker-machine ip amch
 192.168.99.100
 ```
 
-Этот урл надо прописать в `/etc/hosts`, добавив такую строчку:
+This url must be written in `/etc/hosts`, adding the following line:
 
 ```
 192.168.99.100 dev.allmychanges.com
 ```
 
-После этого можно открыть в браузере <http://dev.allmychanges.com> и покажется
-интерфейс AllMyChanges.
+After that, you can open <http://dev.allmychanges.com> in your browser and it will appear
+AllMyChanges interface.
 
 
-Как получить данные с продакшена и налить локальную базу
+How to get data from production and pour local database
 --------------------------------------------------------
 
-Если есть дамп базы с продакшена, то залить его в локальную базу легко и просто.
-Достаточно положить дамп в директорию dumps, так, чтобы имя файло было
-`dumps/latest.tar.bz2` и после этого надо запустить команду:
+If there is a database dump from production, then uploading it to the local database is easy and simple.
+It is enough to put the dump in the dumps directory, so that the file name is
+`dumps/latest.tar.bz2` and after that you need to run the command:
 
 ```
 inv restore-db
 ```
 
-**Внимание** предыдущие данные будут при этом затерты.
+**Warning** previous data will be erased.
 
 
-[homebrew]: http://brew.sh
-[cask]: http://caskroom.io
-[autoenv]: https://github.com/kennethreitz/autoenv
+[homebrew]: https://brew.sh
+[autoenv]: https://github.com/inishchith/autoenv
 
 
-Как создавать и накатывать миграции
+How to create and run migrations
 -----------------------------------
 
-Создавать:
+Create:
 ```
 inv manage makemigrations
 ```
 
-Накатывать:
+Run:
 ```
 inv manage migrate
 ```
 
-Как запускать тесты
+How to run tests
 -------------------
 
-Очень просто:
+Very simple:
 
 ```
 inv test
 ```
 
-Бывает так же полезно запускать не все тесты, а только сфейлившиеся:
+It is also useful to run not all tests, but only flawed ones:
 
 ```
 inv test --failed

@@ -42,7 +42,6 @@ nosetests.xml
 *.csv
 \#*
 /.hash-before-release
-/bower_components/
 /dumps/
 /fake/
 /tmp/
