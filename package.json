@@ -18,7 +18,7 @@
     "jquery": "^2.1.4",
     "jquery-sticky": "^1.0.3",
     "jquery.cookie": "^1.4.1",
-    "lodash": "^3.10.1",
+    "lodash": "^4.17.21",
     "priorityqueuejs": "^1.0.0",
     "ramda": "^0.18.0",
     "react": "^0.14.0",
