@@ -1,5 +1,13 @@
 # allmychanges.com
 
+## Project is closed!
+
+Here is the screenshot of the final email I've got from the service:
+
+![](images/allmychanges-last-email.png)
+
+If you want to resurrect AllMyChanges, please, contact me as `sasha at svetlyak.ru`.
+
 
 ## Dev environment
 
